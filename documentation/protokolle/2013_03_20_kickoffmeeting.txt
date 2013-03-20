@@ -1,0 +1,33 @@
+Kickoff Meeting vom 20. März 2013
+
+- JCD Badger VFS wird in Java implementiert
+- Projekt SVN Repository ist im SVN Repository https://code.vis.ethz.ch/project/jcd_badgers/ verfügbar
+- Workspace setup auf den Rechnern der Projektmitglieder durchgeführt. (siehe documentation/README.txt
+- Besprechen Requirements
+-- Pro VFS Core wird nur 1 File verwendet
+- Nomenklatur
+  VirtualDisk: 1 File auf Hostfilesystem, ist mit 1 Passwort verschlüsselt (optional)
+- Thomas: Wir wollen FileSystemProvider verwenden 
+
+
+Weitere Tasks
+-----------------
+
+Philipp
+- Setup Latex Dokumentation
+- Commandozeilen Befehlsspec techen
+
+Thomas
+- Abchecken FileSystemProvider API
+
+Matthias
+- Core Schnittstelle fixieren
+
+
+
+Offene Fragen 
+-------------
+Product to deliver am 8. April?
+Wird das Produkt am 8. April benotet?
+
+Philipp klärt ab bis Mo 25. März abend 

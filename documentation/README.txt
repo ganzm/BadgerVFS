@@ -16,10 +16,14 @@ Project setup
 - Get project data from SVN Repository
 - Import code style formatter
    Windows / Preferences / Java / Codestyle / Formmater / Import
-   
+- Eclipse Save-Action code formatting einricht
+- Latex
+-- TexLife Distribution
+-- TexLibs Eclipse Plugin
 
+- ArgoUML (kann svg export)
 
-
+- WindowBuilder https://developers.google.com/java-dev-tools/wbpro/
 
 
 
@@ -36,11 +40,11 @@ Variante I
 ----------
 
 - Aus Pfad "/user/home/file.txt" String wird ein Hash erstellt
-- Hash wird in b-Baum eingefügt mit referenz auf DataNode
+- Hash wird in b-Baum eingefÃ¼gt mit referenz auf DataNode
 
 - Aus Pfad "/user/home/subfolder" String wird ein Hash erstellt
-- Hash wird in b-Baum eingefügt mit referenz auf (Folder)DataNode
-- (Folder)DataNode enthält Liste mit Subfolders und enthaltenen Files
+- Hash wird in b-Baum eingefÃ¼gt mit referenz auf (Folder)DataNode
+- (Folder)DataNode enthÃ¤lt Liste mit Subfolders und enthaltenen Files
 
 Nachteil: Liste ist langsam, sollte aber nicht so tragisch sein, da wir pro Listeneintrag "nur" 8 bytes schreiben
 -> Insert in Folder mit 10'000 Files/Folder verschiebt 80kbytes
