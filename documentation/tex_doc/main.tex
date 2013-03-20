@@ -1,0 +1,120 @@
+\documentclass[
+%  draft,
+  10pt,
+  a4paper,
+  parskip,
+  titlepage,
+%  twocolumn,
+%  twoside,
+%  openright,
+%  listof=totocnumbered,
+%  bibliography=totocnumbered,		% Literaturverzeichnis im Inhaltsverzeichnis aufführen und nummerieren
+%  liststotoc,				% Verzeichnisse im Inhaltsverzeichnis aufführen
+%  idxtotoc				% Index im Inhaltsverzeichnis aufführen
+]{scrartcl}
+%]{report}
+%]{scrbook}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage[svgnames]{xcolor}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[breaklinks]{hyperref}
+\usepackage[all]{hypcap}        % jump to the start of table/figure instead to the caption of it (fix for hyperref)
+%\usepackage{url}
+\usepackage{placeins}           % for \FloatBarrier
+\usetikzlibrary{arrows,positioning,shapes} 
+\usepackage{titlepage}
+\usepackage{textcomp} % for \textgreater and \textless
+\usepackage{comment}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{chngpage}
+\usepackage{multirow}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[LO,RE]{\iffloatpage{}{Report: Analysis of a Messaging System}}
+\fancyhead[RO,LE]{\iffloatpage{}{\thepage}}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{\iffloatpage{0pt}{0.4pt}}
+
+\lstset{ %
+  basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  escapeinside={\%*}{*)},         % if you want to add a comment within your code
+  morekeywords={*,...}            % if you want to add more keywords to the set
+}
+
+
+\setcounter{tocdepth}{5}   
+\setcounter{secnumdepth}{5} 
+
+\author{Thomas Frick (LEGI)\\Matthias Ganz (LEGI)\\Philipp Rohr (04-397-030)}
+
+\makeatletter
+\AtBeginDocument{\markboth{\@author}{\@title}}   % gives access to those variables through \@author
+
+\title{Implementation of a Virtual File System}
+\date{\today}
+
+\hypersetup
+{
+  pdftitle={\@title},
+  pdfauthor={\@author},
+  pdfsubject={}
+}
+
+\clubpenalty=10000
+\widowpenalty=10000\displaywidowpenalty=10000 
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\console}[1]{\fbox{\texttt{#1}}}
+\newcommand{\file}[1]{\textsl{#1}}
+
+\newcommand{\anmerkung}[1]{\marginpar{\color{red}\footnotesize{#1}}}
+\newcommand{\todo}[1]{{\color{red}#1\index{todo!#1}}\anmerkung{{\color{red} todo}}}
+
+
+
+\setcounter{tocdepth}{2}
+\begin{document}
+\maketitle
+
+\input{res/tikzstyle}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\tableofcontents
+
+\include{abstract}
+\include{chap1}
+
+
+
+\listoffigures
+\listoftables
+
+\bibliographystyle{plain}
+\bibliography{literature}
+\end{document}
