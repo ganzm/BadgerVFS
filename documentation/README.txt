@@ -25,10 +25,6 @@ Project setup
 
 - WindowBuilder https://developers.google.com/java-dev-tools/wbpro/
 
-
-
-
-   
    
 -------------
 File Format
@@ -51,33 +47,7 @@ Nachteil: Liste ist langsam, sollte aber nicht so tragisch sein, da wir pro List
 
 Vergleich: ext4 kann 64'000 files pro Folder
 
-
-Variante II
------------
-
-- Wir unterscheiden zwischen Index-Node und Data-Node
-
-- Jeder Node im b-Baum ist ein File/Folder
-- Key ist File/Folder Name
-- Folder hat Referenz auf Parent
-
-
-
-Notizen
-
-/aux/
-/abc.txt
-/blub/
-/blub/abc.txt
-/blub/subblub/
-/blub/subblub/text.txt
-/blub/xyz.raw
-/cd/
-/cd/data.iso
-
-----------------------
-
-
+--------------------------
 
 Header
 - Info | 50 byte ASCII String
