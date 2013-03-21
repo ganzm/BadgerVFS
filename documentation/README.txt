@@ -64,9 +64,7 @@ Header
   File offset where our Data Section starts
 - SaltString | 8 bytes 
   Salt used to hash Username & password randomly string generated while creating this file
-- Username | xx bytes 
-  CryptoHash (SHA-whatever) of Username+SaltString
-- Username | xx bytes 
+- password | xx bytes 
   CryptoHash (SHA-whatever) of Password+SaltString
   
 Index Section

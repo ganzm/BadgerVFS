@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
+
 public interface VFSDiskManager {
 
 	/**
@@ -7,12 +9,12 @@ public interface VFSDiskManager {
 	 * 
 	 * releases any ressource associated with this Manager
 	 */
-	public void close();
+	public void close() throws VFSException;
 
 	/**
 	 * releases this Manager, deletes the file and any containing file
 	 */
-	public void dispose();
+	public void dispose() throws VFSException;
 
 	/**
 	 * Remaining disk space
