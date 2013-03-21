@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ public class DataSectionHandler {
 	}
 
 	public static DataSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) {
+		logger.debug("create Data Section...");
 		DataSectionHandler data = new DataSectionHandler();
 
 		data.dataSectionOffset = dataSectionOffset;
@@ -31,6 +33,20 @@ public class DataSectionHandler {
 		// init size to 0 and don't allocate any space
 		data.dataSectionSize = 0;
 
+		logger.debug("create Data Section DONE");
+		return data;
+	}
+
+	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
+		logger.debug("read Data Section...");
+		DataSectionHandler data = new DataSectionHandler();
+
+		data.dataSectionOffset = dataSectionOffset;
+
+		// init size to 0 and don't allocate any space
+		data.dataSectionSize = randomAccessFile.length() - dataSectionOffset;
+
+		logger.debug("read Data Section DONE");
 		return data;
 	}
 

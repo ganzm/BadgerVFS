@@ -17,7 +17,12 @@ public class DiskConfiguration {
 	private String encryptionAlgorithm;
 
 	private String compressionAlgorithm;
-	
+
+	@Override
+	public String toString() {
+		return " Password=* EncryptionAlgorithm=" + encryptionAlgorithm + " CompressionAlgorithm=" + compressionAlgorithm + " HostFilePath=" + hostFilePath;
+	}
+
 	public String getHostFilePath() {
 		return hostFilePath;
 	}
@@ -50,6 +55,4 @@ public class DiskConfiguration {
 		this.compressionAlgorithm = compressionAlgorithm;
 	}
 
-
-	
 }

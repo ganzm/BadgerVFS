@@ -25,6 +25,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private static Logger logger = Logger.getLogger(VFSDiskManagerImpl.class);
 
+	private final DiskConfiguration config;
+
 	/** the file we write our data to */
 	private RandomAccessFile virtualDiskFile;
 
@@ -37,8 +39,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	/**
 	 * Private constructor
 	 */
-	private VFSDiskManagerImpl() {
-
+	private VFSDiskManagerImpl(DiskConfiguration config) {
+		this.config = config;
 	}
 
 	/**
@@ -51,7 +53,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	public static VFSDiskManagerImpl create(DiskConfiguration config) throws VFSException {
 		try {
 			logger.info("Create new BadgerVFS Disk on " + config.getHostFilePath());
-			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl();
+			logger.debug("Using Config " + config.toString());
+			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
 			if (file.exists()) {
@@ -61,10 +64,12 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
 
 			long headerSectionOffset = 0;
+
 			mgr.header = HeaderSectionHandler.createNew(randomAccessFile, config, headerSectionOffset);
 			long indexSectionOffset = mgr.header.getSectionSize();
-			mgr.index = IndexSectionHandler.createNew(randomAccessFile, config, indexSectionOffset);
-			long dataSectionOffset = indexSectionOffset + mgr.index.getSectionSize();
+			long dataSectionOffset = mgr.header.getDataSectionOffset();
+
+			mgr.index = IndexSectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
 			mgr.data = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
@@ -85,8 +90,34 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public static VFSDiskManagerImpl open(DiskConfiguration config) throws VFSException {
 
-		// TODO implement me
-		throw new UnsupportedOperationException();
+		try {
+			logger.info("Open BadgerVFS Disk on " + config.getHostFilePath());
+			logger.debug("Using Config " + config.toString());
+			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl(config);
+
+			File file = new File(config.getHostFilePath());
+			if (file.exists() == false) {
+				throw new VFSException("Cannot open VFSDiskManager because the file does not exist " + config.getHostFilePath());
+			}
+
+			RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
+			long headerSectionOffset = 0;
+
+			mgr.header = HeaderSectionHandler.createExisting(randomAccessFile, config, headerSectionOffset);
+			long indexSectionOffset = mgr.header.getSectionSize();
+			long dataSectionOffset = mgr.header.getDataSectionOffset();
+
+			mgr.index = IndexSectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.data = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
+
+			mgr.virtualDiskFile = randomAccessFile;
+
+			return mgr;
+
+		} catch (Exception e) {
+			throw new VFSException(e);
+		}
 	}
 
 	@Override
@@ -104,9 +135,13 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
+	public void dispose() throws VFSException {
+		logger.info("Getting rid of " + config.getHostFilePath());
+		close();
 
+		if (new File(config.getHostFilePath()).delete() == false) {
+			throw new VFSException("Could not delete File " + config.getHostFilePath());
+		}
 	}
 
 	@Override

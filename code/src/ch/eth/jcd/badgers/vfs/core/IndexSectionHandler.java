@@ -21,12 +21,22 @@ public class IndexSectionHandler {
 
 	}
 
-	public static IndexSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long indexSectionOffset) throws IOException {
+	public static IndexSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long indexSectionOffset, long dataSectionOffset)
+			throws IOException {
 		IndexSectionHandler index = new IndexSectionHandler();
 
-		index.indexSectionSize = indexSectionOffset;
+		index.indexSectionSize = dataSectionOffset - indexSectionOffset;
 		randomAccessFile.seek(indexSectionOffset);
 		randomAccessFile.setLength(indexSectionOffset + index.indexSectionSize);
+
+		return index;
+	}
+
+	public static IndexSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long indexSectionOffset,
+			long dataSectionOffset) {
+		IndexSectionHandler index = new IndexSectionHandler();
+
+		index.indexSectionSize = dataSectionOffset - indexSectionOffset;
 
 		return index;
 	}
