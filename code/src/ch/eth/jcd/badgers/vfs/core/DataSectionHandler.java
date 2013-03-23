@@ -7,21 +7,24 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 
+/**
+ * $Id$ TODO describe DataSectionHandler
+ * 
+ */
 public class DataSectionHandler {
 	private static Logger logger = Logger.getLogger(DataSectionHandler.class);
 
-	/**
-	 * offset in bytes where the first byte of the data section is located on the virtual disk
-	 */
-	private long dataSectionOffset;
+	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
+		logger.debug("read Data Section...");
+		DataSectionHandler data = new DataSectionHandler();
 
-	/**
-	 * Size in bytes of the data section, may grow or shrink over time
-	 */
-	private long dataSectionSize;
+		data.dataSectionOffset = dataSectionOffset;
 
-	private DataSectionHandler() {
+		// init size to 0 and don't allocate any space
+		data.dataSectionSize = randomAccessFile.length() - dataSectionOffset;
 
+		logger.debug("read Data Section DONE");
+		return data;
 	}
 
 	public static DataSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) {
@@ -37,17 +40,23 @@ public class DataSectionHandler {
 		return data;
 	}
 
-	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
-		logger.debug("read Data Section...");
-		DataSectionHandler data = new DataSectionHandler();
+	/**
+	 * offset in bytes where the first byte of the data section is located on the virtual disk
+	 */
+	private long dataSectionOffset;
 
-		data.dataSectionOffset = dataSectionOffset;
+	/**
+	 * Size in bytes of the data section, may grow or shrink over time
+	 */
+	private long dataSectionSize;
 
-		// init size to 0 and don't allocate any space
-		data.dataSectionSize = randomAccessFile.length() - dataSectionOffset;
+	private DataSectionHandler() {
 
-		logger.debug("read Data Section DONE");
-		return data;
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+
 	}
 
 	public long getSectionOffset() {
@@ -56,11 +65,6 @@ public class DataSectionHandler {
 
 	public long getSectionSize() {
 		return dataSectionSize;
-	}
-
-	public void close() {
-		// TODO Auto-generated method stub
-
 	}
 
 }
