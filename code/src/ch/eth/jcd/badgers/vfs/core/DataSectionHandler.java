@@ -8,7 +8,9 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 
 /**
- * $Id$ TODO describe DataSectionHandler
+ * $Id$
+ * 
+ * TODO describe DataSectionHandler
  * 
  */
 public class DataSectionHandler {
