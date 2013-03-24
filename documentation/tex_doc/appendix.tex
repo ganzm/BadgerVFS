@@ -1,0 +1,53 @@
+\section{Glossary}
+
+\paragraph{VFS core} The main Java library, that handles all the interaction
+with virtual disks and importing/exporting/storing files. It is used by the
+command line client and the gui.
+
+\paragraph{Virtual Disk} A virtual disk denotes a container file that is stored
+on the host file system. A virtual disk can be opened with the software that is
+developed during this project and stores the actual files. The file extension of
+the virtual disk is ``*.bfs''.
+
+
+\section{Command line client}
+
+The command line client allows the usage of the VFS core and is mainly intended
+to test the basic functionalities. The console runs either in  management mode
+or in filesystem mode. The management mode is entered automatically when
+starting the command line client. It allows creating and disposing virtual
+disks. The filesystem mode is entered as soon as a virtual disk is opened.
+
+\textbf{TODO: DISCUSSION: sollen ganze ordner importiert und exportiert werden
+können? wird dies von der client-seite gehandelt?}
+
+\subsection{startup}
+The command line client can be started as follows:
+
+\code{ java -jar VFSCore.jar ch.eth.jcd.badgers.vfs.ui.VFSConsole }
+
+\subsection{commands}
+Following commands can be used with the command line client in management mode:
+
+\begin{itemize}
+  \item{\textbf{create c:\textbackslash path\textbackslash to\textbackslash
+  disk.bfs 1024}} creates virtual disk of size 1024 megabytes on the host
+  system
+  \item {\textbf{dispose c:\textbackslash path\textbackslash to\textbackslash
+  disk.bfs}} deletes the given virtual disk
+  \item {\textbf{open c:\textbackslash path\textbackslash to\textbackslash
+  disk.bfs}} opens filesystem mode for the given virtual disk
+\end{itemize}
+
+follwing commands can be used in filesystem mode:
+
+\begin{itemize}
+  \item {\textbf{ls}} lists the contents of the current directory
+  \item {\textbf{rm file}} deletes the entry denoted as file
+  \item {\textbf{cp src dst}} copies the src file to dst 
+  \item {\textbf{import ext\_dst}} imports a ext\_src from the host system to
+  dst
+  \item {\textbf{export src ext\_src}} exports a src file to the host system
+  ext\_dst
+\end{itemize}
+
