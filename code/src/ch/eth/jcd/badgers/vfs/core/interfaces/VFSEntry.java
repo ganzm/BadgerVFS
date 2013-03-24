@@ -4,6 +4,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+/**
+ * $Id
+ * 
+ * Represents a folder or directory which actually exists on the file system
+ * 
+ */
 public interface VFSEntry {
 
 	/**
@@ -57,5 +63,10 @@ public interface VFSEntry {
 	 * @param newName
 	 */
 	public void renameTo(String newName);
+
+	/**
+	 * deletes the file or folder this Entry represents
+	 */
+	public void delete();
 
 }

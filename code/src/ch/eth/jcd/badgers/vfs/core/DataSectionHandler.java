@@ -16,6 +16,23 @@ import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 public class DataSectionHandler {
 	private static Logger logger = Logger.getLogger(DataSectionHandler.class);
 
+	/**
+	 * offset in bytes where the first byte of the data section is located on the virtual disk
+	 */
+	private long dataSectionOffset;
+
+	/**
+	 * Size in bytes of the data section, may grow or shrink over time
+	 */
+	private long dataSectionSize;
+
+	/**
+	 * Constructor
+	 */
+	private DataSectionHandler() {
+
+	}
+
 	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
 		logger.debug("read Data Section...");
 		DataSectionHandler data = new DataSectionHandler();
@@ -43,22 +60,15 @@ public class DataSectionHandler {
 	}
 
 	/**
-	 * offset in bytes where the first byte of the data section is located on the virtual disk
+	 * Memory Allocation on the DataSection
+	 * 
+	 * @return
 	 */
-	private long dataSectionOffset;
-
-	/**
-	 * Size in bytes of the data section, may grow or shrink over time
-	 */
-	private long dataSectionSize;
-
-	private DataSectionHandler() {
-
+	public DataBlock allocateNewDataBlock() {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	public void close() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public long getSectionOffset() {

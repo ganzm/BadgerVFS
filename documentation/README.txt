@@ -49,7 +49,7 @@ Vergleich: ext4 kann 64'000 files pro Folder
 
 --------------------------
 
-Header
+VFS File Header
 - Info | 50 byte ASCII String
   Contains something like Badger VFS 2013 V1.0
 - Version | 10 byte ASCII String
@@ -71,5 +71,18 @@ Index Section
 
 
 Data Section
-  
-  
+- Data section is split into blocks a X bytes
+- Block layout
+  - BlockHeader | 1 byte
+    LSB indicates the Header-Bit
+  - NextDataBlock | 8 bytes long
+    Adress of the next Data Block (linked list)
+    \x0000 0000 if this is the last Data block of a certain fFile or folder
+  - HeaderLengthIndicator | 4 bytes
+    indicates the lenght of the DataBlock Header in bytes
+    This field only exists if BlockHeader Bit is set to 1
+  - Header | variable number of bytes
+    Header Informationen creation date, modification date, file name
+    This field only exists if BlockHeader Bit is set to 1
+  - DataLenghtIndicator | 4 bytes
+    Indicates the number of data is saved on this DataBlock

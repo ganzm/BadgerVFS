@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -30,11 +31,16 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	/** the file we write our data to */
 	private RandomAccessFile virtualDiskFile;
 
-	private HeaderSectionHandler header;
+	/**
+	 * Root folder to the file system
+	 */
+	private VFSEntry root;
 
-	private IndexSectionHandler index;
+	private HeaderSectionHandler headerSectionHandler;
 
-	private DataSectionHandler data;
+	private IndexSectionHandler indexSectionHandler;
+
+	private DataSectionHandler dataSectionHandler;
 
 	/**
 	 * Private constructor
@@ -65,14 +71,19 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 			long headerSectionOffset = 0;
 
-			mgr.header = HeaderSectionHandler.createNew(randomAccessFile, config, headerSectionOffset);
-			long indexSectionOffset = mgr.header.getSectionSize();
-			long dataSectionOffset = mgr.header.getDataSectionOffset();
+			mgr.headerSectionHandler = HeaderSectionHandler.createNew(randomAccessFile, config, headerSectionOffset);
+			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
+			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.index = IndexSectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
-			mgr.data = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
+			mgr.indexSectionHandler = IndexSectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.dataSectionHandler = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
+
+			logger.debug("Creating root folder...");
+			VFSPath rootPath = mgr.CreatePath("/");
+			mgr.root = rootPath.createDirectory();
+			logger.debug("Creating root folder done");
 
 			return mgr;
 
@@ -104,12 +115,12 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 			long headerSectionOffset = 0;
 
-			mgr.header = HeaderSectionHandler.createExisting(randomAccessFile, config, headerSectionOffset);
-			long indexSectionOffset = mgr.header.getSectionSize();
-			long dataSectionOffset = mgr.header.getDataSectionOffset();
+			mgr.headerSectionHandler = HeaderSectionHandler.createExisting(randomAccessFile, config, headerSectionOffset);
+			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
+			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.index = IndexSectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
-			mgr.data = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
+			mgr.indexSectionHandler = IndexSectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.dataSectionHandler = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
 
@@ -124,9 +135,9 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	public void close() throws VFSException {
 
 		try {
-			header.close();
-			index.close();
-			data.close();
+			headerSectionHandler.close();
+			indexSectionHandler.close();
+			dataSectionHandler.close();
 
 			virtualDiskFile.close();
 		} catch (Exception ex) {
@@ -146,14 +157,30 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public long getFreeSpace() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override
 	public VFSEntry getRoot() {
-		// TODO Auto-generated method stub
-		return null;
+		return root;
+	}
+
+	@Override
+	public VFSPath CreatePath(String pathString) throws VFSException {
+		VFSPathImpl path = new VFSPathImpl(this, pathString);
+		return path;
+	}
+
+	public HeaderSectionHandler getHeaderSectionHandler() {
+		return headerSectionHandler;
+	}
+
+	public IndexSectionHandler getIndexSectionHandler() {
+		return indexSectionHandler;
+	}
+
+	public DataSectionHandler getDataSectionHandler() {
+		return dataSectionHandler;
 	}
 
 }
