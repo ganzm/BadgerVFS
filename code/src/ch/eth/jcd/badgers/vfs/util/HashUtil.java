@@ -9,13 +9,11 @@ import org.apache.commons.codec.digest.DigestUtils;
  * $Id
  * 
  * 
- * TODO describe HashUtil
- * 
  */
 public class HashUtil {
 
-	public void asdf() {
+	public static byte[] hashSha512(byte[] toHash) {
 		MessageDigest md = DigestUtils.getSha512Digest();
-
+		return md.digest(toHash);
 	}
 }

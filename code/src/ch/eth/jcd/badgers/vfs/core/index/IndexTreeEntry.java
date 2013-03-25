@@ -13,7 +13,12 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
  */
 public class IndexTreeEntry {
 
-	public static final long INDEX_TREE_ENTRY_HASH_SIZE = 50;
+	/**
+	 * Hash Size in Bytes
+	 * 
+	 * Sha512 creates 512bit hashes
+	 */
+	public static final long INDEX_TREE_ENTRY_HASH_SIZE = 64;
 	/**
 	 * Size when serialized to disk in bytes
 	 * 
@@ -31,8 +36,10 @@ public class IndexTreeEntry {
 
 	/**
 	 * Lazy loaded reference to the first DataBlock
-	 * 
-	 * 
 	 */
 	private DataBlock firstBlock;
+
+	public IndexTreeEntry() {
+
+	}
 }
