@@ -2,7 +2,10 @@
 \section{The File Format}
 
 
-This section describes the binary file format used by the file system. The file is separated into tree major parts. The header, index and the data section. Each of them is described below.
+This section describes the binary file format used by the file system inside a
+virtual disk.
+The file is separated into three major parts. The header, index and the data
+section. Each of them is described below.
 
 \subsection{Header Section}
 
@@ -10,17 +13,17 @@ This section describes the binary file format used by the file system. The file 
 \hline
   \textbf{Name} & \textbf{Lenght} & \textbf{Description}
 \\  \hline
-  Info & 50 byte ASCII String & Contains something like Badger VFS 2013 V1.0 
+  Info & 50 byte UTF-8 String & Contains something like Badger VFS 2013 V1.0 
 \\ \hline
-  Version & 10 byte ASCII String & Contains something like "1.0"
+  Version & 10 byte UTF-8 String & Contains something like "1.0"
 \\ \hline
-  Compression used & 20 byte ASCII String & null or indicates compression used for this file
+  Compression used & 20 byte UTF-8 String & null or indicates compression used for this file
 \\ \hline
-  Encryption used & 20 byte ASCII String & null or indicates encryption used for this file
+  Encryption used & 20 byte UTF-8 String & null or indicates encryption used for this file
 \\ \hline
- IndexSectionOffset & long (8 byte) &  File offset where our Index Section starts
-\\ \hline
- DataSectionOffset & long (8 byte) &  File offset where our Data Section starts
+ IndexSectionOffset & long (8 byte) &  File offset where our index section
+ starts \\ \hline
+ DataSectionOffset & long (8 byte) &  File offset where our data section starts
 \\ \hline
  SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
    file
@@ -44,11 +47,12 @@ Block layout \\
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
-  \textbf{Name} & \textbf{Lenght} & \textbf{Description}
+  \textbf{Name} & \textbf{Length} & \textbf{Description}
 \\  \hline
  BlockHeader & 1 byte &
  \\
- \hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first Datablock of a file.
+ \hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first datablock
+ of a file.
  \\ 
  \hspace{0.2cm} 1) Directory-Bit & &  If set to 1 this is a directory, not a file
  \\ 
