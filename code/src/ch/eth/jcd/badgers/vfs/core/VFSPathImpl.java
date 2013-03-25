@@ -34,6 +34,12 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public boolean exists() {
+
+		// what to do
+		// create hash from path string
+		// ask IndexSectionHandler whether there is an entry for this hash in its tree
+		// everything ok
+
 		throw new UnsupportedOperationException("TODO");
 
 	}

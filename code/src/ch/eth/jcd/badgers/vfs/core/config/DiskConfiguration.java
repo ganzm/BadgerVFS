@@ -1,7 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core.config;
 
 /**
- * 
  * DiskConfiguration used to open/create a VirtualDisk
  * 
  */
@@ -18,41 +17,56 @@ public class DiskConfiguration {
 
 	private String compressionAlgorithm;
 
-	@Override
-	public String toString() {
-		return " Password=* EncryptionAlgorithm=" + encryptionAlgorithm + " CompressionAlgorithm=" + compressionAlgorithm + " HostFilePath=" + hostFilePath;
-	}
+	/**
+	 * the maximum size of the file we store our data on the host file system <br>
+	 * values <=0 indicate that there is no limit <br>
+	 */
+	private long maximumSize = -1;
 
-	public String getHostFilePath() {
-		return hostFilePath;
-	}
-
-	public void setHostFilePath(String hostFilePath) {
-		this.hostFilePath = hostFilePath;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	public String getCompressionAlgorithm() {
+		return compressionAlgorithm;
 	}
 
 	public String getEncryptionAlgorithm() {
 		return encryptionAlgorithm;
 	}
 
-	public void setEncryptionAlgorithm(String encryptionAlgorithm) {
-		this.encryptionAlgorithm = encryptionAlgorithm;
+	public String getHostFilePath() {
+		return hostFilePath;
 	}
 
-	public String getCompressionAlgorithm() {
-		return compressionAlgorithm;
+	public long getMaximumSize() {
+		return maximumSize;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public void setCompressionAlgorithm(String compressionAlgorithm) {
 		this.compressionAlgorithm = compressionAlgorithm;
+	}
+
+	public void setEncryptionAlgorithm(String encryptionAlgorithm) {
+		this.encryptionAlgorithm = encryptionAlgorithm;
+	}
+
+	public void setHostFilePath(String hostFilePath) {
+		this.hostFilePath = hostFilePath;
+	}
+
+	public void setMaximumSize(long maximumSize) {
+		this.maximumSize = maximumSize;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		return " Password=* EncryptionAlgorithm=" + encryptionAlgorithm + " CompressionAlgorithm=" + compressionAlgorithm + " MaxSize=" + maximumSize
+				+ " HostFilePath=" + hostFilePath;
 	}
 
 }

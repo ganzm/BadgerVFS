@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.core;
+package ch.eth.jcd.badgers.vfs.core.header;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,6 +9,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.index.IndexSectionHandler;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 

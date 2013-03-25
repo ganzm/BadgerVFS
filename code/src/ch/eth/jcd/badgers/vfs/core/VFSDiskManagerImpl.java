@@ -11,6 +11,9 @@ import java.io.RandomAccessFile;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.header.HeaderSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.index.IndexSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;

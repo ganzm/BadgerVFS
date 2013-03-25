@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
+import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 
