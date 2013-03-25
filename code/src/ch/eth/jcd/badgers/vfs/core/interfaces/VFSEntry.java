@@ -50,6 +50,12 @@ public interface VFSEntry {
 	public VFSPath getPath();
 
 	/**
+	 * 
+	 * @return returns true if the VFSEntry is a directory
+	 */
+	public boolean isDirectory();
+
+	/**
 	 * moves this file or folder to another location
 	 * 
 	 * @param path

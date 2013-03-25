@@ -17,5 +17,7 @@ public interface VFSPath {
 
 	public boolean exists() throws VFSException;
 
+	public String getPathString() throws VFSException;
+
 	public VFSEntry getVFSEntry() throws VFSException;
 }

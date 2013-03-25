@@ -80,4 +80,9 @@ public class VFSEntryImpl implements VFSEntry {
 	public void delete() {
 		throw new UnsupportedOperationException("TODO");
 	}
+
+	@Override
+	public boolean isDirectory() {
+		throw new UnsupportedOperationException("TODO");
+	}
 }

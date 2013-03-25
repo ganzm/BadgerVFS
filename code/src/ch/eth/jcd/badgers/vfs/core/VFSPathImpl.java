@@ -49,6 +49,7 @@ public class VFSPathImpl implements VFSPath {
 		throw new UnsupportedOperationException("TODO");
 	}
 
+	@Override
 	public String getPathString() {
 		return pathString;
 	}
@@ -57,4 +58,5 @@ public class VFSPathImpl implements VFSPath {
 	public String toString() {
 		return "Path to " + pathString;
 	}
+
 }
