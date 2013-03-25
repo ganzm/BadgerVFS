@@ -31,8 +31,8 @@ Following commands can be used with the command line client in management mode:
 
 \begin{itemize}
   \item{\textbf{create c:\textbackslash path\textbackslash to\textbackslash
-  disk.bfs 1024}} creates virtual disk of size 1024 megabytes on the host
-  system
+  disk.bfs 1024}} creates virtual disk with a maximum quota of 1024 megabytes on the host system. The file may grow up to 1024 megabytes.
+  \textbf{TODO}: more parameters are needed (encryption, compression, password if there is encryption)
   \item {\textbf{dispose c:\textbackslash path\textbackslash to\textbackslash
   disk.bfs}} deletes the given virtual disk
   \item {\textbf{open c:\textbackslash path\textbackslash to\textbackslash
@@ -45,8 +45,7 @@ follwing commands can be used in filesystem mode:
   \item {\textbf{ls}} lists the contents of the current directory
   \item {\textbf{rm file}} deletes the entry denoted as file
   \item {\textbf{cp src dst}} copies the src file to dst 
-  \item {\textbf{import ext\_dst}} imports a ext\_src from the host system to
-  dst
+  \item {\textbf{import ext\_dst}} imports a ext\_src from the host system to dst
   \item {\textbf{export src ext\_src}} exports a src file to the host system
   ext\_dst
 \end{itemize}

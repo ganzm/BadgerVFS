@@ -1,0 +1,85 @@
+
+\section{The File Format}
+
+
+This section describes the binary file format used by the file system. The file is separated into tree major parts. The header, index and the data section. Each of them is described below.
+
+\subsection{Header Section}
+
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+  \textbf{Name} & \textbf{Lenght} & \textbf{Description}
+\\  \hline
+  Info & 50 byte ASCII String & Contains something like Badger VFS 2013 V1.0 
+\\ \hline
+  Version & 10 byte ASCII String & Contains something like "1.0"
+\\ \hline
+  Compression used & 20 byte ASCII String & null or indicates compression used for this file
+\\ \hline
+  Encryption used & 20 byte ASCII String & null or indicates encryption used for this file
+\\ \hline
+ IndexSectionOffset & long (8 byte) &  File offset where our Index Section starts
+\\ \hline
+ DataSectionOffset & long (8 byte) &  File offset where our Data Section starts
+\\ \hline
+ SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
+   file
+ \\ \hline
+  Password & xxx bytes  & CryptoHash (SHA-whatever) of Password+SaltString
+\\ \hline
+
+\end{tabular}
+
+
+\subsection{Index Section}
+
+Data in the index section are organized in a B-Tree structure.
+
+
+\subsection{Data Section}
+The data section is split into blocks where each of them is X bytes long. Each block contains some amount of data and points to a subsequent block
+
+
+Block layout \\
+
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+  \textbf{Name} & \textbf{Lenght} & \textbf{Description}
+\\  \hline
+ BlockHeader & 1 byte &
+ \\
+ \hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first Datablock of a file.
+ \\ 
+ \hspace{0.2cm} 1) Directory-Bit & &  If set to 1 this is a directory, not a file
+ \\ 
+ \hspace{0.2cm} 2) not used & &  
+ \\ 
+ \hspace{0.2cm} 3) not used & &  
+ \\ 
+ \hspace{0.2cm} 4) not used & &  
+ \\ 
+ \hspace{0.2cm} 5) not used & &  
+ \\ 
+ \hspace{0.2cm} 6) not used & &  
+ \\ 
+ \hspace{0.2cm} 7) not used & &  
+ 
+\\  \hline
+ NextDataBlock & 8 byte long & 
+ Points to the start address of the next Datablock (linked list).
+    0 if this is the last Data block of a certain file or folder.
+\\  \hline
+  HeaderLengthIndicator & 4 byte &     indicates the lenght of the DataBlock Header in bytes
+  \newline This field only exists if BlockHeader Bit is set to 1
+\\  \hline
+  Header & 
+  n byte &
+  Header Informationen creation date, modification date, file name. (May be encrypted/compressed)
+  \newline This field only exists if BlockHeader Bit is set to 1
+\\  \hline
+  DataLenghtIndicator & 4 byte &
+    Indicates the number of data saved on this DataBlock
+\\  \hline
+ Data & n byte & user data (may be encrypted/compressed)
+\\  \hline
+\end{tabular}
