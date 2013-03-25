@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.util.HashUtil;
 
 public class IndexSectionHandler {
 
@@ -47,6 +48,12 @@ public class IndexSectionHandler {
 
 	public void close() {
 
+	}
+
+	public IndexTreeEntry getIndexTreeEntryByPathString(String pathString) {
+
+		byte[] key = HashUtil.hashUtf8String(pathString);
+		throw new UnsupportedOperationException("TODO");
 	}
 
 }

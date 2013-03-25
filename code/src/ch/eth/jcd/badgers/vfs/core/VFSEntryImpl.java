@@ -63,7 +63,7 @@ public class VFSEntryImpl implements VFSEntry {
 
 	@Override
 	public VFSPath getPath() {
-		throw new UnsupportedOperationException("TODO");
+		return path;
 	}
 
 	@Override

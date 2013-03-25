@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import ch.eth.jcd.badgers.vfs.core.index.IndexTreeEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -10,9 +11,23 @@ public class VFSPathImpl implements VFSPath {
 
 	private final String pathString;
 
-	protected VFSPathImpl(VFSDiskManagerImpl vfsDiskManagerImpl, String pathString) {
+	protected VFSPathImpl(VFSDiskManagerImpl vfsDiskManagerImpl, String absolutePathString) {
 		this.diskMgr = vfsDiskManagerImpl;
-		this.pathString = pathString;
+		this.pathString = validateAbsolutePath(absolutePathString);
+	}
+
+	/**
+	 * <ul>
+	 * <li>strip leading and trailing whitespaces</li>
+	 * <li>convert stuff like /path//otherpath to /path/otherpath</li>
+	 * <li>cut away stuff like /./ and /../</li>
+	 * <li>check if path starts with /</li>
+	 * <ul>
+	 */
+	public static String validateAbsolutePath(String pathString) {
+		// TODO do stuff here
+
+		return pathString;
 	}
 
 	@Override
@@ -29,19 +44,17 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public VFSEntry createFile() {
+		// what to do
+		// create hash from path string
+		// ask IndexSectionHandler whether there is an entry for this hash in its tree
+		// everything ok
 		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override
 	public boolean exists() {
-
-		// what to do
-		// create hash from path string
-		// ask IndexSectionHandler whether there is an entry for this hash in its tree
-		// everything ok
-
-		throw new UnsupportedOperationException("TODO");
-
+		IndexTreeEntry indexTreeEntry = diskMgr.getIndexSectionHandler().getIndexTreeEntryByPathString(pathString);
+		return indexTreeEntry != null;
 	}
 
 	@Override

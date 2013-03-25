@@ -23,7 +23,7 @@ public class IndexTreeEntry {
 	 * Size when serialized to disk in bytes
 	 * 
 	 * Size of our FilePath Hash we use as Key for the b-tree <br>
-	 * 8 byte Reference to Datablock
+	 * 8 byte Reference to DataBlock
 	 */
 	public static final long INDEX_TREE_ENTRY_TOTAL_SIZE = INDEX_TREE_ENTRY_HASH_SIZE + 8;
 
