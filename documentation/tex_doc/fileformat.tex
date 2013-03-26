@@ -34,9 +34,73 @@ section. Each of them is described below.
 \end{tabular}
 
 
-\subsection{Index Section}
+\subsection{Directory Section}
 
-Data in the index section are organized in a B-Tree structure.
+The directory section describes which files and folders belong to which parent directory. This section has a fixed size and contains so called DirectoryBlocks which also have a fixed size. This makes management an manipulation easy. To each directory belongs a B-Tree structure which lists all contained entries.
+
+
+\subsubsection*{Directory Block}
+
+One Directory Block represents a Node in our B-Tree of order 2.
+
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+  \textbf{Name} & \textbf{Length} & \textbf{Description}
+\\  \hline
+
+DirectoryHeader & 1 byte & Header information. This header makes it easy to determine whether a DirecotryBlock is in used or not (memory management)
+
+\\  \hline
+
+DirectoryEntryBlock1 & 128 byte & The smaller key inserted into our B-Tree
+
+\\  \hline
+
+DirectoryEntryBlock2 & 128 byte & The bigger key inserted into our B-Tree
+
+\\  \hline
+
+DirectoryBlockLink1 & 8 byte & Points to another DirectoryBlock which contains keys smaller than DirectoryEntryBlock1
+
+\\  \hline
+
+DirectoryBlockLink2 & 8 byte & Points to another DirectoryBlock which contains keys bigger than DirectoryEntryBlock1 but smaller than DirectoryEntryBlock2
+
+\\  \hline
+
+DirectoryBlockLink3 & 8 byte & Points to another DirectoryBlock which contains keys bigger than DirectoryEntryBlock2
+
+\\  \hline
+
+
+\end{tabular}
+
+\subsubsection*{Directory Entry Block}
+
+Represents a single directory.
+
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+  \textbf{Name} & \textbf{Length} & \textbf{Description}
+\\  \hline
+
+Filename & 112 byte & UTF-8 Filename String 
+
+
+\\  \hline
+
+DataBlockLocation & 8 byte & Pointer to a DataBlock located in the Data Section. This DataBlock holds some meta information about the current directory
+
+
+\\  \hline
+
+DirectoryEntryTreeRoot & 8 bytes & Pointer to a DirectoryBlock located in the Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree containing all entries of that directory specified by the current Directory Entry Block.
+
+
+
+\\  \hline
+
+\end{tabular}
 
 
 \subsection{Data Section}
@@ -49,7 +113,7 @@ Block layout \\
 \hline
   \textbf{Name} & \textbf{Length} & \textbf{Description}
 \\  \hline
- BlockHeader & 1 byte &
+ BlockHeader & 1 byte & 
  \\
  \hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first datablock
  of a file.
@@ -69,20 +133,21 @@ Block layout \\
  \hspace{0.2cm} 7) not used & &  
  
 \\  \hline
- NextDataBlock & 8 byte long & 
+ NextDataBlock & 8 byte & 
  Points to the start address of the next Datablock (linked list).
-    0 if this is the last Data block of a certain file or folder.
+    0 if this is the last DataBlock of a certain file or folder.
 \\  \hline
-  HeaderLengthIndicator & 4 byte &     indicates the lenght of the DataBlock Header in bytes
-  \newline This field only exists if BlockHeader Bit is set to 1
+  EntryHeaderLength & 4 byte & Indicates the length of the DataBlock Header in bytes.
+  \newline \textit{This field only exists if Header-Bit is set to 1}
 \\  \hline
-  Header & 
+  EntryHeader & 
   n byte &
-  Header Informationen creation date, modification date, file name. (May be encrypted/compressed)
-  \newline This field only exists if BlockHeader Bit is set to 1
+  EntryHeader Informationen creation date, modification date, file name. (May be encrypted/compressed)
+  \newline \textit{This field only exists if Header-Bit is set to 1}
 \\  \hline
-  DataLenghtIndicator & 4 byte &
-    Indicates the number of data saved on this DataBlock
+  DataLenght & 4 byte &
+    Indicates the number of data saved on this DataBlock.
+    
 \\  \hline
  Data & n byte & user data (may be encrypted/compressed)
 \\  \hline
