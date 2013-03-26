@@ -44,15 +44,24 @@ follwing commands can be used in filesystem mode:
 
 \begin{itemize}
   \item {\textbf{ls}} lists the contents of the current directory
-  \item {\textbf{cd dst}} changes current directory to dst
-  \item {\textbf{rm file}} deletes the entry denoted as file
-  \item {\textbf{cp src dst}} copies the src file to dst 
-  \item {\textbf{mv src dst}} moves the src file to dst
-  \item {\textbf{import ext\_dst}} imports a ext\_src from the host system to dst
-  \item {\textbf{export src ext\_src}} exports a src file to the host system
-  ext\_dst
+  \item {\textbf{cd dst}} changes current directory to \textit{dst} which must
+  be either a child directory of the current path or ``..''
+  \item {\textbf{mkdir dirName}} creates a new directory \textit{dirName} in the
+  current path
+  \item {\textbf{mkfile fileName}} creates a new empty file \textit{fileName} in
+  the current path - this is rather not usefull, as the ``import'' creates a
+  file with content
+  \item {\textbf{rm file}} deletes the entry denoted as \textit{file}, it must
+  be a child of the current path
+  \item {\textbf{cp src dst}} copies the \textit{src} file to \textit{dst} as a
+  child of the current path
+  \item {\textbf{mv src dst}} moves the \textit{src} file to \textit{dst}
+  \item {\textbf{import ext\_dst}} imports a \textit{ext\_src} from the host
+  system to \textit{dst}
+  \item {\textbf{export src ext\_src}} exports a \textit{src} file to the host
+  system \textit{ext\_dst}
   \item {\textbf{find searchString}} lists all filesystem entries below the
-  current entry containing searchString
+  current entry containing \textit{searchString}
   \item {\textbf{close}} closes the filesystem mode, from now on management mode
   commands can be executed
 \end{itemize}
