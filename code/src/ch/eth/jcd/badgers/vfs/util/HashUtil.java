@@ -19,6 +19,12 @@ public class HashUtil {
 		return hashSha512(string.getBytes(cs));
 	}
 
+	/**
+	 * generate a 512bit long SHA-512 hash (64byte)
+	 * 
+	 * @param toHash
+	 * @return
+	 */
 	public static byte[] hashSha512(byte[] toHash) {
 		MessageDigest md = DigestUtils.getSha512Digest();
 		return md.digest(toHash);

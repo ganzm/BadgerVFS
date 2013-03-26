@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.header.HeaderSectionHandler;
-import ch.eth.jcd.badgers.vfs.core.index.IndexSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -41,7 +41,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private HeaderSectionHandler headerSectionHandler;
 
-	private IndexSectionHandler indexSectionHandler;
+	private DirectorySectionHandler directorySectionHandler;
 
 	private DataSectionHandler dataSectionHandler;
 
@@ -78,7 +78,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.indexSectionHandler = IndexSectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.directorySectionHandler = DirectorySectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
 			mgr.dataSectionHandler = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
@@ -122,7 +122,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.indexSectionHandler = IndexSectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.directorySectionHandler = DirectorySectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
 			mgr.dataSectionHandler = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
@@ -139,7 +139,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 		try {
 			headerSectionHandler.close();
-			indexSectionHandler.close();
+			directorySectionHandler.close();
 			dataSectionHandler.close();
 
 			virtualDiskFile.close();
@@ -178,8 +178,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		return headerSectionHandler;
 	}
 
-	public IndexSectionHandler getIndexSectionHandler() {
-		return indexSectionHandler;
+	public DirectorySectionHandler getDirectorySectionHandler() {
+		return directorySectionHandler;
 	}
 
 	public DataSectionHandler getDataSectionHandler() {

@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.core.index;
+package ch.eth.jcd.badgers.vfs.core.directory;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 
@@ -11,7 +11,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
  * 
  * 
  */
-public class IndexTreeEntry {
+public class DirectoryEntryBlock {
 
 	/**
 	 * Hash Size in Bytes
@@ -39,7 +39,7 @@ public class IndexTreeEntry {
 	 */
 	private DataBlock firstBlock;
 
-	public IndexTreeEntry() {
+	public DirectoryEntryBlock() {
 
 	}
 }

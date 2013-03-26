@@ -9,7 +9,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
-import ch.eth.jcd.badgers.vfs.core.index.IndexSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 
@@ -44,7 +44,7 @@ public class HeaderSectionHandler {
 
 	private byte[] passwordHash;
 
-	private long indexSectionOffset;
+	private long directorySectionOffset;
 
 	private long dataSectionOffset;
 
@@ -75,7 +75,7 @@ public class HeaderSectionHandler {
 
 		long indexSectionOffsetIndicatorLocation = randomAccessFile.getFilePointer();
 
-		// write 8 bytes - we will write IndexSectionOffset later
+		// write 8 bytes - we will write DirectorySectionOffset later
 		randomAccessFile.writeLong(0);
 
 		// write 8 bytes - we will write DataSectionOffset later
@@ -90,21 +90,21 @@ public class HeaderSectionHandler {
 		header.passwordHash = SecurityUtil.hashString(config.getPassword(), PASSWORDHASH_FIELD_LENGTH);
 		randomAccessFile.write(header.passwordHash);
 
-		header.indexSectionOffset = randomAccessFile.getFilePointer();
+		header.directorySectionOffset = randomAccessFile.getFilePointer();
 
-		// now we are at the end of the index section, remember this position
-		header.headerSectionSize = header.indexSectionOffset - header.headerSectionOffset;
+		// now we are at the end of the directory section, remember this position
+		header.headerSectionSize = header.directorySectionOffset - header.headerSectionOffset;
 
 		randomAccessFile.seek(indexSectionOffsetIndicatorLocation);
 
 		// write IndexSectionOffset | double (8 byte)
-		randomAccessFile.writeLong(header.indexSectionOffset);
+		randomAccessFile.writeLong(header.directorySectionOffset);
 
 		// DataSectionOffset | double (8 byte)
-		header.dataSectionOffset = header.indexSectionOffset + IndexSectionHandler.DEFAULT_INDEXSECTION_SIZE;
+		header.dataSectionOffset = header.directorySectionOffset + DirectorySectionHandler.DEFAULT_INDEXSECTION_SIZE;
 		randomAccessFile.writeLong(header.dataSectionOffset);
 
-		randomAccessFile.seek(header.indexSectionOffset);
+		randomAccessFile.seek(header.directorySectionOffset);
 
 		logger.debug("init Header Section DONE");
 		return header;
@@ -146,9 +146,9 @@ public class HeaderSectionHandler {
 		header.encryptionString = new String(encryptionBytes, cs);
 		logger.debug("Encryption: " + header.encryptionString);
 
-		// read 8 bytes - IndexSectionOffset
-		header.indexSectionOffset = randomAccessFile.readLong();
-		logger.debug("IndexSectionOffset: " + header.indexSectionOffset);
+		// read 8 bytes - DirectorySectionOffset
+		header.directorySectionOffset = randomAccessFile.readLong();
+		logger.debug("DirectorySectionOffset: " + header.directorySectionOffset);
 
 		// read 8 bytes - DataSectionOffset
 		header.dataSectionOffset = randomAccessFile.readLong();

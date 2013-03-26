@@ -1,6 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core;
 
-import ch.eth.jcd.badgers.vfs.core.index.IndexTreeEntry;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -53,7 +53,7 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public boolean exists() {
-		IndexTreeEntry indexTreeEntry = diskMgr.getIndexSectionHandler().getIndexTreeEntryByPathString(pathString);
+		DirectoryEntryBlock indexTreeEntry = diskMgr.getDirectorySectionHandler().getIndexTreeEntryByPathString(pathString);
 		return indexTreeEntry != null;
 	}
 
