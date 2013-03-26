@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * $Id
+ * $Id$
  * 
  * Represents a folder or directory which actually exists on the file system
  * 
@@ -48,6 +48,21 @@ public interface VFSEntry {
 	 * @return returns the path of this file or folder
 	 */
 	public VFSPath getPath();
+
+	/**
+	 * This Method creates a fully initialized new VFSPath object with <code> this (VFSEntry)</code> as parent and <code>childName</code> as child. With this
+	 * method no client of the filesystem framework needs to create new VFSPaths or VFSEntries itself.
+	 * 
+	 * @return returns a fully initialized new VFSPath object wich <code> this (VFSEntry)</code> as parent and <code>childName</code> as child
+	 */
+	public VFSPath getNewChildPath(String childName);
+
+	/**
+	 * returns the parent of current entry. if root returns itself
+	 * 
+	 * @return
+	 */
+	public VFSEntry getParent();
 
 	/**
 	 * 
