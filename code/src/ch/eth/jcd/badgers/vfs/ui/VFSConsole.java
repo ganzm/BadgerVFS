@@ -32,6 +32,8 @@ public class VFSConsole {
 	// filesystem commands
 	private static final String LS_STRING = "ls";
 	private static final String CD_STRING = "cd";
+	private static final String MKDIR_STRING = "mkdir";
+	private static final String MKFILE_STRING = "mkfile";
 	private static final String RM_STRING = "rm";
 	private static final String CP_STRING = "cp";
 	private static final String MV_STRING = "mv";
@@ -74,7 +76,9 @@ public class VFSConsole {
 
 		commands.put(LS_STRING, controller.getListCommand());
 		commands.put(CD_STRING, controller.getChangeDirectoryCommand());
-		commands.put(RM_STRING, controller.getDeleteCommand());
+		commands.put(MKDIR_STRING, controller.getMakeDirCommand());
+		commands.put(MKFILE_STRING, controller.getMakeFileCommand());
+		commands.put(RM_STRING, controller.getRemoveCommand());
 		commands.put(CP_STRING, controller.getCopyCommand());
 		commands.put(MV_STRING, controller.getMoveCommand());
 		commands.put(IMPORT_STRING, controller.getImportCommand());
@@ -109,7 +113,7 @@ public class VFSConsole {
 
 				if (splittedInput.length > 1) {
 
-					params = Arrays.copyOfRange(splittedInput, 1, splittedInput.length - 1);
+					params = Arrays.copyOfRange(splittedInput, 1, splittedInput.length);
 				}
 				cmd.execute(params);
 
@@ -123,8 +127,8 @@ public class VFSConsole {
 		}
 	}
 
-	private void printHelpMessage() {
-		// TODO Auto-generated method stub
+	public void printHelpMessage() {
+		writer.println("Usage: TO_BE_IMPLEMENTED");
 
 	}
 
@@ -133,6 +137,11 @@ public class VFSConsole {
 	 */
 	public void stop() {
 		this.stopped = true;
+
+	}
+
+	public void write(String string) {
+		writer.println(string);
 
 	}
 
