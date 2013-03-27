@@ -23,10 +23,6 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
-/**
- * $Id$ TODO describe VFSUIController
- * 
- */
 public class VFSUIController {
 
 	/**
@@ -66,8 +62,8 @@ public class VFSUIController {
 	private final VFSConsole console;
 
 	// current state of the console
-	private VFSDiskManager currentManager;
 	private VFSEntry currentDirectory;
+	private VFSDiskManager currentManager;
 
 	public VFSUIController(VFSConsole vfsConsole) {
 		this.console = vfsConsole;
@@ -213,46 +209,6 @@ public class VFSUIController {
 
 			}
 
-		};
-	}
-
-	public Command getRemoveCommand() {
-		return new Command() {
-
-			@Override
-			public void execute(String[] param) {
-				LOGGER.debug("remove command entered");
-
-				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn("No disk open, please use open or create command first");
-					return;
-				}
-
-				if (!(param.length == 1)) {
-					LOGGER.warn("no correct number of parameters for remove command given");
-					console.printHelpMessage();
-					return;
-				}
-				VFSEntry childToRemove = null;
-				try {
-					for (VFSEntry child : currentDirectory.getChildren()) {
-						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
-							childToRemove = child;
-						}
-					}
-					if (childToRemove == null) {
-						LOGGER.warn("Child: " + param[0] + " not found in current directory, nothing removed");
-						return;
-					}
-
-					childToRemove.delete();
-				} catch (Exception e) {
-					LOGGER.error("Could not remove file:" + param[0], e);
-				}
-
-				LOGGER.debug("remove command leaving");
-
-			}
 		};
 	}
 
@@ -418,6 +374,58 @@ public class VFSUIController {
 		};
 	}
 
+	public Command getMakeDirCommand() {
+		return new Command() {
+
+			@Override
+			public void execute(String[] param) {
+				LOGGER.debug("makedir command entered");
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn("No disk open, please use open or create command");
+					return;
+				}
+				if (param.length != 1) {
+					LOGGER.warn("No correct number of arguments for makeDir");
+					console.printHelpMessage();
+					return;
+				}
+				try {
+					currentDirectory.getChildPath(param[0]).createDirectory();
+				} catch (Exception e) {
+					LOGGER.error("Error while creating new directory:", e);
+				}
+				LOGGER.debug("makedir command leaving");
+
+			}
+		};
+	}
+
+	public Command getMakeFileCommand() {
+		return new Command() {
+
+			@Override
+			public void execute(String[] param) {
+				LOGGER.debug("makefile command entered");
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn("No disk open, please use open or create command");
+					return;
+				}
+				if (param.length != 1) {
+					LOGGER.warn("No correct number of arguments for makeDir");
+					console.printHelpMessage();
+					return;
+				}
+				try {
+					currentDirectory.getChildPath(param[0]).createFile();
+				} catch (Exception e) {
+					LOGGER.error("Error while creating new directory:", e);
+				}
+				LOGGER.debug("makefile command leaving");
+
+			}
+		};
+	}
+
 	public Command getMoveCommand() {
 		return new Command() {
 
@@ -483,53 +491,41 @@ public class VFSUIController {
 		};
 	}
 
-	public Command getMakeDirCommand() {
+	public Command getRemoveCommand() {
 		return new Command() {
 
 			@Override
 			public void execute(String[] param) {
-				LOGGER.debug("makedir command entered");
+				LOGGER.debug("remove command entered");
+
 				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn("No disk open, please use open or create command");
+					LOGGER.warn("No disk open, please use open or create command first");
 					return;
 				}
-				if (param.length != 1) {
-					LOGGER.warn("No correct number of arguments for makeDir");
+
+				if (!(param.length == 1)) {
+					LOGGER.warn("no correct number of parameters for remove command given");
 					console.printHelpMessage();
 					return;
 				}
+				VFSEntry childToRemove = null;
 				try {
-					currentDirectory.getChildPath(param[0]).createDirectory();
+					for (VFSEntry child : currentDirectory.getChildren()) {
+						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
+							childToRemove = child;
+						}
+					}
+					if (childToRemove == null) {
+						LOGGER.warn("Child: " + param[0] + " not found in current directory, nothing removed");
+						return;
+					}
+
+					childToRemove.delete();
 				} catch (Exception e) {
-					LOGGER.error("Error while creating new directory:", e);
+					LOGGER.error("Could not remove file:" + param[0], e);
 				}
-				LOGGER.debug("makedir command leaving");
 
-			}
-		};
-	}
-
-	public Command getMakeFileCommand() {
-		return new Command() {
-
-			@Override
-			public void execute(String[] param) {
-				LOGGER.debug("makefile command entered");
-				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn("No disk open, please use open or create command");
-					return;
-				}
-				if (param.length != 1) {
-					LOGGER.warn("No correct number of arguments for makeDir");
-					console.printHelpMessage();
-					return;
-				}
-				try {
-					currentDirectory.getChildPath(param[0]).createFile();
-				} catch (Exception e) {
-					LOGGER.error("Error while creating new directory:", e);
-				}
-				LOGGER.debug("makefile command leaving");
+				LOGGER.debug("remove command leaving");
 
 			}
 		};
