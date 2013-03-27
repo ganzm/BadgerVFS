@@ -24,7 +24,7 @@ public class MockedVFSPath implements VFSPath {
 	@Override
 	public VFSEntry createDirectory() {
 		MockedVFSEntry entry = new MockedVFSEntry(path, pathToRoot);
-		if (entry.createVFSEntry()) {
+		if (entry.createDirectory()) {
 			return entry;
 		}
 		return null;
@@ -32,7 +32,11 @@ public class MockedVFSPath implements VFSPath {
 
 	@Override
 	public VFSEntry createFile() {
-		return new MockedVFSEntry(path, pathToRoot);
+		MockedVFSEntry entry = new MockedVFSEntry(path, pathToRoot);
+		if (entry.createFile()) {
+			return entry;
+		}
+		return null;
 	}
 
 	@Override
@@ -50,7 +54,7 @@ public class MockedVFSPath implements VFSPath {
 
 	@Override
 	public String getPathString() {
-		return path;
+		return "/" + path;
 	}
 
 	@Override

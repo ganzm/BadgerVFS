@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
+import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
@@ -44,5 +45,13 @@ public interface VFSDiskManager {
 	 * @throws VFSInvalidPathException
 	 */
 	public VFSPath CreatePath(String path) throws VFSException;
+
+	/**
+	 * return the DiskConfigutation
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
+	public DiskConfiguration getDiskConfiguration() throws VFSException;
 
 }

@@ -101,7 +101,7 @@ public class MockedVFSPathTest {
 	@Test
 	public void testGetPath() {
 		MockedVFSPath newDir = new MockedVFSPath("newDir", instance.getRoot());
-		String newDirPath = newDir.getPathString();
+		String newDirPath = newDir.getPathString().substring(1);
 		Assert.assertEquals("newDir", newDirPath);
 
 		String newDirAbsolutePath = newDir.getAbsolutPath();

@@ -218,4 +218,9 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		return dataSectionHandler;
 	}
 
+	@Override
+	public DiskConfiguration getDiskConfiguration() throws VFSException {
+		return config;
+	}
+
 }

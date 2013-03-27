@@ -135,4 +135,9 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 		return new MockedVFSPath(path, config.getHostFilePath());
 	}
 
+	@Override
+	public DiskConfiguration getDiskConfiguration() throws VFSException {
+		return config;
+	}
+
 }

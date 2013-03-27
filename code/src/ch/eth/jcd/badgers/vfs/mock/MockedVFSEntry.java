@@ -21,7 +21,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSEntry implements VFSEntry {
 
-	final Path fileEntry;
+	Path fileEntry;
 	final String pathToRoot;
 
 	MockedVFSEntry(String path, String pathToRoot) {
@@ -33,7 +33,7 @@ public class MockedVFSEntry implements VFSEntry {
 	public void copyTo(VFSPath newLocation) {
 
 		try {
-			Files.walkFileTree(fileEntry, new CopyDirVisitor(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getPathString())));
+			Files.walkFileTree(fileEntry, new CopyDirVisitor(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getPathString().substring(1))));
 		} catch (IOException | VFSException e) {
 			e.printStackTrace();
 		}
@@ -72,7 +72,17 @@ public class MockedVFSEntry implements VFSEntry {
 		}
 	}
 
-	boolean createVFSEntry() {
+	boolean createFile() {
+		try {
+			Files.createFile(fileEntry);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return false;
+		}
+		return true;
+	}
+
+	boolean createDirectory() {
 		try {
 			Files.createDirectory(fileEntry);
 		} catch (IOException e) {
@@ -157,7 +167,7 @@ public class MockedVFSEntry implements VFSEntry {
 	@Override
 	public void renameTo(String newName) {
 		try {
-			Files.move(fileEntry, fileEntry.resolveSibling(newName));
+			fileEntry = Files.move(fileEntry, fileEntry.resolveSibling(newName));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -193,13 +203,19 @@ public class MockedVFSEntry implements VFSEntry {
 
 	@Override
 	public VFSPath getNewChildPath(String childName) {
-		// TODO Auto-generated method stub
-		return null;
+		if (fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
+			return new MockedVFSPath(childName, pathToRoot);
+		} else {
+			return new MockedVFSPath(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length() + 1) + File.separatorChar + childName, pathToRoot);
+		}
 	}
 
 	@Override
 	public VFSEntry getParent() {
-		// TODO Auto-generated method stub
+		if (!fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
+			return new MockedVFSEntry(fileEntry.toAbsolutePath().toString()
+					.substring(pathToRoot.length() + 1, fileEntry.toAbsolutePath().toString().lastIndexOf(File.separatorChar)), pathToRoot);
+		}
 		return null;
 	}
 
