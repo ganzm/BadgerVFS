@@ -119,10 +119,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
 		VFSPathImpl rootPath = new VFSPathImpl(this, VFSPathImpl.FILE_SEPARATOR);
-		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath);
-
-		rootDirectory.setDataBlock(rootDirectoryDataBlock);
-		rootDirectory.setDirectoryBlock(rootDirectoryBlock);
+		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath, rootDirectoryDataBlock, rootDirectoryBlock);
 
 		this.root = rootDirectory;
 	}

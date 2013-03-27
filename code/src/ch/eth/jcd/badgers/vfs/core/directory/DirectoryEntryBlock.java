@@ -1,10 +1,11 @@
 package ch.eth.jcd.badgers.vfs.core.directory;
 
+import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 /**
- * $Id
+ * $Id$
  * 
  * That's what's inside of a DirectoryBlock
  * 
@@ -42,16 +43,6 @@ public class DirectoryEntryBlock {
 	 */
 	private long directoryEntryNodeLocation;
 
-	// /**
-	// * DataBlock which is linked to this DirectoryEntry
-	// */
-	// private DataBlock dataBlock;
-	//
-	// /**
-	// * If this DirectoryEntryBlock is a Folder then this link points to the root of a B-Tree which lists the contained Entries of this Folder
-	// */
-	// private DirectoryBlock directoryEntryTreeNode;
-
 	public DirectoryEntryBlock(String fileName) {
 		this.fileName = fileName;
 		checkFileNameConstraints(fileName);
@@ -77,5 +68,13 @@ public class DirectoryEntryBlock {
 
 	public long getDirectoryEntryNodeLocation() {
 		return directoryEntryNodeLocation;
+	}
+
+	public void assignDataBlock(DataBlock dataBlock) {
+		this.dataBlockLocation = dataBlock.getLocation();
+	}
+
+	public void assignDirectoryBlock(DirectoryBlock directoryBlock) {
+		this.directoryEntryNodeLocation = directoryBlock.getLocation();
 	}
 }

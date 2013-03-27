@@ -62,8 +62,6 @@ public interface VFSEntry {
 	/**
 	 * returns the parent of current entry. if root returns itself
 	 * 
-	 * Memo MG: das würd ich gern na bespreche
-	 * 
 	 * @return
 	 * @throws VFSException
 	 */

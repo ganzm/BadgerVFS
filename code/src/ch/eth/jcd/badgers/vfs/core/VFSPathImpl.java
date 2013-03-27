@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.IOException;
+
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -32,7 +34,7 @@ public class VFSPathImpl implements VFSPath {
 		pathString = pathString.trim();
 
 		if (pathString.startsWith(VFSPath.FILE_SEPARATOR) == false) {
-			throw new VFSInvalidPathException("Path should start with / but it does not" + pathString);
+			throw new VFSInvalidPathException("Path should start with / but it does not Path: " + pathString);
 		}
 
 		// TODO this wont work properly for every case
@@ -48,9 +50,22 @@ public class VFSPathImpl implements VFSPath {
 			throw new VFSException("Can't create Directory from " + pathString + " already exists");
 		}
 
-		VFSEntryImpl entry = VFSEntryImpl.createNewDirectory(diskMgr, this);
+		try {
+			VFSEntryImpl entry = VFSEntryImpl.createNewDirectory(diskMgr, this);
+			return entry;
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
 
-		return entry;
+	}
+
+	public String getParentPath() throws VFSException {
+		String parentPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
+		if ("".equals(parentPath)) {
+			// found the root path
+			return VFSPath.FILE_SEPARATOR;
+		}
+		return parentPath;
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package ch.eth.jcd.badgers.vfs.test.core;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;

@@ -1,7 +1,9 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.IOException;
 import java.util.List;
 
+import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
@@ -19,8 +21,9 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	private DirectoryChildTree childTree;
 
-	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
-		super(diskManager, path);
+	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock, DirectoryBlock directoryBlock) {
+		super(diskManager, path, firstDataBlock);
+		childTree = new DirectoryChildTree(directoryBlock);
 	}
 
 	public void setDirectoryBlock(DirectoryBlock directoryBlock) {
@@ -40,24 +43,33 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public VFSEntry getChildByName(String fileName) throws VFSException {
-		List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());
 
-		for (DirectoryEntryBlock block : directoryEntryList) {
+		try {
+			List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());
 
-			if (fileName.equals(block.getFileName())) {
+			for (DirectoryEntryBlock block : directoryEntryList) {
 
-				VFSPathImpl path = (VFSPathImpl) getChildPath(block.getFileName());
+				if (fileName.equals(block.getFileName())) {
 
-				VFSEntryImpl entry;
-				if (block.isFolderEntryBlock()) {
-					entry = new VFSDirectoryImpl(diskManager, path);
-				} else {
-					entry = new VFSFileImpl(diskManager, path);
+					VFSPathImpl path = (VFSPathImpl) getChildPath(block.getFileName());
+
+					DataBlock firstDataBlock = diskManager.getDataSectionHandler().loadDataBlock(block.getDataBlockLocation());
+
+					VFSEntryImpl entry;
+					if (block.isFolderEntryBlock()) {
+						DirectoryBlock directoryBlock = diskManager.getDirectorySectionHandler().loadDirectoryBlock(block.getDirectoryEntryNodeLocation());
+						entry = new VFSDirectoryImpl(diskManager, path, firstDataBlock, directoryBlock);
+
+					} else {
+						entry = new VFSFileImpl(diskManager, path, firstDataBlock);
+					}
+
+					return entry;
 				}
-
-				return entry;
 			}
+			return null;
+		} catch (IOException e) {
+			throw new VFSException(e);
 		}
-		return null;
 	}
 }

@@ -25,11 +25,12 @@ public class DirectoryBlock {
 	 */
 	private final long location;
 
-	private DirectoryBlock link1;
-	private DirectoryEntryBlock node2;
-	private DirectoryBlock link3;
-	private DirectoryEntryBlock node4;
-	private DirectoryBlock link5;
+	private long linkLeft;
+	private long linkMiddle;
+	private long linkRight;
+
+	private DirectoryEntryBlock nodeLeft;
+	private DirectoryEntryBlock nodeRight;
 
 	public DirectoryBlock(long location) {
 		this.location = location;
@@ -47,53 +48,48 @@ public class DirectoryBlock {
 		return block;
 	}
 
-	public DirectoryBlock getLink1() {
-		return link1;
-	}
-
-	public void setLink1(DirectoryBlock link1) {
-		this.link1 = link1;
-	}
-
-	public DirectoryEntryBlock getNode2() {
-		return node2;
-	}
-
-	public void setNode2(DirectoryEntryBlock node2) {
-		this.node2 = node2;
-	}
-
-	public DirectoryBlock getLink3() {
-		return link3;
-	}
-
-	public void setLink3(DirectoryBlock link3) {
-		this.link3 = link3;
-	}
-
-	public DirectoryEntryBlock getNode4() {
-		return node4;
-	}
-
-	public void setNode4(DirectoryEntryBlock node4) {
-		this.node4 = node4;
-	}
-
-	public DirectoryBlock getLink5() {
-		return link5;
-	}
-
-	public void setLink5(DirectoryBlock link5) {
-		this.link5 = link5;
-	}
-
 	public long getLocation() {
 		return location;
 	}
 
-	public int getLeft() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getLinkLeft() {
+		return linkLeft;
+	}
+
+	public void setLinkLeft(long linkLeft) {
+		this.linkLeft = linkLeft;
+	}
+
+	public long getLinkMiddle() {
+		return linkMiddle;
+	}
+
+	public void setLinkMiddle(long linkMiddle) {
+		this.linkMiddle = linkMiddle;
+	}
+
+	public long getLinkRight() {
+		return linkRight;
+	}
+
+	public void setLinkRight(long linkRight) {
+		this.linkRight = linkRight;
+	}
+
+	public DirectoryEntryBlock getNodeLeft() {
+		return nodeLeft;
+	}
+
+	public void setNodeLeft(DirectoryEntryBlock nodeLeft) {
+		this.nodeLeft = nodeLeft;
+	}
+
+	public DirectoryEntryBlock getNodeRight() {
+		return nodeRight;
+	}
+
+	public void setNodeRight(DirectoryEntryBlock nodeRight) {
+		this.nodeRight = nodeRight;
 	}
 
 }

@@ -1,10 +1,13 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -22,20 +25,39 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * 
 	 * @param path
 	 */
-	public VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
+	public VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock) {
 		this.diskManager = diskManager;
 		this.path = path;
+		this.firstDataBlock = firstDataBlock;
 	}
 
 	/**
 	 * TODO move to me a factory if you want to
 	 * 
-	 * @param vfsPathImpl
+	 * @param vfsPath
 	 * @return
+	 * @throws VFSException
+	 * @throws IOException
 	 */
-	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPathImpl) {
-		throw new UnsupportedOperationException("TODO");
+	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
 
+		// get parent directory
+		VFSPathImpl parentPath = new VFSPathImpl(diskManager, vfsPath.getParentPath());
+		VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) parentPath.getVFSEntry();
+
+		DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
+
+		DataBlock dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
+		directoryEntryBlock.assignDataBlock(dataBlock);
+
+		DirectoryBlock directoryBlock = diskManager.getDirectorySectionHandler().allocateNewDirectoryBlock();
+		directoryEntryBlock.assignDirectoryBlock(directoryBlock);
+
+		parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
+
+		VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
+
+		return entry;
 	}
 
 	public void setDataBlock(DataBlock dataBlock) {

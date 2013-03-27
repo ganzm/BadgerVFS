@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 
@@ -18,8 +19,8 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	private static Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
-	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
-		super(diskManager, path);
+	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock) {
+		super(diskManager, path, firstDataBlock);
 	}
 
 	@Override
