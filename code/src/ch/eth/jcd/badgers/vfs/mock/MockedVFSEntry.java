@@ -209,12 +209,18 @@ public class MockedVFSEntry implements VFSEntry {
 	}
 
 	@Override
-	public VFSEntry getParent() {
-		if (!fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
-			return new MockedVFSEntry(fileEntry.toAbsolutePath().toString()
-					.substring(pathToRoot.length() + 1, fileEntry.toAbsolutePath().toString().lastIndexOf(File.separatorChar)), pathToRoot);
+	public VFSEntry getParent() throws VFSException {
+		// finds parents path
+		String absolutePathString = fileEntry.toAbsolutePath().toString();
+		if (!absolutePathString.equals(pathToRoot)) {
+			int beginIndex = pathToRoot.length();
+			int lastIndexOf = absolutePathString.lastIndexOf(File.separatorChar) + 1;
+			String parentPath = absolutePathString.substring(beginIndex, lastIndexOf);
+			return new MockedVFSEntry(parentPath, pathToRoot);
 		}
-		return null;
+
+		// if is root, returns itself
+		return getPath().getVFSEntry();
 	}
 
 }

@@ -86,13 +86,18 @@ public class VFSUIController {
 				}
 
 				if (!(param.length == 1)) {
-					LOGGER.warn("no correct number of parameters for remove command given");
+					LOGGER.warn("no correct number of parameters for cd command given");
 					console.printHelpMessage();
 					return;
 				}
 
 				if ("..".equals(param[0])) {
-					currentDirectory = currentDirectory.getParent();
+					try {
+						currentDirectory = currentDirectory.getParent();
+					} catch (VFSException e) {
+						LOGGER.error("could not cd to ..", e);
+					}
+					return;
 				}
 				VFSEntry childToCD = null;
 				try {
@@ -112,7 +117,7 @@ public class VFSUIController {
 					currentDirectory = childToCD;
 
 				} catch (Exception e) {
-					LOGGER.error("Could not remove file:" + param[0], e);
+					LOGGER.error("Could not cd to file:" + param[0], e);
 				}
 
 				LOGGER.debug("cd command leaving");
