@@ -163,7 +163,7 @@ public class VFSUIController {
 					return;
 				}
 
-				if (!(param.length == 1)) {
+				if (!(param.length == 2)) {
 					LOGGER.warn("no correct number of parameters for copy command given");
 					console.printHelpMessage();
 					return;
@@ -419,7 +419,7 @@ public class VFSUIController {
 					return;
 				}
 
-				if (!(param.length == 1)) {
+				if (!(param.length == 2)) {
 					LOGGER.warn("no correct number of parameters for mv command given");
 					console.printHelpMessage();
 					return;
