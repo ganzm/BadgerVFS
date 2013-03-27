@@ -21,7 +21,7 @@ section. Each of them is described below.
 \\ \hline
   Encryption used & 20 byte UTF-8 String & null or indicates encryption used for this file
 \\ \hline
- IndexSectionOffset & long (8 byte) &  File offset where our index section
+ DirectorySectionOffset & long (8 byte) &  File offset where our directory section
  starts \\ \hline
  DataSectionOffset & long (8 byte) &  File offset where our data section starts
 \\ \hline
@@ -137,14 +137,10 @@ Block layout \\
  Points to the start address of the next Datablock (linked list).
     0 if this is the last DataBlock of a certain file or folder.
 \\  \hline
-  EntryHeaderLength & 4 byte & Indicates the length of the DataBlock Header in bytes.
+  CreationDate & 8 byte & UTC Time when this file was created
   \newline \textit{This field only exists if Header-Bit is set to 1}
 \\  \hline
-  EntryHeader & 
-  n byte &
-  EntryHeader Informationen creation date, modification date, file name. (May be encrypted/compressed)
-  \newline \textit{This field only exists if Header-Bit is set to 1}
-\\  \hline
+
   DataLenght & 4 byte &
     Indicates the number of data saved on this DataBlock.
     
@@ -152,3 +148,8 @@ Block layout \\
  Data & n byte & user data (may be encrypted/compressed)
 \\  \hline
 \end{tabular}
+
+
+\subsection{The root directory}
+
+- First DataBlock in the Data Section by default
