@@ -97,7 +97,7 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 				@Override
 				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 
-					System.out.println("Deleting dir: " + dir);
+					LOGGER.debug("Deleting dir: " + dir);
 					if (exc == null) {
 						Files.delete(dir);
 						return FileVisitResult.CONTINUE;
@@ -109,7 +109,7 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-					System.out.println("Deleting file: " + file);
+					LOGGER.debug("Deleting file: " + file);
 					Files.delete(file);
 					return FileVisitResult.CONTINUE;
 				}

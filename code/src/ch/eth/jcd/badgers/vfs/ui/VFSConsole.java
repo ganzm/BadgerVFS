@@ -128,8 +128,31 @@ public class VFSConsole {
 	}
 
 	public void printHelpMessage() {
-		writer.println("Usage: TO_BE_IMPLEMENTED");
-
+		/*
+		 * @formatter:off
+		 */
+		String helpMessage = "usage:\n"
+				+ "management mode:\n"
+				+ "\tcreate [c:\\path\\to\\disk.bfs 1024]\t creates virtual disk with a maximum quota of 1024 megabytes on the host system. The file may grow up to 1024 megabytes.\n"
+				+ "\tdispose [c:\\path\\to\\disk.bfs]\t deletes the given virtual disk\n" 
+				+ "\topen [c:\\path\\to\\disk.bfs]\t opens filesystem mode for the given virtual disk\n"
+				+ "\texit\t exits the console program\n"
+				+ "filesystem mode:\n"
+				+ "ls: lists current directory\n"
+				+ "\tcd [dst]\t\t changes current directory to dst which must be either a child directory of the current path or “..”\n"
+				+ "\tmkdir [dirName]\t\t creates a new directory dirName in the current path\n"
+				+ "\tmkfile [fileName]\t creates a new empty file fileName in the current path - this is rather not usefull, as the “import” creates a file with content\n"
+				+ "\trm [file]\t\t deletes the entry denoted as file, it must be a child of the current path\n"
+				+ "\tcp [src] [dst]\t\t copies the src file to dst as a child of the current path\n"
+				+ "\tmv [src] [dst]\t\t moves the src file to dst\n"
+				+ "\timport [ext_src] [dst]\t imports a ext src from the host system to dst\n"
+				+ "\texport [src] [ext_src]\t exports a src file to the host system ext dst\n"
+				+ "\tfind [searchString]\t lists all filesystem entries below the current entry containing searchString\n"
+				+ "\tclose\t\t\t closes the filesystem mode, from now on management mode commands can be executed\n";
+		write(helpMessage);
+		/*
+		 * @formatter:on
+		 */
 	}
 
 	/**
