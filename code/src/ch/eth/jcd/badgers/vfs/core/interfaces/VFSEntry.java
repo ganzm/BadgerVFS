@@ -89,6 +89,11 @@ public interface VFSEntry {
 
 	/**
 	 * deletes the file or folder this Entry represents
+	 * 
+	 * throws an exception if you try to delete a non empty directory
+	 * 
+	 * This instance is marked as deleted. Any further method call will lead to an exception
+	 * 
 	 */
 	public void delete();
 

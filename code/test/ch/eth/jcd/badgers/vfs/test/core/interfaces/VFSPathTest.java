@@ -30,7 +30,7 @@ public class VFSPathTest {
 	private static VFSDiskManager diskManager;
 
 	public VFSPathTest(VFSDiskManager manager) {
-		this.diskManager = manager;
+		VFSPathTest.diskManager = manager;
 	}
 
 	private static DiskConfiguration getMockedConfig(String rootFolderName) {
