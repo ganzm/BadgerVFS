@@ -94,6 +94,6 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public String getName() throws VFSException {
-		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
+		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR) + 1);
 	}
 }

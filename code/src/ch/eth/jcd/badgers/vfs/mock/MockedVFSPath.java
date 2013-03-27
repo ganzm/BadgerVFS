@@ -66,7 +66,7 @@ public class MockedVFSPath implements VFSPath {
 	@Override
 	public String getName() throws VFSException {
 		String pathString = getAbsolutePath();
-		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
+		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR) + 1);
 	}
 
 }

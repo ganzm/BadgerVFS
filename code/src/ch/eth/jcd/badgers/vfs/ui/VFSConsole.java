@@ -142,6 +142,7 @@ public class VFSConsole {
 
 	public void write(String string) {
 		writer.println(string);
+		writer.flush();
 
 	}
 

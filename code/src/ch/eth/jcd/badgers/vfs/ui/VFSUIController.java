@@ -372,7 +372,7 @@ public class VFSUIController {
 				}
 				try {
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						console.write(child.getPath().getAbsolutePath());
+						console.write(child.getPath().getName());
 					}
 				} catch (Exception e) {
 					LOGGER.error("Error while listing files", e);
