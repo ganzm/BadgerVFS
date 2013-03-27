@@ -17,8 +17,10 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 		VFSEntry rootPath = diskManager.getRoot();
 		VFSPath path = rootPath.getChildPath("home");
 		Assert.assertFalse(path.exists());
+		Assert.assertEquals("/home", path.getAbsolutePath());
 
 		VFSEntry homeDir = path.createDirectory();
 		Assert.assertTrue(path.exists());
+		Assert.assertTrue(homeDir.isDirectory());
 	}
 }

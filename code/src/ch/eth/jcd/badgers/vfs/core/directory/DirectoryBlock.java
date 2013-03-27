@@ -91,4 +91,9 @@ public class DirectoryBlock {
 		return location;
 	}
 
+	public int getLeft() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

@@ -63,18 +63,19 @@ public class VFSPathImpl implements VFSPath {
 	}
 
 	@Override
-	public boolean exists() {
-
-		VFSEntry current = diskMgr.getRoot();
-
+	public boolean exists() throws VFSException {
+		// we need to loop through the while directory tree to determine whether a path exists or not
+		VFSEntryImpl current = (VFSEntryImpl) diskMgr.getRoot();
 		for (String pathItem : pathParts) {
-			//
-			// current.getChildren()
-			// "1".toString();
+			VFSEntryImpl child = (VFSEntryImpl) current.getChildByName(pathItem);
+			if (child == null) {
+				return false;
+			}
 
+			current = child;
 		}
+		return true;
 
-		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override

@@ -27,13 +27,15 @@ public class DirectorySectionHandler {
 
 	private final byte[] directoryBlockBuffer = new byte[DirectoryBlock.BLOCK_SIZE];
 
-	private DirectorySectionHandler() {
+	private final RandomAccessFile virtualDiskFile;
 
+	private DirectorySectionHandler(RandomAccessFile virtualDiskFile) {
+		this.virtualDiskFile = virtualDiskFile;
 	}
 
 	public static DirectorySectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long directorySectionOffset,
 			long dataSectionOffset) throws IOException {
-		DirectorySectionHandler directorySection = new DirectorySectionHandler();
+		DirectorySectionHandler directorySection = new DirectorySectionHandler(randomAccessFile);
 
 		// set fixed size of the section
 		directorySection.sectionSize = dataSectionOffset - directorySectionOffset;
@@ -51,7 +53,7 @@ public class DirectorySectionHandler {
 
 	public static DirectorySectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long directorySectionOffset,
 			long dataSectionOffset) {
-		DirectorySectionHandler directorySection = new DirectorySectionHandler();
+		DirectorySectionHandler directorySection = new DirectorySectionHandler(randomAccessFile);
 
 		directorySection.sectionSize = dataSectionOffset - directorySectionOffset;
 
@@ -73,19 +75,19 @@ public class DirectorySectionHandler {
 
 	}
 
-	public DirectoryBlock allocateNewDirectoryBlock(RandomAccessFile virtualDiskFile) {
-		long freePosition = getNextFreeDirectorySectionPosition(virtualDiskFile);
+	public DirectoryBlock allocateNewDirectoryBlock() {
+		long freePosition = getNextFreeDirectorySectionPosition();
 		DirectoryBlock directoryBlock = new DirectoryBlock(freePosition);
 		directoryBlock.persist(virtualDiskFile);
 		return directoryBlock;
 	}
 
-	private long getNextFreeDirectorySectionPosition(RandomAccessFile virtualDiskFile) {
+	private long getNextFreeDirectorySectionPosition() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public DirectoryBlock loadDataBlock(RandomAccessFile virtualDiskFile, long location) throws IOException {
+	public DirectoryBlock loadDirectoryBlock(long location) throws IOException {
 		virtualDiskFile.seek(location);
 		virtualDiskFile.read(directoryBlockBuffer);
 

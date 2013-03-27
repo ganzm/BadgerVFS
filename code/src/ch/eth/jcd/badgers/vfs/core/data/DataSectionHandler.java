@@ -28,16 +28,18 @@ public class DataSectionHandler {
 	 */
 	private long dataSectionSize;
 
+	private final RandomAccessFile virtualDiskFile;
+
 	/**
 	 * Constructor
 	 */
-	private DataSectionHandler() {
-
+	private DataSectionHandler(RandomAccessFile virtualDiskFile) {
+		this.virtualDiskFile = virtualDiskFile;
 	}
 
 	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
 		logger.debug("read Data Section...");
-		DataSectionHandler data = new DataSectionHandler();
+		DataSectionHandler data = new DataSectionHandler(randomAccessFile);
 
 		data.dataSectionOffset = dataSectionOffset;
 
@@ -50,7 +52,7 @@ public class DataSectionHandler {
 
 	public static DataSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) {
 		logger.debug("create Data Section...");
-		DataSectionHandler data = new DataSectionHandler();
+		DataSectionHandler data = new DataSectionHandler(randomAccessFile);
 
 		data.dataSectionOffset = dataSectionOffset;
 
@@ -69,14 +71,14 @@ public class DataSectionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public DataBlock allocateNewDataBlock(RandomAccessFile virtualDiskFile, boolean isDirectory) throws IOException {
-		long freePosition = getNextFreeDataBlockPosition(virtualDiskFile);
+	public DataBlock allocateNewDataBlock(boolean isDirectory) throws IOException {
+		long freePosition = getNextFreeDataBlockPosition();
 		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
 		dataBlock.persist(virtualDiskFile);
 		return dataBlock;
 	}
 
-	public DataBlock loadDataBlock(RandomAccessFile virtualDiskFile, long location) throws IOException {
+	public DataBlock loadDataBlock(long location) throws IOException {
 
 		virtualDiskFile.seek(location);
 		virtualDiskFile.read(dataBlockBuffer);
@@ -86,7 +88,7 @@ public class DataSectionHandler {
 		return dataBlock;
 	}
 
-	private long getNextFreeDataBlockPosition(RandomAccessFile virtualDiskFile) {
+	private long getNextFreeDataBlockPosition() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

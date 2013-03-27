@@ -95,6 +95,9 @@ DataBlockLocation & 8 byte & Pointer to a DataBlock located in the Data Section.
 \\  \hline
 
 DirectoryEntryTreeRoot & 8 bytes & Pointer to a DirectoryBlock located in the Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree containing all entries of that directory specified by the current Directory Entry Block.
+\newline
+
+\textbf{This field containing a 0 indicates that this entry is a file not a directory}
 
 
 
@@ -118,7 +121,7 @@ Block layout \\
  \hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first datablock
  of a file.
  \\ 
- \hspace{0.2cm} 1) Directory-Bit & &  If set to 1 this is a directory, not a file
+ \hspace{0.2cm} 1) not used & &  
  \\ 
  \hspace{0.2cm} 2) not used & &  
  \\ 
@@ -151,5 +154,3 @@ Block layout \\
 
 
 \subsection{The root directory}
-
-- First DataBlock in the Data Section by default

@@ -7,12 +7,13 @@ import java.util.List;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
-public class VFSEntryImpl implements VFSEntry {
+public abstract class VFSEntryImpl implements VFSEntry {
 
 	private final VFSPath path;
-	private final VFSDiskManagerImpl diskManager;
+	protected final VFSDiskManagerImpl diskManager;
 
 	private DataBlock firstDataBlock;
 
@@ -21,7 +22,7 @@ public class VFSEntryImpl implements VFSEntry {
 	 * 
 	 * @param path
 	 */
-	protected VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
+	public VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
 		this.diskManager = diskManager;
 		this.path = path;
 	}
@@ -34,14 +35,7 @@ public class VFSEntryImpl implements VFSEntry {
 	 */
 	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPathImpl) {
 		throw new UnsupportedOperationException("TODO");
-		// VFSEntryImpl entry = new VFSEntryImpl(diskManager, vfsPathImpl);
-		//
-		// DataSectionHandler dataSectionHandler = diskManager.getDataSectionHandler();
-		//
-		// DataBlock dataBlock = dataSectionHandler.allocateNewDataBlock()
-		// dataBlock.setPath(vfsPathImpl.getPathString());
-		//
-		// return entry;
+
 	}
 
 	public void setDataBlock(DataBlock dataBlock) {
@@ -59,9 +53,7 @@ public class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public List<VFSEntry> getChildren() {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract List<VFSEntry> getChildren();
 
 	/**
 	 * Returns a single VFSEntry
@@ -74,9 +66,7 @@ public class VFSEntryImpl implements VFSEntry {
 	 *            name of the file or folder contained by this VFSEntry
 	 * @return
 	 */
-	public VFSEntry getChildByName(String fileName) {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract VFSEntry getChildByName(String fileName) throws VFSException;
 
 	@Override
 	public InputStream getInputStream() {
@@ -114,8 +104,20 @@ public class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public VFSPath getChildPath(String childName) {
-		throw new UnsupportedOperationException("TODO");
+	public VFSPath getChildPath(String childName) throws VFSException {
+
+		String thisPath = getPath().getAbsolutePath();
+
+		String childPath;
+		if (VFSPath.FILE_SEPARATOR.equals(thisPath)) {
+			// this is the Root Entry
+			childPath = VFSPath.FILE_SEPARATOR + childName;
+		} else {
+			childPath = thisPath + VFSPath.FILE_SEPARATOR + childName;
+		}
+
+		VFSPathImpl childPathObj = new VFSPathImpl(diskManager, childPath);
+		return childPathObj;
 	}
 
 	@Override

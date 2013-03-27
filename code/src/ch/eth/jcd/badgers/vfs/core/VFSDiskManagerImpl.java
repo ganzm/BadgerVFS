@@ -30,7 +30,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  */
 public class VFSDiskManagerImpl implements VFSDiskManager {
 
-	private static Logger logger = Logger.getLogger(VFSDiskManagerImpl.class);
+	private static Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
 	private final DiskConfiguration config;
 
@@ -64,8 +64,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public static VFSDiskManagerImpl create(DiskConfiguration config) throws VFSException {
 		try {
-			logger.info("Create new BadgerVFS Disk on " + config.getHostFilePath());
-			logger.debug("Using Config " + config.toString());
+			LOGGER.info("Create new BadgerVFS Disk on " + config.getHostFilePath());
+			LOGGER.debug("Using Config " + config.toString());
 			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
@@ -96,29 +96,29 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	private void createRootFolder() throws IOException {
-		logger.debug("Creating root folder...");
+		LOGGER.debug("Creating root folder...");
 
-		DataBlock rootDirectoryDataBlock = dataSectionHandler.allocateNewDataBlock(virtualDiskFile, true);
-		DirectoryBlock rootDirectoryBlock = directorySectionHandler.allocateNewDirectoryBlock(virtualDiskFile);
+		DataBlock rootDirectoryDataBlock = dataSectionHandler.allocateNewDataBlock(true);
+		DirectoryBlock rootDirectoryBlock = directorySectionHandler.allocateNewDirectoryBlock();
 
 		prepareRootFolder(rootDirectoryDataBlock, rootDirectoryBlock);
 
-		logger.debug("Creating root folder done");
+		LOGGER.debug("Creating root folder done");
 	}
 
 	private void openRootFolder() throws IOException {
-		logger.debug("Opening root folder...");
+		LOGGER.debug("Opening root folder...");
 
-		DataBlock rootDirectoryDataBlock = dataSectionHandler.loadDataBlock(virtualDiskFile, dataSectionHandler.getSectionOffset());
-		DirectoryBlock rootDirectoryBlock = directorySectionHandler.loadDataBlock(virtualDiskFile, directorySectionHandler.getSectionOffset());
+		DataBlock rootDirectoryDataBlock = dataSectionHandler.loadDataBlock(dataSectionHandler.getSectionOffset());
+		DirectoryBlock rootDirectoryBlock = directorySectionHandler.loadDirectoryBlock(directorySectionHandler.getSectionOffset());
 
 		prepareRootFolder(rootDirectoryDataBlock, rootDirectoryBlock);
 
-		logger.debug("Opening root folder done");
+		LOGGER.debug("Opening root folder done");
 	}
 
 	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
-		VFSPathImpl rootPath = new VFSPathImpl(this, VFSPath.FILE_SEPARATOR);
+		VFSPathImpl rootPath = new VFSPathImpl(this, VFSPathImpl.FILE_SEPARATOR);
 		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath);
 
 		rootDirectory.setDataBlock(rootDirectoryDataBlock);
@@ -137,8 +137,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	public static VFSDiskManagerImpl open(DiskConfiguration config) throws VFSException {
 
 		try {
-			logger.info("Open BadgerVFS Disk on " + config.getHostFilePath());
-			logger.debug("Using Config " + config.toString());
+			LOGGER.info("Open BadgerVFS Disk on " + config.getHostFilePath());
+			LOGGER.debug("Using Config " + config.toString());
 			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
@@ -158,6 +158,8 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			mgr.dataSectionHandler = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
+
+			mgr.openRootFolder();
 
 			return mgr;
 
@@ -182,7 +184,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void dispose() throws VFSException {
-		logger.info("Getting rid of " + config.getHostFilePath());
+		LOGGER.info("Getting rid of " + config.getHostFilePath());
 		close();
 
 		if (new File(config.getHostFilePath()).delete() == false) {

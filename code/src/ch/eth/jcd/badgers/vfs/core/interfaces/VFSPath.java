@@ -15,6 +15,12 @@ public interface VFSPath {
 
 	public VFSEntry createFile() throws VFSException;
 
+	/**
+	 * check whether a path actually exists or not
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
 	public boolean exists() throws VFSException;
 
 	/**

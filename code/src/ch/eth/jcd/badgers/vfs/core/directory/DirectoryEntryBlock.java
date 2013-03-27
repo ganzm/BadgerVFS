@@ -1,13 +1,12 @@
 package ch.eth.jcd.badgers.vfs.core.directory;
 
-import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 /**
  * $Id
  * 
- * That's what's inside of an IndexBlock
+ * That's what's inside of a DirectoryBlock
  * 
  * Fixed size when serialized
  * 
@@ -29,14 +28,29 @@ public class DirectoryEntryBlock {
 	private final String fileName;
 
 	/**
-	 * DataBlock which is linked to this DirectoryEntry
+	 * Points to a DataBlock in our file
 	 */
-	private DataBlock dataBlock;
+	private long dataBlockLocation;
 
 	/**
-	 * If this DirectoryEntryBlock is a Folder then this link points to the root of a B-Tree which lists the contained Entries of this Folder
+	 * 
+	 * Is zero if this Directory does not specify a Folder
+	 * 
+	 * Otherwise it points to a DirectoryBlock which is the root of a B-Tree which contains the files located in our folder
+	 * 
+	 * 
 	 */
-	private DirectoryBlock directoryEntryTreeNode;
+	private long directoryEntryNodeLocation;
+
+	// /**
+	// * DataBlock which is linked to this DirectoryEntry
+	// */
+	// private DataBlock dataBlock;
+	//
+	// /**
+	// * If this DirectoryEntryBlock is a Folder then this link points to the root of a B-Tree which lists the contained Entries of this Folder
+	// */
+	// private DirectoryBlock directoryEntryTreeNode;
 
 	public DirectoryEntryBlock(String fileName) {
 		this.fileName = fileName;
@@ -49,7 +63,19 @@ public class DirectoryEntryBlock {
 		}
 	}
 
-	public void setDataBlock(DataBlock dataBlock) {
-		this.dataBlock = dataBlock;
+	public boolean isFolderEntryBlock() {
+		return directoryEntryNodeLocation != 0;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public long getDataBlockLocation() {
+		return dataBlockLocation;
+	}
+
+	public long getDirectoryEntryNodeLocation() {
+		return directoryEntryNodeLocation;
 	}
 }
