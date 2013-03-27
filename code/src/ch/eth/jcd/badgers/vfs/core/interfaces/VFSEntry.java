@@ -55,7 +55,7 @@ public interface VFSEntry {
 	 * 
 	 * @return returns a fully initialized new VFSPath object which <code> this (VFSEntry)</code> as parent and <code>childName</code> as child
 	 */
-	public VFSPath getNewChildPath(String childName);
+	public VFSPath getChildPath(String childName);
 
 	/**
 	 * returns the parent of current entry. if root returns itself

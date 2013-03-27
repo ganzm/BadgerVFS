@@ -5,6 +5,7 @@ import java.nio.file.Files;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSPath implements VFSPath {
 
@@ -53,13 +54,19 @@ public class MockedVFSPath implements VFSPath {
 	}
 
 	@Override
-	public String getPathString() {
-		return "/" + path;
+	public String getAbsolutePath() {
+		return VFSPath.FILE_SEPARATOR + path;
 	}
 
 	@Override
 	public VFSEntry getVFSEntry() {
 		return new MockedVFSEntry(path, pathToRoot);
+	}
+
+	@Override
+	public String getName() throws VFSException {
+		String pathString = getAbsolutePath();
+		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
 	}
 
 }

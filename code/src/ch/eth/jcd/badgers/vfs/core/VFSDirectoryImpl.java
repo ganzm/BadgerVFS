@@ -22,4 +22,8 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		childTree = new DirectoryChildTree(directoryBlock);
 	}
 
+	public DirectoryChildTree getChildTree() {
+		return childTree;
+	}
+
 }

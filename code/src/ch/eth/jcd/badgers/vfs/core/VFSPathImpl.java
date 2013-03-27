@@ -3,16 +3,19 @@ package ch.eth.jcd.badgers.vfs.core;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 public class VFSPathImpl implements VFSPath {
 
 	private final VFSDiskManagerImpl diskMgr;
 
 	private final String pathString;
+	private final String[] pathParts;
 
 	protected VFSPathImpl(VFSDiskManagerImpl vfsDiskManagerImpl, String absolutePathString) {
 		this.diskMgr = vfsDiskManagerImpl;
-		this.pathString = validateAbsolutePath(absolutePathString);
+		this.pathString = absolutePathString;
+		this.pathParts = validateAndSplitAbsolutePath(absolutePathString);
 	}
 
 	/**
@@ -23,10 +26,19 @@ public class VFSPathImpl implements VFSPath {
 	 * <li>check if path starts with /</li>
 	 * <ul>
 	 */
-	public static String validateAbsolutePath(String pathString) {
+	public static String[] validateAndSplitAbsolutePath(String pathString) {
 		// TODO do stuff here
 
-		return pathString;
+		pathString = pathString.trim();
+
+		if (pathString.startsWith(VFSPath.FILE_SEPARATOR) == false) {
+			throw new VFSInvalidPathException("Path should start with / but it does not" + pathString);
+		}
+
+		// TODO this wont work properly for every case
+		pathString = pathString.substring(1);
+
+		return pathString.split(VFSPath.FILE_SEPARATOR);
 	}
 
 	@Override
@@ -52,6 +64,16 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public boolean exists() {
+
+		VFSEntry current = diskMgr.getRoot();
+
+		for (String pathItem : pathParts) {
+			//
+			// current.getChildren()
+			// "1".toString();
+
+		}
+
 		throw new UnsupportedOperationException("TODO");
 	}
 
@@ -61,7 +83,7 @@ public class VFSPathImpl implements VFSPath {
 	}
 
 	@Override
-	public String getPathString() {
+	public String getAbsolutePath() {
 		return pathString;
 	}
 
@@ -70,4 +92,8 @@ public class VFSPathImpl implements VFSPath {
 		return "Path to " + pathString;
 	}
 
+	@Override
+	public String getName() throws VFSException {
+		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
+	}
 }

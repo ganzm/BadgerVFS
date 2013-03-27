@@ -97,7 +97,7 @@ public class VFSPathTest {
 	@Test
 	public void testCreateDirectory() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
-		VFSPath testDir = rootEntry.getNewChildPath("dirTest");
+		VFSPath testDir = rootEntry.getChildPath("dirTest");
 		Assert.assertFalse("Expected directory not exists", testDir.exists());
 		testDir.createDirectory();
 		Assert.assertTrue("Expected directory exists", testDir.exists());
@@ -107,7 +107,7 @@ public class VFSPathTest {
 	public void testCreateFile() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
 
-		VFSPath newFile = rootEntry.getNewChildPath("newFile.txt");
+		VFSPath newFile = rootEntry.getChildPath("newFile.txt");
 		Assert.assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
 		Assert.assertTrue("Expected file exists", entry.getPath().exists());
@@ -116,7 +116,7 @@ public class VFSPathTest {
 	@Test
 	public void testExists() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
-		VFSPath newFile = rootEntry.getNewChildPath("newExists.txt");
+		VFSPath newFile = rootEntry.getChildPath("newExists.txt");
 		Assert.assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
 		Assert.assertTrue("Expected file exists", entry.getPath().exists());
@@ -126,8 +126,8 @@ public class VFSPathTest {
 	@Test
 	public void testGetPathString() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
-		VFSPath newDir = rootEntry.getNewChildPath("newDir");
-		String newDirPath = newDir.getPathString();
+		VFSPath newDir = rootEntry.getChildPath("newDir");
+		String newDirPath = newDir.getAbsolutePath();
 		Assert.assertEquals("Expected path = /newDir", "/newDir", newDirPath);
 	}
 

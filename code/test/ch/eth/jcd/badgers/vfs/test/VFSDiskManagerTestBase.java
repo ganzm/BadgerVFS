@@ -21,8 +21,8 @@ public class VFSDiskManagerTestBase {
 	public static void beforeClass() throws VFSException {
 		UnittestLogger.init();
 
-		diskManager = setupMock();
-		// diskManager = setupDefault();
+		// diskManager = setupMock();
+		diskManager = setupDefault();
 	}
 
 	@Before

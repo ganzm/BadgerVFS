@@ -96,7 +96,7 @@ public class VFSUIController {
 				VFSEntry childToCD = null;
 				try {
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						if (child.getPath().getPathString().endsWith(param[0])) {
+						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToCD = child;
 						}
 					}
@@ -200,7 +200,7 @@ public class VFSUIController {
 				VFSEntry childToRemove = null;
 				try {
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						if (child.getPath().getPathString().endsWith(param[0])) {
+						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToRemove = child;
 						}
 					}
@@ -287,7 +287,7 @@ public class VFSUIController {
 				try {
 					VFSEntry childToExport = null;
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						if (child.getPath().getPathString().endsWith(param[0])) {
+						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToExport = child;
 						}
 					}
@@ -344,7 +344,7 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					VFSEntry newFile = currentDirectory.getNewChildPath(param[1]).createFile();
+					VFSEntry newFile = currentDirectory.getChildPath(param[1]).createFile();
 
 					FileInputStream fis = new FileInputStream(param[0]);
 					OutputStream os = newFile.getOutputStream(0);
@@ -371,7 +371,7 @@ public class VFSUIController {
 				}
 				try {
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						console.write(child.getPath().getPathString());
+						console.write(child.getPath().getAbsolutePath());
 					}
 				} catch (Exception e) {
 					LOGGER.error("Error while listing files", e);
@@ -435,7 +435,7 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentDirectory.getNewChildPath(param[0]).createDirectory();
+					currentDirectory.getChildPath(param[0]).createDirectory();
 				} catch (Exception e) {
 					LOGGER.error("Error while creating new directory:", e);
 				}
@@ -461,7 +461,7 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentDirectory.getNewChildPath(param[0]).createFile();
+					currentDirectory.getChildPath(param[0]).createFile();
 				} catch (Exception e) {
 					LOGGER.error("Error while creating new directory:", e);
 				}

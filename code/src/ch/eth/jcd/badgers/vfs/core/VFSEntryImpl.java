@@ -63,6 +63,21 @@ public class VFSEntryImpl implements VFSEntry {
 		throw new UnsupportedOperationException("TODO");
 	}
 
+	/**
+	 * Returns a single VFSEntry
+	 * 
+	 * 
+	 * 
+	 * does only work on directories
+	 * 
+	 * @param fileName
+	 *            name of the file or folder contained by this VFSEntry
+	 * @return
+	 */
+	public VFSEntry getChildByName(String fileName) {
+		throw new UnsupportedOperationException("TODO");
+	}
+
 	@Override
 	public InputStream getInputStream() {
 		throw new UnsupportedOperationException("TODO");
@@ -99,7 +114,7 @@ public class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public VFSPath getNewChildPath(String childName) {
+	public VFSPath getChildPath(String childName) {
 		throw new UnsupportedOperationException("TODO");
 	}
 

@@ -14,12 +14,11 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
-	private static Logger logger = Logger.getLogger(MockedVFSDiskManagerImpl.class);
+	private static Logger LOGGER = Logger.getLogger(MockedVFSDiskManagerImpl.class);
 
 	/**
 	 * creates a new virtual disk
@@ -30,8 +29,8 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public static MockedVFSDiskManagerImpl create(DiskConfiguration config) throws VFSException {
 		try {
-			logger.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
-			logger.debug("Using Config " + config.toString());
+			LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
+			LOGGER.debug("Using Config " + config.toString());
 			MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
@@ -60,8 +59,8 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	public static MockedVFSDiskManagerImpl open(DiskConfiguration config) throws VFSException {
 
 		try {
-			logger.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
-			logger.debug("Using Config " + config.toString());
+			LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
+			LOGGER.debug("Using Config " + config.toString());
 			MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
@@ -116,7 +115,7 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 			});
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 	}
 
@@ -128,11 +127,6 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	@Override
 	public VFSEntry getRoot() {
 		return new MockedVFSPath("", config.getHostFilePath()).getVFSEntry();
-	}
-
-	@Override
-	public VFSPath CreatePath(String path) throws VFSException {
-		return new MockedVFSPath(path, config.getHostFilePath());
 	}
 
 	@Override

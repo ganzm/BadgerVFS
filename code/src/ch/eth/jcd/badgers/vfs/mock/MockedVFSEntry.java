@@ -15,11 +15,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSEntry implements VFSEntry {
+	private static final Logger LOGGER = Logger.getLogger(MockedVFSEntry.class);
 
 	Path fileEntry;
 	final String pathToRoot;
@@ -33,9 +36,10 @@ public class MockedVFSEntry implements VFSEntry {
 	public void copyTo(VFSPath newLocation) {
 
 		try {
-			Files.walkFileTree(fileEntry, new CopyDirVisitor(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getPathString().substring(1))));
+			Files.walkFileTree(fileEntry,
+					new CopyDirVisitor(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getAbsolutePath().substring(1))));
 		} catch (IOException | VFSException e) {
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		// try {
 		// Files.copy(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getPath()));
@@ -117,8 +121,7 @@ public class MockedVFSEntry implements VFSEntry {
 		try {
 			return Files.newInputStream(fileEntry);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return null;
 	}
@@ -128,8 +131,7 @@ public class MockedVFSEntry implements VFSEntry {
 		try {
 			return Files.newOutputStream(fileEntry);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 		return null;
 	}
@@ -155,11 +157,9 @@ public class MockedVFSEntry implements VFSEntry {
 			toFile = Paths.get(((MockedVFSEntry) (path.getVFSEntry())).getAbsolutePath());
 			Files.move(fileEntry, toFile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		} catch (VFSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 
 	}
@@ -169,8 +169,7 @@ public class MockedVFSEntry implements VFSEntry {
 		try {
 			fileEntry = Files.move(fileEntry, fileEntry.resolveSibling(newName));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 	}
 
@@ -195,14 +194,13 @@ public class MockedVFSEntry implements VFSEntry {
 		try {
 			Files.delete(fileEntry);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
 		}
 
 	}
 
 	@Override
-	public VFSPath getNewChildPath(String childName) {
+	public VFSPath getChildPath(String childName) {
 		if (fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
 			return new MockedVFSPath(childName, pathToRoot);
 		} else {

@@ -14,7 +14,8 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 	@Test
 	public void testCreateSimpleDir() throws VFSException {
 
-		VFSPath path = diskManager.CreatePath("/home");
+		VFSEntry rootPath = diskManager.getRoot();
+		VFSPath path = rootPath.getChildPath("home");
 		Assert.assertFalse(path.exists());
 
 		VFSEntry homeDir = path.createDirectory();

@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.directory;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 /**
@@ -43,7 +44,7 @@ public class DirectoryEntryBlock {
 	}
 
 	private void checkFileNameConstraints(String fileName) {
-		if (fileName.contains("/")) {
+		if (fileName.contains(VFSPath.FILE_SEPARATOR)) {
 			throw new VFSInvalidPathException(fileName + " is an invalid FileName");
 		}
 	}

@@ -118,7 +118,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
-		VFSPathImpl rootPath = new VFSPathImpl(this, "/");
+		VFSPathImpl rootPath = new VFSPathImpl(this, VFSPath.FILE_SEPARATOR);
 		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath);
 
 		rootDirectory.setDataBlock(rootDirectoryDataBlock);
@@ -198,12 +198,6 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	@Override
 	public VFSEntry getRoot() {
 		return root;
-	}
-
-	@Override
-	public VFSPath CreatePath(String pathString) throws VFSException {
-		VFSPathImpl path = new VFSPathImpl(this, pathString);
-		return path;
 	}
 
 	public HeaderSectionHandler getHeaderSectionHandler() {
