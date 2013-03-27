@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.directory;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 /**
  * $Id
@@ -9,37 +10,45 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
  * 
  * Fixed size when serialized
  * 
- * 
  */
 public class DirectoryEntryBlock {
 
 	/**
-	 * Hash Size in Bytes
+	 * Maximum size of a file name in bytes
+	 */
+	public static final int MAX_FILENAME_SIZE = 112;
+
+	/**
+	 * Size of one IndexBlock when serialized to disk
 	 * 
-	 * Sha512 creates 512bit hashes
+	 * An Index Block consists of 2 IndexTreeEntries and 3 pointers to other IndexBlocks
 	 */
-	public static final long INDEX_TREE_ENTRY_HASH_SIZE = 64;
-	/**
-	 * Size when serialized to disk in bytes
-	 * 
-	 * Size of our FilePath Hash we use as Key for the b-tree <br>
-	 * 8 byte Reference to DataBlock
-	 */
-	public static final long INDEX_TREE_ENTRY_TOTAL_SIZE = INDEX_TREE_ENTRY_HASH_SIZE + 8;
+	public static final int BLOCK_SIZE = MAX_FILENAME_SIZE + (2 * 8);
+
+	private final String fileName;
 
 	/**
-	 * the fixed size key which we insert into our b-Tree
+	 * DataBlock which is linked to this DirectoryEntry
 	 */
-	private byte[] key;
-
-	private long firstDataBlock;
+	private DataBlock dataBlock;
 
 	/**
-	 * Lazy loaded reference to the first DataBlock
+	 * If this DirectoryEntryBlock is a Folder then this link points to the root of a B-Tree which lists the contained Entries of this Folder
 	 */
-	private DataBlock firstBlock;
+	private DirectoryBlock directoryEntryTreeNode;
 
-	public DirectoryEntryBlock() {
+	public DirectoryEntryBlock(String fileName) {
+		this.fileName = fileName;
+		checkFileNameConstraints(fileName);
+	}
 
+	private void checkFileNameConstraints(String fileName) {
+		if (fileName.contains("/")) {
+			throw new VFSInvalidPathException(fileName + " is an invalid FileName");
+		}
+	}
+
+	public void setDataBlock(DataBlock dataBlock) {
+		this.dataBlock = dataBlock;
 	}
 }

@@ -53,12 +53,14 @@ public interface VFSEntry {
 	 * This Method creates a fully initialized new VFSPath object with <code> this (VFSEntry)</code> as parent and <code>childName</code> as child. With this
 	 * method no client of the filesystem framework needs to create new VFSPaths or VFSEntries itself.
 	 * 
-	 * @return returns a fully initialized new VFSPath object wich <code> this (VFSEntry)</code> as parent and <code>childName</code> as child
+	 * @return returns a fully initialized new VFSPath object which <code> this (VFSEntry)</code> as parent and <code>childName</code> as child
 	 */
 	public VFSPath getNewChildPath(String childName);
 
 	/**
 	 * returns the parent of current entry. if root returns itself
+	 * 
+	 * Memo MG: das würd ich gern na bespreche
 	 * 
 	 * @return
 	 */

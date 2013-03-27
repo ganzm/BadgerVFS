@@ -191,4 +191,16 @@ public class MockedVFSEntry implements VFSEntry {
 
 	}
 
+	@Override
+	public VFSPath getNewChildPath(String childName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public VFSEntry getParent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
 import ch.eth.jcd.badgers.vfs.util.HashUtil;
 
@@ -24,6 +23,6 @@ public class HashTest {
 		new Random().nextBytes(data);
 
 		byte[] hashedData = HashUtil.hashSha512(data);
-		Assert.assertEquals(DirectoryEntryBlock.INDEX_TREE_ENTRY_HASH_SIZE, hashedData.length);
+		Assert.assertEquals(64, hashedData.length);
 	}
 }

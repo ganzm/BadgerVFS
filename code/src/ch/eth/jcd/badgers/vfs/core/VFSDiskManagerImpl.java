@@ -6,12 +6,15 @@
 package ch.eth.jcd.badgers.vfs.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.header.HeaderSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
@@ -75,24 +78,53 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			long headerSectionOffset = 0;
 
 			mgr.headerSectionHandler = HeaderSectionHandler.createNew(randomAccessFile, config, headerSectionOffset);
-			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
+			long directorySectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.directorySectionHandler = DirectorySectionHandler.createNew(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.directorySectionHandler = DirectorySectionHandler.createNew(randomAccessFile, config, directorySectionOffset, dataSectionOffset);
 			mgr.dataSectionHandler = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;
 
-			logger.debug("Creating root folder...");
-			VFSPath rootPath = mgr.CreatePath("/");
-			mgr.root = rootPath.createDirectory();
-			logger.debug("Creating root folder done");
+			mgr.createRootFolder();
 
 			return mgr;
 
 		} catch (Exception e) {
 			throw new VFSException(e);
 		}
+	}
+
+	private void createRootFolder() throws IOException {
+		logger.debug("Creating root folder...");
+
+		DataBlock rootDirectoryDataBlock = dataSectionHandler.allocateNewDataBlock(virtualDiskFile, true);
+		DirectoryBlock rootDirectoryBlock = directorySectionHandler.allocateNewDirectoryBlock(virtualDiskFile);
+
+		prepareRootFolder(rootDirectoryDataBlock, rootDirectoryBlock);
+
+		logger.debug("Creating root folder done");
+	}
+
+	private void openRootFolder() throws IOException {
+		logger.debug("Opening root folder...");
+
+		DataBlock rootDirectoryDataBlock = dataSectionHandler.loadDataBlock(virtualDiskFile, dataSectionHandler.getSectionOffset());
+		DirectoryBlock rootDirectoryBlock = directorySectionHandler.loadDataBlock(virtualDiskFile, directorySectionHandler.getSectionOffset());
+
+		prepareRootFolder(rootDirectoryDataBlock, rootDirectoryBlock);
+
+		logger.debug("Opening root folder done");
+	}
+
+	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
+		VFSPathImpl rootPath = new VFSPathImpl(this, "/");
+		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath);
+
+		rootDirectory.setDataBlock(rootDirectoryDataBlock);
+		rootDirectory.setDirectoryBlock(rootDirectoryBlock);
+
+		this.root = rootDirectory;
 	}
 
 	/**
@@ -119,10 +151,10 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			long headerSectionOffset = 0;
 
 			mgr.headerSectionHandler = HeaderSectionHandler.createExisting(randomAccessFile, config, headerSectionOffset);
-			long indexSectionOffset = mgr.headerSectionHandler.getSectionSize();
+			long directorySectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.directorySectionHandler = DirectorySectionHandler.createExisting(randomAccessFile, config, indexSectionOffset, dataSectionOffset);
+			mgr.directorySectionHandler = DirectorySectionHandler.createExisting(randomAccessFile, config, directorySectionOffset, dataSectionOffset);
 			mgr.dataSectionHandler = DataSectionHandler.createExisting(randomAccessFile, config, dataSectionOffset);
 
 			mgr.virtualDiskFile = randomAccessFile;

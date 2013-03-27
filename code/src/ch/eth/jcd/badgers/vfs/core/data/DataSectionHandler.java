@@ -16,6 +16,8 @@ import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 public class DataSectionHandler {
 	private static Logger logger = Logger.getLogger(DataSectionHandler.class);
 
+	private final byte[] dataBlockBuffer = new byte[DataBlock.BLOCK_SIZE];
+
 	/**
 	 * offset in bytes where the first byte of the data section is located on the virtual disk
 	 */
@@ -62,10 +64,31 @@ public class DataSectionHandler {
 	/**
 	 * Memory Allocation on the DataSection
 	 * 
+	 * @param isDirectory
+	 * 
 	 * @return
+	 * @throws IOException
 	 */
-	public DataBlock allocateNewDataBlock() {
-		throw new UnsupportedOperationException("TODO");
+	public DataBlock allocateNewDataBlock(RandomAccessFile virtualDiskFile, boolean isDirectory) throws IOException {
+		long freePosition = getNextFreeDataBlockPosition(virtualDiskFile);
+		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
+		dataBlock.persist(virtualDiskFile);
+		return dataBlock;
+	}
+
+	public DataBlock loadDataBlock(RandomAccessFile virtualDiskFile, long location) throws IOException {
+
+		virtualDiskFile.seek(location);
+		virtualDiskFile.read(dataBlockBuffer);
+
+		DataBlock dataBlock = DataBlock.deserialize(location, dataBlockBuffer);
+
+		return dataBlock;
+	}
+
+	private long getNextFreeDataBlockPosition(RandomAccessFile virtualDiskFile) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	public void close() {

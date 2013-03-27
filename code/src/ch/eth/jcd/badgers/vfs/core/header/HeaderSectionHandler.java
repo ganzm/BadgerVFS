@@ -101,7 +101,7 @@ public class HeaderSectionHandler {
 		randomAccessFile.writeLong(header.directorySectionOffset);
 
 		// DataSectionOffset | double (8 byte)
-		header.dataSectionOffset = header.directorySectionOffset + DirectorySectionHandler.DEFAULT_INDEXSECTION_SIZE;
+		header.dataSectionOffset = header.directorySectionOffset + DirectorySectionHandler.DEFAULT_DIRECTORYSECTION_SIZE;
 		randomAccessFile.writeLong(header.dataSectionOffset);
 
 		randomAccessFile.seek(header.directorySectionOffset);

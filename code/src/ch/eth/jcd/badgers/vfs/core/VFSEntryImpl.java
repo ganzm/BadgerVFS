@@ -5,21 +5,23 @@ import java.io.OutputStream;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
-import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 public class VFSEntryImpl implements VFSEntry {
 
 	private final VFSPath path;
 	private final VFSDiskManagerImpl diskManager;
 
+	private DataBlock firstDataBlock;
+
 	/**
 	 * creates a new
 	 * 
 	 * @param path
 	 */
-	private VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
+	protected VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path) {
 		this.diskManager = diskManager;
 		this.path = path;
 	}
@@ -31,14 +33,24 @@ public class VFSEntryImpl implements VFSEntry {
 	 * @return
 	 */
 	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPathImpl) {
-		VFSEntryImpl entry = new VFSEntryImpl(diskManager, vfsPathImpl);
+		throw new UnsupportedOperationException("TODO");
+		// VFSEntryImpl entry = new VFSEntryImpl(diskManager, vfsPathImpl);
+		//
+		// DataSectionHandler dataSectionHandler = diskManager.getDataSectionHandler();
+		//
+		// DataBlock dataBlock = dataSectionHandler.allocateNewDataBlock()
+		// dataBlock.setPath(vfsPathImpl.getPathString());
+		//
+		// return entry;
+	}
 
-		DataSectionHandler dataSectionHandler = diskManager.getDataSectionHandler();
+	public void setDataBlock(DataBlock dataBlock) {
+		if (firstDataBlock != null) {
+			// this should not happen
+			throw new VFSRuntimeException("Internal error - Overriding DataBlock of " + this);
+		}
 
-		DataBlock dataBlock = dataSectionHandler.allocateNewDataBlock();
-		dataBlock.setPath(vfsPathImpl.getPathString());
-
-		return entry;
+		this.firstDataBlock = dataBlock;
 	}
 
 	@Override
@@ -83,6 +95,16 @@ public class VFSEntryImpl implements VFSEntry {
 
 	@Override
 	public boolean isDirectory() {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public VFSPath getNewChildPath(String childName) {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public VFSEntry getParent() {
 		throw new UnsupportedOperationException("TODO");
 	}
 }
