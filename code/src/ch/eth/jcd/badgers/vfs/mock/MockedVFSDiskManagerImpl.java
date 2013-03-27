@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSDiskManagerImpl implements VFSDiskManager {
@@ -132,6 +133,11 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	@Override
 	public DiskConfiguration getDiskConfiguration() throws VFSException {
 		return config;
+	}
+
+	@Override
+	public VFSPath createPath(String path) throws VFSException {
+		return new MockedVFSPath(path, config.getHostFilePath());
 	}
 
 }

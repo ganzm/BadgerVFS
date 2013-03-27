@@ -217,4 +217,10 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		return config;
 	}
 
+	@Override
+	public VFSPath createPath(String pathString) throws VFSException {
+		VFSPathImpl path = new VFSPathImpl(this, pathString);
+		return path;
+	}
+
 }

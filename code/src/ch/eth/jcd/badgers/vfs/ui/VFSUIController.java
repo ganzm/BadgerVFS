@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
@@ -156,7 +157,25 @@ public class VFSUIController {
 			@Override
 			public void execute(String[] param) {
 				LOGGER.debug("cp command entered");
-				console.stop();
+
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn("No disk open, please use open or create command first");
+					return;
+				}
+
+				if (!(param.length == 1)) {
+					LOGGER.warn("no correct number of parameters for copy command given");
+					console.printHelpMessage();
+					return;
+				}
+				try {
+					VFSPath srcPath = currentManager.createPath(param[0]);
+					VFSPath dstPath = currentManager.createPath(param[1]);
+
+					srcPath.getVFSEntry().copyTo(dstPath);
+				} catch (Exception e) {
+					LOGGER.error("Error copying from " + param[0] + " to " + param[1]);
+				}
 				LOGGER.debug("cp command leaving");
 			}
 		};
@@ -394,7 +413,25 @@ public class VFSUIController {
 			@Override
 			public void execute(String[] param) {
 				LOGGER.debug("mv command entered");
-				console.stop();
+
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn("No disk open, please use open or create command first");
+					return;
+				}
+
+				if (!(param.length == 1)) {
+					LOGGER.warn("no correct number of parameters for mv command given");
+					console.printHelpMessage();
+					return;
+				}
+				try {
+					VFSPath srcPath = currentManager.createPath(param[0]);
+					VFSPath dstPath = currentManager.createPath(param[1]);
+
+					srcPath.getVFSEntry().moveTo(dstPath);
+				} catch (Exception e) {
+					LOGGER.error("Error moving from " + param[0] + " to " + param[1]);
+				}
 				LOGGER.debug("mv command leaving");
 
 			}
