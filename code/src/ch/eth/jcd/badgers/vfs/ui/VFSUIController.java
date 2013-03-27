@@ -169,8 +169,19 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					VFSPath srcPath = currentManager.createPath(param[0]);
-					VFSPath dstPath = currentManager.createPath(param[1]);
+					VFSPath srcPath;
+					if (!param[0].startsWith(VFSPath.FILE_SEPARATOR)) {
+						srcPath = currentDirectory.getChildPath(param[0]);
+					} else {
+						srcPath = currentManager.createPath(param[0]);
+					}
+
+					VFSPath dstPath;
+					if (!param[1].startsWith(VFSPath.FILE_SEPARATOR)) {
+						dstPath = currentDirectory.getChildPath(param[1]);
+					} else {
+						dstPath = currentManager.createPath(param[1]);
+					}
 
 					srcPath.getVFSEntry().copyTo(dstPath);
 				} catch (Exception e) {
@@ -425,9 +436,19 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					VFSPath srcPath = currentManager.createPath(param[0]);
-					VFSPath dstPath = currentManager.createPath(param[1]);
+					VFSPath srcPath;
+					if (!param[0].startsWith(VFSPath.FILE_SEPARATOR)) {
+						srcPath = currentDirectory.getChildPath(param[0]);
+					} else {
+						srcPath = currentManager.createPath(param[0]);
+					}
 
+					VFSPath dstPath;
+					if (!param[1].startsWith(VFSPath.FILE_SEPARATOR)) {
+						dstPath = currentDirectory.getChildPath(param[1]);
+					} else {
+						dstPath = currentManager.createPath(param[1]);
+					}
 					srcPath.getVFSEntry().moveTo(dstPath);
 				} catch (Exception e) {
 					LOGGER.error("Error moving from " + param[0] + " to " + param[1]);
