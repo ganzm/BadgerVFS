@@ -90,8 +90,8 @@ public class VFSPathTest {
 
 	@Parameters
 	public static Collection<Object[]> getParameters() throws VFSException {
-		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig(MockedVFSDiskManagerImpl.class.getName())) },
-				{ MockedVFSDiskManagerImpl.create(getMockedConfig(VFSDiskManagerImpl.class.getName())) } });
+		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("MockedRoot")) },
+				{ VFSDiskManagerImpl.create(getMockedConfig("BadgersDisk.bfs")) } });
 	}
 
 	@Test
