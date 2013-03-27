@@ -21,13 +21,13 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
-public class MockedVFSEntry implements VFSEntry {
-	private static final Logger LOGGER = Logger.getLogger(MockedVFSEntry.class);
+public class MockedVFSEntryImpl implements VFSEntry {
+	private static final Logger LOGGER = Logger.getLogger(MockedVFSEntryImpl.class);
 
 	Path fileEntry;
 	final String pathToRoot;
 
-	MockedVFSEntry(String path, String pathToRoot) {
+	MockedVFSEntryImpl(String path, String pathToRoot) {
 		fileEntry = Paths.get(pathToRoot + File.separatorChar + path);
 		this.pathToRoot = pathToRoot;
 	}
@@ -106,9 +106,9 @@ public class MockedVFSEntry implements VFSEntry {
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(fileEntry)) {
 			for (Path path : directoryStream) {
 				if (path.toAbsolutePath().toString().equals(pathToRoot)) {
-					childs.add(new MockedVFSEntry(path.toAbsolutePath().toString().substring(pathToRoot.length()), pathToRoot));
+					childs.add(new MockedVFSEntryImpl(path.toAbsolutePath().toString().substring(pathToRoot.length()), pathToRoot));
 				} else {
-					childs.add(new MockedVFSEntry(path.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot));
+					childs.add(new MockedVFSEntryImpl(path.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot));
 				}
 			}
 		} catch (IOException ex) {
@@ -139,9 +139,9 @@ public class MockedVFSEntry implements VFSEntry {
 	@Override
 	public VFSPath getPath() {
 		if (fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
-			return new MockedVFSPath(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length()), pathToRoot);
+			return new MockedVFSPathImpl(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length()), pathToRoot);
 		} else {
-			return new MockedVFSPath(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
+			return new MockedVFSPathImpl(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class MockedVFSEntry implements VFSEntry {
 	public void moveTo(VFSPath path) {
 		Path toFile;
 		try {
-			toFile = Paths.get(((MockedVFSEntry) (path.getVFSEntry())).getAbsolutePath());
+			toFile = Paths.get(((MockedVFSEntryImpl) (path.getVFSEntry())).getAbsolutePath());
 			Files.move(fileEntry, toFile);
 		} catch (IOException e) {
 			LOGGER.error("", e);
@@ -175,8 +175,8 @@ public class MockedVFSEntry implements VFSEntry {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof MockedVFSEntry) {
-			MockedVFSEntry obj = (MockedVFSEntry) o;
+		if (o instanceof MockedVFSEntryImpl) {
+			MockedVFSEntryImpl obj = (MockedVFSEntryImpl) o;
 			if (obj.fileEntry.equals(this)) {
 				return true;
 			}
@@ -202,16 +202,16 @@ public class MockedVFSEntry implements VFSEntry {
 	@Override
 	public VFSPath getChildPath(String childName) {
 		if (fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
-			return new MockedVFSPath(childName, pathToRoot);
+			return new MockedVFSPathImpl(childName, pathToRoot);
 		} else {
-			return new MockedVFSPath(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length() + 1) + File.separatorChar + childName, pathToRoot);
+			return new MockedVFSPathImpl(fileEntry.toAbsolutePath().toString().substring(pathToRoot.length() + 1) + File.separatorChar + childName, pathToRoot);
 		}
 	}
 
 	@Override
 	public VFSEntry getParent() {
 		if (!fileEntry.toAbsolutePath().toString().equals(pathToRoot)) {
-			return new MockedVFSEntry(fileEntry.toAbsolutePath().toString()
+			return new MockedVFSEntryImpl(fileEntry.toAbsolutePath().toString()
 					.substring(pathToRoot.length() + 1, fileEntry.toAbsolutePath().toString().lastIndexOf(File.separatorChar) + 1), pathToRoot);
 		}
 		return null;

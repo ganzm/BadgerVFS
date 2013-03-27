@@ -127,7 +127,7 @@ public class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public VFSEntry getRoot() {
-		return new MockedVFSPath("", config.getHostFilePath()).getVFSEntry();
+		return new MockedVFSPathImpl("", config.getHostFilePath()).getVFSEntry();
 	}
 
 	@Override

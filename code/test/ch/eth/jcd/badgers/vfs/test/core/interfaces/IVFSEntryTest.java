@@ -15,67 +15,32 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 
-@RunWith(Parameterized.class)
-public class VFSEntryTest {
+public abstract class IVFSEntryTest {
 
-	private static VFSDiskManager diskManager;
+	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
 
-	public VFSEntryTest(VFSDiskManager manager) {
-		this.diskManager = manager;
-	}
-
-	private static DiskConfiguration getMockedConfig(String rootFolderName) {
-		DiskConfiguration config = new DiskConfiguration();
-		config.setHostFilePath(getRootDir(rootFolderName));
-		return config;
-
-	}
-
-	private static String getRootDir(String rootFolderName) {
-		String tempDir = System.getProperty("java.io.tmpdir");
-		String fileName;
-		if (tempDir.endsWith("/") || tempDir.endsWith("\\")) {
-			fileName = tempDir + rootFolderName;
-		} else {
-			fileName = tempDir + File.separatorChar + rootFolderName;
-		}
-		return fileName;
-
-	}
-
-	@AfterClass
-	public static void afterClass() throws VFSException {
-		diskManager.dispose();
-	}
+	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
 	@Before
 	public void beforeTest() throws VFSException {
 		Class<? extends VFSDiskManager> class1;
 		try {
-			class1 = (Class<? extends VFSDiskManager>) Class.forName(diskManager.getClass().getName());
+			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			diskManager = (VFSDiskManager) methodOpen.invoke(null, diskManager.getDiskConfiguration());
-			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
+			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -94,13 +59,7 @@ public class VFSEntryTest {
 
 	@After
 	public void afterTest() throws VFSException {
-		diskManager.close();
-	}
-
-	@Parameters(name = "Run {0}")
-	public static Collection<Object[]> getParameters() throws VFSException {
-		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("VFSEntryTestMockedRoot")) },
-				{ VFSDiskManagerImpl.create(getMockedConfig("VFSEntryTestBadgersDisk.bfs")) } });
+		getVFSDiskManager().close();
 	}
 
 	@Test
@@ -108,7 +67,7 @@ public class VFSEntryTest {
 		String isDirectory = "IsDirectory";
 		String isNotADirectory = "IsNotADirectory.txt";
 
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 
 		VFSPath isDirectoryPath = rootEntry.getChildPath(isDirectory);
 		assertFalse("Expected directory not exists", isDirectoryPath.exists());
@@ -124,7 +83,7 @@ public class VFSEntryTest {
 
 	@Test
 	public void testGetOutputStreamTest() throws VFSException {
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath newFile = rootEntry.getChildPath("newOutputStreamTest.txt");
 		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
@@ -143,7 +102,7 @@ public class VFSEntryTest {
 	public void testGetInputStreamTest() throws VFSException {
 		String fileName = "newInputStreamTest.txt";
 		String fileContent = "newInputStreamTest String";
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath newFile = rootEntry.getChildPath(fileName);
 		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
@@ -170,7 +129,7 @@ public class VFSEntryTest {
 		String fileNameBefore = "beforeRename.txt";
 		String fileNameAfter = "afterRename.txt";
 		String fileContent = "Test String";
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath newFile = rootEntry.getChildPath(fileNameBefore);
 		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
@@ -207,7 +166,7 @@ public class VFSEntryTest {
 		String copyFile = "copy.txt";
 		String fileContent = "copy file";
 
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath copyFromPath = rootEntry.getChildPath(copyFromFolder);
 		assertFalse("Expected direcotry not exists", copyFromPath.exists());
 		VFSEntry copyFromEntry = copyFromPath.createDirectory();
@@ -257,7 +216,7 @@ public class VFSEntryTest {
 		String moveFile = "move.txt";
 		String fileContent = "move file";
 
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath copyFromPath = rootEntry.getChildPath(moveFromFolder);
 		assertFalse("Expected direcotry not exists", copyFromPath.exists());
 		VFSEntry copyFromEntry = copyFromPath.createDirectory();
@@ -301,15 +260,15 @@ public class VFSEntryTest {
 
 	@Test
 	public void testGetChildren() throws VFSException {
-		diskManager.dispose();
+		getVFSDiskManager().dispose();
 		Class<? extends VFSDiskManager> class1;
 		try {
-			class1 = (Class<? extends VFSDiskManager>) Class.forName(diskManager.getClass().getName());
+			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
 			Method method = class1.getMethod("create", DiskConfiguration.class);
-			Object o = method.invoke(null, diskManager.getDiskConfiguration());
+			Object o = method.invoke(null, getVFSDiskManager().getDiskConfiguration());
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			diskManager = (VFSDiskManager) method.invoke(null, diskManager.getDiskConfiguration());
-			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			setVFSDiskManager((VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration()));
+			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -328,7 +287,7 @@ public class VFSEntryTest {
 		String dir2 = "Dir2";
 		String file1 = "File1.txt";
 
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath dir1Path = rootEntry.getChildPath(dir1);
 		assertFalse("Expected directory not exists", dir1Path.exists());
 		dir1Path.createDirectory();
@@ -351,7 +310,7 @@ public class VFSEntryTest {
 			e.printStackTrace();
 		}
 
-		List<VFSEntry> childs = diskManager.getRoot().getChildren();
+		List<VFSEntry> childs = getVFSDiskManager().getRoot().getChildren();
 		assertTrue(childs.size() == 3);
 		for (VFSEntry child : childs) {
 			System.out.println(child);
@@ -364,7 +323,7 @@ public class VFSEntryTest {
 		String delDir = "delDir";
 		String delFile = "delFile.txt";
 
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 
 		VFSPath delDirectoryPath = rootEntry.getChildPath(delDir);
 		assertFalse("Expected directory not exists", delDirectoryPath.exists());
@@ -391,7 +350,7 @@ public class VFSEntryTest {
 	@Test
 	public void testGetParent() throws VFSException {
 		String testGetParent = "testGetParent";
-		VFSEntry rootEntry = diskManager.getRoot();
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 
 		VFSPath testGetParentPath = rootEntry.getChildPath(testGetParent);
 		assertFalse("Expected directory not exists", testGetParentPath.exists());
