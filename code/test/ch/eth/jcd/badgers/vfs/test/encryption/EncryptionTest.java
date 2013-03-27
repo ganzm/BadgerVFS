@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.test.core;
+package ch.eth.jcd.badgers.vfs.test.encryption;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
