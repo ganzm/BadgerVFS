@@ -1,12 +1,15 @@
 package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Assert;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -22,7 +25,7 @@ import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 @RunWith(Parameterized.class)
 public class VFSDiskManagerTest {
 
-	private final VFSDiskManager diskManager;
+	private static VFSDiskManager diskManager;
 
 	public VFSDiskManagerTest(VFSDiskManager manager) {
 		this.diskManager = manager;
@@ -47,13 +50,21 @@ public class VFSDiskManagerTest {
 
 	}
 
+	@AfterClass
+	public static void afterClass() throws VFSException {
+
+		diskManager.dispose();
+		assertFalse("Expected File to be deleted", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+
+	}
+
 	@Test
 	public void testCreateAndDispose() throws VFSException {
-		Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 
 		diskManager.close();
 
-		Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 
 		Class<? extends VFSDiskManager> class1;
 		try {
@@ -61,7 +72,7 @@ public class VFSDiskManagerTest {
 			Method method = class1.getMethod("create", DiskConfiguration.class);
 			Object o = method.invoke(null, diskManager.getDiskConfiguration());
 			System.out.println(o);
-			Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -75,28 +86,19 @@ public class VFSDiskManagerTest {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
-
-		// diskManager.dispose();
-
-		// Assert.assertFalse("Expected File to be deleted", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 	}
 
 	@Test
 	public void testgetRoot() throws VFSException {
-		Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
-
+		assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		VFSEntry entry = diskManager.getRoot();
-		Assert.assertTrue(entry.getPath().exists());
-
-		diskManager.dispose();
-
-		Assert.assertFalse("Expected File to be deleted", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue(entry.getPath().exists());
 	}
 
-	@Parameters
+	@Parameters(name = "Run {0}")
 	public static Collection<Object[]> getParameters() throws VFSException {
-		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("MockedRoot")) },
-				{ VFSDiskManagerImpl.create(getMockedConfig("BadgersDisk.bfs")) } });
+		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("VFSDiskManagerTestMocked")) },
+				{ VFSDiskManagerImpl.create(getMockedConfig("VFSDiskManagerTestBadgersDisk.bfs")) } });
 	}
 
 }

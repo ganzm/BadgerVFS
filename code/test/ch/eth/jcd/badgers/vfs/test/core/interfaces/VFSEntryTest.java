@@ -1,5 +1,10 @@
 package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,8 +18,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -62,9 +65,7 @@ public class VFSEntryTest {
 
 	@AfterClass
 	public static void afterClass() throws VFSException {
-
 		diskManager.dispose();
-
 	}
 
 	@Before
@@ -74,7 +75,7 @@ public class VFSEntryTest {
 			class1 = (Class<? extends VFSDiskManager>) Class.forName(diskManager.getClass().getName());
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
 			diskManager = (VFSDiskManager) methodOpen.invoke(null, diskManager.getDiskConfiguration());
-			Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -96,10 +97,10 @@ public class VFSEntryTest {
 		diskManager.close();
 	}
 
-	@Parameters
+	@Parameters(name = "Run {0}")
 	public static Collection<Object[]> getParameters() throws VFSException {
-		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("MockedRoot")) },
-				{ VFSDiskManagerImpl.create(getMockedConfig("BadgersDisk.bfs")) } });
+		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("VFSEntryTestMockedRoot")) },
+				{ VFSDiskManagerImpl.create(getMockedConfig("VFSEntryTestBadgersDisk.bfs")) } });
 	}
 
 	@Test
@@ -110,24 +111,24 @@ public class VFSEntryTest {
 		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath isDirectoryPath = rootEntry.getChildPath(isDirectory);
-		Assert.assertFalse("Expected directory not exists", isDirectoryPath.exists());
+		assertFalse("Expected directory not exists", isDirectoryPath.exists());
 		VFSEntry directory = isDirectoryPath.createDirectory();
-		Assert.assertTrue("Expected directory exists", isDirectoryPath.exists());
-		Assert.assertTrue("Expected isDirectory is true", directory.isDirectory());
+		assertTrue("Expected directory exists", isDirectoryPath.exists());
+		assertTrue("Expected isDirectory is true", directory.isDirectory());
 
 		VFSPath aFileNotDirectory = directory.getChildPath(isNotADirectory);
-		Assert.assertFalse("Expected file not exists", aFileNotDirectory.exists());
+		assertFalse("Expected file not exists", aFileNotDirectory.exists());
 		VFSEntry entry = aFileNotDirectory.createFile();
-		Assert.assertTrue("Expected file exists", aFileNotDirectory.exists());
+		assertTrue("Expected file exists", aFileNotDirectory.exists());
 	}
 
 	@Test
 	public void testGetOutputStreamTest() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newFile = rootEntry.getChildPath("newOutputStreamTest.txt");
-		Assert.assertFalse("Expected file not exists", newFile.exists());
+		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -135,7 +136,7 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 	}
 
 	@Test
@@ -144,9 +145,9 @@ public class VFSEntryTest {
 		String fileContent = "newInputStreamTest String";
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newFile = rootEntry.getChildPath(fileName);
-		Assert.assertFalse("Expected file not exists", newFile.exists());
+		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -154,14 +155,14 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
 			readed = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals("Expected readed content: " + fileContent, fileContent, readed);
+		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 	}
 
 	@Test
@@ -171,9 +172,9 @@ public class VFSEntryTest {
 		String fileContent = "Test String";
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newFile = rootEntry.getChildPath(fileNameBefore);
-		Assert.assertFalse("Expected file not exists", newFile.exists());
+		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -181,12 +182,12 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 
 		entry.renameTo(fileNameAfter);
 
-		Assert.assertFalse("Expected file not exists", newFile.exists());
-		Assert.assertTrue("Expected file not exists", entry.getPath().exists());
+		assertFalse("Expected file not exists", newFile.exists());
+		assertTrue("Expected file not exists", entry.getPath().exists());
 
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
@@ -194,7 +195,7 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals("Expected readed content: " + fileContent, fileContent, readed);
+		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 
 	}
 
@@ -208,21 +209,21 @@ public class VFSEntryTest {
 
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath copyFromPath = rootEntry.getChildPath(copyFromFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyFromPath.exists());
+		assertFalse("Expected direcotry not exists", copyFromPath.exists());
 		VFSEntry copyFromEntry = copyFromPath.createDirectory();
-		Assert.assertTrue("Expected direcotry exists", copyFromPath.exists());
+		assertTrue("Expected direcotry exists", copyFromPath.exists());
 
 		VFSPath copyToPath = rootEntry.getChildPath(copyToFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyToPath.exists());
+		assertFalse("Expected direcotry not exists", copyToPath.exists());
 
 		VFSPath copyPath = copyFromEntry.getChildPath(copyFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyPath.exists());
+		assertFalse("Expected direcotry not exists", copyPath.exists());
 		VFSEntry copyEntry = copyPath.createDirectory();
-		Assert.assertTrue("Expected direcotry exists", copyPath.exists());
+		assertTrue("Expected direcotry exists", copyPath.exists());
 
 		VFSPath newFile = copyEntry.getChildPath(copyFile);
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -230,14 +231,14 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 
 		copyFromEntry.copyTo(copyToPath);
-		Assert.assertTrue("Expected directory exists", copyToPath.exists());
-		Assert.assertTrue("Expected directory exists", copyToPath.getVFSEntry().getChildPath(copyFolder).exists());
-		Assert.assertTrue("Expected file exists", copyToPath.getVFSEntry().getChildPath(copyFolder).getVFSEntry().getChildPath(copyFile).exists());
-		Assert.assertTrue("Expected directory exists", copyFromEntry.getChildPath(copyFolder).exists());
-		Assert.assertTrue("Expected file exists", copyFromPath.getVFSEntry().getChildPath(copyFolder).getVFSEntry().getChildPath(copyFile).exists());
+		assertTrue("Expected directory exists", copyToPath.exists());
+		assertTrue("Expected directory exists", copyToPath.getVFSEntry().getChildPath(copyFolder).exists());
+		assertTrue("Expected file exists", copyToPath.getVFSEntry().getChildPath(copyFolder).getVFSEntry().getChildPath(copyFile).exists());
+		assertTrue("Expected directory exists", copyFromEntry.getChildPath(copyFolder).exists());
+		assertTrue("Expected file exists", copyFromPath.getVFSEntry().getChildPath(copyFolder).getVFSEntry().getChildPath(copyFile).exists());
 		entry = copyToPath.getVFSEntry().getChildPath(copyFolder).getVFSEntry().getChildPath(copyFile).getVFSEntry();
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
@@ -245,7 +246,7 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals("Expected readed content: " + fileContent, fileContent, readed);
+		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 	}
 
 	@Test
@@ -258,21 +259,21 @@ public class VFSEntryTest {
 
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath copyFromPath = rootEntry.getChildPath(moveFromFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyFromPath.exists());
+		assertFalse("Expected direcotry not exists", copyFromPath.exists());
 		VFSEntry copyFromEntry = copyFromPath.createDirectory();
-		Assert.assertTrue("Expected direcotry exists", copyFromPath.exists());
+		assertTrue("Expected direcotry exists", copyFromPath.exists());
 
 		VFSPath copyToPath = rootEntry.getChildPath(moveToFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyToPath.exists());
+		assertFalse("Expected direcotry not exists", copyToPath.exists());
 
 		VFSPath copyPath = copyFromEntry.getChildPath(moveFolder);
-		Assert.assertFalse("Expected direcotry not exists", copyPath.exists());
+		assertFalse("Expected direcotry not exists", copyPath.exists());
 		VFSEntry copyEntry = copyPath.createDirectory();
-		Assert.assertTrue("Expected direcotry exists", copyPath.exists());
+		assertTrue("Expected direcotry exists", copyPath.exists());
 
 		VFSPath newFile = copyEntry.getChildPath(moveFile);
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -280,14 +281,14 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertTrue("Expected file exists", newFile.exists());
+		assertTrue("Expected file exists", newFile.exists());
 
 		copyFromEntry.copyTo(copyToPath);
-		Assert.assertTrue("Expected directory exists", copyToPath.exists());
-		Assert.assertTrue("Expected directory exists", copyToPath.getVFSEntry().getChildPath(moveFolder).exists());
-		Assert.assertTrue("Expected file exists", copyToPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
-		Assert.assertTrue("Expected directory exists", copyFromEntry.getChildPath(moveFolder).exists());
-		Assert.assertTrue("Expected file exists", copyFromPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
+		assertTrue("Expected directory exists", copyToPath.exists());
+		assertTrue("Expected directory exists", copyToPath.getVFSEntry().getChildPath(moveFolder).exists());
+		assertTrue("Expected file exists", copyToPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
+		assertTrue("Expected directory exists", copyFromEntry.getChildPath(moveFolder).exists());
+		assertTrue("Expected file exists", copyFromPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
 		entry = copyToPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).getVFSEntry();
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
@@ -295,7 +296,7 @@ public class VFSEntryTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Assert.assertEquals("Expected readed content: " + fileContent, fileContent, readed);
+		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 	}
 
 	@Test
@@ -308,7 +309,7 @@ public class VFSEntryTest {
 			Object o = method.invoke(null, diskManager.getDiskConfiguration());
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
 			diskManager = (VFSDiskManager) method.invoke(null, diskManager.getDiskConfiguration());
-			Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -329,19 +330,19 @@ public class VFSEntryTest {
 
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath dir1Path = rootEntry.getChildPath(dir1);
-		Assert.assertFalse("Expected directory not exists", dir1Path.exists());
+		assertFalse("Expected directory not exists", dir1Path.exists());
 		dir1Path.createDirectory();
-		Assert.assertTrue("Expected directory exists", dir1Path.exists());
+		assertTrue("Expected directory exists", dir1Path.exists());
 
 		VFSPath dir2Path = rootEntry.getChildPath(dir2);
-		Assert.assertFalse("Expected directory not exists", dir2Path.exists());
+		assertFalse("Expected directory not exists", dir2Path.exists());
 		dir2Path.createDirectory();
-		Assert.assertTrue("Expected directory exists", dir2Path.exists());
+		assertTrue("Expected directory exists", dir2Path.exists());
 
 		VFSPath file1Path = rootEntry.getChildPath(file1);
-		Assert.assertFalse("Expected file not exists", file1Path.exists());
+		assertFalse("Expected file not exists", file1Path.exists());
 		VFSEntry entry = file1Path.createFile();
-		Assert.assertTrue("Expected file exists", file1Path.exists());
+		assertTrue("Expected file exists", file1Path.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -351,7 +352,7 @@ public class VFSEntryTest {
 		}
 
 		List<VFSEntry> childs = diskManager.getRoot().getChildren();
-		Assert.assertTrue(childs.size() == 3);
+		assertTrue(childs.size() == 3);
 		for (VFSEntry child : childs) {
 			System.out.println(child);
 		}
@@ -366,25 +367,25 @@ public class VFSEntryTest {
 		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath delDirectoryPath = rootEntry.getChildPath(delDir);
-		Assert.assertFalse("Expected directory not exists", delDirectoryPath.exists());
+		assertFalse("Expected directory not exists", delDirectoryPath.exists());
 		VFSEntry delDirectoryEntry = delDirectoryPath.createDirectory();
-		Assert.assertTrue("Expected directory exists", delDirectoryPath.exists());
-		Assert.assertTrue("Expected isDirectory is true", delDirectoryEntry.isDirectory());
+		assertTrue("Expected directory exists", delDirectoryPath.exists());
+		assertTrue("Expected isDirectory is true", delDirectoryEntry.isDirectory());
 
 		VFSPath delFilePath = delDirectoryEntry.getChildPath(delFile);
-		Assert.assertFalse("Expected file not exists", delFilePath.exists());
+		assertFalse("Expected file not exists", delFilePath.exists());
 		VFSEntry delFileEntry = delFilePath.createFile();
-		Assert.assertTrue("Expected file exists", delFilePath.exists());
+		assertTrue("Expected file exists", delFilePath.exists());
 		try {
 			delDirectoryEntry.delete();
 		} catch (Exception e) {
-			Assert.assertNotNull("Expected DirectoryNotEmptyException", e);
+			assertNotNull("Expected DirectoryNotEmptyException", e);
 		}
 
 		delFileEntry.delete();
-		Assert.assertFalse("Expected file not exists", delFilePath.exists());
+		assertFalse("Expected file not exists", delFilePath.exists());
 		delDirectoryEntry.delete();
-		Assert.assertFalse("Expected directory not exists", delDirectoryPath.exists());
+		assertFalse("Expected directory not exists", delDirectoryPath.exists());
 	}
 
 	@Test
@@ -393,11 +394,11 @@ public class VFSEntryTest {
 		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath testGetParentPath = rootEntry.getChildPath(testGetParent);
-		Assert.assertFalse("Expected directory not exists", testGetParentPath.exists());
+		assertFalse("Expected directory not exists", testGetParentPath.exists());
 		VFSEntry testGetParentEntry = testGetParentPath.createDirectory();
-		Assert.assertTrue("Expected directory exists", testGetParentPath.exists());
-		Assert.assertTrue("Expected isDirectory is true", testGetParentEntry.isDirectory());
-		Assert.assertEquals(rootEntry, testGetParentEntry.getParent());
+		assertTrue("Expected directory exists", testGetParentPath.exists());
+		assertTrue("Expected isDirectory is true", testGetParentEntry.isDirectory());
+		assertEquals(rootEntry.getPath().getAbsolutePath(), testGetParentEntry.getParent().getPath().getAbsolutePath());
 
 	}
 

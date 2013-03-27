@@ -1,12 +1,14 @@
 package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,7 +68,7 @@ public class VFSPathTest {
 			class1 = (Class<? extends VFSDiskManager>) Class.forName(diskManager.getClass().getName());
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
 			diskManager = (VFSDiskManager) methodOpen.invoke(null, diskManager.getDiskConfiguration());
-			Assert.assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+			assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -88,19 +90,19 @@ public class VFSPathTest {
 		diskManager.close();
 	}
 
-	@Parameters
+	@Parameters(name = "Run {0}")
 	public static Collection<Object[]> getParameters() throws VFSException {
-		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("MockedRoot")) },
-				{ VFSDiskManagerImpl.create(getMockedConfig("BadgersDisk.bfs")) } });
+		return Arrays.asList(new Object[][] { { MockedVFSDiskManagerImpl.create(getMockedConfig("VFSPathTestMockedRoot")) },
+				{ VFSDiskManagerImpl.create(getMockedConfig("VFSPathTestBadgersDisk.bfs")) } });
 	}
 
 	@Test
 	public void testCreateDirectory() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath testDir = rootEntry.getChildPath("dirTest");
-		Assert.assertFalse("Expected directory not exists", testDir.exists());
+		assertFalse("Expected directory not exists", testDir.exists());
 		testDir.createDirectory();
-		Assert.assertTrue("Expected directory exists", testDir.exists());
+		assertTrue("Expected directory exists", testDir.exists());
 	}
 
 	@Test
@@ -108,18 +110,18 @@ public class VFSPathTest {
 		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath newFile = rootEntry.getChildPath("newFile.txt");
-		Assert.assertFalse("Expected file not exists", newFile.exists());
+		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", entry.getPath().exists());
+		assertTrue("Expected file exists", entry.getPath().exists());
 	}
 
 	@Test
 	public void testExists() throws VFSException {
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newFile = rootEntry.getChildPath("newExists.txt");
-		Assert.assertFalse("Expected file not exists", newFile.exists());
+		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
-		Assert.assertTrue("Expected file exists", entry.getPath().exists());
+		assertTrue("Expected file exists", entry.getPath().exists());
 
 	}
 
@@ -128,7 +130,7 @@ public class VFSPathTest {
 		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newDir = rootEntry.getChildPath("newDir");
 		String newDirPath = newDir.getAbsolutePath();
-		Assert.assertEquals("Expected path = /newDir", "/newDir", newDirPath);
+		assertEquals("Expected path = /newDir", "/newDir", newDirPath);
 	}
 
 }
