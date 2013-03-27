@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.ui;
+package ch.eth.jcd.badgers.vfs.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ import java.nio.channels.WritableByteChannel;
  * TODO describe ChannelTools
  * 
  */
-public final class ChannelTools {
+public final class ChannelUtil {
 	/**
 	 * Copies input to output. Closes both streams a the end!
 	 * 
@@ -30,7 +30,7 @@ public final class ChannelTools {
 		final ReadableByteChannel inputChannel = Channels.newChannel(input);
 		final WritableByteChannel outputChannel = Channels.newChannel(output);
 		// copy the channels
-		ChannelTools.fastChannelCopy(inputChannel, outputChannel);
+		ChannelUtil.fastChannelCopy(inputChannel, outputChannel);
 		// closing the channels
 		inputChannel.close();
 		outputChannel.close();

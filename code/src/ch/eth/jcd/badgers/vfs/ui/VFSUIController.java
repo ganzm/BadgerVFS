@@ -20,6 +20,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
+import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 /**
  * $Id$ TODO describe VFSUIController
@@ -298,7 +299,7 @@ public class VFSUIController {
 					InputStream is = childToExport.getInputStream();
 					OutputStream os = new FileOutputStream(param[1]);
 
-					ChannelTools.fastStreamCopy(is, os);
+					ChannelUtil.fastStreamCopy(is, os);
 				} catch (Exception e) {
 					LOGGER.error("Error while exporting file: ", e);
 				}
@@ -349,7 +350,7 @@ public class VFSUIController {
 					FileInputStream fis = new FileInputStream(param[0]);
 					OutputStream os = newFile.getOutputStream(0);
 
-					ChannelTools.fastStreamCopy(fis, os);
+					ChannelUtil.fastStreamCopy(fis, os);
 				} catch (Exception e) {
 					LOGGER.error("Error while importing file: ", e);
 				}
