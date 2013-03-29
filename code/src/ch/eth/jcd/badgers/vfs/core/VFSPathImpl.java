@@ -82,7 +82,7 @@ public class VFSPathImpl implements VFSPath {
 		// we need to loop through the while directory tree to determine whether a path exists or not
 		VFSEntryImpl current = (VFSEntryImpl) diskMgr.getRoot();
 		for (String pathItem : pathParts) {
-			VFSEntryImpl child = (VFSEntryImpl) current.getChildByName(pathItem);
+			VFSEntryImpl child = current.getChildByName(pathItem);
 			if (child == null) {
 				return false;
 			}
@@ -94,8 +94,49 @@ public class VFSPathImpl implements VFSPath {
 	}
 
 	@Override
-	public VFSEntry getVFSEntry() {
-		throw new UnsupportedOperationException("TODO");
+	public VFSEntry getVFSEntry() throws VFSException {
+		VFSEntryImpl rootEntry = (VFSEntryImpl) diskMgr.getRoot();
+		if (rootEntry.getPath().equals(this)) {
+			return rootEntry;
+		}
+
+		VFSEntryImpl current = rootEntry;
+		for (String pathPart : pathParts) {
+			current = current.getChildByName(pathPart);
+		}
+
+		return current;
+	}
+
+	/**
+	 * Eclipse generated code
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((pathString == null) ? 0 : pathString.hashCode());
+		return result;
+	}
+
+	/**
+	 * Eclipse generated code
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		VFSPathImpl other = (VFSPathImpl) obj;
+		if (pathString == null) {
+			if (other.pathString != null)
+				return false;
+		} else if (!pathString.equals(other.pathString))
+			return false;
+		return true;
 	}
 
 	@Override

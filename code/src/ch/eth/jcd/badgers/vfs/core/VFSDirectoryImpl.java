@@ -42,7 +42,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	}
 
 	@Override
-	public VFSEntry getChildByName(String fileName) throws VFSException {
+	public VFSEntryImpl getChildByName(String fileName) throws VFSException {
 
 		try {
 			List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());

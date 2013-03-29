@@ -88,7 +88,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 *            name of the file or folder contained by this VFSEntry
 	 * @return
 	 */
-	public abstract VFSEntry getChildByName(String fileName) throws VFSException;
+	public abstract VFSEntryImpl getChildByName(String fileName) throws VFSException;
 
 	@Override
 	public InputStream getInputStream() {
