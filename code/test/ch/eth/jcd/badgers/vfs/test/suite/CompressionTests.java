@@ -4,8 +4,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import ch.eth.jcd.badgers.vfs.test.compression.BadgersRLECompressionTest;
+
 @RunWith(Suite.class)
-@SuiteClasses({ CoreTests.class, EncryptionTests.class, CompressionTests.class })
-public class AllTests {
+@SuiteClasses({ BadgersRLECompressionTest.class })
+public class CompressionTests {
 
 }
