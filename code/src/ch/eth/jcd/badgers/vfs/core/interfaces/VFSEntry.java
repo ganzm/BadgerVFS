@@ -27,7 +27,7 @@ public interface VFSEntry {
 	 * 
 	 * @return
 	 */
-	public List<VFSEntry> getChildren();
+	public List<VFSEntry> getChildren() throws VFSException;
 
 	/**
 	 * Use this to read from a file

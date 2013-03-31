@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.test.core;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,6 +42,23 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 			Assert.assertTrue(path.exists());
 			Assert.assertTrue(homeDir.isDirectory());
+		}
+
+		List<VFSEntry> children = rootEntry.getChildren();
+		Assert.assertEquals(100, children.size());
+
+		VFSEntry previous = null;
+		for (VFSEntry entry : children) {
+
+			if (previous != null) {
+
+				String previousFileName = previous.getPath().getName();
+				String fileName = entry.getPath().getName();
+
+				Assert.assertTrue(previousFileName.compareTo(fileName) < 0);
+			}
+
+			previous = entry;
 		}
 	}
 }

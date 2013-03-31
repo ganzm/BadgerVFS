@@ -19,7 +19,8 @@ public class DirectorySectionHandler {
 
 	private static Logger logger = Logger.getLogger(DirectorySectionHandler.class);
 
-	public static final long MAX_NUM_DIRECTORY_BLOCKS = 20;
+	public static final long MAX_NUM_DIRECTORY_BLOCKS = 200;
+
 	/**
 	 * Default size of the directory section of our file system
 	 */
@@ -135,5 +136,11 @@ public class DirectorySectionHandler {
 		DirectoryBlock dataBlock = DirectoryBlock.deserialize(location, directoryBlockBuffer);
 
 		return dataBlock;
+	}
+
+	public void freeDirectoryBlock(DirectoryBlock directoryBlock) throws IOException {
+		virtualDiskFile.seek(directoryBlock.getLocation());
+		// just clear header byte
+		virtualDiskFile.write(0);
 	}
 }

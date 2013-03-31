@@ -41,23 +41,40 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 */
 	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
 
-		// get parent directory
-		VFSPathImpl parentPath = new VFSPathImpl(diskManager, vfsPath.getParentPath());
-		VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) parentPath.getVFSEntry();
+		DataBlock dataBlock = null;
+		DirectoryBlock directoryBlock = null;
+		try {
+			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
+			directoryBlock = diskManager.getDirectorySectionHandler().allocateNewDirectoryBlock();
 
-		DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
+			// get parent directory
+			VFSPathImpl parentPath = new VFSPathImpl(diskManager, vfsPath.getParentPath());
+			VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) parentPath.getVFSEntry();
 
-		DataBlock dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
-		directoryEntryBlock.assignDataBlock(dataBlock);
+			DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
 
-		DirectoryBlock directoryBlock = diskManager.getDirectorySectionHandler().allocateNewDirectoryBlock();
-		directoryEntryBlock.assignDirectoryBlock(directoryBlock);
+			directoryEntryBlock.assignDataBlock(dataBlock);
 
-		parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
+			// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
+			directoryEntryBlock.assignDirectoryBlock(directoryBlock);
 
-		VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
+			parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
 
-		return entry;
+			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
+
+			return entry;
+		} catch (Exception ex) {
+
+			if (dataBlock != null) {
+				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
+			}
+
+			if (directoryBlock != null) {
+				diskManager.getDirectorySectionHandler().freeDirectoryBlock(directoryBlock);
+			}
+
+			throw ex;
+		}
 	}
 
 	public void setDataBlock(DataBlock dataBlock) {
@@ -75,7 +92,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public abstract List<VFSEntry> getChildren();
+	public abstract List<VFSEntry> getChildren() throws VFSException;
 
 	/**
 	 * Returns a single VFSEntry

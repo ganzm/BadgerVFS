@@ -40,6 +40,8 @@ public class DataSectionHandler {
 	 */
 	private final long maximumFileSize;
 
+	private final long blockIncrement = 2;
+
 	/**
 	 * Constructor
 	 */
@@ -87,6 +89,12 @@ public class DataSectionHandler {
 		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
 		dataBlock.persist(virtualDiskFile);
 		return dataBlock;
+	}
+
+	public void freeDataBlock(DataBlock dataBlock) throws IOException {
+		virtualDiskFile.seek(dataBlock.getLocation());
+		// just clear header byte
+		virtualDiskFile.write(0);
 	}
 
 	public DataBlock loadDataBlock(long location) throws IOException {
@@ -149,8 +157,6 @@ public class DataSectionHandler {
 		return currentFilePosition;
 
 	}
-
-	private final long blockIncrement = 2;
 
 	public void close() {
 	}
