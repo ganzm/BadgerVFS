@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
  * $Id$
@@ -84,8 +85,12 @@ public class DirectorySectionHandler {
 	public DirectoryBlock allocateNewDirectoryBlock() throws IOException {
 		long freePosition = getNextFreeDirectorySectionPosition();
 		DirectoryBlock directoryBlock = new DirectoryBlock(freePosition);
-		directoryBlock.persist(virtualDiskFile);
+		persistDirectoryBlock(directoryBlock);
 		return directoryBlock;
+	}
+
+	public void persistDirectoryBlock(DirectoryBlock directoryBlock) {
+		directoryBlock.persist(virtualDiskFile);
 	}
 
 	private long getNextFreeDirectorySectionPosition() throws IOException {
@@ -120,6 +125,11 @@ public class DirectorySectionHandler {
 	}
 
 	public DirectoryBlock loadDirectoryBlock(long location) throws IOException {
+		if (location == 0 || location < sectionOffset || location > (sectionOffset + sectionSize)) {
+			throw new VFSRuntimeException("Tried to load DirectoryBlock from Location " + location + " Valid Range is [" + sectionOffset + ", "
+					+ (sectionOffset + sectionSize));
+		}
+
 		virtualDiskFile.seek(location);
 		virtualDiskFile.read(directoryBlockBuffer);
 

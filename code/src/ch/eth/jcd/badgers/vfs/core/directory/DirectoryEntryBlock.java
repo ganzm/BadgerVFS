@@ -12,7 +12,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
  * Fixed size when serialized
  * 
  */
-public class DirectoryEntryBlock {
+public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 	/**
 	 * Maximum size of a file name in bytes
@@ -76,5 +76,10 @@ public class DirectoryEntryBlock {
 
 	public void assignDirectoryBlock(DirectoryBlock directoryBlock) {
 		this.directoryEntryNodeLocation = directoryBlock.getLocation();
+	}
+
+	@Override
+	public int compareTo(DirectoryEntryBlock o) {
+		return this.fileName.compareTo(o.fileName);
 	}
 }
