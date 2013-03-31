@@ -89,7 +89,7 @@ public class DirectorySectionHandler {
 		return directoryBlock;
 	}
 
-	public void persistDirectoryBlock(DirectoryBlock directoryBlock) {
+	public void persistDirectoryBlock(DirectoryBlock directoryBlock) throws IOException {
 		directoryBlock.persist(virtualDiskFile);
 	}
 
@@ -118,7 +118,6 @@ public class DirectorySectionHandler {
 				throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection");
 			}
 
-			byteAsInt = virtualDiskFile.read();
 		}
 
 		throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection");

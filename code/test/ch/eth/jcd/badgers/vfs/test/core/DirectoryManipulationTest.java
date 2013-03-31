@@ -1,8 +1,12 @@
 package ch.eth.jcd.badgers.vfs.test.core;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import ch.eth.jcd.badgers.vfs.core.VFSDirectoryImpl;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -13,13 +17,30 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 	@Test
 	public void testCreateSimpleDir() throws VFSException {
 
-		VFSEntry rootPath = diskManager.getRoot();
-		VFSPath path = rootPath.getChildPath("home");
-		Assert.assertFalse(path.exists());
-		Assert.assertEquals("/home", path.getAbsolutePath());
+		NumberFormat decimalFormat = new DecimalFormat("###");
 
-		VFSEntry homeDir = path.createDirectory();
-		Assert.assertTrue(path.exists());
-		Assert.assertTrue(homeDir.isDirectory());
+		VFSEntry rootEntry = diskManager.getRoot();
+
+		for (int i = 0; i < 100; i++) {
+
+			String folderName = "home" + decimalFormat.format(i);
+			VFSPath path = rootEntry.getChildPath(folderName);
+			Assert.assertFalse(path.exists());
+
+			Assert.assertEquals("/" + folderName, path.getAbsolutePath());
+
+			if (rootEntry instanceof VFSDirectoryImpl) {
+				((VFSDirectoryImpl) rootEntry).debugPrint();
+			}
+
+			VFSEntry homeDir = path.createDirectory();
+
+			if (rootEntry instanceof VFSDirectoryImpl) {
+				((VFSDirectoryImpl) rootEntry).debugPrint();
+			}
+
+			Assert.assertTrue(path.exists());
+			Assert.assertTrue(homeDir.isDirectory());
+		}
 	}
 }

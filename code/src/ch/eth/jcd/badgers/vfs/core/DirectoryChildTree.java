@@ -17,7 +17,7 @@ public class DirectoryChildTree {
 	/**
 	 * upper most node of our tree
 	 */
-	private final DirectoryBlock rootBlock;
+	private DirectoryBlock rootBlock;
 
 	public DirectoryChildTree(DirectoryBlock rootBlock) {
 		this.rootBlock = rootBlock;
@@ -31,15 +31,15 @@ public class DirectoryChildTree {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<DirectoryEntryBlock> traverseTree(DirectorySectionHandler directorySectionhandle) throws IOException {
+	public List<DirectoryEntryBlock> traverseTree(DirectorySectionHandler directorySectionhandler) throws IOException {
 		List<DirectoryEntryBlock> result = new ArrayList<>();
 
-		visitEntryBlock(directorySectionhandle, rootBlock, result);
+		visitEntryBlock(directorySectionhandler, rootBlock, result);
 
 		return result;
 	}
 
-	private void visitEntryBlock(DirectorySectionHandler directorySectionhandle, DirectoryBlock block, List<DirectoryEntryBlock> result) throws IOException {
+	private void visitEntryBlock(DirectorySectionHandler directorySectionhandler, DirectoryBlock block, List<DirectoryEntryBlock> result) throws IOException {
 
 		long dirBlockLink;
 		DirectoryEntryBlock node;
@@ -47,8 +47,8 @@ public class DirectoryChildTree {
 		// traverse left path
 		dirBlockLink = block.getLinkLeft();
 		if (dirBlockLink != 0) {
-			DirectoryBlock subBlock = directorySectionhandle.loadDirectoryBlock(dirBlockLink);
-			visitEntryBlock(directorySectionhandle, subBlock, result);
+			DirectoryBlock subBlock = directorySectionhandler.loadDirectoryBlock(dirBlockLink);
+			visitEntryBlock(directorySectionhandler, subBlock, result);
 		}
 
 		// visit left node
@@ -58,10 +58,10 @@ public class DirectoryChildTree {
 		}
 
 		// traverse middle path
-		dirBlockLink = block.getLinkLeft();
+		dirBlockLink = block.getLinkMiddle();
 		if (dirBlockLink != 0) {
-			DirectoryBlock subBlock = directorySectionhandle.loadDirectoryBlock(dirBlockLink);
-			visitEntryBlock(directorySectionhandle, subBlock, result);
+			DirectoryBlock subBlock = directorySectionhandler.loadDirectoryBlock(dirBlockLink);
+			visitEntryBlock(directorySectionhandler, subBlock, result);
 		}
 
 		// visit right node
@@ -71,10 +71,10 @@ public class DirectoryChildTree {
 		}
 
 		// traverse right path
-		dirBlockLink = block.getLinkLeft();
+		dirBlockLink = block.getLinkRight();
 		if (dirBlockLink != 0) {
-			DirectoryBlock subBlock = directorySectionhandle.loadDirectoryBlock(dirBlockLink);
-			visitEntryBlock(directorySectionhandle, subBlock, result);
+			DirectoryBlock subBlock = directorySectionhandler.loadDirectoryBlock(dirBlockLink);
+			visitEntryBlock(directorySectionhandler, subBlock, result);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class DirectoryChildTree {
 	 *            The directory block we were following in the last recursive call
 	 * 
 	 * @param directoryBlockToAttach
-	 *            this direcotry block was created in a previous recursive call and should now be added to currentBlock
+	 *            this directory block was created in a previous recursive call and should now be added to currentBlock
 	 * 
 	 * 
 	 * @throws IOException
@@ -109,24 +109,26 @@ public class DirectoryChildTree {
 	private void bottomUpTreeInsert(Stack<DirectoryBlock> pathToLeave, DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry,
 			DirectoryBlock lastDirectoryBlock, DirectoryBlock directoryBlockToAttach) throws IOException {
 
-		DirectoryBlock currentBlock = pathToLeave.pop();
 		if (pathToLeave.isEmpty()) {
-			// create new root block
 			insertAtRoot(directorySectionhandler, newEntry, lastDirectoryBlock, directoryBlockToAttach);
 			return;
-		} else {
-			currentBlock = pathToLeave.pop();
-
 		}
 
-		if (currentBlock.getNodeRight() == null) {
+		DirectoryBlock currentBlock = pathToLeave.pop();
+
+		if (currentBlock.getNodeLeft() == null) {
+			// this is the very first insert into this b-tree
+			currentBlock.setNodeLeft(newEntry);
+			directorySectionhandler.persistDirectoryBlock(currentBlock);
+
+		} else if (currentBlock.getNodeRight() == null) {
 			// right block is still empty
 			// this node has only 2 subnode
 			// we got the DirectoryBlock where the new entry is going to belong to
 			// insert Key
 
 			// If the node contains fewer than the maximum legal number of elements, then there is room for the new element
-			if (currentBlock.getNodeLeft().compareTo(newEntry) > 0) {
+			if (currentBlock.getNodeLeft().compareTo(newEntry) < 0) {
 				currentBlock.setNodeRight(newEntry);
 			} else {
 				currentBlock.setNodeRight(currentBlock.getNodeLeft());
@@ -186,8 +188,8 @@ public class DirectoryChildTree {
 				if (currentBlock.getLinkLeft() == lastVisitedChildBlockLink) {
 					// recursive call ascended from the left branch
 
-					newBlock.setLinkLeft(currentBlock.getLinkRight());
-					currentBlock.setLinkRight(currentBlock.getLinkMiddle());
+					newBlock.setLinkLeft(currentBlock.getLinkMiddle());
+					newBlock.setLinkMiddle(currentBlock.getLinkRight());
 
 					if (insertDanglingOnTheRight) {
 						currentBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
@@ -196,27 +198,36 @@ public class DirectoryChildTree {
 						currentBlock.setLinkLeft(directoryBlockToAttach.getLocation());
 					}
 
+					currentBlock.setLinkRight(0);
+
 				} else if (currentBlock.getLinkMiddle() == lastVisitedChildBlockLink) {
 					// recursive call ascended from the middle branch
 
-					newBlock.setLinkLeft(currentBlock.getLinkRight());
-
 					if (insertDanglingOnTheRight) {
-						currentBlock.setLinkRight(directoryBlockToAttach.getLocation());
+						newBlock.setLinkLeft(directoryBlockToAttach.getLocation());
+
+						newBlock.setLinkMiddle(currentBlock.getLinkRight());
 					} else {
-						currentBlock.setLinkRight(currentBlock.getLinkMiddle());
+						newBlock.setLinkLeft(currentBlock.getLinkMiddle());
+						newBlock.setLinkMiddle(currentBlock.getLinkRight());
+
 						currentBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
 					}
+
+					currentBlock.setLinkRight(0);
 
 				} else if (currentBlock.getLinkRight() == lastVisitedChildBlockLink) {
 					// recursive call ascended from the right branch
 
 					if (insertDanglingOnTheRight) {
-						newBlock.setLinkLeft(directoryBlockToAttach.getLocation());
-					} else {
 						newBlock.setLinkLeft(currentBlock.getLinkRight());
-						currentBlock.setLinkRight(directoryBlockToAttach.getLocation());
+						newBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
+					} else {
+						newBlock.setLinkMiddle(currentBlock.getLinkRight());
+						newBlock.setLinkLeft(directoryBlockToAttach.getLocation());
 					}
+
+					currentBlock.setLinkRight(0);
 				}
 			}
 
@@ -228,8 +239,6 @@ public class DirectoryChildTree {
 			DirectoryEntryBlock toInsertToParent = sorted[1];
 
 			bottomUpTreeInsert(pathToLeave, directorySectionhandler, toInsertToParent, currentBlock, newBlock);
-			// attach newBlock to parent and insert
-
 		}
 
 	}
@@ -240,22 +249,19 @@ public class DirectoryChildTree {
 		DirectoryBlock newRootBlock = directorySectionhandler.allocateNewDirectoryBlock();
 		newRootBlock.setNodeLeft(newEntry);
 
-		if (directoryBlockToAttach != null) {
-			// attach dangling block
+		if (lastDirectoryBlock.getNodeLeft().compareTo(directoryBlockToAttach.getNodeLeft()) < 0) {
 
-			DirectoryEntryBlock entry1 = lastDirectoryBlock.getNodeLeft();
-			DirectoryEntryBlock entry2 = directoryBlockToAttach.getNodeLeft();
+			newRootBlock.setLinkLeft(lastDirectoryBlock.getLocation());
+			newRootBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
+		} else {
 
-			if (entry1.compareTo(entry2) > 0) {
-				newRootBlock.setLinkLeft(lastDirectoryBlock.getLocation());
-				newRootBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
-			} else {
-				newRootBlock.setLinkLeft(directoryBlockToAttach.getLocation());
-				newRootBlock.setLinkMiddle(lastDirectoryBlock.getLocation());
-			}
+			newRootBlock.setLinkLeft(directoryBlockToAttach.getLocation());
+			newRootBlock.setLinkMiddle(lastDirectoryBlock.getLocation());
 		}
 
 		directorySectionhandler.persistDirectoryBlock(newRootBlock);
+
+		this.rootBlock = newRootBlock;
 	}
 
 	private DirectoryEntryBlock[] Sort(DirectoryEntryBlock nodeLeft, DirectoryEntryBlock nodeRight, DirectoryEntryBlock newEntry) {
@@ -292,7 +298,7 @@ public class DirectoryChildTree {
 
 				VFSDuplicatedEntryException.throwIf(compLeft == 0);
 
-				if (compLeft < 0) {
+				if (compLeft > 0) {
 					// follow left branch
 					currentBlock = directorySectionhandler.loadDirectoryBlock(currentBlock.getLinkLeft());
 					pathToLeave.push(currentBlock);
@@ -302,7 +308,7 @@ public class DirectoryChildTree {
 					int compRight = currentBlock.getNodeRight().compareTo(newEntry);
 					VFSDuplicatedEntryException.throwIf(compRight == 0);
 
-					if (compRight < 0) {
+					if (compRight > 0) {
 						// follow middle branch
 						currentBlock = directorySectionhandler.loadDirectoryBlock(currentBlock.getLinkMiddle());
 						pathToLeave.push(currentBlock);
@@ -321,5 +327,11 @@ public class DirectoryChildTree {
 				}
 			}
 		}
+	}
+
+	public String dumpTreeToString(DirectorySectionHandler directorySectionHandler) throws IOException {
+		StringBuffer buf = new StringBuffer();
+		rootBlock.dumpShort(directorySectionHandler, buf, 0);
+		return buf.toString();
 	}
 }

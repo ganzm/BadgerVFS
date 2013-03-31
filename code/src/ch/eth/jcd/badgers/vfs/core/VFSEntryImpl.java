@@ -121,9 +121,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public boolean isDirectory() {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract boolean isDirectory();
 
 	@Override
 	public VFSPath getChildPath(String childName) throws VFSException {

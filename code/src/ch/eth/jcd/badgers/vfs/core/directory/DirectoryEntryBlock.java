@@ -1,5 +1,8 @@
 package ch.eth.jcd.badgers.vfs.core.directory;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
@@ -14,6 +17,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
  */
 public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
+	private static final Charset cs = Charset.forName("UTF8");
 	/**
 	 * Maximum size of a file name in bytes
 	 */
@@ -38,7 +42,6 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	 * Is zero if this Directory does not specify a Folder
 	 * 
 	 * Otherwise it points to a DirectoryBlock which is the root of a B-Tree which contains the files located in our folder
-	 * 
 	 * 
 	 */
 	private long directoryEntryNodeLocation;
@@ -81,5 +84,61 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	@Override
 	public int compareTo(DirectoryEntryBlock o) {
 		return this.fileName.compareTo(o.fileName);
+	}
+
+	public byte[] serialize() {
+		ByteBuffer buf = ByteBuffer.allocate(BLOCK_SIZE);
+
+		buf.putLong(dataBlockLocation);
+		buf.putLong(directoryEntryNodeLocation);
+		buf.put(fileName.getBytes(cs));
+
+		return buf.array();
+	}
+
+	public static DirectoryEntryBlock deserialize(ByteBuffer buf) {
+		long newDataBlockLocation = buf.getLong();
+		if (newDataBlockLocation == 0) {
+			return null;
+		}
+
+		long newDirectoryEntryNodeLocation = buf.getLong();
+
+		byte[] fileNameBuffer = new byte[MAX_FILENAME_SIZE];
+		buf.get(fileNameBuffer);
+		String newFileName = new String(fileNameBuffer, cs).trim();
+
+		DirectoryEntryBlock newBlock = new DirectoryEntryBlock(newFileName);
+		newBlock.dataBlockLocation = newDataBlockLocation;
+		newBlock.directoryEntryNodeLocation = newDirectoryEntryNodeLocation;
+
+		return newBlock;
+	}
+
+	public void dump(StringBuffer buf, int depth) {
+		for (int i = 0; i < depth; i++) {
+			buf.append("\t");
+		}
+
+		buf.append("Data[");
+		buf.append(dataBlockLocation);
+		buf.append("] DirRootBlock[");
+		buf.append(directoryEntryNodeLocation);
+		buf.append("] ");
+		buf.append(fileName);
+		buf.append("\n");
+	}
+
+	public static void dumpEmpty(StringBuffer buf, int depth) {
+		for (int i = 0; i < depth; i++) {
+			buf.append("\t");
+		}
+
+		buf.append("NO DATA\n");
+	}
+
+	@Override
+	public String toString() {
+		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + (directoryEntryNodeLocation != 0) + "] Name[" + fileName + "]";
 	}
 }

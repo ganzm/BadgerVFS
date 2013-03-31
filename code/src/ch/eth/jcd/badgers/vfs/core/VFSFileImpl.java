@@ -30,6 +30,11 @@ public class VFSFileImpl extends VFSEntryImpl {
 	}
 
 	@Override
+	public boolean isDirectory() {
+		return false;
+	}
+
+	@Override
 	public VFSEntryImpl getChildByName(String fileName) {
 		LOGGER.debug("Tried to call getChildByName on File " + getPath());
 		return null;

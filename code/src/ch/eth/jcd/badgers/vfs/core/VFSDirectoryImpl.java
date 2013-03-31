@@ -3,6 +3,8 @@ package ch.eth.jcd.badgers.vfs.core;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
@@ -19,6 +21,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  */
 public class VFSDirectoryImpl extends VFSEntryImpl {
 
+	private static Logger LOGGER = Logger.getLogger(VFSDirectoryImpl.class);
+
 	private DirectoryChildTree childTree;
 
 	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock, DirectoryBlock directoryBlock) {
@@ -32,6 +36,11 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	public DirectoryChildTree getChildTree() {
 		return childTree;
+	}
+
+	@Override
+	public boolean isDirectory() {
+		return true;
 	}
 
 	@Override
@@ -70,6 +79,15 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 			return null;
 		} catch (IOException e) {
 			throw new VFSException(e);
+		}
+	}
+
+	public void debugPrint() {
+		try {
+			String tree = childTree.dumpTreeToString(diskManager.getDirectorySectionHandler());
+			LOGGER.debug("\n" + tree);
+		} catch (Exception ex) {
+			LOGGER.error("Error while debugPrint", ex);
 		}
 	}
 }
