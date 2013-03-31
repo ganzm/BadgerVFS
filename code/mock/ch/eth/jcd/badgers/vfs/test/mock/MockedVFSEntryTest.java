@@ -26,7 +26,7 @@ public class MockedVFSEntryTest extends IVFSEntryTest {
 
 	@Override
 	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
-		this.manager = manager;
+		MockedVFSEntryTest.manager = manager;
 	}
 
 	@AfterClass

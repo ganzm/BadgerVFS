@@ -6,7 +6,6 @@ import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 
 public class UnitTestUtils {
 
-	@SuppressWarnings("unused")
 	public static DiskConfiguration getMockedConfig(String rootFolderName) {
 		DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(getRootDir(rootFolderName));

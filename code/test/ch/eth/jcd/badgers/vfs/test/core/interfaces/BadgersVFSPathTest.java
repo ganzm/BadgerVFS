@@ -32,7 +32,7 @@ public class BadgersVFSPathTest extends IVFSPathTest {
 
 	@Override
 	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
-		this.manager = manager;
+		BadgersVFSPathTest.manager = manager;
 	}
 
 	@AfterClass

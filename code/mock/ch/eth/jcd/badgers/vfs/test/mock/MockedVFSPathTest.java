@@ -26,7 +26,7 @@ public class MockedVFSPathTest extends IVFSPathTest {
 
 	@Override
 	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
-		this.manager = manager;
+		MockedVFSPathTest.manager = manager;
 	}
 
 	@AfterClass

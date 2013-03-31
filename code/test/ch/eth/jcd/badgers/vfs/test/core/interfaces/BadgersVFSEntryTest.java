@@ -32,7 +32,7 @@ public class BadgersVFSEntryTest extends IVFSEntryTest {
 
 	@Override
 	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
-		this.manager = manager;
+		BadgersVFSEntryTest.manager = manager;
 	}
 
 	@AfterClass
