@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
+
 /**
  * 
  * $Id$
@@ -144,7 +146,7 @@ public class DirectoryBlock {
 		this.nodeRight = nodeRight;
 	}
 
-	public void dumpShort(DirectorySectionHandler directorySectionHandler, StringBuffer buf, int depth) throws IOException {
+	public void dumpShort(DirectorySectionHandler directorySectionHandler, StringBuffer buf, int depth) throws VFSException {
 		for (int i = 0; i < depth; i++) {
 			buf.append("\t");
 		}

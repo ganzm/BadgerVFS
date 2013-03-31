@@ -6,8 +6,9 @@ import java.io.RandomAccessFile;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
-import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
  * $Id$
@@ -124,18 +125,22 @@ public class DirectorySectionHandler {
 		throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection");
 	}
 
-	public DirectoryBlock loadDirectoryBlock(long location) throws IOException {
+	public DirectoryBlock loadDirectoryBlock(long location) throws VFSException, VFSInvalidLocationExceptionException {
 		if (location == 0 || location < sectionOffset || location > (sectionOffset + sectionSize)) {
-			throw new VFSRuntimeException("Tried to load DirectoryBlock from Location " + location + " Valid Range is [" + sectionOffset + ", "
-					+ (sectionOffset + sectionSize));
+			throw new VFSInvalidLocationExceptionException("Tried to load DirectoryBlock from Location " + location + " Valid Range is [" + sectionOffset
+					+ ", " + (sectionOffset + sectionSize));
 		}
 
-		virtualDiskFile.seek(location);
-		virtualDiskFile.read(directoryBlockBuffer);
+		try {
+			virtualDiskFile.seek(location);
+			virtualDiskFile.read(directoryBlockBuffer);
 
-		DirectoryBlock dataBlock = DirectoryBlock.deserialize(location, directoryBlockBuffer);
+			DirectoryBlock dataBlock = DirectoryBlock.deserialize(location, directoryBlockBuffer);
 
-		return dataBlock;
+			return dataBlock;
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	public void freeDirectoryBlock(DirectoryBlock directoryBlock) throws IOException {

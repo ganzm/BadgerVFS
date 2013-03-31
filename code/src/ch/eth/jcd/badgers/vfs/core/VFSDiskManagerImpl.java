@@ -106,7 +106,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		LOGGER.debug("Creating root folder done");
 	}
 
-	private void openRootFolder() throws IOException {
+	private void openRootFolder() throws VFSException {
 		LOGGER.debug("Opening root folder...");
 
 		DataBlock rootDirectoryDataBlock = dataSectionHandler.loadDataBlock(dataSectionHandler.getSectionOffset());
@@ -184,8 +184,11 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		LOGGER.info("Getting rid of " + config.getHostFilePath());
 		close();
 
-		if (new File(config.getHostFilePath()).delete() == false) {
-			throw new VFSException("Could not delete File " + config.getHostFilePath());
+		File file = new File(config.getHostFilePath());
+		if (file.exists()) {
+			if (new File(config.getHostFilePath()).delete() == false) {
+				throw new VFSException("Could not delete File " + config.getHostFilePath());
+			}
 		}
 	}
 

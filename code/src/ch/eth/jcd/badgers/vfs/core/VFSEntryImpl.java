@@ -16,9 +16,10 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 public abstract class VFSEntryImpl implements VFSEntry {
 
 	private final VFSPath path;
+
 	protected final VFSDiskManagerImpl diskManager;
 
-	private DataBlock firstDataBlock;
+	protected DataBlock firstDataBlock;
 
 	/**
 	 * creates a new
@@ -133,8 +134,13 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void delete() {
-		throw new UnsupportedOperationException("TODO");
+	public void delete() throws VFSException {
+		try {
+			VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) getParent();
+			parentDirectory.deleteChild(this);
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	@Override
@@ -158,7 +164,38 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public VFSEntry getParent() {
-		throw new UnsupportedOperationException("TODO");
+	public VFSEntry getParent() throws VFSException {
+		return getParentProtected();
+	}
+
+	protected VFSDirectoryImpl getParentProtected() throws VFSException {
+		String pathString = path.getAbsolutePath();
+		int separatorIndex = pathString.lastIndexOf(VFSPath.FILE_SEPARATOR);
+
+		String parentPathString = pathString.substring(0, separatorIndex + 1);
+
+		VFSPath parentPath = diskManager.createPath(parentPathString);
+
+		if (parentPath.exists() == false) {
+			throw new VFSException("Internal Error while trying to get Parent of " + pathString);
+		}
+
+		return (VFSDirectoryImpl) parentPath.getVFSEntry();
+	}
+
+	/**
+	 * delete user data of this entry
+	 * 
+	 * @throws IOException
+	 */
+	protected void deleteDataBlocks() throws VFSException, IOException {
+		long next = firstDataBlock.getNextDataBlock();
+		diskManager.getDataSectionHandler().freeDataBlock(firstDataBlock);
+
+		while (next != 0) {
+			DataBlock tmp = diskManager.getDataSectionHandler().loadDataBlock(next);
+			next = tmp.getNextDataBlock();
+			diskManager.getDataSectionHandler().freeDataBlock(tmp);
+		}
 	}
 }

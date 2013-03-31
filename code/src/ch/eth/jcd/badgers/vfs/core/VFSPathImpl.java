@@ -33,6 +33,11 @@ public class VFSPathImpl implements VFSPath {
 
 		pathString = pathString.trim();
 
+		if (VFSPath.FILE_SEPARATOR.equals(pathString)) {
+			// apply exception for root path
+			return new String[0];
+		}
+
 		if (pathString.startsWith(VFSPath.FILE_SEPARATOR) == false) {
 			throw new VFSInvalidPathException("Path should start with / but it does not Path: " + pathString);
 		}

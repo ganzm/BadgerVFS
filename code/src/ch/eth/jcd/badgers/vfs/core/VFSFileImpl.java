@@ -39,5 +39,4 @@ public class VFSFileImpl extends VFSEntryImpl {
 		LOGGER.debug("Tried to call getChildByName on File " + getPath());
 		return null;
 	}
-
 }

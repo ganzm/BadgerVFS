@@ -96,6 +96,6 @@ public interface VFSEntry {
 	 * This instance is marked as deleted. Any further method call will lead to an exception
 	 * 
 	 */
-	public void delete();
+	public void delete() throws VFSException;
 
 }

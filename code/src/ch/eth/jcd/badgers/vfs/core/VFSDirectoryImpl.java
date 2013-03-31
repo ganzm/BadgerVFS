@@ -105,4 +105,31 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 			LOGGER.error("Error while debugPrint", ex);
 		}
 	}
+
+	protected void deleteChild(VFSEntryImpl entry) throws VFSException, IOException {
+		String filePath = entry.getPath().getAbsolutePath();
+		String fileName = entry.getPath().getName();
+
+		LOGGER.info("Deleting... " + filePath);
+
+		if (entry.isDirectory()) {
+			VFSDirectoryImpl directoryEntry = ((VFSDirectoryImpl) entry);
+
+			// delete directory content first
+			List<VFSEntry> childEntries = entry.getChildren();
+			for (VFSEntry childEntry : childEntries) {
+				directoryEntry.deleteChild((VFSEntryImpl) childEntry);
+			}
+
+			// delete Directory tree structure
+			DirectoryBlock directoryRootBlock = directoryEntry.childTree.getRootBlock();
+			diskManager.getDirectorySectionHandler().freeDirectoryBlock(directoryRootBlock);
+		}
+
+		// remove this from parent directory tree structure
+		childTree.remove(diskManager.getDirectorySectionHandler(), fileName);
+		entry.deleteDataBlocks();
+
+		LOGGER.info("Deleting DONE " + filePath);
+	}
 }

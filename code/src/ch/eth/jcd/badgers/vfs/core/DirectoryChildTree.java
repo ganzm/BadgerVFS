@@ -10,8 +10,16 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
+/**
+ * $Id$
+ * 
+ * b tree which contains the child entries of a single directory
+ * 
+ */
 public class DirectoryChildTree {
 
 	/**
@@ -23,6 +31,10 @@ public class DirectoryChildTree {
 		this.rootBlock = rootBlock;
 	}
 
+	public DirectoryBlock getRootBlock() {
+		return rootBlock;
+	}
+
 	/**
 	 * depth first tree traversal
 	 * 
@@ -31,7 +43,7 @@ public class DirectoryChildTree {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<DirectoryEntryBlock> traverseTree(DirectorySectionHandler directorySectionhandler) throws IOException {
+	public List<DirectoryEntryBlock> traverseTree(DirectorySectionHandler directorySectionhandler) throws VFSException {
 		List<DirectoryEntryBlock> result = new ArrayList<>();
 
 		visitEntryBlock(directorySectionhandler, rootBlock, result);
@@ -39,7 +51,8 @@ public class DirectoryChildTree {
 		return result;
 	}
 
-	private void visitEntryBlock(DirectorySectionHandler directorySectionhandler, DirectoryBlock block, List<DirectoryEntryBlock> result) throws IOException {
+	private void visitEntryBlock(DirectorySectionHandler directorySectionhandler, DirectoryBlock block, List<DirectoryEntryBlock> result) throws VFSException,
+			VFSInvalidLocationExceptionException {
 
 		long dirBlockLink;
 		DirectoryEntryBlock node;
@@ -78,7 +91,7 @@ public class DirectoryChildTree {
 		}
 	}
 
-	public void insert(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry) throws IOException {
+	public void insert(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry) throws VFSException, IOException {
 		// ----------------------------
 		// All insertions start at a leaf node.
 		// To insert a new element, search the tree to find the leaf node where the new element should be added.
@@ -180,7 +193,7 @@ public class DirectoryChildTree {
 			directorySectionhandler.persistDirectoryBlock(newBlock);
 
 			// --------------------------
-			// wire the danglink block
+			// wire the dangling block
 
 			if (directoryBlockToAttach != null) {
 				long lastVisitedChildBlockLink = lastDirectoryBlock.getLocation();
@@ -240,7 +253,6 @@ public class DirectoryChildTree {
 
 			bottomUpTreeInsert(pathToLeave, directorySectionhandler, toInsertToParent, currentBlock, newBlock);
 		}
-
 	}
 
 	private void insertAtRoot(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry, DirectoryBlock lastDirectoryBlock,
@@ -280,8 +292,10 @@ public class DirectoryChildTree {
 	 * @param newEntry
 	 * @return
 	 * @throws IOException
+	 * @throws VFSInvalidLocationExceptionException
 	 */
-	private Stack<DirectoryBlock> getBlockToInsertEntry(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry) throws IOException {
+	private Stack<DirectoryBlock> getBlockToInsertEntry(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry) throws VFSException,
+			VFSInvalidLocationExceptionException {
 
 		Stack<DirectoryBlock> pathToLeave = new Stack<DirectoryBlock>();
 
@@ -329,7 +343,179 @@ public class DirectoryChildTree {
 		}
 	}
 
-	public String dumpTreeToString(DirectorySectionHandler directorySectionHandler) throws IOException {
+	/**
+	 * 
+	 * @param directorySectionHandler
+	 * @param fileName
+	 * @return DirectoryEntryBlock which was removed
+	 * @throws IOException
+	 */
+	public void remove(DirectorySectionHandler directorySectionHandler, String fileName) throws VFSException, IOException {
+
+		// dummy block
+		DirectoryEntryBlock fileNameBlock = new DirectoryEntryBlock(fileName);
+
+		Stack<DirectoryBlock> pathTopDown = findDirectoryBlockWithEntry(directorySectionHandler, fileNameBlock);
+
+		DirectoryBlock currentDirectoryBlock = pathTopDown.peek();
+
+		long linkLocation = 0;
+		boolean deleteLeftNode;
+		if (currentDirectoryBlock.getNodeLeft().compareTo(fileNameBlock) == 0) {
+			// we want to delete the left Entry of the currentDirectoryBlock
+			linkLocation = currentDirectoryBlock.getLinkLeft();
+			deleteLeftNode = true;
+		} else {
+			// we want to delete the right Entry of the currentDirectoryBlock
+			linkLocation = currentDirectoryBlock.getLinkMiddle();
+			deleteLeftNode = false;
+		}
+
+		if (linkLocation == 0) {
+			// we are trying to remove an entry from a leave
+
+			// simply delete the entry
+			if (deleteLeftNode) {
+				currentDirectoryBlock.setNodeLeft(currentDirectoryBlock.getNodeRight());
+				currentDirectoryBlock.setNodeRight(null);
+			} else {
+				currentDirectoryBlock.setNodeRight(null);
+			}
+			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
+
+			// rebalance the tree
+			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown, fileNameBlock);
+
+		} else {
+			// we are trying to remove an internal node of our tree
+
+			Stack<DirectoryBlock> pathToSymmetricFollower = new Stack<>();
+			DirectoryEntryBlock symFollower = findAndDeleteSymmetricFollower(directorySectionHandler, linkLocation, pathToSymmetricFollower);
+
+			// replace node to delete with symmetric follower
+			if (deleteLeftNode) {
+				currentDirectoryBlock.setNodeLeft(symFollower);
+			} else {
+				currentDirectoryBlock.setNodeRight(symFollower);
+			}
+			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
+
+			// copy path information to the leave
+			while (pathToSymmetricFollower.isEmpty() == false) {
+				// CARE: the top of pathToSymmetricFollower should eventually be on top of pathTopDown
+				pathTopDown.push(pathToSymmetricFollower.firstElement());
+			}
+
+			// delete symmetric follower because we duplicated this entry on the current node
+			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown, symFollower);
+		}
+	}
+
+	private void rebalanceTreeAfterDeletion(DirectorySectionHandler directorySectionHandler, Stack<DirectoryBlock> pathTopDown,
+			DirectoryEntryBlock fileNameBlock) {
+
+		DirectoryBlock current = pathTopDown.pop();
+
+		// check if deleting an element from a leaf node has brought it under the minimum size of 1
+		if (current.getNodeLeft() != null) {
+			// everything's fine;
+			return;
+		}
+
+		throw new UnsupportedOperationException("Implement this");
+		// TODO Auto-generated method stub
+
+	}
+
+	private DirectoryEntryBlock findAndDeleteSymmetricFollower(DirectorySectionHandler directorySectionHandler, long directoryBlockLocation,
+			Stack<DirectoryBlock> pathToSymmetricFollower) throws VFSInvalidLocationExceptionException, VFSException, IOException {
+
+		long currentLocation = directoryBlockLocation;
+		while (true) {
+
+			DirectoryBlock current = directorySectionHandler.loadDirectoryBlock(currentLocation);
+			pathToSymmetricFollower.push(current);
+
+			if ((currentLocation = current.getLinkRight()) != 0) {
+				continue;
+			} else if ((currentLocation = current.getLinkMiddle()) != 0) {
+				continue;
+			} else {
+				DirectoryEntryBlock symmetricFollower = null;
+				if (current.getNodeRight() != null) {
+					symmetricFollower = current.getNodeRight();
+					current.setNodeRight(null);
+				} else {
+					symmetricFollower = current.getNodeLeft();
+					current.setNodeLeft(current.getNodeRight());
+					current.setNodeRight(null);
+				}
+
+				directorySectionHandler.persistDirectoryBlock(current);
+				return symmetricFollower;
+			}
+		}
+	}
+
+	private Stack<DirectoryBlock> findDirectoryBlockWithEntry(DirectorySectionHandler directorySectionHandler, DirectoryEntryBlock toFind) {
+
+		// find the DirectoryEntryBlock to remove
+		Stack<DirectoryBlock> pathToLeave = new Stack<DirectoryBlock>();
+
+		DirectoryBlock current = rootBlock;
+
+		try {
+
+			while (true) {
+
+				DirectoryEntryBlock node = current.getNodeLeft();
+				if (node != null) {
+
+					int cmpRes = toFind.compareTo(node);
+					if (cmpRes < 0) {
+						// travel down left branch
+						pathToLeave.push(current);
+						current = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
+					} else if (cmpRes == 0) {
+						// found it
+						pathToLeave.push(current);
+						return pathToLeave;
+					} else {
+
+						node = current.getNodeRight();
+						if (node == null) {
+							// travel down middle branch
+							pathToLeave.push(current);
+							current = directorySectionHandler.loadDirectoryBlock(current.getLinkMiddle());
+						} else {
+
+							cmpRes = toFind.compareTo(node);
+							if (cmpRes < 0) {
+								// travel down middle branch
+								pathToLeave.push(current);
+								current = directorySectionHandler.loadDirectoryBlock(current.getLinkMiddle());
+
+							} else if (cmpRes == 0) {
+								// found it
+								pathToLeave.push(current);
+								return pathToLeave;
+							} else {
+								// travel down right branch
+								pathToLeave.push(current);
+								current = directorySectionHandler.loadDirectoryBlock(current.getLinkRight());
+							}
+						}
+					}
+				}
+			}
+		} catch (VFSInvalidLocationExceptionException ex) {
+			throw new VFSRuntimeException("Could not delete Entry - File not found " + toFind.getFileName(), ex);
+		} catch (VFSException e) {
+			throw new VFSRuntimeException("", e);
+		}
+	}
+
+	public String dumpTreeToString(DirectorySectionHandler directorySectionHandler) throws VFSException {
 		StringBuffer buf = new StringBuffer();
 		rootBlock.dumpShort(directorySectionHandler, buf, 0);
 		return buf.toString();

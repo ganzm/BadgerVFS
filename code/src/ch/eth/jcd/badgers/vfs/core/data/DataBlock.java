@@ -52,6 +52,10 @@ public class DataBlock {
 		return creationDate;
 	}
 
+	public long getNextDataBlock() {
+		return nextDataBlock;
+	}
+
 	private byte[] serializeHeader() {
 		ByteBuffer buf = ByteBuffer.allocate(21);
 

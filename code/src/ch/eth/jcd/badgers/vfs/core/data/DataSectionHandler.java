@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 
 /**
@@ -97,14 +99,22 @@ public class DataSectionHandler {
 		virtualDiskFile.write(0);
 	}
 
-	public DataBlock loadDataBlock(long location) throws IOException {
+	public DataBlock loadDataBlock(long location) throws VFSException {
+		if (location == 0 || location < dataSectionOffset || location > (dataSectionOffset + dataSectionSize)) {
+			throw new VFSInvalidLocationExceptionException("Tried to load DataBlock from Location " + location + " Valid Range is [" + dataSectionOffset + ", "
+					+ (dataSectionOffset + dataSectionSize));
+		}
 
-		virtualDiskFile.seek(location);
-		virtualDiskFile.read(dataBlockBuffer);
+		try {
+			virtualDiskFile.seek(location);
+			virtualDiskFile.read(dataBlockBuffer);
 
-		DataBlock dataBlock = DataBlock.deserialize(location, dataBlockBuffer);
+			DataBlock dataBlock = DataBlock.deserialize(location, dataBlockBuffer);
 
-		return dataBlock;
+			return dataBlock;
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	/**
@@ -150,7 +160,9 @@ public class DataSectionHandler {
 			tmpBlockIncrement = Math.min(maxAllowedNewBlocks, tmpBlockIncrement);
 		}
 
-		virtualDiskFile.setLength(currentFilePosition + (tmpBlockIncrement * DataBlock.BLOCK_SIZE));
+		long newLength = currentFilePosition + (tmpBlockIncrement * DataBlock.BLOCK_SIZE);
+		virtualDiskFile.setLength(newLength);
+		dataSectionSize = newLength - dataSectionOffset;
 		logger.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());
 
 		logger.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
