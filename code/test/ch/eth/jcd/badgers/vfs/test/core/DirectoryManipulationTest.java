@@ -24,10 +24,11 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 	public void testCreateSimpleDir() throws VFSException {
 
 		NumberFormat decimalFormat = new DecimalFormat("###");
+		int numEntries = 100;
 
 		VFSEntry rootEntry = diskManager.getRoot();
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < numEntries; i++) {
 
 			String folderName = "home" + decimalFormat.format(i);
 			VFSPath path = rootEntry.getChildPath(folderName);
@@ -35,22 +36,16 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 			Assert.assertEquals("/" + folderName, path.getAbsolutePath());
 
-			if (rootEntry instanceof VFSDirectoryImpl) {
-				((VFSDirectoryImpl) rootEntry).debugPrint();
-			}
-
+			printDirTree(rootEntry);
 			VFSEntry homeDir = path.createDirectory();
-
-			if (rootEntry instanceof VFSDirectoryImpl) {
-				((VFSDirectoryImpl) rootEntry).debugPrint();
-			}
+			printDirTree(rootEntry);
 
 			Assert.assertTrue(path.exists());
 			Assert.assertTrue(homeDir.isDirectory());
 		}
 
 		List<VFSEntry> children = rootEntry.getChildren();
-		Assert.assertEquals(100, children.size());
+		Assert.assertEquals(numEntries, children.size());
 
 		VFSEntry previous = null;
 		for (VFSEntry entry : children) {
@@ -69,17 +64,31 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 		// ----------------------
 		// delete the stuff we created
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < numEntries; i++) {
 
 			String folderName = "home" + decimalFormat.format(i);
 			VFSPath path = rootEntry.getChildPath(folderName);
 
 			assertTrue(path.exists());
 			VFSEntry homeEntry = path.getVFSEntry();
+
+			printDirTree(rootEntry);
 			homeEntry.delete();
+			printDirTree(rootEntry);
+
 			assertFalse(path.exists());
 		}
 
+	}
+
+	private void printDirTree(VFSEntry rootEntry) {
+		if (rootEntry instanceof VFSDirectoryImpl) {
+			((VFSDirectoryImpl) rootEntry).debugPrint();
+
+			StringBuffer buf = new StringBuffer();
+			boolean result = ((VFSDirectoryImpl) rootEntry).performTreeSanityCheck(buf);
+			Assert.assertTrue(buf.toString(), result);
+		}
 	}
 
 	@Test

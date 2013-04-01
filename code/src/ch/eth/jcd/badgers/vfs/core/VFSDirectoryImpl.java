@@ -106,6 +106,10 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		}
 	}
 
+	public boolean performTreeSanityCheck(StringBuffer buf) {
+		return childTree.performTreeSanityCheck(diskManager.getDirectorySectionHandler(), buf);
+	}
+
 	protected void deleteChild(VFSEntryImpl entry) throws VFSException, IOException {
 		String filePath = entry.getPath().getAbsolutePath();
 		String fileName = entry.getPath().getName();

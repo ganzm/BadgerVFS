@@ -355,23 +355,24 @@ public class DirectoryChildTree {
 		// dummy block
 		DirectoryEntryBlock fileNameBlock = new DirectoryEntryBlock(fileName);
 
+		// search block where we delete an element
 		Stack<DirectoryBlock> pathTopDown = findDirectoryBlockWithEntry(directorySectionHandler, fileNameBlock);
 
 		DirectoryBlock currentDirectoryBlock = pathTopDown.peek();
 
-		long linkLocation = 0;
+		long leftSideLinkLocation = 0;
 		boolean deleteLeftNode;
 		if (currentDirectoryBlock.getNodeLeft().compareTo(fileNameBlock) == 0) {
 			// we want to delete the left Entry of the currentDirectoryBlock
-			linkLocation = currentDirectoryBlock.getLinkLeft();
+			leftSideLinkLocation = currentDirectoryBlock.getLinkLeft();
 			deleteLeftNode = true;
 		} else {
 			// we want to delete the right Entry of the currentDirectoryBlock
-			linkLocation = currentDirectoryBlock.getLinkMiddle();
+			leftSideLinkLocation = currentDirectoryBlock.getLinkMiddle();
 			deleteLeftNode = false;
 		}
 
-		if (linkLocation == 0) {
+		if (leftSideLinkLocation == 0) {
 			// we are trying to remove an entry from a leave
 
 			// simply delete the entry
@@ -384,13 +385,13 @@ public class DirectoryChildTree {
 			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
 
 			// rebalance the tree
-			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown, fileNameBlock);
+			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown);
 
 		} else {
 			// we are trying to remove an internal node of our tree
 
 			Stack<DirectoryBlock> pathToSymmetricFollower = new Stack<>();
-			DirectoryEntryBlock symFollower = findAndDeleteSymmetricFollower(directorySectionHandler, linkLocation, pathToSymmetricFollower);
+			DirectoryEntryBlock symFollower = findAndDeleteSymmetricFollower(directorySectionHandler, leftSideLinkLocation, pathToSymmetricFollower);
 
 			// replace node to delete with symmetric follower
 			if (deleteLeftNode) {
@@ -403,16 +404,16 @@ public class DirectoryChildTree {
 			// copy path information to the leave
 			while (pathToSymmetricFollower.isEmpty() == false) {
 				// CARE: the top of pathToSymmetricFollower should eventually be on top of pathTopDown
-				pathTopDown.push(pathToSymmetricFollower.firstElement());
+				DirectoryBlock removed = pathToSymmetricFollower.remove(0);
+				pathTopDown.push(removed);
 			}
 
-			// delete symmetric follower because we duplicated this entry on the current node
-			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown, symFollower);
+			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown);
 		}
 	}
 
-	private void rebalanceTreeAfterDeletion(DirectorySectionHandler directorySectionHandler, Stack<DirectoryBlock> pathTopDown,
-			DirectoryEntryBlock fileNameBlock) {
+	private void rebalanceTreeAfterDeletion(DirectorySectionHandler directorySectionHandler, Stack<DirectoryBlock> pathTopDown) throws IOException,
+			VFSInvalidLocationExceptionException, VFSException {
 
 		DirectoryBlock current = pathTopDown.pop();
 
@@ -422,9 +423,190 @@ public class DirectoryChildTree {
 			return;
 		}
 
-		throw new UnsupportedOperationException("Implement this");
-		// TODO Auto-generated method stub
+		// check if this is the root node and the tree is now empty
+		if (pathTopDown.isEmpty()) {
+			// we are at the root here
 
+			if (current.getLinkLeft() != 0) {
+				// current node (rootBlock) is empty
+				// but there is a link
+				// promote linked node
+				rootBlock = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
+			}
+
+			return;
+		}
+
+		// check if we can solve the rebalancing problem by rotation
+		DirectoryBlock parent = pathTopDown.peek();
+
+		if (tryRebalanceByRotating(directorySectionHandler, current, parent)) {
+			return;
+		}
+
+		if (parent.getLinkLeft() == current.getLocation()) {
+			// current node is the left branch
+			// merge with right sibling and pivot node from parent
+			DirectoryBlock rightSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkMiddle());
+
+			// move pivot one level down
+			current.setNodeLeft(parent.getNodeLeft());
+			current.setNodeRight(rightSibling.getNodeLeft());
+
+			parent.setNodeLeft(parent.getNodeRight());
+			parent.setNodeRight(null);
+			parent.setLinkMiddle(parent.getLinkRight());
+			parent.setLinkRight(0);
+
+			current.setLinkMiddle(rightSibling.getLinkLeft());
+			current.setLinkRight(rightSibling.getLinkMiddle());
+
+			directorySectionHandler.persistDirectoryBlock(current);
+			directorySectionHandler.persistDirectoryBlock(parent);
+			directorySectionHandler.freeDirectoryBlock(rightSibling);
+		} else if (parent.getLinkMiddle() == current.getLocation()) {
+			// current node is the middle branch
+			// merge with left sibling and pivot node from parent
+			DirectoryBlock leftSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkLeft());
+
+			// move pivot one level down
+			leftSibling.setNodeRight(parent.getNodeLeft());
+			leftSibling.setLinkRight(current.getLinkLeft());
+
+			parent.setNodeLeft(parent.getNodeRight());
+			parent.setNodeRight(null);
+			parent.setLinkMiddle(parent.getLinkRight());
+			parent.setLinkRight(0);
+
+			directorySectionHandler.persistDirectoryBlock(leftSibling);
+			directorySectionHandler.persistDirectoryBlock(parent);
+			directorySectionHandler.freeDirectoryBlock(current);
+
+		} else {
+			// current node is the right branch
+			// merge with left sibling and pivot node from parent
+			DirectoryBlock leftSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkMiddle());
+
+			leftSibling.setNodeRight(parent.getNodeRight());
+			leftSibling.setLinkRight(current.getLinkLeft());
+
+			parent.setNodeRight(null);
+			parent.setLinkRight(0);
+
+			directorySectionHandler.persistDirectoryBlock(leftSibling);
+			directorySectionHandler.persistDirectoryBlock(parent);
+			directorySectionHandler.freeDirectoryBlock(current);
+		}
+
+		rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown);
+
+	}
+
+	/**
+	 * check if we can solve the balancing problem by rotation
+	 * 
+	 * @param directorySectionHandler
+	 * @param current
+	 * @param parent
+	 * @return
+	 * @throws VFSInvalidLocationExceptionException
+	 * @throws VFSException
+	 * @throws IOException
+	 */
+	private boolean tryRebalanceByRotating(DirectorySectionHandler directorySectionHandler, DirectoryBlock current, DirectoryBlock parent)
+			throws VFSInvalidLocationExceptionException, VFSException, IOException {
+
+		if (parent.getLinkLeft() == current.getLocation()) {
+			// current node is the left branch
+			DirectoryBlock rightSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkMiddle());
+
+			if (rightSibling.getNodeRight() != null) {
+				// do a rotation left
+
+				current.setNodeLeft(parent.getNodeLeft());
+				parent.setNodeLeft(rightSibling.getNodeLeft());
+				rightSibling.setNodeLeft(rightSibling.getNodeRight());
+				rightSibling.setNodeRight(null);
+
+				current.setLinkMiddle(rightSibling.getLinkLeft());
+				rightSibling.setLinkLeft(rightSibling.getLinkMiddle());
+				rightSibling.setLinkMiddle(rightSibling.getLinkRight());
+				rightSibling.setLinkRight(0);
+
+				directorySectionHandler.persistDirectoryBlock(current);
+				directorySectionHandler.persistDirectoryBlock(parent);
+				directorySectionHandler.persistDirectoryBlock(rightSibling);
+
+				return true;
+			}
+		} else if (parent.getLinkMiddle() == current.getLocation()) {
+			// current node is the middle branch
+
+			DirectoryBlock leftSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkLeft());
+
+			if (leftSibling.getNodeRight() != null) {
+				// left sibling above minimum load
+
+				current.setNodeLeft(parent.getNodeLeft());
+				parent.setNodeLeft(leftSibling.getNodeRight());
+				leftSibling.setNodeRight(null);
+
+				current.setLinkMiddle(current.getLinkLeft());
+				current.setLinkLeft(leftSibling.getLinkRight());
+				leftSibling.setLinkRight(0);
+
+				directorySectionHandler.persistDirectoryBlock(current);
+				directorySectionHandler.persistDirectoryBlock(parent);
+				directorySectionHandler.persistDirectoryBlock(leftSibling);
+
+				return true;
+			}
+
+			if (parent.getLinkRight() != 0) {
+				DirectoryBlock rightSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkRight());
+				if (rightSibling.getNodeRight() != null) {
+					// left rotation
+
+					current.setNodeLeft(parent.getNodeRight());
+					parent.setNodeRight(rightSibling.getNodeLeft());
+					rightSibling.setNodeLeft(rightSibling.getNodeRight());
+					rightSibling.setNodeRight(null);
+
+					current.setLinkMiddle(rightSibling.getLinkLeft());
+					rightSibling.setLinkLeft(rightSibling.getLinkMiddle());
+					rightSibling.setLinkMiddle(rightSibling.getLinkRight());
+					rightSibling.setLinkRight(0);
+
+					directorySectionHandler.persistDirectoryBlock(current);
+					directorySectionHandler.persistDirectoryBlock(parent);
+					directorySectionHandler.persistDirectoryBlock(rightSibling);
+
+					return true;
+				}
+			}
+
+		} else {
+			// current node is the right branch
+			DirectoryBlock leftSibling = directorySectionHandler.loadDirectoryBlock(parent.getLinkMiddle());
+
+			if (leftSibling.getNodeRight() != null) {
+				current.setNodeLeft(parent.getNodeRight());
+				parent.setNodeRight(leftSibling.getNodeRight());
+				leftSibling.setNodeRight(null);
+
+				current.setLinkMiddle(current.getLinkLeft());
+				current.setLinkLeft(leftSibling.getLinkRight());
+				leftSibling.setLinkRight(0);
+
+				directorySectionHandler.persistDirectoryBlock(current);
+				directorySectionHandler.persistDirectoryBlock(parent);
+				directorySectionHandler.persistDirectoryBlock(leftSibling);
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private DirectoryEntryBlock findAndDeleteSymmetricFollower(DirectorySectionHandler directorySectionHandler, long directoryBlockLocation,
@@ -437,20 +619,28 @@ public class DirectoryChildTree {
 			pathToSymmetricFollower.push(current);
 
 			if ((currentLocation = current.getLinkRight()) != 0) {
-				continue;
-			} else if ((currentLocation = current.getLinkMiddle()) != 0) {
-				continue;
-			} else {
-				DirectoryEntryBlock symmetricFollower = null;
-				if (current.getNodeRight() != null) {
-					symmetricFollower = current.getNodeRight();
-					current.setNodeRight(null);
-				} else {
-					symmetricFollower = current.getNodeLeft();
-					current.setNodeLeft(current.getNodeRight());
-					current.setNodeRight(null);
-				}
+				// follow right path down
 
+				currentLocation = current.getLinkRight();
+				continue;
+			} else if (current.getNodeRight() != null) {
+
+				DirectoryEntryBlock symmetricFollower = current.getNodeRight();
+				current.setNodeRight(null);
+				directorySectionHandler.persistDirectoryBlock(current);
+				return symmetricFollower;
+			} else if ((currentLocation = current.getLinkMiddle()) != 0) {
+				// follow middle path down
+
+				currentLocation = current.getLinkMiddle();
+				continue;
+
+			} else {
+
+				// take left node as symmetric follower
+				DirectoryEntryBlock symmetricFollower = current.getNodeLeft();
+				current.setNodeLeft(current.getNodeRight());
+				current.setNodeRight(null);
 				directorySectionHandler.persistDirectoryBlock(current);
 				return symmetricFollower;
 			}
@@ -519,5 +709,86 @@ public class DirectoryChildTree {
 		StringBuffer buf = new StringBuffer();
 		rootBlock.dumpShort(directorySectionHandler, buf, 0);
 		return buf.toString();
+	}
+
+	public boolean performTreeSanityCheck(DirectorySectionHandler directorySectionHandler, StringBuffer debugInformation) {
+
+		if (rootBlock.getNodeLeft() == null && rootBlock.getNodeRight() == null) {
+			// special case for root node
+			debugInformation.append("Tree empty");
+			return true;
+		}
+
+		try {
+
+			int depth = performDirectoryBlockSanityCheck(directorySectionHandler, rootBlock, null, null, 0);
+			debugInformation.append("Tree depth is " + depth + "\n");
+			return true;
+		} catch (VFSException exception) {
+			debugInformation.append(exception.getMessage());
+			return false;
+		}
+	}
+
+	private int performDirectoryBlockSanityCheck(DirectorySectionHandler directorySectionHandler, DirectoryBlock block, DirectoryEntryBlock leftPivot,
+			DirectoryEntryBlock rightPivot, int recursionDepth) throws VFSException {
+
+		DirectoryEntryBlock leftNode = block.getNodeLeft();
+		DirectoryEntryBlock rightNode = block.getNodeRight();
+
+		if (leftNode == null) {
+			throw new VFSException("Empty LeftNode in Block " + block.getLocation());
+		}
+
+		if (leftPivot != null) {
+			if (leftPivot.compareTo(leftNode) >= 0) {
+				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With left Parent Pivot [" + leftPivot.getFileName()
+						+ "] and LeftNode" + leftNode.getFileName() + "]");
+			}
+		}
+
+		if (rightPivot != null) {
+			if (rightPivot.compareTo(leftNode) <= 0) {
+				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With right Parent Pivot [" + rightPivot.getFileName()
+						+ "] and LeftNode[" + leftNode.getFileName() + "]");
+			}
+		}
+
+		if (rightNode != null) {
+			if (leftNode.compareTo(block.getNodeRight()) >= 0) {
+				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " [" + leftNode.getFileName() + "] [" + rightNode.getFileName()
+						+ "]");
+			}
+		}
+
+		int depth = 0;
+		// check left subblocks
+		if (block.getLinkLeft() != 0) {
+			DirectoryBlock subBlock = directorySectionHandler.loadDirectoryBlock(block.getLinkLeft());
+			int newDepth = performDirectoryBlockSanityCheck(directorySectionHandler, subBlock, null, leftNode, recursionDepth + 1);
+			depth = Math.max(depth, newDepth);
+		}
+
+		// check middle subblocks
+		if (block.getLinkMiddle() != 0) {
+			DirectoryBlock subBlock = directorySectionHandler.loadDirectoryBlock(block.getLinkMiddle());
+			int newDepth = performDirectoryBlockSanityCheck(directorySectionHandler, subBlock, leftNode, rightNode, recursionDepth + 1);
+			depth = Math.max(depth, newDepth);
+		}
+
+		// check right subblocks
+		if (block.getLinkRight() != 0) {
+			DirectoryBlock subBlock = directorySectionHandler.loadDirectoryBlock(block.getLinkRight());
+			int newDepth = performDirectoryBlockSanityCheck(directorySectionHandler, subBlock, rightNode, null, recursionDepth + 1);
+			depth = Math.max(depth, newDepth);
+		}
+
+		// check if this is a leave
+		if (block.getLinkLeft() == 0 && block.getLinkMiddle() == 0 && block.getLinkRight() == 0) {
+			// leave found
+			return 0;
+		}
+
+		return depth;
 	}
 }
