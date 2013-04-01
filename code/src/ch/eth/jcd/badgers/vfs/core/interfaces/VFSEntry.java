@@ -15,6 +15,15 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 public interface VFSEntry {
 
 	/**
+	 * File write mode
+	 * 
+	 * Overwrites existing data
+	 * 
+	 * @see VFSEntry#getOutputStream(int)
+	 */
+	public static final int WRITE_MODE_OVERRIDE = 0;
+
+	/**
 	 * copies this Entry recursively (deep copy) to a new location
 	 * 
 	 * @param newLocation

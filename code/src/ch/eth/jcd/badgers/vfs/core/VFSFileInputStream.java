@@ -30,7 +30,7 @@ public class VFSFileInputStream extends InputStream {
 	@Override
 	public int read() throws IOException {
 		try {
-			long bytesLeftOnThisBlock = currentPosition - currentDataBlock.getUserDataLocation();
+			long bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
 
 			while (bytesLeftOnThisBlock <= 0) {
 				long nextBlockLocation = currentDataBlock.getNextDataBlock();
@@ -39,11 +39,11 @@ public class VFSFileInputStream extends InputStream {
 
 					// skip to next Block
 					currentDataBlock = dataSectionHandler.loadDataBlock(nextBlockLocation);
-					LOGGER.info("InputStream[" + firstDataBlock.getLocation() + "] - Skip to next DataBlock " + currentDataBlock.getLocation());
+					LOGGER.info("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
 
 					currentPosition = currentDataBlock.getUserDataLocation();
 
-					bytesLeftOnThisBlock = currentPosition - currentDataBlock.getUserDataLocation();
+					bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
 				} else {
 					// no more DataBlocks
 

@@ -98,8 +98,10 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 		directoryEntryBlock.assignDataBlock(dataBlock);
 
-		// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
-		directoryEntryBlock.assignDirectoryBlock(directoryBlock);
+		if (directoryBlock != null) {
+			// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
+			directoryEntryBlock.assignDirectoryBlock(directoryBlock);
+		}
 
 		parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
 	}

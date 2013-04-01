@@ -24,7 +24,7 @@ public class VFSFileOutputStream extends OutputStream {
 		this.currentDataBlock = firstDataBlock;
 		this.currentPosition = firstDataBlock.getUserDataLocation();
 
-		LOGGER.info("InputStream[" + firstDataBlock.getLocation() + "] - Open");
+		LOGGER.info("OutputStream[" + firstDataBlock.getLocation() + "] - Open");
 	}
 
 	@Override
@@ -32,10 +32,14 @@ public class VFSFileOutputStream extends OutputStream {
 		long spaceLeftOnThisBlock = currentDataBlock.getLocation() + DataBlock.BLOCK_SIZE - currentPosition;
 
 		if (spaceLeftOnThisBlock <= 0) {
+			DataBlock newBlock = dataSectionHandler.allocateNewDataBlock(false);
+			currentDataBlock.setNextDataBlock(newBlock.getLocation());
+			dataSectionHandler.persistDataBlock(currentDataBlock);
 
-			currentDataBlock = dataSectionHandler.allocateNewDataBlock(false);
+			currentDataBlock = newBlock;
 			currentPosition = currentDataBlock.getUserDataLocation();
 
+			LOGGER.info("OutputStream[" + firstDataBlock.getLocation() + "] - allocated new Block at " + currentDataBlock.getLocation());
 		}
 
 		dataSectionHandler.writeByte(currentPosition++, b);

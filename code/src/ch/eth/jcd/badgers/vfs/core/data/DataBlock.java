@@ -86,6 +86,10 @@ public class DataBlock {
 		return nextDataBlock;
 	}
 
+	public void setNextDataBlock(long nextDataBlock) {
+		this.nextDataBlock = nextDataBlock;
+	}
+
 	private byte[] serializeHeader() {
 		ByteBuffer buf = ByteBuffer.allocate(HEADER_SIZE);
 
@@ -103,7 +107,7 @@ public class DataBlock {
 		buf.putLong(creationDate.getTime());
 
 		// Data Length
-		buf.putInt(0);
+		buf.putInt(dataLength);
 
 		return buf.array();
 	}
