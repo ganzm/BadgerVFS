@@ -19,8 +19,10 @@ public class DataBlock {
 	 */
 	public static final int BLOCK_SIZE = 512;
 
+	private static final int HEADER_SIZE = 21;
+
 	/**
-	 * Position (offset in bytes) in our file where this datablock is located
+	 * Position (offset in bytes) in our file where this DataBlock is located
 	 */
 	private final long location;
 
@@ -34,7 +36,6 @@ public class DataBlock {
 	private Date creationDate;
 
 	/**
-	 * TODO
 	 */
 	private int dataLength = 0;
 
@@ -44,8 +45,37 @@ public class DataBlock {
 		this.creationDate = new Date();
 	}
 
+	/**
+	 * Location in our Virtual Disk File where this DataBlock is located
+	 * 
+	 * @return
+	 */
 	public long getLocation() {
 		return location;
+	}
+
+	/**
+	 * Location in our Virtual Disk File where the first user data bytes fo this DataBlock is located
+	 * 
+	 * @return
+	 */
+	public long getUserDataLocation() {
+		return location + HEADER_SIZE;
+	}
+
+	/**
+	 * Number of user data stored on this block
+	 * 
+	 * maximum BLOCK_SIZE - HEADER_SIZE
+	 * 
+	 * @return
+	 */
+	public int getDataLenght() {
+		return dataLength;
+	}
+
+	public void addDataLength(int increment) {
+		dataLength += increment;
 	}
 
 	public Date getCreationDate() {
@@ -57,7 +87,7 @@ public class DataBlock {
 	}
 
 	private byte[] serializeHeader() {
-		ByteBuffer buf = ByteBuffer.allocate(21);
+		ByteBuffer buf = ByteBuffer.allocate(HEADER_SIZE);
 
 		// BlockHeader
 		int header = 1;

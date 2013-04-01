@@ -34,7 +34,7 @@ public interface VFSEntry {
 	 * 
 	 * @return
 	 */
-	public InputStream getInputStream();
+	public InputStream getInputStream() throws VFSException;
 
 	/**
 	 * in case you want to write stuff to this entry
@@ -43,7 +43,7 @@ public interface VFSEntry {
 	 *            TODO
 	 * @return
 	 */
-	public OutputStream getOutputStream(int writeMode);
+	public OutputStream getOutputStream(int writeMode) throws VFSException;
 
 	/**
 	 * 

@@ -33,14 +33,13 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	/**
-	 * TODO move to me a factory if you want to
 	 * 
 	 * @param vfsPath
 	 * @return
 	 * @throws VFSException
 	 * @throws IOException
 	 */
-	protected static VFSEntryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
+	protected static VFSDirectoryImpl createNewDirectory(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
 
 		DataBlock dataBlock = null;
 		DirectoryBlock directoryBlock = null;
@@ -48,18 +47,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
 			directoryBlock = diskManager.getDirectorySectionHandler().allocateNewDirectoryBlock();
 
-			// get parent directory
-			VFSPathImpl parentPath = new VFSPathImpl(diskManager, vfsPath.getParentPath());
-			VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) parentPath.getVFSEntry();
-
-			DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
-
-			directoryEntryBlock.assignDataBlock(dataBlock);
-
-			// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
-			directoryEntryBlock.assignDirectoryBlock(directoryBlock);
-
-			parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
+			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, directoryBlock);
 
 			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
 
@@ -76,6 +64,44 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 			throw ex;
 		}
+	}
+
+	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
+
+		DataBlock dataBlock = null;
+		try {
+			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(false);
+
+			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
+
+			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
+
+			return entry;
+		} catch (Exception ex) {
+
+			if (dataBlock != null) {
+				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
+			}
+
+			throw ex;
+		}
+	}
+
+	private static void insertEntryIntoParentFolder(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, DataBlock dataBlock, DirectoryBlock directoryBlock)
+			throws VFSException, IOException {
+
+		// get parent directory
+		VFSPathImpl parentPath = new VFSPathImpl(diskManager, vfsPath.getParentPath());
+		VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) parentPath.getVFSEntry();
+
+		DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
+
+		directoryEntryBlock.assignDataBlock(dataBlock);
+
+		// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
+		directoryEntryBlock.assignDirectoryBlock(directoryBlock);
+
+		parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
 	}
 
 	public void setDataBlock(DataBlock dataBlock) {
@@ -109,14 +135,10 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	public abstract VFSEntryImpl getChildByName(String fileName) throws VFSException;
 
 	@Override
-	public InputStream getInputStream() {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract InputStream getInputStream() throws VFSException;
 
 	@Override
-	public OutputStream getOutputStream(int writeMode) {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract OutputStream getOutputStream(int writeMode) throws VFSException;
 
 	@Override
 	public VFSPath getPath() {
@@ -137,6 +159,11 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	public void delete() throws VFSException {
 		try {
 			VFSDirectoryImpl parentDirectory = (VFSDirectoryImpl) getParent();
+
+			if (parentDirectory == this) {
+				throw new VFSException("Don't try to delete the root directory fool");
+			}
+
 			parentDirectory.deleteChild(this);
 		} catch (IOException e) {
 			throw new VFSException(e);

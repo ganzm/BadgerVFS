@@ -7,10 +7,14 @@ package ch.eth.jcd.badgers.vfs.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionInputStream;
+import ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionOutputStream;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
@@ -223,6 +227,43 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 	public VFSPath createPath(String pathString) throws VFSException {
 		VFSPathImpl path = new VFSPathImpl(this, pathString);
 		return path;
+	}
+
+	/**
+	 * apply compression/encryption checks the configuration an wraps the InputStream accordingly
+	 * 
+	 * @param inputStream
+	 * @return
+	 */
+	public InputStream wrapInputStream(InputStream inputStream) {
+
+		String compressionAlgoName = config.getCompressionAlgorithm();
+
+		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
+
+		if (compressionAlgoName != null && "".equals(compressionAlgoName) == false) {
+			return new BadgersLZ77CompressionInputStream(inputStream);
+		}
+
+		return inputStream;
+	}
+
+	/**
+	 * apply compression/encryption checks the configuration an wraps the OutputStream accordingly
+	 * 
+	 * @param outputStream
+	 * @return
+	 */
+	public OutputStream wrapOutputStream(OutputStream outputStream) {
+		String compressionAlgoName = config.getCompressionAlgorithm();
+
+		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
+
+		if (compressionAlgoName != null && "".equals(compressionAlgoName) == false) {
+			return new BadgersLZ77CompressionOutputStream(outputStream);
+		}
+
+		return outputStream;
 	}
 
 }

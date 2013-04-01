@@ -111,7 +111,7 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 			rootEntry.delete();
 			Assert.fail("expected an exception");
 		} catch (VFSException e) {
-			LOGGER.error("", e);
+			LOGGER.info("Expected this: ", e);
 		}
 	}
 }

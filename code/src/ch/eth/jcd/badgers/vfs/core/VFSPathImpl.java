@@ -64,6 +64,20 @@ public class VFSPathImpl implements VFSPath {
 
 	}
 
+	@Override
+	public VFSEntry createFile() throws VFSException {
+		if (exists()) {
+			throw new VFSException("Can't create File from " + pathString + " already exists");
+		}
+
+		try {
+			VFSFileImpl entry = VFSEntryImpl.createNewFile(diskMgr, this);
+			return entry;
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
+	}
+
 	public String getParentPath() throws VFSException {
 		String parentPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
 		if ("".equals(parentPath)) {
@@ -71,15 +85,6 @@ public class VFSPathImpl implements VFSPath {
 			return VFSPath.FILE_SEPARATOR;
 		}
 		return parentPath;
-	}
-
-	@Override
-	public VFSEntry createFile() {
-		// what to do
-		// create hash from path string
-		// ask IndexSectionHandler whether there is an entry for this hash in its tree
-		// everything ok
-		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override

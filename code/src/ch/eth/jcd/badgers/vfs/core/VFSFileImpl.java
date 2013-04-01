@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -7,6 +9,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
  * $Id$
@@ -38,5 +41,18 @@ public class VFSFileImpl extends VFSEntryImpl {
 	public VFSEntryImpl getChildByName(String fileName) {
 		LOGGER.debug("Tried to call getChildByName on File " + getPath());
 		return null;
+	}
+
+	@Override
+	public InputStream getInputStream() throws VFSException {
+		VFSFileInputStream inputStream = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
+		return diskManager.wrapInputStream(inputStream);
+	}
+
+	@Override
+	public OutputStream getOutputStream(int writeMode) throws VFSException {
+		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
+		return diskManager.wrapOutputStream(outputStream);
+
 	}
 }

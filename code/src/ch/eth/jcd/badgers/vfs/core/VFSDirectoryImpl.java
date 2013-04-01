@@ -1,6 +1,8 @@
 package ch.eth.jcd.badgers.vfs.core;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,5 +137,15 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		entry.deleteDataBlocks();
 
 		LOGGER.info("Deleting DONE " + filePath);
+	}
+
+	@Override
+	public InputStream getInputStream() throws VFSException {
+		throw new VFSException("getInputStream() does not work on directories");
+	}
+
+	@Override
+	public OutputStream getOutputStream(int writeMode) throws VFSException {
+		throw new VFSException("getInputStream() does not work on directories");
 	}
 }
