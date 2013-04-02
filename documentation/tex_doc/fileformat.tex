@@ -154,3 +154,26 @@ Block layout \\
 
 
 \subsection{The root directory}
+
+
+\section{The Compression}
+
+To reduce the data volume within the virtual disk, compression on each file can
+be enabled. Currently available compression algorithms are run length encoding
+\cite{rle} and LZ77 \cite{lz77}.
+
+\subsection{Run Length Encoding}
+
+The available 8bit run length encoding(rle) algorithm is a very simple form of
+data compression where multiple occurrence of the same byte were stored as a
+single byte value and the corresponding count. It is useful for simple graphic
+images like line drawings and icons.
+
+\subsection{LZ77}
+
+Abraham Lempel and Jacob Ziv introduced the LZ77 lossless compression algorithm
+in 1977. Newer compression methods such as GZIP or DEFLATE often use LZ77-based
+algorithms. The compression is achieved by replacing the data with a reference
+to an earlier existing copy in the data input stream. For that a window of
+a certain size is held in memory where existing copies of the current data are
+searched.
