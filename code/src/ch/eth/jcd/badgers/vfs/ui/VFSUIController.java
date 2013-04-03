@@ -30,7 +30,7 @@ public class VFSUIController {
 	 */
 
 	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
-	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = BadgerFSDiskManagerImpl.class;
+	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 
@@ -48,8 +48,10 @@ public class VFSUIController {
 	private static VFSDiskManager getDiskManager(String methodName, String[] param) throws VFSException {
 		DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(param[0]);
-		if (param.length == 2)
-			config.setMaximumSize(Long.parseLong(param[1]));
+		if (param.length == 2) {
+			long maximumSizeInMb = Long.parseLong(param[1]);
+			config.setMaximumSize(maximumSizeInMb * 1024 * 1024);
+		}
 		try {
 			Method createMethod = DISKMANAGER_IMPLEMENTATION.getMethod(methodName, DiskConfiguration.class);
 			return (VFSDiskManager) createMethod.invoke(null, config);

@@ -18,8 +18,9 @@ public class DiskConfiguration {
 	private String compressionAlgorithm;
 
 	/**
-	 * the maximum size of the file we store our data on the host file system <br>
+	 * the maximum size in bytes of the file we store our data on the host file system <br>
 	 * values <=0 indicate that there is no limit <br>
+	 * 
 	 */
 	private long maximumSize = -1;
 
