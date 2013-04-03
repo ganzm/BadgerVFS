@@ -4,8 +4,8 @@ class BadgersLZ77Tuple {
 	int matchLoc;
 	int matchLength;
 	String charFollowed;
-	static final int lookForwardWindow = 7;
-	static final int windowLength = 31;
+	static final int lookForwardWindow = 15;
+	static final int windowLength = 4095;
 
 	/**
 	 * 
@@ -22,9 +22,9 @@ class BadgersLZ77Tuple {
 		this.charFollowed = charFollowed;
 	}
 
-	BadgersLZ77Tuple(int match, int charFollowed) {
-		this.matchLoc = match >> 3;
-		this.matchLength = match & 7;
+	BadgersLZ77Tuple(int match, int match2, int charFollowed) {
+		this.matchLoc = (match << 4) | (match2 >> 4);
+		this.matchLength = match2 & lookForwardWindow;
 		this.charFollowed = Character.toString((char) charFollowed);
 	}
 
@@ -38,8 +38,8 @@ class BadgersLZ77Tuple {
 	}
 
 	public byte[] toByte() {
-		int concat = (matchLoc << 3) | matchLength;
-		byte[] result = new byte[] { (byte) concat, (byte) charFollowed.charAt(0) };
+		int concat = (matchLoc << 4) | matchLength;
+		byte[] result = new byte[] { (byte) (concat >> 8), (byte) concat, (byte) charFollowed.charAt(0) };
 		return result;
 	}
 }

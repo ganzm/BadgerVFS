@@ -29,7 +29,7 @@ public class BadgersLZ77CompressionInputStream extends InputStream {
 		if (currentTuple != null && currentTuple.matchLength == 0) {
 			cachedString.append(currentTuple.charFollowed);
 			currentTuple.matchLength--;
-			return (int) currentTuple.charFollowed.charAt(0);
+			return currentTuple.charFollowed.charAt(0);
 		}
 		if (currentTuple != null && currentTuple.matchLength > 0) {
 			char charToReturn = cachedString.charAt(cachedString.length() - currentTuple.matchLoc);
@@ -42,13 +42,13 @@ public class BadgersLZ77CompressionInputStream extends InputStream {
 		if (newRead == -1) {
 			return newRead;
 		}
-		currentTuple = new BadgersLZ77Tuple(newRead, in.read());
+		currentTuple = new BadgersLZ77Tuple(newRead, in.read(), in.read());
 
 		if (currentTuple.matchLength == 0) {
 			// no match, just return;
 			cachedString.append(currentTuple.charFollowed);
 			currentTuple.matchLength--;
-			return (int) currentTuple.charFollowed.charAt(0);
+			return currentTuple.charFollowed.charAt(0);
 		} else {
 			// match found, return first char and append it to the cachedString.
 			char charToReturn = cachedString.charAt(cachedString.length() - currentTuple.matchLoc);

@@ -77,6 +77,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();
 			out.write(tmp[0]);
 			out.write(tmp[1]);
+			out.write(tmp[2]);
 
 		} else {
 			// match not founde -> create Tuple
@@ -85,6 +86,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();
 			out.write(tmp[0]);
 			out.write(tmp[1]);
+			out.write(tmp[2]);
 		}
 		cachedString.append(forwardString.substring(0, 1));
 		forwardString.deleteCharAt(0);

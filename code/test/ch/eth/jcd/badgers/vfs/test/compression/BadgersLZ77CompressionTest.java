@@ -97,8 +97,8 @@ public class BadgersLZ77CompressionTest {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
 
 		BadgersLZ77CompressionInputStream in = new BadgersLZ77CompressionInputStream(inputStream);
-		Assert.assertEquals(stringDatas.length(), in.read(rawDataCopy));
 		in.close();
+		Assert.assertEquals(stringDatas.length(), in.read(rawDataCopy));
 
 		byte[] rawData = stringDatas.getBytes();
 		for (int i = 0; i < rawData.length; i++) {
