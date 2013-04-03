@@ -114,11 +114,15 @@ public class VFSUIController {
 						}
 					}
 					if (childToCD == null) {
-						LOGGER.warn("Child: " + param[0] + " not found  in current directory");
+						String warning = String.format("Child: %s not found  in current directory", param[0]);
+						LOGGER.warn(warning);
+						console.writeLn(warning);
 						return;
 					}
 					if (!childToCD.isDirectory()) {
-						LOGGER.warn("Cannot cd to file!");
+						String warning = "Cannot cd to file!";
+						LOGGER.warn(warning);
+						console.writeLn(warning);
 						return;
 					}
 					currentDirectory = childToCD;
@@ -307,7 +311,10 @@ public class VFSUIController {
 						}
 					}
 					if (childToExport == null) {
-						LOGGER.warn("Child: " + param[0] + " not found in current directory, nothing exported");
+						String warning = String.format("Child: %s not found in current directory, nothing exported", param[0]);
+						LOGGER.warn(warning);
+						console.writeLn(warning);
+
 						return;
 					}
 					InputStream is = childToExport.getInputStream();
@@ -358,7 +365,9 @@ public class VFSUIController {
 
 				File importFile = new File(param[0]);
 				if (!importFile.exists()) {
-					LOGGER.warn("file to import does not exist:" + param[0]);
+					String warning = String.format("file to import does not exist: %s", param[0]);
+					LOGGER.warn(warning);
+					console.writeLn(warning);
 					return;
 				}
 				try {
@@ -558,7 +567,9 @@ public class VFSUIController {
 						}
 					}
 					if (childToRemove == null) {
-						LOGGER.warn("Child: " + param[0] + " not found in current directory, nothing removed");
+						String warning = String.format("Child: %s not found in current directory, nothing removed", param[0]);
+						LOGGER.warn(warning);
+						console.writeLn(warning);
 						return;
 					}
 
