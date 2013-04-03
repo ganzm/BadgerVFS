@@ -16,6 +16,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.VFSDiskManagerTestBase;
+import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 
 public class FileManipulationTest extends VFSDiskManagerTestBase {
 	private static Logger LOGGER = Logger.getLogger(FileManipulationTest.class);
@@ -47,6 +48,7 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 			LOGGER.debug("Create " + fileName);
 			Assert.assertFalse(filePath.exists());
 			VFSEntry fileEntry = filePath.createFile();
+			CoreTestUtil.printDirBTree(homeDir);
 			Assert.assertTrue(filePath.exists());
 
 			InputStream in = fileEntry.getInputStream();

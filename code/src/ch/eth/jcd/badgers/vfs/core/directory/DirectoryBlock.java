@@ -154,9 +154,7 @@ public class DirectoryBlock {
 		buf.append("Block[");
 		buf.append(location);
 		buf.append("] LinkL[");
-
 		buf.append(linkLeft);
-
 		buf.append("] LinkM[");
 		buf.append(linkMiddle);
 		buf.append("] LinkR[");

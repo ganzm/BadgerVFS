@@ -11,11 +11,11 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.eth.jcd.badgers.vfs.core.VFSDirectoryImpl;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.VFSDiskManagerTestBase;
+import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 
 public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 	private static Logger LOGGER = Logger.getLogger(DirectoryManipulationTest.class);
@@ -36,9 +36,9 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 			Assert.assertEquals("/" + folderName, path.getAbsolutePath());
 
-			printDirTree(rootEntry);
+			CoreTestUtil.printDirBTree(rootEntry);
 			VFSEntry homeDir = path.createDirectory();
-			printDirTree(rootEntry);
+			CoreTestUtil.printDirBTree(rootEntry);
 
 			Assert.assertTrue(path.exists());
 			Assert.assertTrue(homeDir.isDirectory());
@@ -72,24 +72,15 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 			assertTrue(path.exists());
 			VFSEntry homeEntry = path.getVFSEntry();
 
-			printDirTree(rootEntry);
+			CoreTestUtil.printDirBTree(rootEntry);
 			homeEntry.delete();
-			printDirTree(rootEntry);
+			CoreTestUtil.printDirBTree(rootEntry);
 
 			assertFalse(path.exists());
 		}
 
 	}
 
-	private void printDirTree(VFSEntry rootEntry) {
-		if (rootEntry instanceof VFSDirectoryImpl) {
-			((VFSDirectoryImpl) rootEntry).debugPrint();
-
-			StringBuffer buf = new StringBuffer();
-			boolean result = ((VFSDirectoryImpl) rootEntry).performTreeSanityCheck(buf);
-			Assert.assertTrue(buf.toString(), result);
-		}
-	}
 
 	@Test
 	public void testDelete() throws VFSException {

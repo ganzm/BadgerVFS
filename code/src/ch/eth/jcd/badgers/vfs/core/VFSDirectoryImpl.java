@@ -148,4 +148,9 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
 		throw new VFSException("getInputStream() does not work on directories");
 	}
+	
+	@Override
+	public String toString() {
+		return "Directory to " + path;
+	}
 }

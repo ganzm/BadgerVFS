@@ -15,7 +15,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 public abstract class VFSEntryImpl implements VFSEntry {
 
-	private final VFSPath path;
+	protected final VFSPath path;
 
 	protected final VFSDiskManagerImpl diskManager;
 
