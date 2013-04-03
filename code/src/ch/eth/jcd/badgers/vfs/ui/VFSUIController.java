@@ -530,6 +530,7 @@ public class VFSUIController {
 				try {
 					currentManager = getDiskManager("open", param);
 					currentDirectory = currentManager.getRoot();
+					console.setPromptString(param[0] + ">");
 				} catch (VFSException e) {
 					LOGGER.error("Exception while setting up Disk:", e);
 				}
