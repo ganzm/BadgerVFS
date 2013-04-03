@@ -94,7 +94,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 			return mgr;
 
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new VFSException(e);
 		}
 	}
@@ -143,7 +143,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			VFSDiskManagerImpl mgr = new VFSDiskManagerImpl(config);
 
 			File file = new File(config.getHostFilePath());
-			if (file.exists() == false) {
+			if (!file.exists()) {
 				throw new VFSException("Cannot open VFSDiskManager because the file does not exist " + config.getHostFilePath());
 			}
 
@@ -164,7 +164,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 			return mgr;
 
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new VFSException(e);
 		}
 	}
@@ -178,7 +178,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 			dataSectionHandler.close();
 
 			virtualDiskFile.close();
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 			throw new VFSException(ex);
 		}
 	}

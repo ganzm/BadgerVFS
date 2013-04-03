@@ -52,7 +52,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
 
 			return entry;
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 
 			if (dataBlock != null) {
 				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
@@ -77,7 +77,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
 
 			return entry;
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 
 			if (dataBlock != null) {
 				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
@@ -205,7 +205,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 		VFSPath parentPath = diskManager.createPath(parentPathString);
 
-		if (parentPath.exists() == false) {
+		if (!parentPath.exists()) {
 			throw new VFSException("Internal Error while trying to get Parent of " + pathString);
 		}
 

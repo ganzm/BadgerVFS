@@ -135,49 +135,8 @@ public class DirectoryChildTree {
 			directorySectionhandler.persistDirectoryBlock(currentBlock);
 
 		} else if (currentBlock.getNodeRight() == null) {
-			// right block is still empty
-			// this node has only 2 subnode
-			// we got the DirectoryBlock where the new entry is going to belong to
-			// insert Key
-
-			// If the node contains fewer than the maximum legal number of elements, then there is room for the new element
-			if (currentBlock.getNodeLeft().compareTo(newEntry) < 0) {
-				currentBlock.setNodeRight(newEntry);
-			} else {
-				currentBlock.setNodeRight(currentBlock.getNodeLeft());
-				currentBlock.setNodeLeft(newEntry);
-			}
-
-			// attach dangling DirectoryNode
-			if (directoryBlockToAttach != null) {
-				long toAttachLocation = directoryBlockToAttach.getLocation();
-				long lastVisitedChildBlockLink = lastDirectoryBlock.getLocation();
-				boolean insertDanglingOnTheRight = lastDirectoryBlock.getNodeLeft().compareTo(directoryBlockToAttach.getNodeLeft()) < 0;
-
-				if (currentBlock.getLinkLeft() == lastVisitedChildBlockLink) {
-					// recursive call ascended from the left branch
-					if (insertDanglingOnTheRight) {
-						currentBlock.setLinkRight(currentBlock.getLinkMiddle());
-						currentBlock.setLinkMiddle(toAttachLocation);
-					} else {
-						currentBlock.setLinkRight(currentBlock.getLinkMiddle());
-						currentBlock.setLinkMiddle(currentBlock.getLinkLeft());
-						currentBlock.setLinkLeft(toAttachLocation);
-					}
-				} else if (currentBlock.getLinkMiddle() == lastVisitedChildBlockLink) {
-					// recursive call ascended from the middle branch
-					if (insertDanglingOnTheRight) {
-						currentBlock.setLinkRight(toAttachLocation);
-					} else {
-						currentBlock.setLinkRight(currentBlock.getLinkMiddle());
-						currentBlock.setLinkMiddle(toAttachLocation);
-					}
-				} else {
-					throw new VFSRuntimeException("Internal Error - there is a problem with the DirectoryTree");
-				}
-			}
-
-			directorySectionhandler.persistDirectoryBlock(currentBlock);
+			bottomUpTreeInsertRightNodeEmpty(directorySectionhandler, newEntry,
+					lastDirectoryBlock, directoryBlockToAttach, currentBlock);
 
 		} else {
 			// Otherwise the node is full, evenly split it into two nodes so:
@@ -253,6 +212,56 @@ public class DirectoryChildTree {
 
 			bottomUpTreeInsert(pathToLeave, directorySectionhandler, toInsertToParent, currentBlock, newBlock);
 		}
+	}
+
+	private void bottomUpTreeInsertRightNodeEmpty(
+			DirectorySectionHandler directorySectionhandler,
+			DirectoryEntryBlock newEntry, DirectoryBlock lastDirectoryBlock,
+			DirectoryBlock directoryBlockToAttach, DirectoryBlock currentBlock)
+			throws IOException {
+		// right block is still empty
+		// this node has only 2 sub nodes
+		// we got the DirectoryBlock where the new entry is going to belong to
+		// insert Key
+
+		// If the node contains fewer than the maximum legal number of elements, then there is room for the new element
+		if (currentBlock.getNodeLeft().compareTo(newEntry) < 0) {
+			currentBlock.setNodeRight(newEntry);
+		} else {
+			currentBlock.setNodeRight(currentBlock.getNodeLeft());
+			currentBlock.setNodeLeft(newEntry);
+		}
+
+		// attach dangling DirectoryNode
+		if (directoryBlockToAttach != null) {
+			long toAttachLocation = directoryBlockToAttach.getLocation();
+			long lastVisitedChildBlockLink = lastDirectoryBlock.getLocation();
+			boolean insertDanglingOnTheRight = lastDirectoryBlock.getNodeLeft().compareTo(directoryBlockToAttach.getNodeLeft()) < 0;
+
+			if (currentBlock.getLinkLeft() == lastVisitedChildBlockLink) {
+				// recursive call ascended from the left branch
+				if (insertDanglingOnTheRight) {
+					currentBlock.setLinkRight(currentBlock.getLinkMiddle());
+					currentBlock.setLinkMiddle(toAttachLocation);
+				} else {
+					currentBlock.setLinkRight(currentBlock.getLinkMiddle());
+					currentBlock.setLinkMiddle(currentBlock.getLinkLeft());
+					currentBlock.setLinkLeft(toAttachLocation);
+				}
+			} else if (currentBlock.getLinkMiddle() == lastVisitedChildBlockLink) {
+				// recursive call ascended from the middle branch
+				if (insertDanglingOnTheRight) {
+					currentBlock.setLinkRight(toAttachLocation);
+				} else {
+					currentBlock.setLinkRight(currentBlock.getLinkMiddle());
+					currentBlock.setLinkMiddle(toAttachLocation);
+				}
+			} else {
+				throw new VFSRuntimeException("Internal Error - there is a problem with the DirectoryTree");
+			}
+		}
+
+		directorySectionhandler.persistDirectoryBlock(currentBlock);
 	}
 
 	private void insertAtRoot(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry, DirectoryBlock lastDirectoryBlock,

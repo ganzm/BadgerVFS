@@ -103,7 +103,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		try {
 			String tree = childTree.dumpTreeToString(diskManager.getDirectorySectionHandler());
 			LOGGER.debug("\n" + tree);
-		} catch (Exception ex) {
+		} catch (VFSException ex) {
 			LOGGER.error("Error while debugPrint", ex);
 		}
 	}
