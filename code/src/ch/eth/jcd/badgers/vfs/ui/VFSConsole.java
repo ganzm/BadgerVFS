@@ -38,7 +38,7 @@ public class VFSConsole {
 	private static final String MKFILE_STRING = "mkfile";
 	private static final String MV_STRING = "mv";
 	private static final String OPEN_STRING = "open";
-	private static final String PWD_String = "pwd";
+	private static final String PWD_STRING = "pwd";
 	private static final String RM_STRING = "rm";
 
 	/**
@@ -83,7 +83,7 @@ public class VFSConsole {
 		commands.put(IMPORT_STRING, controller.getImportCommand());
 		commands.put(EXPORT_STRING, controller.getExportCommand());
 		commands.put(CLOSE_STRING, controller.getCloseCommand());
-		commands.put(PWD_String, controller.getPWDCommand());
+		commands.put(PWD_STRING, controller.getPWDCommand());
 
 	}
 
