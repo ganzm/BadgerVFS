@@ -8,7 +8,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class CoreTestUtil {
-	private static Logger LOGGER = Logger.getLogger(CoreTestUtil.class);
+	private static final Logger LOGGER = Logger.getLogger(CoreTestUtil.class);
 
 	public static void printDirBTree(VFSEntry directory) {
 		try {

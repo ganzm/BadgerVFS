@@ -17,9 +17,9 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
-public class MockedVFSDiskManagerImpl implements VFSDiskManager {
+public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
-	private static Logger LOGGER = Logger.getLogger(MockedVFSDiskManagerImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(MockedVFSDiskManagerImpl.class);
 
 	/**
 	 * creates a new virtual disk

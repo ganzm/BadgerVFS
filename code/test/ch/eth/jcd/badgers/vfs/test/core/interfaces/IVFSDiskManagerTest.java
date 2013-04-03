@@ -3,6 +3,7 @@ package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
@@ -28,9 +29,10 @@ public abstract class IVFSDiskManagerTest {
 		try {
 			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
 			Method method = class1.getMethod("open", DiskConfiguration.class);
-			Object o = method.invoke(null, getVFSDiskManager().getDiskConfiguration());
+			method.invoke(null, getVFSDiskManager().getDiskConfiguration());
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-		} catch (Exception e) {
+		} catch (VFSException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}

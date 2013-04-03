@@ -19,7 +19,7 @@ import ch.eth.jcd.badgers.vfs.test.VFSDiskManagerTestBase;
 import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 
 public class FileManipulationTest extends VFSDiskManagerTestBase {
-	private static Logger LOGGER = Logger.getLogger(FileManipulationTest.class);
+	private static final Logger LOGGER = Logger.getLogger(FileManipulationTest.class);
 
 	private final Random rnd = new Random(0);
 

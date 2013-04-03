@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.test.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +19,7 @@ import ch.eth.jcd.badgers.vfs.test.VFSDiskManagerTestBase;
 import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 
 public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
-	private static Logger LOGGER = Logger.getLogger(DirectoryManipulationTest.class);
+	private static final Logger LOGGER = Logger.getLogger(DirectoryManipulationTest.class);
 
 	@Test
 	public void testCreateSimpleDir() throws VFSException {
@@ -32,20 +33,20 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 			String folderName = "home" + decimalFormat.format(i);
 			VFSPath path = rootEntry.getChildPath(folderName);
-			Assert.assertFalse(path.exists());
+			assertFalse(path.exists());
 
-			Assert.assertEquals("/" + folderName, path.getAbsolutePath());
+			assertEquals("/" + folderName, path.getAbsolutePath());
 
 			CoreTestUtil.printDirBTree(rootEntry);
 			VFSEntry homeDir = path.createDirectory();
 			CoreTestUtil.printDirBTree(rootEntry);
 
-			Assert.assertTrue(path.exists());
-			Assert.assertTrue(homeDir.isDirectory());
+			assertTrue(path.exists());
+			assertTrue(homeDir.isDirectory());
 		}
 
 		List<VFSEntry> children = rootEntry.getChildren();
-		Assert.assertEquals(numEntries, children.size());
+		assertEquals(numEntries, children.size());
 
 		VFSEntry previous = null;
 		for (VFSEntry entry : children) {
@@ -81,7 +82,6 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 	}
 
-
 	@Test
 	public void testDelete() throws VFSException {
 		// try to delete root directory
@@ -89,14 +89,14 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 
 		VFSPath subFolderPath = rootEntry.getChildPath("subfolder1");
 
-		Assert.assertFalse(subFolderPath.exists());
+		assertFalse(subFolderPath.exists());
 		VFSEntry subfolder = subFolderPath.createDirectory();
-		Assert.assertTrue(subFolderPath.exists());
+		assertTrue(subFolderPath.exists());
 
 		subfolder.delete();
 
 		subFolderPath = rootEntry.getChildPath("subfolder1");
-		Assert.assertFalse(subFolderPath.exists());
+		assertFalse(subFolderPath.exists());
 
 		try {
 			rootEntry.delete();

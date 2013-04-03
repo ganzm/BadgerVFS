@@ -9,8 +9,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSPathImpl implements VFSPath {
 
-	String path;
-	String pathToRoot;
+	private final String path;
+	private final String pathToRoot;
 
 	public MockedVFSPathImpl(String path, String pathToRoot) {
 		this.path = path;

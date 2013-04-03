@@ -77,7 +77,7 @@ public abstract class IVFSEntryTest {
 
 		VFSPath aFileNotDirectory = directory.getChildPath(isNotADirectory);
 		assertFalse("Expected file not exists", aFileNotDirectory.exists());
-		VFSEntry entry = aFileNotDirectory.createFile();
+		aFileNotDirectory.createFile();
 		assertTrue("Expected file exists", aFileNotDirectory.exists());
 	}
 
@@ -265,8 +265,8 @@ public abstract class IVFSEntryTest {
 		try {
 			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
 			Method method = class1.getMethod("create", DiskConfiguration.class);
-			Object o = method.invoke(null, getVFSDiskManager().getDiskConfiguration());
-			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+			method.invoke(null, getVFSDiskManager().getDiskConfiguration());
+			class1.getMethod("open", DiskConfiguration.class);
 			setVFSDiskManager((VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration()));
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException e) {
@@ -337,7 +337,7 @@ public abstract class IVFSEntryTest {
 		assertTrue("Expected file exists", delFilePath.exists());
 		try {
 			delDirectoryEntry.delete();
-		} catch (Exception e) {
+		} catch (VFSException e) {
 			assertNotNull("Expected DirectoryNotEmptyException", e);
 		}
 
