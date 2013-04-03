@@ -14,6 +14,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 
 /**
  * $Id$
@@ -108,7 +109,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		}
 	}
 
-	public boolean performTreeSanityCheck(StringBuffer buf) {
+	public boolean performTreeSanityCheck(StringBuffer buf) throws VFSInvalidLocationExceptionException, VFSException {
 		return childTree.performTreeSanityCheck(diskManager.getDirectorySectionHandler(), buf);
 	}
 
@@ -128,8 +129,8 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 			}
 
 			// delete Directory tree structure
-			DirectoryBlock directoryRootBlock = directoryEntry.childTree.getRootBlock();
-			diskManager.getDirectorySectionHandler().freeDirectoryBlock(directoryRootBlock);
+			long directoryRootBlockLocation = directoryEntry.childTree.getRootBlockLocation();
+			diskManager.getDirectorySectionHandler().freeDirectoryBlock(directoryRootBlockLocation);
 		}
 
 		// remove this from parent directory tree structure
@@ -148,7 +149,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
 		throw new VFSException("getInputStream() does not work on directories");
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Directory to " + path;

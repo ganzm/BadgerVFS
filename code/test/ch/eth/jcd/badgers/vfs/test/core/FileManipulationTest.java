@@ -49,7 +49,7 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 			Assert.assertFalse(filePath.exists());
 			VFSEntry fileEntry = filePath.createFile();
 			CoreTestUtil.printDirBTree(homeDir);
-			Assert.assertTrue(filePath.exists());
+			Assert.assertTrue("Expect File to exist " + filePath.getAbsolutePath(), filePath.exists());
 
 			InputStream in = fileEntry.getInputStream();
 			Assert.assertEquals("Expect empty stream", -1, in.read());

@@ -148,4 +148,10 @@ public class DirectorySectionHandler {
 		// just clear header byte
 		virtualDiskFile.write(0);
 	}
+
+	public void freeDirectoryBlock(long directoryBlockLocation) throws IOException {
+		virtualDiskFile.seek(directoryBlockLocation);
+		// just clear header byte
+		virtualDiskFile.write(0);
+	}
 }

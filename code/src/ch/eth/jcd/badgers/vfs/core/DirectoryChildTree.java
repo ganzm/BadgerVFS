@@ -23,16 +23,12 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 public class DirectoryChildTree {
 
 	/**
-	 * upper most node of our tree
+	 * location of our upper most node of our tree
 	 */
-	private DirectoryBlock rootBlock;
+	private long rootBlockLocation;
 
 	public DirectoryChildTree(DirectoryBlock rootBlock) {
-		this.rootBlock = rootBlock;
-	}
-
-	public DirectoryBlock getRootBlock() {
-		return rootBlock;
+		this.rootBlockLocation = rootBlock.getLocation();
 	}
 
 	/**
@@ -46,9 +42,14 @@ public class DirectoryChildTree {
 	public List<DirectoryEntryBlock> traverseTree(DirectorySectionHandler directorySectionhandler) throws VFSException {
 		List<DirectoryEntryBlock> result = new ArrayList<>();
 
+		DirectoryBlock rootBlock = directorySectionhandler.loadDirectoryBlock(rootBlockLocation);
 		visitEntryBlock(directorySectionhandler, rootBlock, result);
 
 		return result;
+	}
+
+	public long getRootBlockLocation() {
+		return rootBlockLocation;
 	}
 
 	private void visitEntryBlock(DirectorySectionHandler directorySectionhandler, DirectoryBlock block, List<DirectoryEntryBlock> result) throws VFSException,
@@ -135,8 +136,7 @@ public class DirectoryChildTree {
 			directorySectionhandler.persistDirectoryBlock(currentBlock);
 
 		} else if (currentBlock.getNodeRight() == null) {
-			bottomUpTreeInsertRightNodeEmpty(directorySectionhandler, newEntry,
-					lastDirectoryBlock, directoryBlockToAttach, currentBlock);
+			bottomUpTreeInsertRightNodeEmpty(directorySectionhandler, newEntry, lastDirectoryBlock, directoryBlockToAttach, currentBlock);
 
 		} else {
 			// Otherwise the node is full, evenly split it into two nodes so:
@@ -214,11 +214,8 @@ public class DirectoryChildTree {
 		}
 	}
 
-	private void bottomUpTreeInsertRightNodeEmpty(
-			DirectorySectionHandler directorySectionhandler,
-			DirectoryEntryBlock newEntry, DirectoryBlock lastDirectoryBlock,
-			DirectoryBlock directoryBlockToAttach, DirectoryBlock currentBlock)
-			throws IOException {
+	private void bottomUpTreeInsertRightNodeEmpty(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry,
+			DirectoryBlock lastDirectoryBlock, DirectoryBlock directoryBlockToAttach, DirectoryBlock currentBlock) throws IOException {
 		// right block is still empty
 		// this node has only 2 sub nodes
 		// we got the DirectoryBlock where the new entry is going to belong to
@@ -282,7 +279,7 @@ public class DirectoryChildTree {
 
 		directorySectionhandler.persistDirectoryBlock(newRootBlock);
 
-		this.rootBlock = newRootBlock;
+		this.rootBlockLocation = newRootBlock.getLocation();
 	}
 
 	private DirectoryEntryBlock[] Sort(DirectoryEntryBlock nodeLeft, DirectoryEntryBlock nodeRight, DirectoryEntryBlock newEntry) {
@@ -308,6 +305,7 @@ public class DirectoryChildTree {
 
 		Stack<DirectoryBlock> pathToLeave = new Stack<DirectoryBlock>();
 
+		DirectoryBlock rootBlock = directorySectionhandler.loadDirectoryBlock(rootBlockLocation);
 		pathToLeave.push(rootBlock);
 		DirectoryBlock currentBlock = rootBlock;
 
@@ -439,8 +437,8 @@ public class DirectoryChildTree {
 			if (current.getLinkLeft() != 0) {
 				// current node (rootBlock) is empty
 				// but there is a link
-				// promote linked node
-				rootBlock = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
+				// promote linked node to be the new root
+				rootBlockLocation = current.getLinkLeft();
 			}
 
 			return;
@@ -656,11 +654,13 @@ public class DirectoryChildTree {
 		}
 	}
 
-	private Stack<DirectoryBlock> findDirectoryBlockWithEntry(DirectorySectionHandler directorySectionHandler, DirectoryEntryBlock toFind) {
+	private Stack<DirectoryBlock> findDirectoryBlockWithEntry(DirectorySectionHandler directorySectionHandler, DirectoryEntryBlock toFind)
+			throws VFSInvalidLocationExceptionException, VFSException {
 
 		// find the DirectoryEntryBlock to remove
 		Stack<DirectoryBlock> pathToLeave = new Stack<DirectoryBlock>();
 
+		DirectoryBlock rootBlock = directorySectionHandler.loadDirectoryBlock(rootBlockLocation);
 		DirectoryBlock current = rootBlock;
 
 		try {
@@ -716,12 +716,15 @@ public class DirectoryChildTree {
 
 	public String dumpTreeToString(DirectorySectionHandler directorySectionHandler) throws VFSException {
 		StringBuffer buf = new StringBuffer();
+		DirectoryBlock rootBlock = directorySectionHandler.loadDirectoryBlock(rootBlockLocation);
 		rootBlock.dumpShort(directorySectionHandler, buf, 0);
 		return buf.toString();
 	}
 
-	public boolean performTreeSanityCheck(DirectorySectionHandler directorySectionHandler, StringBuffer debugInformation) {
+	public boolean performTreeSanityCheck(DirectorySectionHandler directorySectionHandler, StringBuffer debugInformation)
+			throws VFSInvalidLocationExceptionException, VFSException {
 
+		DirectoryBlock rootBlock = directorySectionHandler.loadDirectoryBlock(rootBlockLocation);
 		if (rootBlock.getNodeLeft() == null && rootBlock.getNodeRight() == null) {
 			// special case for root node
 			debugInformation.append("Tree empty");
@@ -800,4 +803,5 @@ public class DirectoryChildTree {
 
 		return depth;
 	}
+
 }
