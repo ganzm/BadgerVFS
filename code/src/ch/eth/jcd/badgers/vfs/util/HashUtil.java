@@ -13,10 +13,10 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 public class HashUtil {
 
-	public static final Charset cs = Charset.forName("UTF8");
+	public static final Charset CS = Charset.forName("UTF8");
 
 	public static byte[] hashUtf8String(String string) {
-		return hashSha512(string.getBytes(cs));
+		return hashSha512(string.getBytes(CS));
 	}
 
 	/**
