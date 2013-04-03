@@ -27,8 +27,7 @@ import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
 
-	private static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
-
+	private static final String NO_CORRECT_NUMBER_OF_PARAMS = "no correct number of parameters for %s command given: expected %s, got %s";
 	/**
 	 * needs to be set when using real implementation
 	 */
@@ -37,6 +36,8 @@ public class VFSUIController {
 	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
+
+	private static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
 
 	/**
 	 * Instantiates a VFSDiskManager Implementation. This is done via reflection, to easily switch between the mocked implementation and the final
@@ -85,11 +86,14 @@ public class VFSUIController {
 
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 1) {
-					LOGGER.warn("no correct number of parameters for cd command given");
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cd", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -137,6 +141,7 @@ public class VFSUIController {
 				LOGGER.debug("close command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
@@ -147,6 +152,7 @@ public class VFSUIController {
 				}
 				currentManager = null;
 				currentDirectory = null;
+				console.setPromptString(">");
 				LOGGER.debug("close command leaving");
 
 			}
@@ -162,11 +168,14 @@ public class VFSUIController {
 
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 2) {
-					LOGGER.warn("no correct number of parameters for copy command given");
+				if (param == null || param.length != 2) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cp", 2, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -201,13 +210,16 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("create command entered");
 				if (param.length != 2) {
-					LOGGER.warn("not enough params for create");
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 2, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
 				try {
 					currentManager = getDiskManager("create", param);
 					currentDirectory = currentManager.getRoot();
+					console.setPromptString(param[0] + ">");
 				} catch (VFSException e) {
 					LOGGER.error("Exception while setting up Disk:", e);
 				}
@@ -225,7 +237,8 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("dispose command entered");
 				if (currentManager == null) {
-					LOGGER.warn("No disk open, please use open or create command");
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 				try {
@@ -235,6 +248,7 @@ public class VFSUIController {
 				}
 				currentManager = null;
 				currentDirectory = null;
+				console.setPromptString(">");
 				LOGGER.debug("dispose command leaving");
 
 			}
@@ -248,7 +262,7 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("exit command entered");
 				if (currentManager != null) {
-					console.write("There is still a disk in use, please use close command first");
+					console.writeLn("There is still a disk in use, please use close command first");
 					return;
 				}
 
@@ -268,11 +282,14 @@ public class VFSUIController {
 
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 2) {
-					LOGGER.warn("no correct number of parameters for import command given");
+				if (param == null || param.length != 2) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "export", 2, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -327,11 +344,14 @@ public class VFSUIController {
 				LOGGER.debug("import command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 2) {
-					LOGGER.warn("no correct number of parameters for import command given");
+				if (param == null || param.length != 2) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "import", 2, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -365,11 +385,12 @@ public class VFSUIController {
 				LOGGER.debug("ls command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 				try {
 					for (VFSEntry child : currentDirectory.getChildren()) {
-						console.write(child.getPath().getName());
+						console.writeLn(child.getPath().getName());
 					}
 				} catch (VFSException e) {
 					LOGGER.error("Error while listing files", e);
@@ -387,11 +408,14 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("makedir command entered");
 				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn("No disk open, please use open or create command");
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
-				if (param.length != 1) {
-					LOGGER.warn("No correct number of arguments for makeDir");
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkdir", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -413,11 +437,15 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("makefile command entered");
 				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn("No disk open, please use open or create command");
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
-				if (param.length != 1) {
-					LOGGER.warn("No correct number of arguments for makeDir");
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkfile", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
+
 					console.printHelpMessage();
 					return;
 				}
@@ -441,11 +469,14 @@ public class VFSUIController {
 
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 2) {
-					LOGGER.warn("no correct number of parameters for mv command given");
+				if (param == null || param.length != 2) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mv", 2, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -480,8 +511,10 @@ public class VFSUIController {
 			public void execute(String[] param) {
 				LOGGER.debug("open command entered");
 
-				if (param.length != 1) {
-					console.write("not enough params for create");
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -506,11 +539,14 @@ public class VFSUIController {
 
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
 
-				if (param.length != 1) {
-					LOGGER.warn("no correct number of parameters for remove command given");
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "remove", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
@@ -532,6 +568,28 @@ public class VFSUIController {
 				}
 
 				LOGGER.debug("remove command leaving");
+
+			}
+		};
+	}
+
+	public Command getPWDCommand() {
+		return new Command() {
+
+			@Override
+			public void execute(String[] param) {
+				LOGGER.debug("pwd command entering");
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
+					return;
+				}
+				try {
+					console.writeLn(currentDirectory.getPath().getAbsolutePath());
+				} catch (VFSException e) {
+					LOGGER.error("Error while pwd", e);
+				}
+				LOGGER.debug("pwd command leaving");
 
 			}
 		};

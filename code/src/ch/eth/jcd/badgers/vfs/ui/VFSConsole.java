@@ -23,27 +23,23 @@ import org.apache.log4j.xml.DOMConfigurator;
  */
 public class VFSConsole {
 
-	// management ommands
+	private static final Logger LOGGER = Logger.getLogger(VFSConsole.class);
+
+	private static final String CD_STRING = "cd";
+	private static final String CLOSE_STRING = "close";
+	private static final String CP_STRING = "cp";
 	private static final String CREATE_STRING = "create";
 	private static final String DISPOSE_STRING = "dispose";
-	private static final String OPEN_STRING = "open";
 	private static final String EXIT_STRING = "exit";
-
-	// filesystem commands
+	private static final String EXPORT_STRING = "export";
+	private static final String IMPORT_STRING = "import";
 	private static final String LS_STRING = "ls";
-	private static final String CD_STRING = "cd";
 	private static final String MKDIR_STRING = "mkdir";
 	private static final String MKFILE_STRING = "mkfile";
-	private static final String RM_STRING = "rm";
-	private static final String CP_STRING = "cp";
 	private static final String MV_STRING = "mv";
-	private static final String IMPORT_STRING = "import";
-	private static final String EXPORT_STRING = "export";
-	private static final String CLOSE_STRING = "close";
-
-	private final Map<String, Command> commands = new HashMap<String, Command>();
-
-	private static final Logger LOGGER = Logger.getLogger(VFSConsole.class);
+	private static final String OPEN_STRING = "open";
+	private static final String PWD_String = "pwd";
+	private static final String RM_STRING = "rm";
 
 	/**
 	 * @param args
@@ -55,11 +51,14 @@ public class VFSConsole {
 		new VFSConsole(reader, new PrintWriter(System.out)).run();
 	}
 
-	private final BufferedReader reader;
-	private boolean stopped = false;
-	private final PrintWriter writer;
+	private final Map<String, Command> commands = new HashMap<String, Command>();
 
 	private final VFSUIController controller;
+	private String promptString = ">";
+	private final BufferedReader reader;
+	private boolean stopped = false;
+
+	private final PrintWriter writer;
 
 	public VFSConsole(BufferedReader reader, PrintWriter writer) {
 		this.reader = reader;
@@ -84,47 +83,8 @@ public class VFSConsole {
 		commands.put(IMPORT_STRING, controller.getImportCommand());
 		commands.put(EXPORT_STRING, controller.getExportCommand());
 		commands.put(CLOSE_STRING, controller.getCloseCommand());
+		commands.put(PWD_String, controller.getPWDCommand());
 
-	}
-
-	/**
-	 * runs the input loop until the stop flag is set by the controller
-	 */
-	public void run() {
-		String input;
-
-		try {
-			while ((input = reader.readLine()) != null) {
-
-				LOGGER.debug(input);
-				if ("".equals(input)) {
-					continue;
-				}
-				// splits the string at whitespaces
-				// http://stackoverflow.com/questions/225337/how-do-i-split-a-string-with-any-whitespace-chars-as-delimiters
-				String[] splittedInput = input.split("\\s+");
-				Command cmd;
-				if ((cmd = commands.get(splittedInput[0])) == null) {
-					writer.println(input + " is not a valid input");
-					printHelpMessage();
-					continue;
-				}
-				String[] params = null;
-
-				if (splittedInput.length > 1) {
-
-					params = Arrays.copyOfRange(splittedInput, 1, splittedInput.length);
-				}
-				cmd.execute(params);
-
-				if (stopped) {
-					return;
-				}
-
-			}
-		} catch (IOException e) {
-			LOGGER.error(e);
-		}
 	}
 
 	public void printHelpMessage() {
@@ -149,10 +109,58 @@ public class VFSConsole {
 				+ "\texport [src] [ext_src]\t exports a src file to the host system ext dst\n"
 				+ "\tfind [searchString]\t lists all filesystem entries below the current entry containing searchString\n"
 				+ "\tclose\t\t\t closes the filesystem mode, from now on management mode commands can be executed\n";
-		write(helpMessage);
+		writeLn(helpMessage);
 		/*
 		 * @formatter:on
 		 */
+	}
+
+	/**
+	 * runs the input loop until the stop flag is set by the controller
+	 */
+	public void run() {
+		String input;
+
+		try {
+			write(promptString);
+
+			while ((input = reader.readLine()) != null) {
+
+				LOGGER.debug(input);
+				if ("".equals(input)) {
+					write(promptString);
+					continue;
+				}
+				// splits the string at whitespaces
+				// http://stackoverflow.com/questions/225337/how-do-i-split-a-string-with-any-whitespace-chars-as-delimiters
+				String[] splittedInput = input.split("\\s+");
+				Command cmd;
+				if ((cmd = commands.get(splittedInput[0])) == null) {
+					writeLn(input + " is not a valid input");
+					printHelpMessage();
+					write(promptString);
+					continue;
+				}
+				String[] params = null;
+
+				if (splittedInput.length > 1) {
+					params = Arrays.copyOfRange(splittedInput, 1, splittedInput.length);
+				}
+				cmd.execute(params);
+
+				if (stopped) {
+					return;
+				}
+				write(promptString);
+
+			}
+		} catch (IOException e) {
+			LOGGER.error(e);
+		}
+	}
+
+	public void setPromptString(String promptString) {
+		this.promptString = promptString;
 	}
 
 	/**
@@ -163,10 +171,14 @@ public class VFSConsole {
 
 	}
 
-	public void write(String string) {
+	private void write(String string) {
+		writer.print(string);
+		writer.flush();
+	}
+
+	public void writeLn(String string) {
 		writer.println(string);
 		writer.flush();
-
 	}
 
 }
