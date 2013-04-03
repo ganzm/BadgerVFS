@@ -7,5 +7,5 @@
 package ch.eth.jcd.badgers.vfs.ui;
 
 public interface Command {
-	public void execute(String[] param);
+	void execute(String[] param);
 }

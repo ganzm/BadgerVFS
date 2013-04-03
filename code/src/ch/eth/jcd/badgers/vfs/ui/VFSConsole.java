@@ -94,7 +94,7 @@ public class VFSConsole {
 		String input;
 
 		try {
-			while (((input = reader.readLine()) != null)) {
+			while ((input = reader.readLine()) != null) {
 
 				LOGGER.debug(input);
 				if ("".equals(input)) {
