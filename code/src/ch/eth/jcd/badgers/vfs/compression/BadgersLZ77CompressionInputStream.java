@@ -23,7 +23,7 @@ public class BadgersLZ77CompressionInputStream extends InputStream {
 	 */
 	@Override
 	public int read() throws IOException {
-		while (cachedString.length() > BadgersLZ77Tuple.windowLength) {
+		while (cachedString.length() > BadgersLZ77Tuple.WINDOW_LENGTH) {
 			cachedString.deleteCharAt(0);
 		}
 		if (currentTuple != null && currentTuple.matchLength == 0) {

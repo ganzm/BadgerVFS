@@ -21,14 +21,14 @@ public interface VFSEntry {
 	 * 
 	 * @see VFSEntry#getOutputStream(int)
 	 */
-	public static final int WRITE_MODE_OVERRIDE = 0;
+	int WRITE_MODE_OVERRIDE = 0;
 
 	/**
 	 * copies this Entry recursively (deep copy) to a new location
 	 * 
 	 * @param newLocation
 	 */
-	public void copyTo(VFSPath newLocation);
+	void copyTo(VFSPath newLocation);
 
 	/**
 	 * lists the content of a directory <br>
@@ -36,14 +36,14 @@ public interface VFSEntry {
 	 * 
 	 * @return
 	 */
-	public List<VFSEntry> getChildren() throws VFSException;
+	List<VFSEntry> getChildren() throws VFSException;
 
 	/**
 	 * Use this to read from a file
 	 * 
 	 * @return
 	 */
-	public InputStream getInputStream() throws VFSException;
+	InputStream getInputStream() throws VFSException;
 
 	/**
 	 * in case you want to write stuff to this entry
@@ -52,13 +52,13 @@ public interface VFSEntry {
 	 *            TODO
 	 * @return
 	 */
-	public OutputStream getOutputStream(int writeMode) throws VFSException;
+	OutputStream getOutputStream(int writeMode) throws VFSException;
 
 	/**
 	 * 
 	 * @return returns the path of this file or folder
 	 */
-	public VFSPath getPath();
+	VFSPath getPath();
 
 	/**
 	 * This Method creates a fully initialized new VFSPath object with <code> this (VFSEntry)</code> as parent and <code>childName</code> as child. With this
@@ -66,7 +66,7 @@ public interface VFSEntry {
 	 * 
 	 * @return returns a fully initialized new VFSPath object which <code> this (VFSEntry)</code> as parent and <code>childName</code> as child
 	 */
-	public VFSPath getChildPath(String childName) throws VFSException;
+	VFSPath getChildPath(String childName) throws VFSException;
 
 	/**
 	 * returns the parent of current entry. if root returns itself
@@ -74,20 +74,20 @@ public interface VFSEntry {
 	 * @return
 	 * @throws VFSException
 	 */
-	public VFSEntry getParent() throws VFSException;
+	VFSEntry getParent() throws VFSException;
 
 	/**
 	 * 
 	 * @return returns true if the VFSEntry is a directory
 	 */
-	public boolean isDirectory();
+	boolean isDirectory();
 
 	/**
 	 * moves this file or folder to another location
 	 * 
 	 * @param path
 	 */
-	public void moveTo(VFSPath path);
+	void moveTo(VFSPath path);
 
 	/**
 	 * conveninence method
@@ -95,7 +95,7 @@ public interface VFSEntry {
 	 * @see moveTo
 	 * @param newName
 	 */
-	public void renameTo(String newName);
+	void renameTo(String newName);
 
 	/**
 	 * deletes the file or folder this Entry represents
@@ -105,6 +105,6 @@ public interface VFSEntry {
 	 * This instance is marked as deleted. Any further method call will lead to an exception
 	 * 
 	 */
-	public void delete() throws VFSException;
+	void delete() throws VFSException;
 
 }

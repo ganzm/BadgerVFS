@@ -3,13 +3,14 @@ package ch.eth.jcd.badgers.vfs.compression;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BadgersLZ77CompressionOutputStream extends OutputStream {
 
 	private final OutputStream out;
 	private final StringBuilder cachedString = new StringBuilder();
 	private final StringBuilder forwardString = new StringBuilder();
-	ArrayList<BadgersLZ77Tuple> encodedInput = new ArrayList<BadgersLZ77Tuple>();
+	private final List<BadgersLZ77Tuple> encodedInput = new ArrayList<BadgersLZ77Tuple>();
 
 	public BadgersLZ77CompressionOutputStream(OutputStream out) {
 		this.out = out;
@@ -25,7 +26,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 	@Override
 	public void write(int b) throws IOException {
 		forwardString.append((char) b);
-		if (forwardString.length() <= BadgersLZ77Tuple.lookForwardWindow) {
+		if (forwardString.length() <= BadgersLZ77Tuple.LOOK_FORWARD_WINDOW) {
 			return;
 		}
 		work();
@@ -71,7 +72,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 			forwardString.delete(0, matchLength);
 
 			// offset to the match
-			int offset = cachedString.length() - (currentMatchLocation + matchLength);
+			int offset = cachedString.length() - currentMatchLocation + matchLength;
 			encodedInput.add(new BadgersLZ77Tuple(offset, matchLength, forwardString.substring(0, 1)));
 			// System.out.println(encodedInput.get(encodedInput.size() - 1));
 			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();
@@ -90,7 +91,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 		}
 		cachedString.append(forwardString.substring(0, 1));
 		forwardString.deleteCharAt(0);
-		while (cachedString.length() > BadgersLZ77Tuple.windowLength) {
+		while (cachedString.length() > BadgersLZ77Tuple.WINDOW_LENGTH) {
 			cachedString.deleteCharAt(0);
 		}
 	}

@@ -1,11 +1,11 @@
 package ch.eth.jcd.badgers.vfs.compression;
 
 class BadgersLZ77Tuple {
-	int matchLoc;
-	int matchLength;
-	String charFollowed;
-	static final int lookForwardWindow = 15;
-	static final int windowLength = 4095;
+	protected final int matchLoc;
+	protected int matchLength;
+	protected final String charFollowed;
+	protected static final int LOOK_FORWARD_WINDOW = 15;
+	protected static final int WINDOW_LENGTH = 4095;
 
 	/**
 	 * 
@@ -24,7 +24,7 @@ class BadgersLZ77Tuple {
 
 	BadgersLZ77Tuple(int match, int match2, int charFollowed) {
 		this.matchLoc = (match << 4) | (match2 >> 4);
-		this.matchLength = match2 & lookForwardWindow;
+		this.matchLength = match2 & LOOK_FORWARD_WINDOW;
 		this.charFollowed = Character.toString((char) charFollowed);
 	}
 

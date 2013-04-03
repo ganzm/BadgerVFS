@@ -10,7 +10,7 @@ public class CaesarOutputStream extends OutputStream {
 
 	public CaesarOutputStream(OutputStream out, int caesarOffset) {
 		this.out = out;
-		this.caesarOffset = 256 - (Math.abs(caesarOffset) % 256);
+		this.caesarOffset = 256 - Math.abs(caesarOffset) % 256;
 	}
 
 	/**

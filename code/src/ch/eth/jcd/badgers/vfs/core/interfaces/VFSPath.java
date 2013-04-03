@@ -9,11 +9,11 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  */
 public interface VFSPath {
 
-	public static final String FILE_SEPARATOR = "/";
+	String FILE_SEPARATOR = "/";
 
-	public VFSEntry createDirectory() throws VFSException;
+	VFSEntry createDirectory() throws VFSException;
 
-	public VFSEntry createFile() throws VFSException;
+	VFSEntry createFile() throws VFSException;
 
 	/**
 	 * check whether a path actually exists or not
@@ -21,13 +21,13 @@ public interface VFSPath {
 	 * @return
 	 * @throws VFSException
 	 */
-	public boolean exists() throws VFSException;
+	boolean exists() throws VFSException;
 
 	/**
 	 * @return returns the complete path of this current object as string
 	 * @throws VFSException
 	 */
-	public String getAbsolutePath() throws VFSException;
+	String getAbsolutePath() throws VFSException;
 
 	/**
 	 * may be implemented as getAbsolutePath().subString(getAbsolutePath().lastIndexOf(VFSPath.FILE_SEPARATOR), ...);
@@ -36,7 +36,7 @@ public interface VFSPath {
 	 * 
 	 * @throws VFSException
 	 */
-	public String getName() throws VFSException;
+	String getName() throws VFSException;
 
-	public VFSEntry getVFSEntry() throws VFSException;
+	VFSEntry getVFSEntry() throws VFSException;
 }

@@ -2,7 +2,6 @@ package ch.eth.jcd.badgers.vfs.core.interfaces;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 public interface VFSDiskManager {
 
@@ -11,22 +10,22 @@ public interface VFSDiskManager {
 	 * 
 	 * releases any ressource associated with this Manager
 	 */
-	public void close() throws VFSException;
+	void close() throws VFSException;
 
 	/**
 	 * releases this Manager, deletes the file and any containing file
 	 */
-	public void dispose() throws VFSException;
+	void dispose() throws VFSException;
 
 	/**
 	 * Remaining disk space
 	 * 
 	 * @return
 	 */
-	public long getFreeSpace();
+	long getFreeSpace();
 
 	/** returns the root folder of our file system */
-	public VFSEntry getRoot();
+	VFSEntry getRoot();
 
 	/**
 	 * return the DiskConfigutation
@@ -34,7 +33,7 @@ public interface VFSDiskManager {
 	 * @return
 	 * @throws VFSException
 	 */
-	public DiskConfiguration getDiskConfiguration() throws VFSException;
+	DiskConfiguration getDiskConfiguration() throws VFSException;
 
 	/**
 	 * creates a path object from a string
@@ -50,8 +49,9 @@ public interface VFSDiskManager {
 	 * 
 	 * @param path
 	 * @return
-	 * @throws VFSInvalidPathException
+	 * @throws VFSException
+	 *             (VFSInvalidPathException)
 	 */
-	public VFSPath createPath(String path) throws VFSException;
+	VFSPath createPath(String path) throws VFSException;
 
 }
