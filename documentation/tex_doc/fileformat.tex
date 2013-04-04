@@ -1,5 +1,9 @@
+\subsection{The \emph{real} implemenation}
 
-\subsection{The File Format}
+Eventually some code that handles a virtual disk was developed and is described
+in this section.
+
+\subsubsection{The File Format}
 
 
 This section describes the binary file format used by the file system inside a
@@ -14,7 +18,9 @@ section. Each of them is described below.
 \label{fig:disk_overview}
 \end{figure}
 
-\subsubsection{Header Section}
+\paragraph{Header Section} The header section contains some general information
+about the currently opened virtual disk. The details can be found in the
+following table:
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
@@ -41,12 +47,12 @@ section. Each of them is described below.
 \end{tabular}
 
 
-\subsubsection{Directory Section}
+\paragraph{Directory Section}
 
 The directory section describes which files and folders belong to which parent directory. This section has a fixed size and contains so called DirectoryBlocks which also have a fixed size. This makes management an manipulation easy. To each directory belongs a B-Tree structure which lists all contained entries.
 
 
-\paragraph*{Directory Block}
+\subparagraph*{Directory Block}
 
 One Directory Block represents a Node in our B-Tree of order 2.
 
@@ -82,7 +88,7 @@ DirectoryBlockLink3 & 8 byte & Points to another DirectoryBlock which contains k
 
 \end{tabular}
 
-\paragraph*{Directory Entry Block}
+\subparagraph*{Directory Entry Block}
 
 Represents a single directory or file.
 
@@ -116,7 +122,7 @@ containing all entries of that directory specified by the current Directory Entr
 \end{tabular}
 
 
-\subsubsection{Data Section}
+\paragraph{Data Section}
 The data section is split into blocks where each of them is X bytes long.
 Each block contains some amount of data and points to a subsequent block
 
@@ -164,23 +170,23 @@ Block layout \\
 \end{tabular}
 
 
-\subsubsection{The root directory}
+\paragraph{The root directory}
 
 
-\subsection{The Compression}
+\subsubsection{compression layer}
 
 To reduce the data volume within the virtual disk, compression on each file can
 be enabled. Currently available compression algorithms are run length encoding
 \cite{rle} and LZ77 \cite{lz77}.
 
-\subsubsection{Run Length Encoding}
+\paragraph{Run Length Encoding}
 
 The available 8bit run length encoding(rle) algorithm is a very simple form of
 data compression where multiple occurrence of the same byte were stored as a
 single byte value and the corresponding count. It is useful for simple graphic
 images like line drawings and icons.
 
-\subsubsection{LZ77}
+\paragraph{LZ77}
 
 Abraham Lempel and Jacob Ziv introduced the LZ77 lossless compression algorithm
 in 1977. Newer compression methods such as GZIP or DEFLATE often use LZ77-based

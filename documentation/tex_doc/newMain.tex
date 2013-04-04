@@ -34,7 +34,12 @@ Philipp Rohr (04-397-030)
 
 \section{Introduction}
 
-This document describes the design and implementation of the \emph{Personal Virtual File System} of group \emph{\groupname}. The project is part of the course \emph{Java and C\# in depth} at ETH Zurich. The following sections describe each project phase, listing the requirements that were implemented and the design decisions taken. The last section describes a use case of using the \emph{Personal Virtual File System}.
+This document describes the design and implementation of the \emph{Personal
+Virtual File System} of group \emph{\groupname}. The project is part of the
+course \emph{Java and C\# in depth} at ETH Zurich. The following sections
+describe each project phase, listing the requirements that were implemented and
+the design decisions taken. The last section describes a use case of using the
+\emph{Personal Virtual File System}.
 
 % PART I: VFS CORE
 % --------------------------------------
@@ -56,15 +61,10 @@ import/export files from/to the host file system.
 The library internally works with a virtual disk that is divided into a header,
 index and data section, having the index represented as B-tree. Such a design
 allows performant access to the data inside the disk.
-\emph{Give a short description (1-2 paragraphs) of what VFS Core is.}
-
-
 
 \include{requirements}
 \include{design}
 \include{fileformat}
-
-
 
 % PART II: VFS Browser
 % --------------------------------------
