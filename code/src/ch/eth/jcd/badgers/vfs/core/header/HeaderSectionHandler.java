@@ -32,6 +32,8 @@ public final class HeaderSectionHandler {
 
 	private String versionString;
 
+	private long maximumSize;
+
 	private long headerSectionOffset;
 
 	private long headerSectionSize;
@@ -66,6 +68,10 @@ public final class HeaderSectionHandler {
 
 		header.versionString = defaultVersionString;
 		virtualDiskFile.write(Arrays.copyOf(header.versionString.getBytes(cs), VERSION_FIELD_LENGTH));
+
+		// maximum size
+		header.maximumSize = config.getMaximumSize();
+		virtualDiskFile.writeLong(header.maximumSize);
 
 		// TODO compression
 		virtualDiskFile.write(Arrays.copyOf("".getBytes(cs), COMPRESSION_FIELD_LENGTH));
@@ -134,16 +140,23 @@ public final class HeaderSectionHandler {
 		header.versionString = new String(versionBytes, cs).trim();
 		logger.debug("Version: " + header.versionString);
 
+		// Maximum Size
+		header.maximumSize = virtualDiskFile.readLong();
+		config.setMaximumSize(header.maximumSize);
+		logger.debug("MaximumSize: " + header.maximumSize);
+
 		// TODO Read compression
 		byte[] compressionBytes = new byte[COMPRESSION_FIELD_LENGTH];
 		virtualDiskFile.read(compressionBytes);
 		header.compressionString = new String(compressionBytes, cs);
+		config.setCompressionAlgorithm(header.compressionString);
 		logger.debug("Compression: " + header.compressionString);
 
-		// TODO Read compression
+		// TODO Read encryption
 		byte[] encryptionBytes = new byte[ENCRYPTION_FIELD_LENGTH];
 		virtualDiskFile.read(encryptionBytes);
 		header.encryptionString = new String(encryptionBytes, cs);
+		config.setEncryptionAlgorithm(header.encryptionString);
 		logger.debug("Encryption: " + header.encryptionString);
 
 		// read 8 bytes - DirectorySectionOffset
@@ -152,7 +165,7 @@ public final class HeaderSectionHandler {
 
 		// read 8 bytes - DataSectionOffset
 		header.dataSectionOffset = virtualDiskFile.readLong();
-		header.headerSectionSize = header.dataSectionOffset;
+		header.headerSectionSize = header.directorySectionOffset;
 		logger.debug("DataSectionOffset: " + header.dataSectionOffset);
 
 		// Read SaltString

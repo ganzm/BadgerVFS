@@ -114,6 +114,9 @@ public class VFSPathImpl implements VFSPath {
 		VFSEntryImpl current = rootEntry;
 		for (String pathPart : pathParts) {
 			current = current.getChildByName(pathPart);
+			if (current == null) {
+				return null;
+			}
 		}
 
 		return current;

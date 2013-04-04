@@ -122,7 +122,8 @@ public final class DirectorySectionHandler {
 
 		}
 
-		throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection");
+		throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection - All " + maxNumDirectoryBlocks
+				+ " DirectoryBlocks are allocated");
 	}
 
 	public DirectoryBlock loadDirectoryBlock(long location) throws VFSException, VFSInvalidLocationExceptionException {

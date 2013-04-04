@@ -69,6 +69,11 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	public VFSEntryImpl getChildByName(String fileName) throws VFSException {
 		try {
 			DirectoryEntryBlock directoryEntry = getChildDirectoryEntryBlockByName(fileName);
+			if (directoryEntry == null) {
+				// child not found
+				return null;
+			}
+
 			return createFromDirectoryEntryBlock(directoryEntry);
 		} catch (IOException e) {
 			throw new VFSException(e);
