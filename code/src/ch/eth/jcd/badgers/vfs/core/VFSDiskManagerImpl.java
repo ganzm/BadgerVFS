@@ -188,10 +188,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		close();
 
 		File file = new File(config.getHostFilePath());
-		if (file.exists()) {
-			if (!file.delete()) {
-				throw new VFSException("Could not delete File " + config.getHostFilePath());
-			}
+		if (file.exists() && !file.delete()) {
+			throw new VFSException("Could not delete File " + config.getHostFilePath());
 		}
 	}
 
