@@ -206,7 +206,33 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	}
 
 	@Override
-	public void findInFolder(String fileName, FindInFolderObserver observer) {
-		throw new UnsupportedOperationException("TODO");
+	public void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException {
+		LOGGER.debug("Find in Fold " + path.getAbsolutePath());
+		String lowerFileName = fileName.toLowerCase();
+
+		List<DirectoryEntryBlock> toDeepSearch = new ArrayList<DirectoryEntryBlock>();
+		List<DirectoryEntryBlock> children = childTree.traverseTree(diskManager.getDirectorySectionHandler());
+		for (DirectoryEntryBlock child : children) {
+
+			if (child.getFileName().toLowerCase().startsWith(lowerFileName)) {
+				// found it
+				LOGGER.debug("Found File " + child.getFileName() + " in Folder " + this.getPath().getAbsolutePath());
+
+				VFSPath path = this.getChildPath(child.getFileName());
+
+				// notify observer
+				observer.foundEntry(path);
+			}
+
+			if (child.isFolderEntryBlock()) {
+				toDeepSearch.add(child);
+			}
+		}
+
+		for (DirectoryEntryBlock entry : toDeepSearch) {
+			VFSPath path = this.getChildPath(entry.getFileName());
+			VFSDirectoryImpl directory = (VFSDirectoryImpl) path.getVFSEntry();
+			directory.findInFolder(fileName, observer);
+		}
 	}
 }

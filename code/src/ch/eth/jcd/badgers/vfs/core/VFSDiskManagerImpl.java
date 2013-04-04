@@ -287,7 +287,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void find(String fileName, FindInFolderObserver observer) throws VFSException {
-		throw new UnsupportedOperationException("TODO");
+		getRoot().findInFolder(fileName, observer);
 	}
 
 }

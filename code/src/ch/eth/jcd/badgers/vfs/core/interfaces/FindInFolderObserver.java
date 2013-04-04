@@ -14,5 +14,5 @@ public interface FindInFolderObserver {
 	 * @param entry
 	 *            entry which matches
 	 */
-	void foundEntry(VFSEntry entry);
+	void foundEntry(VFSPath path);
 }

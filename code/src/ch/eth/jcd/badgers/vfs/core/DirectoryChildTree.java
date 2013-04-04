@@ -52,6 +52,16 @@ public class DirectoryChildTree {
 		return rootBlockLocation;
 	}
 
+	/**
+	 * Visits each element of this tree
+	 * 
+	 * 
+	 * @param directorySectionhandler
+	 * @param block
+	 * @param result
+	 * @throws VFSException
+	 * @throws VFSInvalidLocationExceptionException
+	 */
 	private void visitEntryBlock(DirectorySectionHandler directorySectionhandler, DirectoryBlock block, List<DirectoryEntryBlock> result) throws VFSException,
 			VFSInvalidLocationExceptionException {
 
@@ -688,45 +698,44 @@ public class DirectoryChildTree {
 		DirectoryBlock current = rootBlock;
 
 		try {
-
 			while (true) {
-
 				DirectoryEntryBlock node = current.getNodeLeft();
-				if (node != null) {
+				if (node == null) {
+					throw new VFSException("Found empty node - this tree seems broken");
+				}
 
-					int cmpRes = toFind.compareTo(node);
-					if (cmpRes < 0) {
-						// travel down left branch
+				int cmpRes = toFind.compareTo(node);
+				if (cmpRes < 0) {
+					// travel down left branch
+					pathToLeave.push(current);
+					current = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
+				} else if (cmpRes == 0) {
+					// found it
+					pathToLeave.push(current);
+					return pathToLeave;
+				} else {
+
+					node = current.getNodeRight();
+					if (node == null) {
+						// travel down middle branch
 						pathToLeave.push(current);
-						current = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
-					} else if (cmpRes == 0) {
-						// found it
-						pathToLeave.push(current);
-						return pathToLeave;
+						current = directorySectionHandler.loadDirectoryBlock(current.getLinkMiddle());
 					} else {
 
-						node = current.getNodeRight();
-						if (node == null) {
+						cmpRes = toFind.compareTo(node);
+						if (cmpRes < 0) {
 							// travel down middle branch
 							pathToLeave.push(current);
 							current = directorySectionHandler.loadDirectoryBlock(current.getLinkMiddle());
+
+						} else if (cmpRes == 0) {
+							// found it
+							pathToLeave.push(current);
+							return pathToLeave;
 						} else {
-
-							cmpRes = toFind.compareTo(node);
-							if (cmpRes < 0) {
-								// travel down middle branch
-								pathToLeave.push(current);
-								current = directorySectionHandler.loadDirectoryBlock(current.getLinkMiddle());
-
-							} else if (cmpRes == 0) {
-								// found it
-								pathToLeave.push(current);
-								return pathToLeave;
-							} else {
-								// travel down right branch
-								pathToLeave.push(current);
-								current = directorySectionHandler.loadDirectoryBlock(current.getLinkRight());
-							}
+							// travel down right branch
+							pathToLeave.push(current);
+							current = directorySectionHandler.loadDirectoryBlock(current.getLinkRight());
 						}
 					}
 				}
