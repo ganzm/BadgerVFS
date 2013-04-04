@@ -133,13 +133,11 @@ public final class DataSectionHandler {
 		int byteAsInt = virtualDiskFile.read();
 
 		while (byteAsInt >= 0) {
-			if ((byteAsInt & 1) != 0) {
-				// block already occupied
-			} else {
+			if ((byteAsInt & 1) == 0) {
 				// block free
 				LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + (currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE);
 				return currentLocation;
-			}
+			} // else: block already occupied
 
 			int skipedBytes = virtualDiskFile.skipBytes(DataBlock.BLOCK_SIZE - 1);
 			currentLocation = virtualDiskFile.getFilePointer();

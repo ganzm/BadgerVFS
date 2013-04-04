@@ -105,13 +105,12 @@ public final class DirectorySectionHandler {
 
 		for (int i = 0; i < maxNumDirectoryBlocks; i++) {
 			int byteAsInt = virtualDiskFile.read();
-			if ((byteAsInt & 1) != 0) {
-				// block already occupied
-			} else {
+			if ((byteAsInt & 1) == 0) {
 				// block free
 				logger.debug("Found free DirectoryBlock at " + currentLocation + " Block Nr " + (currentLocation - sectionOffset) / DirectoryBlock.BLOCK_SIZE);
 				return currentLocation;
-			}
+				
+			}  // else: block already occupied
 
 			int skipedBytes = virtualDiskFile.skipBytes(DirectoryBlock.BLOCK_SIZE - 1);
 			currentLocation = virtualDiskFile.getFilePointer();

@@ -143,7 +143,8 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 	@Override
 	public String toString() {
-		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + (directoryEntryNodeLocation != 0) + "] Name[" + fileName + ']';
+		boolean isZero = directoryEntryNodeLocation != 0;
+		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + isZero + "] Name[" + fileName + ']';
 	}
 
 }

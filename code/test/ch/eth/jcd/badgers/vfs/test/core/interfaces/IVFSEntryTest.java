@@ -139,7 +139,9 @@ public abstract class IVFSEntryTest {
 		entry.renameTo(fileNameAfter);
 
 		assertFalse("Expected file beforeRename.txt not exists anymore", newFile.exists());
-		assertTrue("Expected file afterRename.txt exists", entry.getPath().exists());
+
+		VFSPath afterRenamePath = rootEntry.getChildPath(fileNameAfter);
+		assertTrue("Expected file afterRename.txt exists", afterRenamePath.exists());
 
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {

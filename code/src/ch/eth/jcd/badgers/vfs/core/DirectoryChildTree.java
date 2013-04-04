@@ -654,7 +654,6 @@ public class DirectoryChildTree {
 			if ((currentLocation = current.getLinkRight()) != 0) {
 				// follow right path down
 
-				currentLocation = current.getLinkRight();
 				continue;
 			} else if (current.getNodeRight() != null) {
 
@@ -665,7 +664,6 @@ public class DirectoryChildTree {
 			} else if ((currentLocation = current.getLinkMiddle()) != 0) {
 				// follow middle path down
 
-				currentLocation = current.getLinkMiddle();
 				continue;
 
 			} else {

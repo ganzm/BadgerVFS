@@ -22,7 +22,7 @@ public class DirectoryBlock {
 	 * 
 	 * An Index Block consists of 1 Header 2 IndexTreeEntries and 3 pointers to other IndexBlocks
 	 */
-	public static final int BLOCK_SIZE = 1 + (2 * DirectoryEntryBlock.BLOCK_SIZE) + (3 * 8);
+	public static final int BLOCK_SIZE = 1 + 2 * DirectoryEntryBlock.BLOCK_SIZE + 3 * 8;
 
 	/**
 	 * Position (offset in bytes) in our file where this IndexBlock is located
