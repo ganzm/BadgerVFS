@@ -184,9 +184,19 @@ public final class DataSectionHandler {
 		return virtualDiskFile.read();
 	}
 
+	public int read(long position, byte[] b, int off, int len) throws IOException {
+		virtualDiskFile.seek(position);
+		return virtualDiskFile.read(b, off, len);
+	}
+
 	public void writeByte(long position, int b) throws IOException {
 		virtualDiskFile.seek(position);
 		virtualDiskFile.write(b);
+	}
+
+	public void write(long position, byte[] b, int off, int len) throws IOException {
+		virtualDiskFile.seek(position);
+		virtualDiskFile.write(b, off, len);
 	}
 
 	public void persistDataBlock(DataBlock dataBlock) throws IOException {

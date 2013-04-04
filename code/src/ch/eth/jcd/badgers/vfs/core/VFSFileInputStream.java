@@ -37,17 +37,10 @@ public class VFSFileInputStream extends InputStream {
 
 				if (nextBlockLocation == 0) {
 					// no more DataBlocks
-
 					// EOF
 					return -1;
 				} else {
-					// skip to next Block
-					currentDataBlock = dataSectionHandler.loadDataBlock(nextBlockLocation);
-					LOGGER.trace("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
-
-					currentPosition = currentDataBlock.getUserDataLocation();
-
-					bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
+					bytesLeftOnThisBlock = skipBlock(nextBlockLocation);
 				}
 
 			}
@@ -60,14 +53,47 @@ public class VFSFileInputStream extends InputStream {
 
 	@Override
 	public int read(byte[] b) throws IOException {
-		// TODO implement to speed things up
-		return super.read(b);
+		return read(b, 0, b.length);
 	}
 
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
+		try {
+			long bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
 
-		// TODO implement to speed things up
-		return super.read(b, off, len);
+			while (bytesLeftOnThisBlock <= 0) {
+				long nextBlockLocation = currentDataBlock.getNextDataBlock();
+
+				if (nextBlockLocation == 0) {
+					// no more DataBlocks
+					// EOF
+					return -1;
+				} else {
+					bytesLeftOnThisBlock = skipBlock(nextBlockLocation);
+				}
+
+			}
+
+			int numBytesToRead = Math.min(len, (int) bytesLeftOnThisBlock);
+			int numBytes = dataSectionHandler.read(currentPosition, b, off, numBytesToRead);
+
+			currentPosition += numBytes;
+
+			return numBytes;
+		} catch (VFSException ex) {
+			throw new IOException(ex);
+		}
+	}
+
+	private long skipBlock(long nextBlockLocation) throws VFSException {
+		long bytesLeftOnThisBlock;
+		// skip to next Block
+		currentDataBlock = dataSectionHandler.loadDataBlock(nextBlockLocation);
+		LOGGER.trace("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
+
+		currentPosition = currentDataBlock.getUserDataLocation();
+
+		bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
+		return bytesLeftOnThisBlock;
 	}
 }
