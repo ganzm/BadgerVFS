@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -211,7 +213,63 @@ public class MockedVFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void findInFolder(String fileName, FindInFolderObserver observer) {
-		throw new UnsupportedOperationException("TODO");
+	public void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException {
+		if (!this.isDirectory()) {
+			throw new VFSException("this is not a directory, search not allowed");
+		}
+
+		try {
+			Files.walkFileTree(fileEntry, new FinderVisitor(fileName, observer));
+		} catch (IOException e) {
+			LOGGER.error("", e);
+		}
+
 	}
+
+	private class FinderVisitor extends SimpleFileVisitor<Path> {
+
+		private final PathMatcher matcher;
+		private int numMatches = 0;
+		private final FindInFolderObserver observer;
+
+		FinderVisitor(String pattern, FindInFolderObserver observer) {
+			matcher = FileSystems.getDefault().getPathMatcher("glob:*" + pattern + "*");
+			this.observer = observer;
+		}
+
+		// Compares the glob pattern against
+		// the file or directory name.
+		void find(Path file) {
+			Path name = file.getFileName();
+			if (name != null && matcher.matches(name) && !name.getFileName().equals(fileEntry.getFileName())) {
+				numMatches++;
+				System.out.println(file);
+				VFSEntry entry = new MockedVFSEntryImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
+				observer.foundEntry(entry);
+			}
+		}
+
+		// Invoke the pattern matching
+		// method on each file.
+		@Override
+		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+			find(file);
+			return FileVisitResult.CONTINUE;
+		}
+
+		// Invoke the pattern matching
+		// method on each directory.
+		@Override
+		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+			find(dir);
+			return FileVisitResult.CONTINUE;
+		}
+
+		@Override
+		public FileVisitResult visitFileFailed(Path file, IOException exc) {
+			System.err.println(exc);
+			return FileVisitResult.CONTINUE;
+		}
+	}
+
 }

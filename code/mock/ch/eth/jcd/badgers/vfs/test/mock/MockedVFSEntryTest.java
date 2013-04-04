@@ -6,8 +6,10 @@ import java.io.File;
 
 import org.junit.AfterClass;
 
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.mock.MockedFindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.test.core.interfaces.IVFSEntryTest;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnitTestUtils;
@@ -34,6 +36,11 @@ public class MockedVFSEntryTest extends IVFSEntryTest {
 		manager.dispose();
 		assertFalse("Expected File to be deleted", new File(manager.getDiskConfiguration().getHostFilePath()).exists());
 
+	}
+
+	@Override
+	public FindInFolderObserver getFindInFolderObserver() throws VFSException {
+		return new MockedFindInFolderObserver();
 	}
 
 }

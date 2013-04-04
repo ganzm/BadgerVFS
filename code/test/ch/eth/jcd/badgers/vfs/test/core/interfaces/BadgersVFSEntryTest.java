@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnitTestUtils;
@@ -47,6 +48,11 @@ public class BadgersVFSEntryTest extends IVFSEntryTest {
 		assertFalse("Expected File to be deleted", new File(manager.getDiskConfiguration().getHostFilePath()).exists());
 		manager = null;
 
+	}
+
+	@Override
+	public FindInFolderObserver getFindInFolderObserver() throws VFSException {
+		return null;
 	}
 
 }

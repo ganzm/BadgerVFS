@@ -2,7 +2,6 @@ package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -23,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -33,6 +33,8 @@ public abstract class IVFSEntryTest {
 	private static final Logger LOGGER = Logger.getLogger(IVFSEntryTest.class);
 
 	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
+
+	public abstract FindInFolderObserver getFindInFolderObserver() throws VFSException;
 
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
@@ -347,6 +349,39 @@ public abstract class IVFSEntryTest {
 		assertTrue("Expected directory testGetParent exists", testGetParentPath.exists());
 		assertTrue("Expected isDirectory on testGetParent is true", testGetParentEntry.isDirectory());
 		assertEquals(rootEntry.getPath().getAbsolutePath(), testGetParentEntry.getParent().getPath().getAbsolutePath());
+
+	}
+
+	@Test
+	public void testFindInDirectory() throws VFSException {
+		String dir1 = "FindDir";
+		String dir2 = "SubFindDir";
+		String file1 = "FindFile1.txt";
+
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSPath dir1Path = rootEntry.getChildPath(dir1);
+		assertFalse("Expected directory Dir1 not exists", dir1Path.exists());
+		VFSEntry dir1Entry = dir1Path.createDirectory();
+		assertTrue("Expected directory Dir1 exists", dir1Path.exists());
+
+		VFSPath dir2Path = dir1Entry.getChildPath(dir2);
+		assertFalse("Expected directory Dir2 not exists", dir2Path.exists());
+		VFSEntry dir2Entry = dir2Path.createDirectory();
+		assertTrue("Expected directory Dir2 exists", dir2Path.exists());
+
+		VFSPath file1Path = dir2Entry.getChildPath(file1);
+		assertFalse("Expected file File1.txt not exists", file1Path.exists());
+		VFSEntry entry = file1Path.createFile();
+		assertTrue("Expected file File1.txt exists", file1Path.exists());
+		try (OutputStream out = entry.getOutputStream(0);
+				OutputStreamWriter writer = new OutputStreamWriter(out);
+				BufferedWriter br = new BufferedWriter(writer)) {
+			br.write("Test\n");
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
+
+		dir1Entry.findInFolder("Find", getFindInFolderObserver());
 
 	}
 
