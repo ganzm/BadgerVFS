@@ -193,12 +193,39 @@ public final class DataSectionHandler {
 		dataBlock.persist(virtualDiskFile);
 	}
 
-	public long getFreeSpace() throws IOException {
+	public long getMaximumPossibleDataBlocks() throws IOException {
+		long canGrow;
+		if (maximumFileSize > 0) {
+			canGrow = maximumFileSize - virtualDiskFile.length();
+		} else {
+			canGrow = virtualDiskFile.length();
+		}
+		return (dataSectionSize + canGrow) / DataBlock.BLOCK_SIZE;
+	}
+
+	public long getNumberOfOccupiedBlocks() throws IOException {
 
 		// go to start of DataSection
 		virtualDiskFile.seek(dataSectionOffset);
 
-		// TODO Auto-generated method stub
-		return 0;
+		long occupiedBlockCount = 0;
+
+		int byteAsInt = virtualDiskFile.read();
+		while (byteAsInt >= 0) {
+			if ((byteAsInt & 1) != 0) {
+
+				occupiedBlockCount++;
+			}
+
+			int skipedBytes = virtualDiskFile.skipBytes(DataBlock.BLOCK_SIZE - 1);
+			byteAsInt = virtualDiskFile.read();
+
+			if (skipedBytes < 0) {
+				break;
+				// end of file
+			}
+		}
+
+		return occupiedBlockCount;
 	}
 }

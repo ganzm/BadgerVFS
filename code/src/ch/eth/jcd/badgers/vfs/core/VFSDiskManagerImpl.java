@@ -197,8 +197,10 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	public long getFreeSpace() throws VFSException {
 		LOGGER.info("Query free space");
 		try {
+			long max = dataSectionHandler.getMaximumPossibleDataBlocks();
+			long occupied = dataSectionHandler.getNumberOfOccupiedBlocks();
 
-			return dataSectionHandler.getFreeSpace();
+			return (max - occupied) * DataBlock.BLOCK_SIZE;
 		} catch (IOException ex) {
 			throw new VFSException("", ex);
 		}

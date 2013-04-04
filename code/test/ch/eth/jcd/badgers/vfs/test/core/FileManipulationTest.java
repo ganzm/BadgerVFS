@@ -36,6 +36,8 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 		VFSPath path = rootEntry.getChildPath(folderName);
 		VFSEntry homeDir = path.createDirectory();
 
+		LOGGER.info("Free Disk Space: " + diskManager.getFreeSpace());
+
 		// ---------------------------------
 		// creation
 		// ---------------------------------
@@ -74,6 +76,8 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 			Assert.assertArrayEquals(rawData, readByte);
 
 		}
+
+		LOGGER.info("Free Disk Space: " + diskManager.getFreeSpace());
 
 		// ---------------------------------
 		// deletion
