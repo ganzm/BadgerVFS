@@ -32,10 +32,6 @@ Philipp Rohr (04-397-030)
 \maketitle
 
 
-% needs to be commented out at the end
-\include{chap1}
-
-
 \section{Introduction}
 
 This document describes the design and implementation of the \emph{Personal Virtual File System} of group \emph{\groupname}. The project is part of the course \emph{Java and C\# in depth} at ETH Zurich. The following sections describe each project phase, listing the requirements that were implemented and the design decisions taken. The last section describes a use case of using the \emph{Personal Virtual File System}.
@@ -49,6 +45,17 @@ This document describes the design and implementation of the \emph{Personal Virt
 %\textbf{[This section has to be completed by April 8th.]}
 
 %TODO: Remove this text and replace it with actual content
+
+VFS Core is a library that provides an implementation of a virtual files system.
+The API that a client of this library can use consists of three interfaces that
+are described in \ref{sec:coreClasses}. The VFS Core provides functionality to
+create/open/dispose new virtual disks and allows the management of files and
+directories within such a disk. Furthermore it provides a simple way to
+import/export files from/to the host file system.
+
+The library internally works with a virtual disk that is divided into a header,
+index and data section, having the index represented as B-tree. Such a design
+allows performant access to the data inside the disk.
 \emph{Give a short description (1-2 paragraphs) of what VFS Core is.}
 
 

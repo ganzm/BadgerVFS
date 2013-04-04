@@ -40,8 +40,6 @@ Following commands can be used with the command line client in management mode:
   \item{\textbf{create c:\textbackslash path\textbackslash to\textbackslash
   disk.bfs 1024}} creates virtual disk with a maximum quota of 1024 megabytes on the host system. The file may grow up to 1024 megabytes.
   \textbf{TODO}: more parameters are needed (encryption, compression, password if there is encryption)
-  \item {\textbf{dispose c:\textbackslash path\textbackslash to\textbackslash
-  disk.bfs}} deletes the given virtual disk
   \item {\textbf{open c:\textbackslash path\textbackslash to\textbackslash
   disk.bfs}} opens filesystem mode for the given virtual disk
   \item {\textbf{exit}} exits the console program
@@ -57,7 +55,7 @@ follwing commands can be used in filesystem mode:
   \item {\textbf{mkdir dirName}} creates a new directory \textit{dirName} in the
   current path
   \item {\textbf{mkfile fileName}} creates a new empty file \textit{fileName} in
-  the current path - this is rather not usefull, as the ``import'' creates a
+  the current path - this is rather not useful, as the ``import'' creates a
   file with content
   \item {\textbf{rm file}} deletes the entry denoted as \textit{file}, it must
   be a child of the current path
@@ -70,6 +68,7 @@ follwing commands can be used in filesystem mode:
   system \textit{ext\_dst}
   \item {\textbf{find searchString}} lists all filesystem entries below the
   current entry containing \textit{searchString}
+  \item {\textbf{dispose}} deletes the currently opened virtual disk
   \item {\textbf{close}} closes the filesystem mode, from now on management mode
   commands can be executed
 \end{itemize}
