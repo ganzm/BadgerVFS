@@ -51,10 +51,11 @@ public class BadgersLZ77CompressionTest {
 	@Test
 	public void testRandomInput() throws IOException {
 
-		byte[] rawData = new byte[2048];
+		Random rnd = new Random();
+		byte[] rawData = new byte[rnd.nextInt(100000)];
 		// byte[] rawData = new byte[] { -1, -1, -2 };
-		byte[] rawDataCopy = new byte[2048];// = new byte[2048];
-		new Random().nextBytes(rawData);
+		byte[] rawDataCopy = new byte[rawData.length];// = new byte[2048];
+		rnd.nextBytes(rawData);
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
