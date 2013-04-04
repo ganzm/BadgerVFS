@@ -1,16 +1,15 @@
-\section{Glossary}
 
-\paragraph{VFS core} The main Java library, that handles all the interaction
-with virtual disks and importing/exporting/storing files. It is used by the
-command line client and the gui.
+% PART IV: Quick Start Guide
+% --------------------------------------
 
-\paragraph{Virtual Disk} A virtual disk denotes a container file that is stored
-on the host file system. A virtual disk can be opened with the software that is
-developed during this project and stores the actual files. The file extension of
-the virtual disk is ``*.bfs''.
+\section{Quick Start Guide}
 
 
-\section{Command line client}
+\subsection{the eclipse project}
+The project requires to be compiled with JAVA 7. It also depends on the maven
+plugin which pulls in all the required libraries.
+
+\subsection{Command line client}
 
 The command line client allows the usage of the VFS core and is mainly intended
 to test the basic functionalities. The console runs either in  management mode
@@ -18,15 +17,23 @@ or in filesystem mode. The management mode is entered automatically when
 starting the command line client. It allows creating and disposing virtual
 disks. The filesystem mode is entered as soon as a virtual disk is opened.
 
-\textbf{TODO: DISCUSSION: sollen ganze ordner importiert und exportiert werden
-können? wird dies von der client-seite gehandelt?}
+%\textbf{TODO: DISCUSSION: sollen ganze ordner importiert und exportiert werden
+%können? wird dies von der client-seite gehandelt?}
 
-\subsection{startup}
+\subsubsection{startup}
 The command line client can be started as follows:
 
-\code{ java -jar VFSCore.jar ch.eth.jcd.badgers.vfs.ui.VFSConsole }
+\begin{verbatim}
+java -jar VFSCore.jar ch.eth.jcd.badgers.vfs.ui.VFSConsole
+\end{verbatim}
 
-\subsection{commands}
+or by starting \verb|ch.eth.jcd.badgers.vfs.ui.VFSConsole| in eclipse.
+
+
+
+This gives a console prompt where the following commands can be used in.
+
+\subsubsection{commands}
 Following commands can be used with the command line client in management mode:
 
 \begin{itemize}
@@ -44,6 +51,7 @@ follwing commands can be used in filesystem mode:
 
 \begin{itemize}
   \item {\textbf{ls}} lists the contents of the current directory
+  \item {\textbf{pwd}} shows the path to the current directory
   \item {\textbf{cd dst}} changes current directory to \textit{dst} which must
   be either a child directory of the current path or ``..''
   \item {\textbf{mkdir dirName}} creates a new directory \textit{dirName} in the
@@ -65,5 +73,3 @@ follwing commands can be used in filesystem mode:
   \item {\textbf{close}} closes the filesystem mode, from now on management mode
   commands can be executed
 \end{itemize}
-
-
