@@ -17,12 +17,13 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
@@ -32,8 +33,8 @@ public class VFSUIController {
 	 * needs to be set when using real implementation
 	 */
 
-	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
-	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
+	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
+	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 
@@ -337,7 +338,47 @@ public class VFSUIController {
 			public void execute(String[] param) {
 
 				LOGGER.debug("find command entered");
-				console.stop();
+
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
+					return;
+				}
+
+				if (param == null || param.length != 1) {
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "find", 1, param == null ? 0 : param.length);
+					LOGGER.warn(logString);
+					console.writeLn(logString);
+					console.printHelpMessage();
+					return;
+				}
+				try {
+					currentManager.find(param[0], new FindInFolderObserver() {
+
+						@Override
+						public void foundEntry(VFSPath path) {
+							try {
+								console.writeLn(path.getAbsolutePath());
+							} catch (VFSException e) {
+								LOGGER.error("Error while getting absolutePath:", e);
+							}
+						}
+
+						@Override
+						public boolean stopSearch(VFSPath currentDirectory) {
+							try {
+								LOGGER.debug("currently looking in:" + currentDirectory.getAbsolutePath());
+							} catch (VFSException e) {
+								LOGGER.error("Error while getting absolutePath:", e);
+							}
+							// do not stop search
+							return false;
+						}
+					});
+				} catch (VFSException e) {
+					LOGGER.error("error while find:", e);
+				}
+
 				LOGGER.debug("find command leaving");
 			}
 		};

@@ -132,7 +132,7 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void find(String fileName, FindInFolderObserver observer) throws VFSException {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException("TODO: find not implemented yet");
 	}
 
 }

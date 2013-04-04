@@ -31,6 +31,7 @@ public class VFSConsole {
 	private static final String CREATE_STRING = "create";
 	private static final String DISPOSE_STRING = "dispose";
 	private static final String EXIT_STRING = "exit";
+	private static final String FIND_STRING = "find";
 	private static final String EXPORT_STRING = "export";
 	private static final String IMPORT_STRING = "import";
 	private static final String LS_STRING = "ls";
@@ -80,6 +81,7 @@ public class VFSConsole {
 		commands.put(RM_STRING, controller.getRemoveCommand());
 		commands.put(CP_STRING, controller.getCopyCommand());
 		commands.put(MV_STRING, controller.getMoveCommand());
+		commands.put(FIND_STRING, controller.getFindCommand());
 		commands.put(IMPORT_STRING, controller.getImportCommand());
 		commands.put(EXPORT_STRING, controller.getExportCommand());
 		commands.put(CLOSE_STRING, controller.getCloseCommand());
