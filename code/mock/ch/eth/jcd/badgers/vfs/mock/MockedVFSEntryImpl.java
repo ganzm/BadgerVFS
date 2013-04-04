@@ -239,13 +239,13 @@ public class MockedVFSEntryImpl implements VFSEntry {
 
 		// Compares the glob pattern against
 		// the file or directory name.
-		void find(Path file) {
+		private void find(Path file) {
 			Path name = file.getFileName();
 			if (name != null && matcher.matches(name) && !name.getFileName().equals(fileEntry.getFileName())) {
 				numMatches++;
-				System.out.println(file);
+				LOGGER.debug("Found: " + file);
 				VFSEntry entry = new MockedVFSEntryImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
-				observer.foundEntry(entry);
+				observer.foundEntry(entry.getPath());
 			}
 		}
 
@@ -267,7 +267,7 @@ public class MockedVFSEntryImpl implements VFSEntry {
 
 		@Override
 		public FileVisitResult visitFileFailed(Path file, IOException exc) {
-			System.err.println(exc);
+			LOGGER.error("visitFileFailed", exc);
 			return FileVisitResult.CONTINUE;
 		}
 	}
