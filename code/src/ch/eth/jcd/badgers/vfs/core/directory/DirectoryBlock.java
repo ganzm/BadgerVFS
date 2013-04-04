@@ -45,6 +45,19 @@ public class DirectoryBlock {
 		this.location = location;
 	}
 
+	/**
+	 * copy references except the location
+	 * 
+	 * @param other
+	 */
+	public void copyValuesFrom(DirectoryBlock other) {
+		this.linkLeft = other.linkLeft;
+		this.linkMiddle = other.linkMiddle;
+		this.linkRight = other.linkRight;
+		this.nodeLeft = other.nodeLeft;
+		this.nodeRight = other.nodeRight;
+	}
+
 	public void persist(RandomAccessFile virtualDiskFile) throws IOException {
 		virtualDiskFile.seek(location);
 		virtualDiskFile.write(serialize());
@@ -193,4 +206,5 @@ public class DirectoryBlock {
 		return "DirBlock[" + location + "] LinkLeft[" + linkLeft + "] Node[" + nodeLeft + "] LinkMiddle[" + linkMiddle + "] Node [" + nodeRight
 				+ "] LinkRight[" + linkRight + "]";
 	}
+
 }

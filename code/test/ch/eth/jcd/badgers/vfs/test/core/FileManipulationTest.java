@@ -85,7 +85,7 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 
 			LOGGER.debug("Delete " + fileName);
 			Assert.assertTrue(filePath.exists());
-			VFSEntry fileEntry = filePath.createFile();
+			VFSEntry fileEntry = filePath.getVFSEntry();
 			fileEntry.delete();
 			Assert.assertFalse(filePath.exists());
 		}

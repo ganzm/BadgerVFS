@@ -25,7 +25,7 @@ public class DirectoryChildTree {
 	/**
 	 * location of our upper most node of our tree
 	 */
-	private long rootBlockLocation;
+	private final long rootBlockLocation;
 
 	public DirectoryChildTree(DirectoryBlock rootBlock) {
 		this.rootBlockLocation = rootBlock.getLocation();
@@ -261,25 +261,33 @@ public class DirectoryChildTree {
 		directorySectionhandler.persistDirectoryBlock(currentBlock);
 	}
 
-	private void insertAtRoot(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry, DirectoryBlock lastDirectoryBlock,
+	private void insertAtRoot(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry, DirectoryBlock rootDirectoryBlock,
 			DirectoryBlock directoryBlockToAttach) throws IOException {
 
-		DirectoryBlock newRootBlock = directorySectionhandler.allocateNewDirectoryBlock();
-		newRootBlock.setNodeLeft(newEntry);
+		assert rootDirectoryBlock.getLocation() == rootBlockLocation;
 
-		if (lastDirectoryBlock.getNodeLeft().compareTo(directoryBlockToAttach.getNodeLeft()) < 0) {
+		// since we don't want do swap our root block we need to copy values from our current
+		// root block to the newly created one
+		DirectoryBlock newBlock = directorySectionhandler.allocateNewDirectoryBlock();
+		newBlock.copyValuesFrom(rootDirectoryBlock);
 
-			newRootBlock.setLinkLeft(lastDirectoryBlock.getLocation());
-			newRootBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
+		rootDirectoryBlock.setNodeLeft(newEntry);
+		rootDirectoryBlock.setNodeRight(null);
+
+		if (newBlock.getNodeLeft().compareTo(directoryBlockToAttach.getNodeLeft()) < 0) {
+
+			rootDirectoryBlock.setLinkLeft(newBlock.getLocation());
+			rootDirectoryBlock.setLinkMiddle(directoryBlockToAttach.getLocation());
+			rootDirectoryBlock.setLinkRight(0);
 		} else {
 
-			newRootBlock.setLinkLeft(directoryBlockToAttach.getLocation());
-			newRootBlock.setLinkMiddle(lastDirectoryBlock.getLocation());
+			rootDirectoryBlock.setLinkLeft(directoryBlockToAttach.getLocation());
+			rootDirectoryBlock.setLinkMiddle(newBlock.getLocation());
+			rootDirectoryBlock.setLinkRight(0);
 		}
 
-		directorySectionhandler.persistDirectoryBlock(newRootBlock);
-
-		this.rootBlockLocation = newRootBlock.getLocation();
+		directorySectionhandler.persistDirectoryBlock(rootDirectoryBlock);
+		directorySectionhandler.persistDirectoryBlock(newBlock);
 	}
 
 	private DirectoryEntryBlock[] Sort(DirectoryEntryBlock nodeLeft, DirectoryEntryBlock nodeRight, DirectoryEntryBlock newEntry) {
@@ -438,7 +446,13 @@ public class DirectoryChildTree {
 				// current node (rootBlock) is empty
 				// but there is a link
 				// promote linked node to be the new root
-				rootBlockLocation = current.getLinkLeft();
+				assert current.getLocation() == rootBlockLocation;
+
+				DirectoryBlock leftLowerFromRootBlock = directorySectionHandler.loadDirectoryBlock(current.getLinkLeft());
+				current.copyValuesFrom(leftLowerFromRootBlock);
+
+				directorySectionHandler.persistDirectoryBlock(current);
+				directorySectionHandler.freeDirectoryBlock(leftLowerFromRootBlock);
 			}
 
 			return;
