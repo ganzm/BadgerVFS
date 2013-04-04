@@ -142,7 +142,7 @@ public class DirectoryChildTree {
 			// Otherwise the node is full, evenly split it into two nodes so:
 			// A single median is chosen from among the leaf's elements and the new element.
 
-			DirectoryEntryBlock[] sorted = Sort(currentBlock.getNodeLeft(), currentBlock.getNodeRight(), newEntry);
+			DirectoryEntryBlock[] sorted = sort(currentBlock.getNodeLeft(), currentBlock.getNodeRight(), newEntry);
 
 			currentBlock.setNodeLeft(sorted[0]);
 			currentBlock.setNodeRight(null);
@@ -290,7 +290,7 @@ public class DirectoryChildTree {
 		directorySectionhandler.persistDirectoryBlock(newBlock);
 	}
 
-	private DirectoryEntryBlock[] Sort(DirectoryEntryBlock nodeLeft, DirectoryEntryBlock nodeRight, DirectoryEntryBlock newEntry) {
+	private DirectoryEntryBlock[] sort(DirectoryEntryBlock nodeLeft, DirectoryEntryBlock nodeRight, DirectoryEntryBlock newEntry) {
 		DirectoryEntryBlock[] toSort = { nodeLeft, nodeRight, newEntry };
 		Arrays.sort(toSort);
 		return toSort;
@@ -427,7 +427,7 @@ public class DirectoryChildTree {
 			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
 
 			// copy path information to the leave
-			while (pathToSymmetricFollower.isEmpty() == false) {
+			while (!pathToSymmetricFollower.isEmpty()) {
 				// CARE: the top of pathToSymmetricFollower should eventually be on top of pathTopDown
 				DirectoryBlock removed = pathToSymmetricFollower.remove(0);
 				pathTopDown.push(removed);

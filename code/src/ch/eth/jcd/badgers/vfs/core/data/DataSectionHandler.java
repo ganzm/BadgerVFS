@@ -16,7 +16,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
  * TODO describe DataSectionHandler
  * 
  */
-public class DataSectionHandler {
+public final class DataSectionHandler {
 	private static Logger logger = Logger.getLogger(DataSectionHandler.class);
 
 	private final byte[] dataBlockBuffer = new byte[DataBlock.BLOCK_SIZE];

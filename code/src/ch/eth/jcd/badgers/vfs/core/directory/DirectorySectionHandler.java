@@ -16,7 +16,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
  * TODO describe DirectorySectionHandler
  * 
  */
-public class DirectorySectionHandler {
+public final class DirectorySectionHandler {
 
 	private static Logger logger = Logger.getLogger(DirectorySectionHandler.class);
 

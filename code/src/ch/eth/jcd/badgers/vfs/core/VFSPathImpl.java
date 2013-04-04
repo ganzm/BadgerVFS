@@ -38,7 +38,7 @@ public class VFSPathImpl implements VFSPath {
 			return new String[0];
 		}
 
-		if (pathString.startsWith(VFSPath.FILE_SEPARATOR) == false) {
+		if (!pathString.startsWith(VFSPath.FILE_SEPARATOR)) {
 			throw new VFSInvalidPathException("Path should start with / but it does not Path: " + pathString);
 		}
 
@@ -78,6 +78,7 @@ public class VFSPathImpl implements VFSPath {
 		}
 	}
 
+	@Override
 	public String getParentPath() throws VFSException {
 		String parentPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
 		if ("".equals(parentPath)) {

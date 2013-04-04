@@ -13,7 +13,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 
-public class HeaderSectionHandler {
+public final class HeaderSectionHandler {
 	private static Logger logger = Logger.getLogger(HeaderSectionHandler.class);
 
 	private static Charset cs = Charset.forName("ASCII");
@@ -48,17 +48,14 @@ public class HeaderSectionHandler {
 
 	private long dataSectionOffset;
 
-	private final RandomAccessFile virtualDiskFile;
-
-	private HeaderSectionHandler(RandomAccessFile virtualDiskFile) {
-		this.virtualDiskFile = virtualDiskFile;
+	private HeaderSectionHandler() {
 	}
 
 	public static HeaderSectionHandler createNew(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
 
 		logger.debug("init Header Section...");
 
-		HeaderSectionHandler header = new HeaderSectionHandler(virtualDiskFile);
+		HeaderSectionHandler header = new HeaderSectionHandler();
 		header.headerSectionOffset = headerSectionOffset;
 
 		// go to start of the index section
@@ -117,7 +114,7 @@ public class HeaderSectionHandler {
 	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
 		logger.debug("reading Header Section...");
 
-		HeaderSectionHandler header = new HeaderSectionHandler(virtualDiskFile);
+		HeaderSectionHandler header = new HeaderSectionHandler();
 		header.headerSectionOffset = headerSectionOffset;
 
 		Charset cs = Charset.forName("ASCII");

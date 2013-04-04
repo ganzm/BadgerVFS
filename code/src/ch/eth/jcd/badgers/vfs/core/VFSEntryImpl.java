@@ -165,10 +165,10 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		VFSPath newParentPath = diskManager.createPath(parentPathString);
 
 		VFSDirectoryImpl newParentDirectory;
-		if (!newParentPath.exists()) {
-			newParentDirectory = (VFSDirectoryImpl) newParentPath.createDirectory();
-		} else {
+		if (newParentPath.exists()) {
 			newParentDirectory = (VFSDirectoryImpl) newParentPath.getVFSEntry();
+		} else {
+			newParentDirectory = (VFSDirectoryImpl) newParentPath.createDirectory();
 		}
 
 		String oldName = path.getName();

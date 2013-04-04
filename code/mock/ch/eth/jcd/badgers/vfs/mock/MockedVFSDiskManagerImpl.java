@@ -29,25 +29,19 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	 * @return
 	 */
 	public static MockedVFSDiskManagerImpl create(DiskConfiguration config) throws VFSException {
-		try {
-			LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
-			LOGGER.debug("Using Config " + config.toString());
-			MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
+		LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
+		LOGGER.debug("Using Config " + config.toString());
+		MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
 
-			File file = new File(config.getHostFilePath());
-			if (!file.exists()) {
-				file.mkdir();
-			}
-			if (!file.isDirectory()) {
-				throw new VFSException("Cannot open MockedVFSDiskManager because the path:  " + config.getHostFilePath()
-						+ " does not exist or is not a directory");
-			}
-
-			return mgr;
-
-		} catch (Exception e) {
-			throw new VFSException(e);
+		File file = new File(config.getHostFilePath());
+		if (!file.exists()) {
+			file.mkdir();
 		}
+		if (!file.isDirectory()) {
+			throw new VFSException("Cannot open MockedVFSDiskManager because the path:  " + config.getHostFilePath() + " does not exist or is not a directory");
+		}
+
+		return mgr;
 	}
 
 	/**
@@ -59,22 +53,16 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public static MockedVFSDiskManagerImpl open(DiskConfiguration config) throws VFSException {
 
-		try {
-			LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
-			LOGGER.debug("Using Config " + config.toString());
-			MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
+		LOGGER.info("Open Mocked BadgerVFS Disk on " + config.getHostFilePath());
+		LOGGER.debug("Using Config " + config.toString());
+		MockedVFSDiskManagerImpl mgr = new MockedVFSDiskManagerImpl(config);
 
-			File file = new File(config.getHostFilePath());
-			if (!file.exists() || !file.isDirectory()) {
-				throw new VFSException("Cannot open MockedVFSDiskManager because the path:  " + config.getHostFilePath()
-						+ " does not exist or is not a directory");
-			}
-
-			return mgr;
-
-		} catch (Exception e) {
-			throw new VFSException(e);
+		File file = new File(config.getHostFilePath());
+		if (!file.exists() || !file.isDirectory()) {
+			throw new VFSException("Cannot open MockedVFSDiskManager because the path:  " + config.getHostFilePath() + " does not exist or is not a directory");
 		}
+
+		return mgr;
 	}
 
 	private final DiskConfiguration config;
