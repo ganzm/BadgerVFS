@@ -43,7 +43,7 @@ public class VFSFileInputStream extends InputStream {
 				} else {
 					// skip to next Block
 					currentDataBlock = dataSectionHandler.loadDataBlock(nextBlockLocation);
-					LOGGER.info("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
+					LOGGER.trace("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
 
 					currentPosition = currentDataBlock.getUserDataLocation();
 
@@ -70,11 +70,4 @@ public class VFSFileInputStream extends InputStream {
 		// TODO implement to speed things up
 		return super.read(b, off, len);
 	}
-
-	@Override
-	public long skip(long n) throws IOException {
-		// TODO Auto-generated method stub
-		return super.skip(n);
-	}
-
 }

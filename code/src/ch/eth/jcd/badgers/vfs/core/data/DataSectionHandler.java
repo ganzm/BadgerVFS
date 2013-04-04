@@ -192,4 +192,13 @@ public final class DataSectionHandler {
 	public void persistDataBlock(DataBlock dataBlock) throws IOException {
 		dataBlock.persist(virtualDiskFile);
 	}
+
+	public long getFreeSpace() throws IOException {
+
+		// go to start of DataSection
+		virtualDiskFile.seek(dataSectionOffset);
+
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

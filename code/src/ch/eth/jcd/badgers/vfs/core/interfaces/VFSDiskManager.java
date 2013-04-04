@@ -22,7 +22,7 @@ public interface VFSDiskManager {
 	 * 
 	 * @return
 	 */
-	long getFreeSpace();
+	long getFreeSpace() throws VFSException;
 
 	/** returns the root folder of our file system */
 	VFSEntry getRoot();

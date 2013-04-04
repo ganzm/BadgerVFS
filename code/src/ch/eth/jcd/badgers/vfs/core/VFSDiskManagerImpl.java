@@ -77,18 +77,16 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 				throw new VFSException("Cannot create VFSDiskManager because the file already exists " + config.getHostFilePath());
 			}
 
-			RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+			mgr.virtualDiskFile = new RandomAccessFile(file, "rw");
 
 			long headerSectionOffset = 0;
 
-			mgr.headerSectionHandler = HeaderSectionHandler.createNew(randomAccessFile, config, headerSectionOffset);
+			mgr.headerSectionHandler = HeaderSectionHandler.createNew(mgr.virtualDiskFile, config, headerSectionOffset);
 			long directorySectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
-			mgr.directorySectionHandler = DirectorySectionHandler.createNew(randomAccessFile, config, directorySectionOffset, dataSectionOffset);
-			mgr.dataSectionHandler = DataSectionHandler.createNew(randomAccessFile, config, dataSectionOffset);
-
-			mgr.virtualDiskFile = randomAccessFile;
+			mgr.directorySectionHandler = DirectorySectionHandler.createNew(mgr.virtualDiskFile, config, directorySectionOffset, dataSectionOffset);
+			mgr.dataSectionHandler = DataSectionHandler.createNew(mgr.virtualDiskFile, config, dataSectionOffset);
 
 			mgr.createRootFolder();
 
@@ -190,15 +188,21 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 		File file = new File(config.getHostFilePath());
 		if (file.exists()) {
-			if (!new File(config.getHostFilePath()).delete()) {
+			if (!file.delete()) {
 				throw new VFSException("Could not delete File " + config.getHostFilePath());
 			}
 		}
 	}
 
 	@Override
-	public long getFreeSpace() {
-		throw new UnsupportedOperationException("TODO");
+	public long getFreeSpace() throws VFSException {
+		LOGGER.info("Query free space");
+		try {
+
+			return dataSectionHandler.getFreeSpace();
+		} catch (IOException ex) {
+			throw new VFSException("", ex);
+		}
 	}
 
 	@Override
