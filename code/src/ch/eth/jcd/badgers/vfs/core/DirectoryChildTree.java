@@ -364,8 +364,12 @@ public class DirectoryChildTree {
 	 * @param fileName
 	 * @return DirectoryEntryBlock which was removed
 	 * @throws IOException
+	 * 
+	 * @returns the DirectoryEntry which was removed
 	 */
-	public void remove(DirectorySectionHandler directorySectionHandler, String fileName) throws VFSException, IOException {
+	public DirectoryEntryBlock remove(DirectorySectionHandler directorySectionHandler, String fileName) throws VFSException, IOException {
+
+		DirectoryEntryBlock deletedNode = null;
 
 		// dummy block
 		DirectoryEntryBlock fileNameBlock = new DirectoryEntryBlock(fileName);
@@ -392,9 +396,13 @@ public class DirectoryChildTree {
 
 			// simply delete the entry
 			if (deleteLeftNode) {
+				deletedNode = currentDirectoryBlock.getNodeLeft();
+
 				currentDirectoryBlock.setNodeLeft(currentDirectoryBlock.getNodeRight());
 				currentDirectoryBlock.setNodeRight(null);
 			} else {
+				deletedNode = currentDirectoryBlock.getNodeRight();
+
 				currentDirectoryBlock.setNodeRight(null);
 			}
 			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
@@ -410,8 +418,10 @@ public class DirectoryChildTree {
 
 			// replace node to delete with symmetric follower
 			if (deleteLeftNode) {
+				deletedNode = currentDirectoryBlock.getNodeLeft();
 				currentDirectoryBlock.setNodeLeft(symFollower);
 			} else {
+				deletedNode = currentDirectoryBlock.getNodeRight();
 				currentDirectoryBlock.setNodeRight(symFollower);
 			}
 			directorySectionHandler.persistDirectoryBlock(currentDirectoryBlock);
@@ -425,6 +435,8 @@ public class DirectoryChildTree {
 
 			rebalanceTreeAfterDeletion(directorySectionHandler, pathTopDown);
 		}
+
+		return deletedNode;
 	}
 
 	private void rebalanceTreeAfterDeletion(DirectorySectionHandler directorySectionHandler, Stack<DirectoryBlock> pathTopDown) throws IOException,

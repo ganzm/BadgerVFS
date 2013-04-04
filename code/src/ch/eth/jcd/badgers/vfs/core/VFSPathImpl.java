@@ -163,4 +163,15 @@ public class VFSPathImpl implements VFSPath {
 	public String getName() throws VFSException {
 		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR) + 1);
 	}
+
+	/**
+	 * creates a new Path object containing the same path but a different file name
+	 * 
+	 * @param newFileName
+	 * @return
+	 */
+	public VFSPathImpl renameTo(String newFileName) {
+		String newPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
+		return new VFSPathImpl(diskMgr, newPath);
+	}
 }

@@ -30,7 +30,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	 */
 	public static final int BLOCK_SIZE = MAX_FILENAME_SIZE + (2 * 8);
 
-	private final String fileName;
+	private String fileName;
 
 	/**
 	 * Points to a DataBlock in our file
@@ -63,6 +63,11 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+
 	}
 
 	public long getDataBlockLocation() {
@@ -141,4 +146,5 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	public String toString() {
 		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + (directoryEntryNodeLocation != 0) + "] Name[" + fileName + "]";
 	}
+
 }

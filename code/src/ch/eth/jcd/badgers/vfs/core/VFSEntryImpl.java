@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
@@ -15,7 +17,9 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 public abstract class VFSEntryImpl implements VFSEntry {
 
-	protected final VFSPath path;
+	private static Logger LOGGER = Logger.getLogger(VFSEntryImpl.class);
+
+	protected final VFSPathImpl path;
 
 	protected final VFSDiskManagerImpl diskManager;
 
@@ -26,7 +30,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * 
 	 * @param path
 	 */
-	public VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock) {
+	protected VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
 		this.diskManager = diskManager;
 		this.path = path;
 		this.firstDataBlock = firstDataBlock;
@@ -153,8 +157,15 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void renameTo(String newName) {
-		throw new UnsupportedOperationException("TODO");
+	public void renameTo(String newName) throws VFSException {
+		try {
+			LOGGER.info("Rename " + getPath().getAbsolutePath() + " to " + newName);
+			String oldName = getPath().getName();
+			VFSDirectoryImpl parent = getParentProtected();
+			parent.renameDirectoryEntryBlock(oldName, newName);
+		} catch (IOException ex) {
+			throw new VFSException(ex);
+		}
 	}
 
 	@Override

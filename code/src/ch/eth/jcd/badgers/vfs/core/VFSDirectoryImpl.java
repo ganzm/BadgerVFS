@@ -12,7 +12,6 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 
@@ -29,7 +28,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	private DirectoryChildTree childTree;
 
-	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPath path, DataBlock firstDataBlock, DirectoryBlock directoryBlock) {
+	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock, DirectoryBlock directoryBlock) {
 		super(diskManager, path, firstDataBlock);
 		childTree = new DirectoryChildTree(directoryBlock);
 	}
@@ -67,20 +66,37 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public VFSEntryImpl getChildByName(String fileName) throws VFSException {
-
 		try {
-			List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());
-
-			for (DirectoryEntryBlock block : directoryEntryList) {
-
-				if (fileName.equals(block.getFileName())) {
-					return createFromDirectoryEntryBlock(block);
-				}
-			}
-			return null;
+			DirectoryEntryBlock directoryEntry = getChildDirectoryEntryBlockByName(fileName);
+			return createFromDirectoryEntryBlock(directoryEntry);
 		} catch (IOException e) {
 			throw new VFSException(e);
 		}
+	}
+
+	protected DirectoryEntryBlock getChildDirectoryEntryBlockByName(String fileName) throws VFSException {
+
+		List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());
+
+		for (DirectoryEntryBlock block : directoryEntryList) {
+
+			if (fileName.equals(block.getFileName())) {
+				return block;
+			}
+		}
+
+		return null;
+	}
+
+	protected void renameDirectoryEntryBlock(String oldFileName, String newFileName) throws VFSException, IOException {
+		DirectoryEntryBlock removedBlock = childTree.remove(diskManager.getDirectorySectionHandler(), oldFileName);
+
+		// rename entry
+		removedBlock.setFileName(newFileName);
+
+		// and insert into the tree
+		childTree.insert(diskManager.getDirectorySectionHandler(), removedBlock);
+
 	}
 
 	private VFSEntryImpl createFromDirectoryEntryBlock(DirectoryEntryBlock block) throws IOException, VFSException {

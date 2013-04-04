@@ -90,12 +90,12 @@ public interface VFSEntry {
 	void moveTo(VFSPath path);
 
 	/**
-	 * conveninence method
+	 * convenience method
 	 * 
 	 * @see moveTo
 	 * @param newName
 	 */
-	void renameTo(String newName);
+	void renameTo(String newName) throws VFSException;
 
 	/**
 	 * deletes the file or folder this Entry represents

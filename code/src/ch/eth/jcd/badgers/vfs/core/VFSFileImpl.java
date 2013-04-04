@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -22,8 +21,7 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	private static Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
-	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPath path,
-			DataBlock firstDataBlock) {
+	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
 		super(diskManager, path, firstDataBlock);
 	}
 
@@ -51,15 +49,13 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	@Override
 	public InputStream getInputStream() throws VFSException {
-		VFSFileInputStream inputStream = new VFSFileInputStream(
-				diskManager.getDataSectionHandler(), firstDataBlock);
+		VFSFileInputStream inputStream = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 		return diskManager.wrapInputStream(inputStream);
 	}
 
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
-		VFSFileOutputStream outputStream = new VFSFileOutputStream(
-				diskManager.getDataSectionHandler(), firstDataBlock);
+		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 		return diskManager.wrapOutputStream(outputStream);
 
 	}
