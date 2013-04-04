@@ -103,7 +103,7 @@ public class VFSConsole {
 				+ "\tls: lists current directory\n"
 				+ "\tpwd: shows path to current directory\n"
 				+ "\tcd [dst]\t\t changes current directory to dst which must be either a child directory of the current path or “..”\n"
-				+ "\find [searchString]\t\t looks in the virtual disk for all files containing [searchString] in their file name"
+				+ "\find [searchString]\t\t lists all files containing [searchString] in their file name"
 				+ "\tmkdir [dirName]\t\t creates a new directory dirName in the current path\n"
 				+ "\tmkfile [fileName]\t creates a new empty file fileName in the current path - this is rather not usefull, as the “import” creates a file with content\n"
 				+ "\trm [file]\t\t deletes the entry denoted as file, it must be a child of the current path\n"
