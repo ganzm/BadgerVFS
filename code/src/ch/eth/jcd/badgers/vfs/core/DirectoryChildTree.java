@@ -651,9 +651,9 @@ public class DirectoryChildTree {
 			DirectoryBlock current = directorySectionHandler.loadDirectoryBlock(currentLocation);
 			pathToSymmetricFollower.push(current);
 
-			if ((currentLocation = current.getLinkRight()) != 0) {
+			if (current.getLinkRight() != 0) {
 				// follow right path down
-
+				currentLocation = current.getLinkRight();
 				continue;
 			} else if (current.getNodeRight() != null) {
 
@@ -661,9 +661,9 @@ public class DirectoryChildTree {
 				current.setNodeRight(null);
 				directorySectionHandler.persistDirectoryBlock(current);
 				return symmetricFollower;
-			} else if ((currentLocation = current.getLinkMiddle()) != 0) {
+			} else if (current.getLinkMiddle() != 0) {
 				// follow middle path down
-
+				currentLocation = current.getLinkMiddle();
 				continue;
 
 			} else {
