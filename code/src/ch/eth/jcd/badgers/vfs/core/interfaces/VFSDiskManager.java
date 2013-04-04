@@ -54,4 +54,16 @@ public interface VFSDiskManager {
 	 */
 	VFSPath createPath(String path) throws VFSException;
 
+	/**
+	 * search for files or folders with a specific name on the whole virtual disk
+	 * 
+	 * Whenever a file is found the observer callback is called. Further search is blocked by the call to the observer
+	 * 
+	 * @see VFSEntry#findInFolder(String, FindInFolderObserver)
+	 * 
+	 * @param fileName
+	 * @param observer
+	 */
+	void find(String fileName, FindInFolderObserver observer) throws VFSException;
+
 }

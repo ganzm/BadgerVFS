@@ -12,6 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -127,6 +128,11 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	public VFSPath createPath(String path) throws VFSException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void find(String fileName, FindInFolderObserver observer) throws VFSException {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -207,5 +208,10 @@ public class MockedVFSEntryImpl implements VFSEntry {
 					.substring(pathToRoot.length() + 1, fileEntry.toAbsolutePath().toString().lastIndexOf(File.separatorChar) + 1), pathToRoot);
 		}
 		return null;
+	}
+
+	@Override
+	public void findInFolder(String fileName, FindInFolderObserver observer) {
+		throw new UnsupportedOperationException("TODO");
 	}
 }

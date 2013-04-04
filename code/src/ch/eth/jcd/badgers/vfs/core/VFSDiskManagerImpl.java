@@ -21,6 +21,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.header.HeaderSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -282,6 +283,11 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		}
 
 		return outputStream;
+	}
+
+	@Override
+	public void find(String fileName, FindInFolderObserver observer) throws VFSException {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 }

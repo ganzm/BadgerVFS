@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -202,5 +203,10 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	@Override
 	public String toString() {
 		return "Directory to " + path;
+	}
+
+	@Override
+	public void findInFolder(String fileName, FindInFolderObserver observer) {
+		throw new UnsupportedOperationException("TODO");
 	}
 }

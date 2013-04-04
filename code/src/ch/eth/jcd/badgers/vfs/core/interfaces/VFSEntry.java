@@ -110,4 +110,14 @@ public interface VFSEntry {
 	 */
 	void delete() throws VFSException;
 
+	/**
+	 * search for files or folders with a specific name in the current Entry and all its subfolders
+	 * 
+	 * Whenever a file is found the observer callback is called. Further search is blocked by the call to the observer
+	 * 
+	 * @param fileName
+	 * @param observer
+	 */
+	void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException;
+
 }
