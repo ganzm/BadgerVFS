@@ -14,16 +14,16 @@ import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 
 public final class HeaderSectionHandler {
-	private static Logger logger = Logger.getLogger(HeaderSectionHandler.class);
+	private static final Logger LOGGER = Logger.getLogger(HeaderSectionHandler.class);
 
 	private static Charset cs = Charset.forName("ASCII");
 
-	private static int INFO_FIELD_LENGTH = 50;
-	private static int VERSION_FIELD_LENGTH = 10;
-	private static int COMPRESSION_FIELD_LENGTH = 20;
-	private static int ENCRYPTION_FIELD_LENGTH = 20;
-	private static int SALT_FIELD_LENGTH = 20;
-	private static int PASSWORDHASH_FIELD_LENGTH = 20;
+	private static final int INFO_FIELD_LENGTH = 50;
+	private static final int VERSION_FIELD_LENGTH = 10;
+	private static final int COMPRESSION_FIELD_LENGTH = 20;
+	private static final int ENCRYPTION_FIELD_LENGTH = 20;
+	private static final int SALT_FIELD_LENGTH = 20;
+	private static final int PASSWORDHASH_FIELD_LENGTH = 20;
 
 	private static String defaultInfoString = "Badger VFS 2013 V1.0";
 	private static String defaultVersionString = "0.1";
@@ -55,7 +55,7 @@ public final class HeaderSectionHandler {
 
 	public static HeaderSectionHandler createNew(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
 
-		logger.debug("init Header Section...");
+		LOGGER.debug("init Header Section...");
 
 		HeaderSectionHandler header = new HeaderSectionHandler();
 		header.headerSectionOffset = headerSectionOffset;
@@ -112,13 +112,13 @@ public final class HeaderSectionHandler {
 
 		virtualDiskFile.seek(header.directorySectionOffset);
 
-		logger.debug("init Header Section DONE");
+		LOGGER.debug("init Header Section DONE");
 		return header;
 
 	}
 
 	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
-		logger.debug("reading Header Section...");
+		LOGGER.debug("reading Header Section...");
 
 		HeaderSectionHandler header = new HeaderSectionHandler();
 		header.headerSectionOffset = headerSectionOffset;
@@ -132,55 +132,55 @@ public final class HeaderSectionHandler {
 		byte[] infoBytes = new byte[INFO_FIELD_LENGTH];
 		virtualDiskFile.read(infoBytes);
 		header.infoString = new String(infoBytes, cs).trim();
-		logger.debug("Info: " + header.infoString);
+		LOGGER.debug("Info: " + header.infoString);
 
 		// Read Version String
 		byte[] versionBytes = new byte[VERSION_FIELD_LENGTH];
 		virtualDiskFile.read(versionBytes);
 		header.versionString = new String(versionBytes, cs).trim();
-		logger.debug("Version: " + header.versionString);
+		LOGGER.debug("Version: " + header.versionString);
 
 		// Maximum Size
 		header.maximumSize = virtualDiskFile.readLong();
 		config.setMaximumSize(header.maximumSize);
-		logger.debug("MaximumSize: " + header.maximumSize);
+		LOGGER.debug("MaximumSize: " + header.maximumSize);
 
 		// TODO Read compression
 		byte[] compressionBytes = new byte[COMPRESSION_FIELD_LENGTH];
 		virtualDiskFile.read(compressionBytes);
 		header.compressionString = new String(compressionBytes, cs);
 		config.setCompressionAlgorithm(header.compressionString);
-		logger.debug("Compression: " + header.compressionString);
+		LOGGER.debug("Compression: " + header.compressionString);
 
 		// TODO Read encryption
 		byte[] encryptionBytes = new byte[ENCRYPTION_FIELD_LENGTH];
 		virtualDiskFile.read(encryptionBytes);
 		header.encryptionString = new String(encryptionBytes, cs);
 		config.setEncryptionAlgorithm(header.encryptionString);
-		logger.debug("Encryption: " + header.encryptionString);
+		LOGGER.debug("Encryption: " + header.encryptionString);
 
 		// read 8 bytes - DirectorySectionOffset
 		header.directorySectionOffset = virtualDiskFile.readLong();
-		logger.debug("DirectorySectionOffset: " + header.directorySectionOffset);
+		LOGGER.debug("DirectorySectionOffset: " + header.directorySectionOffset);
 
 		// read 8 bytes - DataSectionOffset
 		header.dataSectionOffset = virtualDiskFile.readLong();
 		header.headerSectionSize = header.directorySectionOffset;
-		logger.debug("DataSectionOffset: " + header.dataSectionOffset);
+		LOGGER.debug("DataSectionOffset: " + header.dataSectionOffset);
 
 		// Read SaltString
 		header.salt = new byte[SALT_FIELD_LENGTH];
 		virtualDiskFile.read(header.salt);
 		String saltString = ByteUtil.bytArrayToHex(header.salt);
-		logger.debug("Salt: " + saltString);
+		LOGGER.debug("Salt: " + saltString);
 
 		// read Password Hash
 		header.passwordHash = new byte[PASSWORDHASH_FIELD_LENGTH];
 		virtualDiskFile.read(header.passwordHash);
 		String passwordHashString = ByteUtil.bytArrayToHex(header.passwordHash);
-		logger.debug("PasswordHash: " + passwordHashString);
+		LOGGER.debug("PasswordHash: " + passwordHashString);
 
-		logger.debug("read Header Section DONE");
+		LOGGER.debug("read Header Section DONE");
 		return header;
 	}
 

@@ -17,7 +17,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
  * 
  */
 public final class DataSectionHandler {
-	private static Logger logger = Logger.getLogger(DataSectionHandler.class);
+	private static final Logger LOGGER = Logger.getLogger(DataSectionHandler.class);
 
 	private final byte[] dataBlockBuffer = new byte[DataBlock.BLOCK_SIZE];
 
@@ -42,7 +42,7 @@ public final class DataSectionHandler {
 	 */
 	private final long maximumFileSize;
 
-	private final long blockIncrement = 2;
+	private static final long BLOCK_INCREMENT = 2;
 
 	/**
 	 * Constructor
@@ -53,7 +53,7 @@ public final class DataSectionHandler {
 	}
 
 	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
-		logger.debug("read Data Section...");
+		LOGGER.debug("read Data Section...");
 		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize());
 
 		data.dataSectionOffset = dataSectionOffset;
@@ -61,12 +61,12 @@ public final class DataSectionHandler {
 		// init size to 0 and don't allocate any space
 		data.dataSectionSize = randomAccessFile.length() - dataSectionOffset;
 
-		logger.debug("read Data Section DONE");
+		LOGGER.debug("read Data Section DONE");
 		return data;
 	}
 
 	public static DataSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) {
-		logger.debug("create Data Section...");
+		LOGGER.debug("create Data Section...");
 		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize());
 
 		data.dataSectionOffset = dataSectionOffset;
@@ -74,7 +74,7 @@ public final class DataSectionHandler {
 		// init size to 0 and don't allocate any space
 		data.dataSectionSize = 0;
 
-		logger.debug("create Data Section DONE");
+		LOGGER.debug("create Data Section DONE");
 		return data;
 	}
 
@@ -137,7 +137,7 @@ public final class DataSectionHandler {
 				// block already occupied
 			} else {
 				// block free
-				logger.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
+				LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
 				return currentLocation;
 			}
 
@@ -154,18 +154,18 @@ public final class DataSectionHandler {
 		// end of file and still no free DataBlock found
 		long currentFilePosition = virtualDiskFile.getFilePointer();
 
-		long tmpBlockIncrement = blockIncrement;
+		long tmpBlockIncrement = BLOCK_INCREMENT;
 		if (maximumFileSize > 0) {
 			long maxAllowedNewBlocks = (maximumFileSize - currentFilePosition) / DataBlock.BLOCK_SIZE;
 			tmpBlockIncrement = Math.min(maxAllowedNewBlocks, tmpBlockIncrement);
 		}
 
-		long newLength = currentFilePosition + (tmpBlockIncrement * DataBlock.BLOCK_SIZE);
+		long newLength = currentFilePosition + tmpBlockIncrement * DataBlock.BLOCK_SIZE;
 		virtualDiskFile.setLength(newLength);
 		dataSectionSize = newLength - dataSectionOffset;
-		logger.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());
+		LOGGER.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());
 
-		logger.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
+		LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
 		return currentFilePosition;
 
 	}

@@ -10,7 +10,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class VFSFileInputStream extends InputStream {
-	private static Logger LOGGER = Logger.getLogger(VFSFileInputStream.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSFileInputStream.class);
 
 	private final DataSectionHandler dataSectionHandler;
 	private final DataBlock firstDataBlock;

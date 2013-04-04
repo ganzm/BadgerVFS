@@ -34,7 +34,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  */
 public class VFSDiskManagerImpl implements VFSDiskManager {
 
-	private static Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
 	private final DiskConfiguration config;
 

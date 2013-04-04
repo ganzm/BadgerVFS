@@ -32,7 +32,7 @@ public class DirectoryBlock {
 	/**
 	 * TODO specification missing
 	 */
-	private final int header = 255;
+	private static final int HEADER = 255;
 
 	private long linkLeft;
 	private long linkMiddle;
@@ -67,26 +67,26 @@ public class DirectoryBlock {
 		ByteBuffer buf = ByteBuffer.allocate(BLOCK_SIZE);
 
 		// write 1 header byte
-		buf.put((byte) header);
+		buf.put((byte) HEADER);
 
 		// write left link
 		buf.putLong(linkLeft);
 
 		// write left node
-		if (nodeLeft != null) {
-			buf.put(nodeLeft.serialize());
-		} else {
+		if (nodeLeft == null) {
 			buf.position(buf.position() + DirectoryEntryBlock.BLOCK_SIZE);
+		} else {
+			buf.put(nodeLeft.serialize());
 		}
 
 		// write middle node
 		buf.putLong(linkMiddle);
 
 		// write right node
-		if (nodeRight != null) {
-			buf.put(nodeRight.serialize());
-		} else {
+		if (nodeRight == null) {
 			buf.position(buf.position() + DirectoryEntryBlock.BLOCK_SIZE);
+		} else {
+			buf.put(nodeRight.serialize());
 		}
 
 		// write right link
@@ -161,7 +161,7 @@ public class DirectoryBlock {
 
 	public void dumpShort(DirectorySectionHandler directorySectionHandler, StringBuffer buf, int depth) throws VFSException {
 		for (int i = 0; i < depth; i++) {
-			buf.append("\t");
+			buf.append('\t');
 		}
 
 		buf.append("Block[");

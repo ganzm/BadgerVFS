@@ -17,7 +17,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
  */
 public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
-	private static final Charset cs = Charset.forName("UTF8");
+	private static final Charset CS = Charset.forName("UTF8");
 	/**
 	 * Maximum size of a file name in bytes
 	 */
@@ -28,7 +28,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	 * 
 	 * An Index Block consists of 2 IndexTreeEntries and 3 pointers to other IndexBlocks
 	 */
-	public static final int BLOCK_SIZE = MAX_FILENAME_SIZE + (2 * 8);
+	public static final int BLOCK_SIZE = MAX_FILENAME_SIZE + 2 * 8;
 
 	private String fileName;
 
@@ -95,7 +95,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 		buf.putLong(dataBlockLocation);
 		buf.putLong(directoryEntryNodeLocation);
-		buf.put(fileName.getBytes(cs));
+		buf.put(fileName.getBytes(CS));
 
 		return buf.array();
 	}
@@ -110,7 +110,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 		byte[] fileNameBuffer = new byte[MAX_FILENAME_SIZE];
 		buf.get(fileNameBuffer);
-		String newFileName = new String(fileNameBuffer, cs).trim();
+		String newFileName = new String(fileNameBuffer, CS).trim();
 
 		DirectoryEntryBlock newBlock = new DirectoryEntryBlock(newFileName);
 		newBlock.dataBlockLocation = newDataBlockLocation;
@@ -121,7 +121,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 	public void dump(StringBuffer buf, int depth) {
 		for (int i = 0; i < depth; i++) {
-			buf.append("\t");
+			buf.append('\t');
 		}
 
 		buf.append("Data[");
@@ -130,12 +130,12 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 		buf.append(directoryEntryNodeLocation);
 		buf.append("] ");
 		buf.append(fileName);
-		buf.append("\n");
+		buf.append('\n');
 	}
 
 	public static void dumpEmpty(StringBuffer buf, int depth) {
 		for (int i = 0; i < depth; i++) {
-			buf.append("\t");
+			buf.append('\t');
 		}
 
 		buf.append("NO DATA\n");
@@ -143,7 +143,7 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 
 	@Override
 	public String toString() {
-		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + (directoryEntryNodeLocation != 0) + "] Name[" + fileName + "]";
+		return "DirectoryEntry Data[" + dataBlockLocation + "] IsDir[" + (directoryEntryNodeLocation != 0) + "] Name[" + fileName + ']';
 	}
 
 }

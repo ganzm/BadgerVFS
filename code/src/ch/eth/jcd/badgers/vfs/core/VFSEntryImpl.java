@@ -17,7 +17,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 public abstract class VFSEntryImpl implements VFSEntry {
 
-	private static Logger LOGGER = Logger.getLogger(VFSEntryImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSEntryImpl.class);
 
 	protected final VFSDiskManagerImpl diskManager;
 

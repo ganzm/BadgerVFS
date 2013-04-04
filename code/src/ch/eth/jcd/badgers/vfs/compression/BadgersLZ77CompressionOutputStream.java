@@ -72,7 +72,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 			forwardString.delete(0, matchLength);
 
 			// offset to the match
-			int offset = cachedString.length() - currentMatchLocation + matchLength;
+			int offset = cachedString.length() - currentMatchLocation - matchLength;
 			encodedInput.add(new BadgersLZ77Tuple(offset, matchLength, forwardString.substring(0, 1)));
 			// System.out.println(encodedInput.get(encodedInput.size() - 1));
 			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();

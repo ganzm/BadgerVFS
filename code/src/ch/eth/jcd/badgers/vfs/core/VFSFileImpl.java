@@ -21,7 +21,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  */
 public class VFSFileImpl extends VFSEntryImpl {
 
-	private static Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
 	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
 		super(diskManager, path, firstDataBlock);

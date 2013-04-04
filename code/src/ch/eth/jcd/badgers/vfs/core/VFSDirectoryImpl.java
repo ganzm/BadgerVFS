@@ -25,7 +25,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
  */
 public class VFSDirectoryImpl extends VFSEntryImpl {
 
-	private static Logger LOGGER = Logger.getLogger(VFSDirectoryImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSDirectoryImpl.class);
 
 	private DirectoryChildTree childTree;
 
