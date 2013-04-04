@@ -2,6 +2,8 @@ package ch.eth.jcd.badgers.vfs.test.testutil;
 
 import java.io.File;
 
+import org.junit.Assert;
+
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 
 public class UnitTestUtils {
@@ -23,6 +25,13 @@ public class UnitTestUtils {
 		}
 		return fileName;
 
+	}
+
+	public static void deleteFileIfExist(String filePath) {
+		File oldFile = new File(filePath);
+		if (oldFile.exists()) {
+			Assert.assertTrue("Could not delete file " + oldFile.getName(), oldFile.delete());
+		}
 	}
 
 }

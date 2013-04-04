@@ -28,7 +28,7 @@ public abstract class IVFSPathTest {
 	public void beforeTest() throws VFSException {
 		Class<? extends VFSDiskManager> class1;
 		try {
-			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
+			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
 			setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());

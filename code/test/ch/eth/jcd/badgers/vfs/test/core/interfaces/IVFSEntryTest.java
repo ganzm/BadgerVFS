@@ -40,10 +40,14 @@ public abstract class IVFSEntryTest {
 	public void beforeTest() throws VFSException {
 		Class<? extends VFSDiskManager> class1;
 		try {
-			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
+			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
 			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
-			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
+			String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
+			setVFSDiskManager(null);
+			VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+			setVFSDiskManager(diskManager);
+			assertTrue("Expected File to exist", new File(filePath).exists());
 		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
 			throw new VFSException(e);
@@ -139,9 +143,7 @@ public abstract class IVFSEntryTest {
 		entry.renameTo(fileNameAfter);
 
 		assertFalse("Expected file beforeRename.txt not exists anymore", newFile.exists());
-
-		VFSPath afterRenamePath = rootEntry.getChildPath(fileNameAfter);
-		assertTrue("Expected file afterRename.txt exists", afterRenamePath.exists());
+		assertTrue("Expected file afterRename.txt exists", entry.getPath().exists());
 
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
@@ -258,11 +260,18 @@ public abstract class IVFSEntryTest {
 		getVFSDiskManager().dispose();
 		Class<? extends VFSDiskManager> class1;
 		try {
-			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
+			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+
+			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
 			Method methodCreate = class1.getMethod("create", DiskConfiguration.class);
-			methodCreate.invoke(null, getVFSDiskManager().getDiskConfiguration());
-			Method methodopen = class1.getMethod("open", DiskConfiguration.class);
-			setVFSDiskManager((VFSDiskManager) methodopen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
+			VFSDiskManager createdDiskManager = (VFSDiskManager) methodCreate.invoke(null, config);
+			createdDiskManager.close();
+
+			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+			VFSDiskManager openedDiskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+
+			setVFSDiskManager(openedDiskManager);
+
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
