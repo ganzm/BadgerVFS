@@ -109,7 +109,7 @@ public final class DirectorySectionHandler {
 				// block already occupied
 			} else {
 				// block free
-				logger.debug("Found free DirectoryBlock at " + currentLocation + " Block Nr " + ((currentLocation - sectionOffset) / DirectoryBlock.BLOCK_SIZE));
+				logger.debug("Found free DirectoryBlock at " + currentLocation + " Block Nr " + (currentLocation - sectionOffset) / DirectoryBlock.BLOCK_SIZE);
 				return currentLocation;
 			}
 
@@ -129,7 +129,7 @@ public final class DirectorySectionHandler {
 	public DirectoryBlock loadDirectoryBlock(long location) throws VFSException, VFSInvalidLocationExceptionException {
 		if (location == 0 || location < sectionOffset || location > (sectionOffset + sectionSize)) {
 			throw new VFSInvalidLocationExceptionException("Tried to load DirectoryBlock from Location " + location + " Valid Range is [" + sectionOffset
-					+ ", " + (sectionOffset + sectionSize));
+					+ ", " + sectionOffset + sectionSize);
 		}
 
 		try {

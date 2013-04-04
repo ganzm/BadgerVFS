@@ -35,8 +35,12 @@ public class VFSFileInputStream extends InputStream {
 			while (bytesLeftOnThisBlock <= 0) {
 				long nextBlockLocation = currentDataBlock.getNextDataBlock();
 
-				if (nextBlockLocation != 0) {
+				if (nextBlockLocation == 0) {
+					// no more DataBlocks
 
+					// EOF
+					return -1;
+				} else {
 					// skip to next Block
 					currentDataBlock = dataSectionHandler.loadDataBlock(nextBlockLocation);
 					LOGGER.info("InputStream[" + firstDataBlock.getLocation() + "] - Jump to next DataBlock " + currentDataBlock.getLocation());
@@ -44,11 +48,6 @@ public class VFSFileInputStream extends InputStream {
 					currentPosition = currentDataBlock.getUserDataLocation();
 
 					bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
-				} else {
-					// no more DataBlocks
-
-					// EOF
-					return -1;
 				}
 
 			}

@@ -32,7 +32,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
  * handles a single virtual disk file
  * 
  */
-public class VFSDiskManagerImpl implements VFSDiskManager {
+public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private static final Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
 
@@ -255,7 +255,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
 
-		if (compressionAlgoName != null && "".equals(compressionAlgoName) == false) {
+		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
 			return new BadgersLZ77CompressionInputStream(inputStream);
 		}
 
@@ -273,7 +273,7 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
 
-		if (compressionAlgoName != null && "".equals(compressionAlgoName) == false) {
+		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
 			return new BadgersLZ77CompressionOutputStream(outputStream);
 		}
 

@@ -102,7 +102,7 @@ public final class DataSectionHandler {
 	public DataBlock loadDataBlock(long location) throws VFSException {
 		if (location == 0 || location < dataSectionOffset || location > (dataSectionOffset + dataSectionSize)) {
 			throw new VFSInvalidLocationExceptionException("Tried to load DataBlock from Location " + location + " Valid Range is [" + dataSectionOffset + ", "
-					+ (dataSectionOffset + dataSectionSize));
+					+ dataSectionOffset + dataSectionSize);
 		}
 
 		try {
@@ -137,7 +137,7 @@ public final class DataSectionHandler {
 				// block already occupied
 			} else {
 				// block free
-				LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
+				LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + (currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE);
 				return currentLocation;
 			}
 
@@ -165,7 +165,7 @@ public final class DataSectionHandler {
 		dataSectionSize = newLength - dataSectionOffset;
 		LOGGER.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());
 
-		LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + ((currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE));
+		LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + (currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE);
 		return currentFilePosition;
 
 	}

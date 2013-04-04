@@ -31,21 +31,21 @@ public class VFSPathImpl implements VFSPath {
 	public static String[] validateAndSplitAbsolutePath(String pathString) {
 		// TODO do stuff here
 
-		pathString = pathString.trim();
+		String tmpPathString = pathString.trim();
 
-		if (VFSPath.FILE_SEPARATOR.equals(pathString)) {
+		if (VFSPath.FILE_SEPARATOR.equals(tmpPathString)) {
 			// apply exception for root path
 			return new String[0];
 		}
 
-		if (!pathString.startsWith(VFSPath.FILE_SEPARATOR)) {
-			throw new VFSInvalidPathException("Path should start with / but it does not Path: " + pathString);
+		if (!tmpPathString.startsWith(VFSPath.FILE_SEPARATOR)) {
+			throw new VFSInvalidPathException("Path should start with / but it does not Path: " + tmpPathString);
 		}
 
 		// TODO this wont work properly for every case
-		pathString = pathString.substring(1);
+		tmpPathString = tmpPathString.substring(1);
 
-		return pathString.split(VFSPath.FILE_SEPARATOR);
+		return tmpPathString.split(VFSPath.FILE_SEPARATOR);
 	}
 
 	@Override
