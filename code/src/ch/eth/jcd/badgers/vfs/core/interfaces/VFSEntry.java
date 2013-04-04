@@ -26,9 +26,12 @@ public interface VFSEntry {
 	/**
 	 * copies this Entry recursively (deep copy) to a new location
 	 * 
+	 * Sample Usage: /home/user/mat copyTo /home/user/mat_copy
+	 * 
 	 * @param newLocation
+	 *            path inclusive name of the entry which is being copied
 	 */
-	void copyTo(VFSPath newLocation);
+	void copyTo(VFSPath newLocation) throws VFSException;
 
 	/**
 	 * lists the content of a directory <br>
@@ -87,7 +90,7 @@ public interface VFSEntry {
 	 * 
 	 * @param path
 	 */
-	void moveTo(VFSPath path);
+	void moveTo(VFSPath path) throws VFSException;
 
 	/**
 	 * convenience method

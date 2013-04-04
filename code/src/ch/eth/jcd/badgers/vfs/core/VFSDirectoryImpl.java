@@ -12,6 +12,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 
@@ -164,6 +165,33 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
 		throw new VFSException("getInputStream() does not work on directories");
+	}
+
+	@Override
+	public void copyTo(VFSPath newLocation) throws VFSException {
+		if (newLocation.exists()) {
+			throw new VFSException("Copy failed - file already exist " + newLocation.getAbsolutePath());
+		}
+		LOGGER.info("Copy Folder " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+
+		VFSEntry newDir = newLocation.createDirectory();
+
+		// copy child entries
+		List<VFSEntry> childEntries = getChildren();
+		for (VFSEntry child : childEntries) {
+			VFSPath newChildLocation = newDir.getChildPath(child.getPath().getName());
+			child.copyTo(newChildLocation);
+		}
+	}
+
+	public void moveDirectoryEntry(String oldName, VFSDirectoryImpl newParentDirectory, String newName) throws VFSException {
+		try {
+			DirectoryEntryBlock removedEntry = childTree.remove(diskManager.getDirectorySectionHandler(), oldName);
+			removedEntry.setFileName(newName);
+			newParentDirectory.childTree.insert(newParentDirectory.diskManager.getDirectorySectionHandler(), removedEntry);
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	@Override

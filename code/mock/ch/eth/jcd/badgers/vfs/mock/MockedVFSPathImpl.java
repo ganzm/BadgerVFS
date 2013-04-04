@@ -19,7 +19,7 @@ public class MockedVFSPathImpl implements VFSPath {
 
 	public MockedVFSPathImpl(String path, VFSEntry root) {
 		this.path = path;
-		this.pathToRoot = ((MockedVFSPathImpl) root.getPath()).getAbsolutPath();
+		this.pathToRoot = ((MockedVFSPathImpl) root.getPath()).createPathToRoot();
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class MockedVFSPathImpl implements VFSPath {
 		return Files.exists(entry.fileEntry);
 	}
 
-	public String getAbsolutPath() {
+	private String createPathToRoot() {
 		if (path.length() > 0) {
 			return pathToRoot + File.separatorChar + path;
 		}
@@ -67,6 +67,16 @@ public class MockedVFSPathImpl implements VFSPath {
 	public String getName() throws VFSException {
 		String pathString = getAbsolutePath();
 		return pathString.substring(pathString.lastIndexOf(File.separatorChar) + 1);
+	}
+
+	@Override
+	public String getParentPath() throws VFSException {
+		String parentPath = getAbsolutePath().substring(0, getAbsolutePath().lastIndexOf(VFSPath.FILE_SEPARATOR));
+		if ("".equals(parentPath)) {
+			// found the root path
+			return VFSPath.FILE_SEPARATOR;
+		}
+		return parentPath;
 	}
 
 }

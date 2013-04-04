@@ -38,7 +38,6 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	private long dataBlockLocation;
 
 	/**
-	 * 
 	 * Is zero if this Directory does not specify a Folder
 	 * 
 	 * Otherwise it points to a DirectoryBlock which is the root of a B-Tree which contains the files located in our folder

@@ -206,6 +206,20 @@ public class VFSDiskManagerImpl implements VFSDiskManager {
 		return root;
 	}
 
+	/**
+	 * TODO promote to interface class and implement
+	 * 
+	 * <ul>
+	 * <li>Compacts the DataSection of the disk</li>
+	 * <li>shrinks the virtual disk file located on the host file system</li>
+	 * </ul>
+	 * 
+	 * @throws VFSException
+	 */
+	public void compact() throws VFSException {
+		throw new UnsupportedOperationException("TODO");
+	}
+
 	public HeaderSectionHandler getHeaderSectionHandler() {
 		return headerSectionHandler;
 	}

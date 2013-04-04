@@ -19,9 +19,9 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 	private static Logger LOGGER = Logger.getLogger(VFSEntryImpl.class);
 
-	protected final VFSPathImpl path;
-
 	protected final VFSDiskManagerImpl diskManager;
+
+	protected VFSPathImpl path;
 
 	protected DataBlock firstDataBlock;
 
@@ -120,9 +120,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void copyTo(VFSPath newLocation) {
-		throw new UnsupportedOperationException("TODO");
-	}
+	public abstract void copyTo(VFSPath newLocation) throws VFSException;
 
 	@Override
 	public abstract List<VFSEntry> getChildren() throws VFSException;
@@ -152,8 +150,34 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void moveTo(VFSPath path) {
-		throw new UnsupportedOperationException("TODO");
+	public void moveTo(VFSPath newLocation) throws VFSException {
+		if (newLocation.exists()) {
+			throw new VFSException("Copy failed - file already exist " + newLocation.getAbsolutePath());
+		}
+
+		LOGGER.info("Move Entry " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+
+		VFSDirectoryImpl oldParentDirectory = getParentProtected();
+
+		String newName = newLocation.getName();
+
+		String parentPathString = newLocation.getParentPath();
+		VFSPath newParentPath = diskManager.createPath(parentPathString);
+
+		VFSDirectoryImpl newParentDirectory;
+		if (!newParentPath.exists()) {
+			newParentDirectory = (VFSDirectoryImpl) newParentPath.createDirectory();
+		} else {
+			newParentDirectory = (VFSDirectoryImpl) newParentPath.getVFSEntry();
+		}
+
+		String oldName = path.getName();
+
+		// do the renaming
+		oldParentDirectory.moveDirectoryEntry(oldName, newParentDirectory, newName);
+
+		// assign new path
+		this.path = (VFSPathImpl) newLocation;
 	}
 
 	@Override
@@ -209,15 +233,12 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	}
 
 	protected VFSDirectoryImpl getParentProtected() throws VFSException {
-		String pathString = path.getAbsolutePath();
-		int separatorIndex = pathString.lastIndexOf(VFSPath.FILE_SEPARATOR);
-
-		String parentPathString = pathString.substring(0, separatorIndex + 1);
+		String parentPathString = path.getParentPath();
 
 		VFSPath parentPath = diskManager.createPath(parentPathString);
 
 		if (!parentPath.exists()) {
-			throw new VFSException("Internal Error while trying to get Parent of " + pathString);
+			throw new VFSException("Internal Error while trying to get Parent of " + path.getAbsolutePath());
 		}
 
 		return (VFSDirectoryImpl) parentPath.getVFSEntry();

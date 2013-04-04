@@ -19,7 +19,9 @@ public class DataBlock {
 	 */
 	public static final int BLOCK_SIZE = 512;
 
-	private static final int HEADER_SIZE = 21;
+	public static final int HEADER_SIZE = 21;
+
+	public static final int USERDATA_SIZE = BLOCK_SIZE - HEADER_SIZE;
 
 	/**
 	 * Position (offset in bytes) in our file where this DataBlock is located

@@ -29,6 +29,8 @@ public interface VFSPath {
 	 */
 	String getAbsolutePath() throws VFSException;
 
+	String getParentPath() throws VFSException;
+
 	/**
 	 * may be implemented as getAbsolutePath().subString(getAbsolutePath().lastIndexOf(VFSPath.FILE_SEPARATOR), ...);
 	 * 

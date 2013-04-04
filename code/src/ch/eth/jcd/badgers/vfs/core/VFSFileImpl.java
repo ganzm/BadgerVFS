@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -8,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -59,4 +61,49 @@ public class VFSFileImpl extends VFSEntryImpl {
 		return diskManager.wrapOutputStream(outputStream);
 
 	}
+
+	@Override
+	public void copyTo(VFSPath newLocation) throws VFSException {
+		if (newLocation.exists()) {
+			throw new VFSException("Copy failed - file already exist " + newLocation.getAbsolutePath());
+		}
+
+		LOGGER.info("Copy file " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+		OutputStream out = null;
+		InputStream in = null;
+
+		try {
+
+			VFSEntry newFile = newLocation.createFile();
+
+			out = newFile.getOutputStream(WRITE_MODE_OVERRIDE);
+			in = getInputStream();
+
+			byte[] buffer = new byte[DataBlock.USERDATA_SIZE];
+
+			int numBytes;
+			while ((numBytes = in.read(buffer)) >= 0) {
+				out.write(buffer, 0, numBytes);
+			}
+
+		} catch (IOException ex) {
+			throw new VFSException("Error while copying data from " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath(), ex);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					LOGGER.error("", e);
+				}
+			}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					LOGGER.error("", e);
+				}
+			}
+		}
+	}
+
 }
