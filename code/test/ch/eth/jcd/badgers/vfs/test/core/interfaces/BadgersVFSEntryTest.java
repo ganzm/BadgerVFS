@@ -25,7 +25,7 @@ public class BadgersVFSEntryTest extends IVFSEntryTest {
 	@Override
 	public VFSDiskManager getVFSDiskManager() throws VFSException {
 		if (manager == null) {
-			manager = VFSDiskManagerImpl.create(UnitTestUtils.getMockedConfig("VFSPathTestMockedRoot"));
+			manager = VFSDiskManagerImpl.create(UnitTestUtils.getMockedConfig("BadgersVFSEntryTest.bfs"));
 		}
 		return manager;
 	}

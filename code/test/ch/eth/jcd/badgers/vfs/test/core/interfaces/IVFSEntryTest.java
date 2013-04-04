@@ -259,10 +259,10 @@ public abstract class IVFSEntryTest {
 		Class<? extends VFSDiskManager> class1;
 		try {
 			class1 = (Class<? extends VFSDiskManager>) Class.forName(getVFSDiskManager().getClass().getName());
-			Method method = class1.getMethod("create", DiskConfiguration.class);
-			method.invoke(null, getVFSDiskManager().getDiskConfiguration());
-			class1.getMethod("open", DiskConfiguration.class);
-			setVFSDiskManager((VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration()));
+			Method methodCreate = class1.getMethod("create", DiskConfiguration.class);
+			methodCreate.invoke(null, getVFSDiskManager().getDiskConfiguration());
+			Method methodopen = class1.getMethod("open", DiskConfiguration.class);
+			setVFSDiskManager((VFSDiskManager) methodopen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
