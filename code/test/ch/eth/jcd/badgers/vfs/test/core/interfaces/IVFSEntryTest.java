@@ -330,12 +330,6 @@ public abstract class IVFSEntryTest {
 		assertFalse("Expected file not exists", delFilePath.exists());
 		VFSEntry delFileEntry = delFilePath.createFile();
 		assertTrue("Expected file exists", delFilePath.exists());
-		try {
-			delDirectoryEntry.delete();
-		} catch (VFSException e) {
-			assertNotNull("Expected DirectoryNotEmptyException", e);
-		}
-
 		delFileEntry.delete();
 		assertFalse("Expected file not exists", delFilePath.exists());
 		delDirectoryEntry.delete();
