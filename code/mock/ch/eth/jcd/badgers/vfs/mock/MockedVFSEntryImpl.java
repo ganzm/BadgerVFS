@@ -24,8 +24,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 public class MockedVFSEntryImpl implements VFSEntry {
 	private static final Logger LOGGER = Logger.getLogger(MockedVFSEntryImpl.class);
 
-	Path fileEntry;
-	final String pathToRoot;
+	protected Path fileEntry;
+	protected final String pathToRoot;
 
 	MockedVFSEntryImpl(String path, String pathToRoot) {
 		fileEntry = Paths.get(pathToRoot + File.separatorChar + path);
@@ -41,13 +41,6 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		} catch (IOException | VFSException e) {
 			LOGGER.error("", e);
 		}
-		// try {
-		// Files.copy(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getPath()));
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-
 	}
 
 	private class CopyDirVisitor extends SimpleFileVisitor<Path> {
@@ -76,32 +69,30 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		}
 	}
 
-	boolean createFile() {
+	protected boolean createFile() {
 		try {
 			Files.createFile(fileEntry);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return false;
 		}
 		return true;
 	}
 
-	boolean createDirectory() {
+	protected boolean createDirectory() {
 		try {
 			Files.createDirectory(fileEntry);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return false;
 		}
 		return true;
 	}
 
-	String getAbsolutePath() throws IOException {
+	protected String getAbsolutePath() throws IOException {
 		return fileEntry.toAbsolutePath().toString();
 	}
 
 	@Override
-	public List<VFSEntry> getChildren() {
+	public List<VFSEntry> getChildren() throws VFSException {
 		List<VFSEntry> childs = new LinkedList<VFSEntry>();
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(fileEntry)) {
 			for (Path path : directoryStream) {
@@ -112,6 +103,7 @@ public class MockedVFSEntryImpl implements VFSEntry {
 				}
 			}
 		} catch (IOException ex) {
+			throw new VFSException(ex);
 		}
 		return childs;
 	}

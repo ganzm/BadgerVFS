@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionOutputStream;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
 
 public class BadgersLZ77CompressionTest {
+	private static final Logger LOGGER = Logger.getLogger(BadgersLZ77CompressionTest.class);
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -24,7 +26,6 @@ public class BadgersLZ77CompressionTest {
 	public void testMaximumCompression() throws IOException {
 
 		byte[] rawData = new byte[2048];
-		System.out.println(rawData.toString());
 		byte[] rawDataCopy = rawData.clone();
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -34,8 +35,8 @@ public class BadgersLZ77CompressionTest {
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
-		System.out.println("Byte length before encryption: " + rawData.length);
-		System.out.println("Byte length after encryption:  " + encrypted.length);
+		LOGGER.debug("Byte length before encryption: " + rawData.length);
+		LOGGER.debug("Byte length after encryption:  " + encrypted.length);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
 
 		BadgersLZ77CompressionInputStream in = new BadgersLZ77CompressionInputStream(inputStream);
@@ -64,8 +65,8 @@ public class BadgersLZ77CompressionTest {
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
-		System.out.println("Byte length before encryption: " + rawData.length);
-		System.out.println("Byte length after encryption:  " + encrypted.length);
+		LOGGER.debug("Byte length before encryption: " + rawData.length);
+		LOGGER.debug("Byte length after encryption:  " + encrypted.length);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
 
 		BadgersLZ77CompressionInputStream in = new BadgersLZ77CompressionInputStream(inputStream);
@@ -93,8 +94,8 @@ public class BadgersLZ77CompressionTest {
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
-		System.out.println("Byte length before encryption: " + stringDatas.length());
-		System.out.println("Byte length after encryption:  " + encrypted.length);
+		LOGGER.debug("Byte length before encryption: " + stringDatas.length());
+		LOGGER.debug("Byte length after encryption:  " + encrypted.length);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
 
 		BadgersLZ77CompressionInputStream in = new BadgersLZ77CompressionInputStream(inputStream);

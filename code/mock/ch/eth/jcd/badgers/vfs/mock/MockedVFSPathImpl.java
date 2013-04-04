@@ -17,11 +17,6 @@ public class MockedVFSPathImpl implements VFSPath {
 		this.pathToRoot = pathToRoot;
 	}
 
-	public MockedVFSPathImpl(String path, VFSEntry root) {
-		this.path = path;
-		this.pathToRoot = ((MockedVFSPathImpl) root.getPath()).createPathToRoot();
-	}
-
 	@Override
 	public VFSEntry createDirectory() {
 		MockedVFSEntryImpl entry = new MockedVFSEntryImpl(path, pathToRoot);
