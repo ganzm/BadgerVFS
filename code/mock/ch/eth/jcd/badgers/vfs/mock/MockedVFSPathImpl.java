@@ -41,13 +41,6 @@ public class MockedVFSPathImpl implements VFSPath {
 		return Files.exists(entry.fileEntry);
 	}
 
-	private String createPathToRoot() {
-		if (path.length() > 0) {
-			return pathToRoot + File.separatorChar + path;
-		}
-		return pathToRoot;
-	}
-
 	@Override
 	public String getAbsolutePath() {
 		return VFSPath.FILE_SEPARATOR + path;

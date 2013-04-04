@@ -19,11 +19,11 @@ public abstract class IVFSDiskManagerTest {
 
 	@Test
 	public void testCreateAndDispose() throws VFSException {
-		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 
 		getVFSDiskManager().close();
 
-		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File still exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 
 		Class<? extends VFSDiskManager> class1;
 		try {
@@ -31,9 +31,9 @@ public abstract class IVFSDiskManagerTest {
 			Method method = class1.getMethod("open", DiskConfiguration.class);
 			method.invoke(null, getVFSDiskManager().getDiskConfiguration());
 			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-		} catch (VFSException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			e.printStackTrace();
+		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			throw new VFSException(e);
 		}
 	}
 
