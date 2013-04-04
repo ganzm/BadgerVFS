@@ -11,7 +11,7 @@ section. Each of them is described below.
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
-  \textbf{Name} & \textbf{Lenght} & \textbf{Description}
+  \textbf{Name} & \textbf{Length} & \textbf{Description}
 \\  \hline
   Info & 50 byte UTF-8 String & Contains something like Badger VFS 2013 V1.0 
 \\ \hline
@@ -77,7 +77,7 @@ DirectoryBlockLink3 & 8 byte & Points to another DirectoryBlock which contains k
 
 \subsubsection*{Directory Entry Block}
 
-Represents a single directory.
+Represents a single directory or file.
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
@@ -89,12 +89,15 @@ Filename & 112 byte & UTF-8 Filename String
 
 \\  \hline
 
-DataBlockLocation & 8 byte & Pointer to a DataBlock located in the Data Section. This DataBlock holds some meta information about the current directory
+DataBlockLocation & 8 byte & Pointer to a DataBlock located in the Data Section.
+This DataBlock holds some meta information about the current directory
 
 
 \\  \hline
 
-DirectoryEntryTreeRoot & 8 bytes & Pointer to a DirectoryBlock located in the Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree containing all entries of that directory specified by the current Directory Entry Block.
+DirectoryEntryTreeRoot & 8 bytes & Pointer to a DirectoryBlock located in the
+Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree
+containing all entries of that directory specified by the current Directory Entry Block.
 \newline
 
 \textbf{This field containing a 0 indicates that this entry is a file not a directory}
@@ -145,7 +148,7 @@ Block layout \\
   \newline \textit{This field only exists if Header-Bit is set to 1}
 \\  \hline
 
-  DataLenght & 4 byte &
+  DataLength & 4 byte &
     Indicates the number of data saved on this DataBlock.
     
 \\  \hline
