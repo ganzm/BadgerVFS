@@ -30,7 +30,9 @@ public class FileDumpInputStream extends InputStream {
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
 		int numBytes = in.read(b, off, len);
-		dumpOut.write(b, off, numBytes);
+		if (numBytes > 0) {
+			dumpOut.write(b, off, numBytes);
+		}
 		return numBytes;
 	}
 
