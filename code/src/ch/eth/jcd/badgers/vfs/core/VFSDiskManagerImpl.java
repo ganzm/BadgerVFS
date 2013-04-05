@@ -256,15 +256,26 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public InputStream wrapInputStream(InputStream inputStream) {
 
+		InputStream result = inputStream;
 		String compressionAlgoName = config.getCompressionAlgorithm();
 
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
+		// try {
+		// result = new FileDumpInputStream(result, "c:\\temp\\", ".in1");
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// }
 
 		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
-			return new BadgersLZ77CompressionInputStream(inputStream);
+			result = new BadgersLZ77CompressionInputStream(result);
 		}
 
-		return inputStream;
+		// try {
+		// result = new FileDumpInputStream(result, "c:\\temp\\", ".in2");
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// }
+		return result;
 	}
 
 	/**
@@ -276,13 +287,25 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	public OutputStream wrapOutputStream(OutputStream outputStream) {
 		String compressionAlgoName = config.getCompressionAlgorithm();
 
+		OutputStream result = outputStream;
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
 
+		// try {
+		// result = new FileDumpOutputStream(result, "c:\\temp\\", ".out1");
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// }
 		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
-			return new BadgersLZ77CompressionOutputStream(outputStream);
+			result = new BadgersLZ77CompressionOutputStream(outputStream);
 		}
 
-		return outputStream;
+		// try {
+		// result = new FileDumpOutputStream(result, "c:\\temp\\", ".out2");
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// }
+
+		return result;
 	}
 
 	@Override
