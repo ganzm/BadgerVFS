@@ -5,6 +5,8 @@
  */
 package ch.eth.jcd.badgers.vfs.core;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,10 +81,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 			}
 
 			mgr.virtualDiskFile = new RandomAccessFile(file, "rw");
-
-			long headerSectionOffset = 0;
-
-			mgr.headerSectionHandler = HeaderSectionHandler.createNew(mgr.virtualDiskFile, config, headerSectionOffset);
+			mgr.headerSectionHandler = HeaderSectionHandler.createNew(mgr.virtualDiskFile, config);
 			long directorySectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
@@ -148,9 +147,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 			RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
 
-			long headerSectionOffset = 0;
-
-			mgr.headerSectionHandler = HeaderSectionHandler.createExisting(randomAccessFile, config, headerSectionOffset);
+			mgr.headerSectionHandler = HeaderSectionHandler.createExisting(randomAccessFile, config);
 			long directorySectionOffset = mgr.headerSectionHandler.getSectionSize();
 			long dataSectionOffset = mgr.headerSectionHandler.getDataSectionOffset();
 
@@ -260,21 +257,12 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		String compressionAlgoName = config.getCompressionAlgorithm();
 
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
-		// try {
-		// result = new FileDumpInputStream(result, "c:\\temp\\", ".in1");
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// }
 
-		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
+		if (compressionAlgoName != null && DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
+			result = new BufferedInputStream(result);
 			result = new BadgersLZ77CompressionInputStream(result);
 		}
 
-		// try {
-		// result = new FileDumpInputStream(result, "c:\\temp\\", ".in2");
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// }
 		return result;
 	}
 
@@ -286,24 +274,14 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public OutputStream wrapOutputStream(OutputStream outputStream) {
 		String compressionAlgoName = config.getCompressionAlgorithm();
-
-		OutputStream result = outputStream;
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
 
-		// try {
-		// result = new FileDumpOutputStream(result, "c:\\temp\\", ".out1");
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// }
-		if (compressionAlgoName != null && !"".equals(compressionAlgoName)) {
-			result = new BadgersLZ77CompressionOutputStream(outputStream);
-		}
+		OutputStream result = outputStream;
 
-		// try {
-		// result = new FileDumpOutputStream(result, "c:\\temp\\", ".out2");
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// }
+		if (compressionAlgoName != null && DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
+			result = new BufferedOutputStream(result);
+			result = new BadgersLZ77CompressionOutputStream(result);
+		}
 
 		return result;
 	}

@@ -6,6 +6,8 @@ package ch.eth.jcd.badgers.vfs.core.config;
  */
 public class DiskConfiguration {
 
+	public static final String COMPRESSION_LZ77 = "LZ77";
+
 	/**
 	 * Path where the virtual disk file is located on the host file system
 	 */
@@ -13,9 +15,9 @@ public class DiskConfiguration {
 
 	private String password;
 
-	private String encryptionAlgorithm;
+	private String encryptionAlgorithm = "";
 
-	private String compressionAlgorithm;
+	private String compressionAlgorithm = COMPRESSION_LZ77;
 
 	/**
 	 * the maximum size in bytes of the file we store our data on the host file system <br>

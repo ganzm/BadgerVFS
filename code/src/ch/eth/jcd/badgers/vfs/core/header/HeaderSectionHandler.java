@@ -34,8 +34,6 @@ public final class HeaderSectionHandler {
 
 	private long maximumSize;
 
-	private long headerSectionOffset;
-
 	private long headerSectionSize;
 
 	private String compressionString;
@@ -53,31 +51,32 @@ public final class HeaderSectionHandler {
 	private HeaderSectionHandler() {
 	}
 
-	public static HeaderSectionHandler createNew(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
+	public static HeaderSectionHandler createNew(RandomAccessFile virtualDiskFile, DiskConfiguration config) throws IOException {
 
 		LOGGER.debug("init Header Section...");
 
 		HeaderSectionHandler header = new HeaderSectionHandler();
-		header.headerSectionOffset = headerSectionOffset;
 
-		// go to start of the index section
-		virtualDiskFile.seek(header.headerSectionOffset);
+		// go to start of the header section
+		virtualDiskFile.seek(0);
 
+		// write Info String
 		header.infoString = defaultInfoString;
 		virtualDiskFile.write(Arrays.copyOf(header.infoString.getBytes(cs), INFO_FIELD_LENGTH));
 
+		// write Version String
 		header.versionString = defaultVersionString;
 		virtualDiskFile.write(Arrays.copyOf(header.versionString.getBytes(cs), VERSION_FIELD_LENGTH));
 
-		// maximum size
+		// Write maximum size of this virtual disk file
 		header.maximumSize = config.getMaximumSize();
 		virtualDiskFile.writeLong(header.maximumSize);
 
-		// TODO compression
-		virtualDiskFile.write(Arrays.copyOf("".getBytes(cs), COMPRESSION_FIELD_LENGTH));
+		// Write compression Algorithm used
+		virtualDiskFile.write(Arrays.copyOf(config.getCompressionAlgorithm().getBytes(cs), COMPRESSION_FIELD_LENGTH));
 
-		// TODO encryption
-		virtualDiskFile.write(Arrays.copyOf("".getBytes(cs), ENCRYPTION_FIELD_LENGTH));
+		// Write encryption Algorithm used
+		virtualDiskFile.write(Arrays.copyOf(config.getEncryptionAlgorithm().getBytes(cs), ENCRYPTION_FIELD_LENGTH));
 
 		long indexSectionOffsetIndicatorLocation = virtualDiskFile.getFilePointer();
 
@@ -99,7 +98,7 @@ public final class HeaderSectionHandler {
 		header.directorySectionOffset = virtualDiskFile.getFilePointer();
 
 		// now we are at the end of the directory section, remember this position
-		header.headerSectionSize = header.directorySectionOffset - header.headerSectionOffset;
+		header.headerSectionSize = header.directorySectionOffset;
 
 		virtualDiskFile.seek(indexSectionOffsetIndicatorLocation);
 
@@ -117,16 +116,15 @@ public final class HeaderSectionHandler {
 
 	}
 
-	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config, long headerSectionOffset) throws IOException {
+	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config) throws IOException {
 		LOGGER.debug("reading Header Section...");
 
 		HeaderSectionHandler header = new HeaderSectionHandler();
-		header.headerSectionOffset = headerSectionOffset;
 
 		Charset cs = Charset.forName("ASCII");
 
 		// go to start of the index section
-		virtualDiskFile.seek(header.headerSectionOffset);
+		virtualDiskFile.seek(0);
 
 		// Read Info String
 		byte[] infoBytes = new byte[INFO_FIELD_LENGTH];
@@ -145,17 +143,17 @@ public final class HeaderSectionHandler {
 		config.setMaximumSize(header.maximumSize);
 		LOGGER.debug("MaximumSize: " + header.maximumSize);
 
-		// TODO Read compression
+		// Read compression
 		byte[] compressionBytes = new byte[COMPRESSION_FIELD_LENGTH];
 		virtualDiskFile.read(compressionBytes);
-		header.compressionString = new String(compressionBytes, cs);
+		header.compressionString = new String(compressionBytes, cs).trim();
 		config.setCompressionAlgorithm(header.compressionString);
 		LOGGER.debug("Compression: " + header.compressionString);
 
-		// TODO Read encryption
+		// Read encryption
 		byte[] encryptionBytes = new byte[ENCRYPTION_FIELD_LENGTH];
 		virtualDiskFile.read(encryptionBytes);
-		header.encryptionString = new String(encryptionBytes, cs);
+		header.encryptionString = new String(encryptionBytes, cs).trim();
 		config.setEncryptionAlgorithm(header.encryptionString);
 		LOGGER.debug("Encryption: " + header.encryptionString);
 
