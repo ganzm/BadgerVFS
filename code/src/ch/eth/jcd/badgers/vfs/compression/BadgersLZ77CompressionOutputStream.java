@@ -36,7 +36,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 		while (forwardString.length() > 0) {
 			work();
 		}
-		super.flush();
+		out.flush();
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 		while (forwardString.length() > 0) {
 			work();
 		}
-		super.close();
+		out.close();
 	}
 
 	private void work() throws IOException {
