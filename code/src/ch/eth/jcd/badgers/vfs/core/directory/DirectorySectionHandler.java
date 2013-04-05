@@ -20,7 +20,7 @@ public final class DirectorySectionHandler {
 
 	private static Logger logger = Logger.getLogger(DirectorySectionHandler.class);
 
-	public static final long MAX_NUM_DIRECTORY_BLOCKS = 200;
+	public static final long MAX_NUM_DIRECTORY_BLOCKS = 10000;
 
 	/**
 	 * Default size of the directory section of our file system

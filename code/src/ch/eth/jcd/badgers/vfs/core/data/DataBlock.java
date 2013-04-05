@@ -17,7 +17,7 @@ public class DataBlock {
 	/**
 	 * Size of one DataBlock when serialized to disk
 	 */
-	public static final int BLOCK_SIZE = 512;
+	public static final int BLOCK_SIZE = 1024;
 
 	public static final int HEADER_SIZE = 21;
 

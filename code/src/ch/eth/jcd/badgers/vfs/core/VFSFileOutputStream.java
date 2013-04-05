@@ -39,7 +39,7 @@ public class VFSFileOutputStream extends OutputStream {
 			currentDataBlock = newBlock;
 			currentPosition = currentDataBlock.getUserDataLocation();
 
-			LOGGER.info("OutputStream[" + firstDataBlock.getLocation() + "] - allocated new Block at " + currentDataBlock.getLocation());
+			LOGGER.debug("OutputStream[" + firstDataBlock.getLocation() + "] - allocated new Block at " + currentDataBlock.getLocation());
 		}
 
 		dataSectionHandler.writeByte(currentPosition++, b);

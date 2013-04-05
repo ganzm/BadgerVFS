@@ -17,13 +17,13 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.mock.MockedVFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
@@ -33,8 +33,8 @@ public class VFSUIController {
 	 * needs to be set when using real implementation
 	 */
 
-	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
-	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
+	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
+	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 

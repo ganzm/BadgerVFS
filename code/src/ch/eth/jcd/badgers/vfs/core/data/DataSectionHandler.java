@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
-import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
  * $Id$
@@ -42,24 +42,39 @@ public final class DataSectionHandler {
 	 */
 	private final long maximumFileSize;
 
-	private static final long BLOCK_INCREMENT = 2;
+	private static final long BLOCK_INCREMENT = 100;
 
 	/**
 	 * Constructor
+	 * 
+	 * @throws IOException
 	 */
-	private DataSectionHandler(RandomAccessFile virtualDiskFile, long maximumFileSize) {
+	private DataSectionHandler(RandomAccessFile virtualDiskFile, long maximumFileSize, long dataSectionOffset, long dataSectionSize) {
 		this.virtualDiskFile = virtualDiskFile;
 		this.maximumFileSize = maximumFileSize;
+		this.dataSectionOffset = dataSectionOffset;
+		this.dataSectionSize = dataSectionSize;
+
+		if (dataSectionSize == 0) {
+			this.cache = new DataBlockCache();
+		} else {
+			this.cache = new DataBlockCache(dataSectionOffset, dataSectionOffset + dataSectionSize - DataBlock.BLOCK_SIZE);
+
+		}
 	}
 
 	public static DataSectionHandler createExisting(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) throws IOException {
 		LOGGER.debug("read Data Section...");
-		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize());
-
-		data.dataSectionOffset = dataSectionOffset;
 
 		// init size to 0 and don't allocate any space
-		data.dataSectionSize = randomAccessFile.length() - dataSectionOffset;
+		long dataSectionSize = randomAccessFile.length() - dataSectionOffset;
+
+		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize(), dataSectionOffset, dataSectionSize);
+
+		if (data.dataSectionSize % DataBlock.BLOCK_SIZE != 0) {
+			throw new VFSRuntimeException("Expected DataSection Size to be dividible by BlockSize " + DataBlock.BLOCK_SIZE + " DataSectionSize: "
+					+ data.dataSectionSize);
+		}
 
 		LOGGER.debug("read Data Section DONE");
 		return data;
@@ -67,12 +82,10 @@ public final class DataSectionHandler {
 
 	public static DataSectionHandler createNew(RandomAccessFile randomAccessFile, DiskConfiguration config, long dataSectionOffset) {
 		LOGGER.debug("create Data Section...");
-		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize());
-
-		data.dataSectionOffset = dataSectionOffset;
-
 		// init size to 0 and don't allocate any space
-		data.dataSectionSize = 0;
+		long dataSectionSize = 0;
+
+		DataSectionHandler data = new DataSectionHandler(randomAccessFile, config.getMaximumSize(), dataSectionOffset, dataSectionSize);
 
 		LOGGER.debug("create Data Section DONE");
 		return data;
@@ -90,6 +103,9 @@ public final class DataSectionHandler {
 		long freePosition = getNextFreeDataBlockPosition();
 		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
 		dataBlock.persist(virtualDiskFile);
+		// update cache
+		cache.markOccupied(freePosition);
+
 		return dataBlock;
 	}
 
@@ -97,6 +113,8 @@ public final class DataSectionHandler {
 		virtualDiskFile.seek(dataBlock.getLocation());
 		// just clear header byte
 		virtualDiskFile.write(0);
+		// update cache
+		cache.markFree(dataBlock.getLocation());
 	}
 
 	public DataBlock loadDataBlock(long location) throws VFSException {
@@ -117,55 +135,70 @@ public final class DataSectionHandler {
 		}
 	}
 
+	private DataBlockCache cache;
+
 	/**
-	 * TODO implement caching here
 	 * 
 	 * @return
 	 * @throws IOException
 	 */
 	private long getNextFreeDataBlockPosition() throws IOException {
+		DataBlockCacheEntry entry;
 
-		// go to start of DataSection
-		virtualDiskFile.seek(dataSectionOffset);
+		entry = cache.getNextFreeOrUnkownDataBlocks();
+		while (entry != null) {
+			// check cache
+			if (entry.getState() == DataBlockCacheEntryState.FREE) {
+				// lucky me - block is free
+				return entry.getFirstBlockLocation();
+			} else if (entry.getState() == DataBlockCacheEntryState.UNKNOWN) {
+				// cache does not know about the state of the block
+				// so go and have a look
+				for (long location = entry.getFirstBlockLocation(); location <= entry.getLastBlockLocation(); location += DataBlock.BLOCK_SIZE) {
+					virtualDiskFile.seek(location);
+					int byteAsInt = virtualDiskFile.read();
 
-		long currentLocation = dataSectionOffset;
+					if (byteAsInt >= 0) {
+						if ((byteAsInt & 1) == 0) {
+							// block free
+							LOGGER.debug("Found free DataBlock at " + location + " Block Nr " + (location - dataSectionOffset) / DataBlock.BLOCK_SIZE);
+							return location;
 
-		int byteAsInt = virtualDiskFile.read();
+						} else {
+							// found DataBlock Header Byte
+							// update cache so we dont have to check this block next time
+							cache.markOccupied(location);
+						}
+					}
+				}
+			} else if (entry.getState() == DataBlockCacheEntryState.OCCUPIED) {
 
-		while (byteAsInt >= 0) {
-			if ((byteAsInt & 1) == 0) {
-				// block free
-				LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + (currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE);
-				return currentLocation;
-			} // else: block already occupied
-
-			int skipedBytes = virtualDiskFile.skipBytes(DataBlock.BLOCK_SIZE - 1);
-			currentLocation = virtualDiskFile.getFilePointer();
-
-			if (skipedBytes != DataBlock.BLOCK_SIZE - 1) {
-				throw new VFSOutOfMemoryException("There is no more space left on the DataSection");
 			}
-
-			byteAsInt = virtualDiskFile.read();
+			entry = cache.getNextFreeOrUnkownDataBlocks();
 		}
 
-		// end of file and still no free DataBlock found
-		long currentFilePosition = virtualDiskFile.getFilePointer();
+		// all the available DataBlocks are occupied
+		// increase Disk
+
+		long endOfFilePos = virtualDiskFile.length();
 
 		long tmpBlockIncrement = BLOCK_INCREMENT;
 		if (maximumFileSize > 0) {
-			long maxAllowedNewBlocks = (maximumFileSize - currentFilePosition) / DataBlock.BLOCK_SIZE;
+			// there is a restriction about file size
+			long maxAllowedNewBlocks = (maximumFileSize - endOfFilePos) / DataBlock.BLOCK_SIZE;
 			tmpBlockIncrement = Math.min(maxAllowedNewBlocks, tmpBlockIncrement);
 		}
 
-		long newLength = currentFilePosition + tmpBlockIncrement * DataBlock.BLOCK_SIZE;
+		long newLength = endOfFilePos + tmpBlockIncrement * DataBlock.BLOCK_SIZE;
 		virtualDiskFile.setLength(newLength);
+
+		cache.addFreeBlocks(endOfFilePos, endOfFilePos + (DataBlock.BLOCK_SIZE * (tmpBlockIncrement - 1)));
+
 		dataSectionSize = newLength - dataSectionOffset;
 		LOGGER.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());
 
-		LOGGER.debug("Found free DataBlock at " + currentLocation + " Block Nr " + (currentLocation - dataSectionOffset) / DataBlock.BLOCK_SIZE);
-		return currentFilePosition;
-
+		LOGGER.debug("Found free DataBlock at " + endOfFilePos + " Block Nr " + (endOfFilePos - dataSectionOffset) / DataBlock.BLOCK_SIZE);
+		return endOfFilePos;
 	}
 
 	public void close() {
@@ -203,6 +236,12 @@ public final class DataSectionHandler {
 		dataBlock.persist(virtualDiskFile);
 	}
 
+	/**
+	 * Return the number of DataBlocks this virtual disk can hold at max
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	public long getMaximumPossibleDataBlocks() throws IOException {
 		long canGrow;
 		if (maximumFileSize > 0) {
