@@ -29,26 +29,14 @@ public class VFSFileInputStream extends InputStream {
 
 	@Override
 	public int read() throws IOException {
-		try {
-			long bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
 
-			while (bytesLeftOnThisBlock <= 0) {
-				long nextBlockLocation = currentDataBlock.getNextDataBlock();
-
-				if (nextBlockLocation == 0) {
-					// no more DataBlocks
-					// EOF
-					return -1;
-				} else {
-					bytesLeftOnThisBlock = skipBlock(nextBlockLocation);
-				}
-
-			}
-
-			return dataSectionHandler.readByte(currentPosition++);
-		} catch (VFSException ex) {
-			throw new IOException(ex);
+		byte[] buffer = new byte[1];
+		int numBytes = read(buffer, 0, 1);
+		if (numBytes < 0) {
+			return numBytes;
 		}
+
+		return buffer[0];
 	}
 
 	@Override
