@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -213,7 +213,7 @@ public class MockedVFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException {
+	public void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException {
 		if (!this.isDirectory()) {
 			throw new VFSException("this is not a directory, search not allowed");
 		}
@@ -230,9 +230,9 @@ public class MockedVFSEntryImpl implements VFSEntry {
 
 		private final PathMatcher matcher;
 		private int numMatches = 0;
-		private final FindInFolderObserver observer;
+		private final FindInFolderCallback observer;
 
-		FinderVisitor(String pattern, FindInFolderObserver observer) {
+		FinderVisitor(String pattern, FindInFolderCallback observer) {
 			matcher = FileSystems.getDefault().getPathMatcher("glob:*" + pattern + "*");
 			this.observer = observer;
 		}
@@ -240,8 +240,8 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		// Compares the glob pattern against
 		// the file or directory name.
 		private void find(Path file) {
-			Path name = file.getFileName();
-			if (name != null && matcher.matches(name) && !name.getFileName().equals(fileEntry.getFileName())) {
+			Path name = file;
+			if (name != null && matcher.matches(name.getFileName()) && !name.getFileName().equals(fileEntry.getFileName())) {
 				numMatches++;
 				LOGGER.debug("Found: " + file);
 				VFSEntry entry = new MockedVFSEntryImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
@@ -253,6 +253,9 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		// method on each file.
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+			if (observer.stopSearch(null)) {
+				return FileVisitResult.TERMINATE;
+			}
 			find(file);
 			return FileVisitResult.CONTINUE;
 		}
@@ -261,12 +264,18 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		// method on each directory.
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+			if (observer.stopSearch(null)) {
+				return FileVisitResult.TERMINATE;
+			}
 			find(dir);
 			return FileVisitResult.CONTINUE;
 		}
 
 		@Override
 		public FileVisitResult visitFileFailed(Path file, IOException exc) {
+			if (observer.stopSearch(null)) {
+				return FileVisitResult.TERMINATE;
+			}
 			LOGGER.error("visitFileFailed", exc);
 			return FileVisitResult.CONTINUE;
 		}

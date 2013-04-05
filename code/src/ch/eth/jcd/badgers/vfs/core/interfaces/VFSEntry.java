@@ -118,6 +118,6 @@ public interface VFSEntry {
 	 * @param fileName
 	 * @param observer
 	 */
-	void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException;
+	void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException;
 
 }

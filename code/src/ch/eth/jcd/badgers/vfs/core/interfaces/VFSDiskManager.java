@@ -59,11 +59,11 @@ public interface VFSDiskManager {
 	 * 
 	 * Whenever a file is found the observer callback is called. Further search is blocked by the call to the observer
 	 * 
-	 * @see VFSEntry#findInFolder(String, FindInFolderObserver)
+	 * @see VFSEntry#findInFolder(String, FindInFolderCallback)
 	 * 
 	 * @param fileName
 	 * @param observer
 	 */
-	void find(String fileName, FindInFolderObserver observer) throws VFSException;
+	void find(String fileName, FindInFolderCallback observer) throws VFSException;
 
 }

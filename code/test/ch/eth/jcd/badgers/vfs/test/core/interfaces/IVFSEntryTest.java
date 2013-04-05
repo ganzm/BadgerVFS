@@ -14,7 +14,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -22,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -33,8 +36,6 @@ public abstract class IVFSEntryTest {
 	private static final Logger LOGGER = Logger.getLogger(IVFSEntryTest.class);
 
 	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
-
-	public abstract FindInFolderObserver getFindInFolderObserver() throws VFSException;
 
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
@@ -145,7 +146,9 @@ public abstract class IVFSEntryTest {
 		entry.renameTo(fileNameAfter);
 
 		assertFalse("Expected file beforeRename.txt not exists anymore", newFile.exists());
-		assertTrue("Expected file afterRename.txt exists", entry.getPath().exists());
+
+		VFSPath afterRenamePath = rootEntry.getChildPath(fileNameAfter);
+		assertTrue("Expected file afterRename.txt exists", afterRenamePath.exists());
 
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
@@ -355,10 +358,26 @@ public abstract class IVFSEntryTest {
 	@Test
 	public void testFindInDirectory() throws VFSException {
 		String dir1 = "FindDir";
+		String notFindDir2 = "notFindDir2";
 		String dir2 = "SubFindDir";
+		String dir3 = "SubNotFDir";
 		String file1 = "FindFile1.txt";
+		String file2 = "NoAvailFile1.txt";
+
+		final List<VFSPath> results = new LinkedList<>();
+		Set<String> expectedFileNames = new HashSet<>();
+		expectedFileNames.add("SubFindDir");
+		expectedFileNames.add("FindFile1.txt");
+		Set<String> expectedAbsoluteFilePaths = new HashSet<>();
+		expectedAbsoluteFilePaths.add("/FindDir/SubFindDir");
+		expectedAbsoluteFilePaths.add("/FindDir/SubNotFDir/FindFile1.txt");
 
 		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSPath notFindDir2Path = rootEntry.getChildPath(notFindDir2);
+		assertFalse("Expected directory notFindDir2 not exists", notFindDir2Path.exists());
+		VFSEntry notFindDir2Entry = notFindDir2Path.createDirectory();
+		assertTrue("Expected directory notFindDir2 exists", notFindDir2Path.exists());
+
 		VFSPath dir1Path = rootEntry.getChildPath(dir1);
 		assertFalse("Expected directory Dir1 not exists", dir1Path.exists());
 		VFSEntry dir1Entry = dir1Path.createDirectory();
@@ -369,7 +388,12 @@ public abstract class IVFSEntryTest {
 		VFSEntry dir2Entry = dir2Path.createDirectory();
 		assertTrue("Expected directory Dir2 exists", dir2Path.exists());
 
-		VFSPath file1Path = dir2Entry.getChildPath(file1);
+		VFSPath dir3Path = dir1Entry.getChildPath(dir3);
+		assertFalse("Expected directory Dir3 not exists", dir3Path.exists());
+		VFSEntry dir3Entry = dir3Path.createDirectory();
+		assertTrue("Expected directory Dir3 exists", dir3Path.exists());
+
+		VFSPath file1Path = dir3Entry.getChildPath(file1);
 		assertFalse("Expected file File1.txt not exists", file1Path.exists());
 		VFSEntry entry = file1Path.createFile();
 		assertTrue("Expected file File1.txt exists", file1Path.exists());
@@ -381,8 +405,39 @@ public abstract class IVFSEntryTest {
 			throw new VFSException(e);
 		}
 
-		dir1Entry.findInFolder("Find", getFindInFolderObserver());
+		VFSPath file2Path = dir2Entry.getChildPath(file2);
+		assertFalse("Expected file File2.txt not exists", file2Path.exists());
+		VFSEntry file2entry = file2Path.createFile();
+		assertTrue("Expected file File2.txt exists", file2Path.exists());
+		try (OutputStream out = file2entry.getOutputStream(0);
+				OutputStreamWriter writer = new OutputStreamWriter(out);
+				BufferedWriter br = new BufferedWriter(writer)) {
+			br.write("Test2\n");
+		} catch (IOException e) {
+			throw new VFSException(e);
+		}
+
+		dir1Entry.findInFolder("Find", new FindInFolderCallback() {
+
+			@Override
+			public boolean stopSearch(VFSPath currentDirectory) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public void foundEntry(VFSPath path) {
+				results.add(path);
+			}
+		});
+
+		assertTrue("Expected 2 files found", results.size() == 2);
+
+		assertTrue("Expected FileName(0) exists in founded items", expectedFileNames.contains(results.get(0).getName()));
+		assertTrue("Expected FileName(1) exists in founded items", expectedFileNames.contains(results.get(1).getName()));
+
+		assertTrue("Expected AbsoluteFilePaths(0) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(0).getAbsolutePath()));
+		assertTrue("Expected AbsoluteFilePaths(1) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(1).getAbsolutePath()));
 
 	}
-
 }

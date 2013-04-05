@@ -21,7 +21,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.header.HeaderSectionHandler;
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -286,7 +286,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public void find(String fileName, FindInFolderObserver observer) throws VFSException {
+	public void find(String fileName, FindInFolderCallback observer) throws VFSException {
 		getRoot().findInFolder(fileName, observer);
 	}
 

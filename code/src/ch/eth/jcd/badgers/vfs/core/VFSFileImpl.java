@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -108,7 +108,7 @@ public class VFSFileImpl extends VFSEntryImpl {
 	}
 
 	@Override
-	public void findInFolder(String fileName, FindInFolderObserver observer) throws VFSException {
+	public void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException {
 		throw new VFSException("find operation not supported for files");
 	}
 

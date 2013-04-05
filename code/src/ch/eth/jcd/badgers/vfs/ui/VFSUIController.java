@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -353,7 +353,7 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentManager.find(param[0], new FindInFolderObserver() {
+					currentManager.find(param[0], new FindInFolderCallback() {
 
 						@Override
 						public void foundEntry(VFSPath path) {

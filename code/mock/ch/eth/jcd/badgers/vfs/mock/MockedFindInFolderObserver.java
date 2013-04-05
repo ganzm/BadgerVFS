@@ -2,12 +2,13 @@ package ch.eth.jcd.badgers.vfs.mock;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderObserver;
+import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
-public class MockedFindInFolderObserver implements FindInFolderObserver {
+public class MockedFindInFolderObserver implements FindInFolderCallback {
 	private static final Logger LOGGER = Logger.getLogger(MockedFindInFolderObserver.class);
+	private final boolean stopSearch = false;
 
 	@Override
 	public void foundEntry(VFSPath path) {

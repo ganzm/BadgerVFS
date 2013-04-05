@@ -6,7 +6,7 @@ package ch.eth.jcd.badgers.vfs.core.interfaces;
  * 
  * 
  */
-public interface FindInFolderObserver {
+public interface FindInFolderCallback {
 
 	/**
 	 * This method is called from the VFSDiskManager whenever it finds a file
