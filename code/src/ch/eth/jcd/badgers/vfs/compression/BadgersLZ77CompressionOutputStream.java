@@ -2,15 +2,14 @@ package ch.eth.jcd.badgers.vfs.compression;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BadgersLZ77CompressionOutputStream extends OutputStream {
 
 	private final OutputStream out;
 	private final StringBuilder cachedString = new StringBuilder();
 	private final StringBuilder forwardString = new StringBuilder();
-	private final List<BadgersLZ77Tuple> encodedInput = new ArrayList<BadgersLZ77Tuple>();
+
+	private final byte[] writeByteBuffer = new byte[3];
 
 	public BadgersLZ77CompressionOutputStream(OutputStream out) {
 		this.out = out;
@@ -73,26 +72,25 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 
 			// offset to the match
 			int offset = cachedString.length() - currentMatchLocation - matchLength;
-			encodedInput.add(new BadgersLZ77Tuple(offset, matchLength, forwardString.substring(0, 1)));
-			// System.out.println(encodedInput.get(encodedInput.size() - 1));
-			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();
-			out.write(tmp[0]);
-			out.write(tmp[1]);
-			out.write(tmp[2]);
+			write(out, offset, matchLength, forwardString.substring(0, 1));
 
 		} else {
-			// match not founde -> create Tuple
-			encodedInput.add(new BadgersLZ77Tuple(0, 0, currentChar));
-			// System.out.println(encodedInput.get(encodedInput.size() - 1));
-			byte[] tmp = encodedInput.get(encodedInput.size() - 1).toByte();
-			out.write(tmp[0]);
-			out.write(tmp[1]);
-			out.write(tmp[2]);
+			// match not found -> create Tuple
+			write(out, 0, 0, currentChar);
 		}
 		cachedString.append(forwardString.substring(0, 1));
 		forwardString.deleteCharAt(0);
 		while (cachedString.length() > BadgersLZ77Tuple.WINDOW_LENGTH) {
 			cachedString.deleteCharAt(0);
 		}
+	}
+
+	private void write(OutputStream out, int matchLoc, int matchLength, String charFollowed) throws IOException {
+		int concat = (matchLoc << 4) | matchLength;
+		writeByteBuffer[0] = (byte) (concat >> 8);
+		writeByteBuffer[1] = (byte) concat;
+		writeByteBuffer[2] = (byte) (charFollowed.charAt(0));
+
+		out.write(writeByteBuffer, 0, 3);
 	}
 }
