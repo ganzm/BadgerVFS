@@ -2,6 +2,7 @@
 This section describes the main aspects of the VFS core library. It shows the
 implementation of the core interfaces and classes, explains the mock classes and
 tests and eventually describes the file format and its management classes.
+
 \subsubsection{Core Classes}\label{sec:coreClasses}
 Figure \ref{fig:core_classes} gives an overview of the main interfaces and
 classes that were implemented. The interfaces \textit{VFSDiskManager},
@@ -24,7 +25,9 @@ path does not imperatively need to exist.
 
 The intention of those interfaces is to hide the real implementation of the
 virtual file system from a client. With that in mind it should be simple to add
-a network layer upon the real implementation without changing client code. 
+a network layer upon the real implementation without changing client code. The
+classes \textit{VFSDiskManagerImpl, VFSEntryImpl (and its descendants) and
+VFSPathImpl} implement all the management for actually using the VFS on a virtual disk.
 
 \begin{figure}[h!]
 \centering
