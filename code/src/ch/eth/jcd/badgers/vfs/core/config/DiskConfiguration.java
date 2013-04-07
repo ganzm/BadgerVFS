@@ -7,6 +7,7 @@ package ch.eth.jcd.badgers.vfs.core.config;
 public class DiskConfiguration {
 
 	public static final String COMPRESSION_LZ77 = "LZ77";
+	public static final String COMPRESSION_RLE = "RLE";
 
 	/**
 	 * Path where the virtual disk file is located on the host file system

@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionInputStream;
 import ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionOutputStream;
+import ch.eth.jcd.badgers.vfs.compression.BadgersRLECompressionInputStream;
+import ch.eth.jcd.badgers.vfs.compression.BadgersRLECompressionOutputStream;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
@@ -261,6 +263,9 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedInputStream(result);
 			result = new BadgersLZ77CompressionInputStream(result);
+		} else if (DiskConfiguration.COMPRESSION_RLE.equals(compressionAlgoName)) {
+			result = new BufferedInputStream(result);
+			result = new BadgersRLECompressionInputStream(result);
 		}
 
 		return result;
@@ -281,6 +286,9 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedOutputStream(result);
 			result = new BadgersLZ77CompressionOutputStream(result);
+		} else if (DiskConfiguration.COMPRESSION_RLE.equals(compressionAlgoName)) {
+			result = new BufferedOutputStream(result);
+			result = new BadgersRLECompressionOutputStream(result);
 		}
 
 		return result;
