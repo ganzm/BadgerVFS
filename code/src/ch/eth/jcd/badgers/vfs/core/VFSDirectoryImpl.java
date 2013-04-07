@@ -214,7 +214,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		List<DirectoryEntryBlock> children = childTree.traverseTree(diskManager.getDirectorySectionHandler());
 		for (DirectoryEntryBlock child : children) {
 
-			if (child.getFileName().toLowerCase().startsWith(lowerFileName)) {
+			if (child.getFileName().toLowerCase().contains(lowerFileName)) {
 				// found it
 				LOGGER.debug("Found File " + child.getFileName() + " in Folder " + this.getPath().getAbsolutePath());
 

@@ -248,8 +248,7 @@ public abstract class IVFSEntryTest {
 		assertTrue("Expected directory MoveTo exists", moveToPath.exists());
 		assertTrue("Expected directory Move exists", moveToPath.getVFSEntry().getChildPath(moveFolder).exists());
 		assertTrue("Expected file move.txt exists", moveToPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
-		assertFalse("Expected directory MoveFrom not exists", moveFromEntry.getChildPath(moveFolder).exists());
-		assertFalse("Expected file move.txt not exists", moveFromPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).exists());
+		assertFalse("Expected directory MoveFrom not exists", rootEntry.getChildPath(moveFromFolder).exists());
 		entry = moveToPath.getVFSEntry().getChildPath(moveFolder).getVFSEntry().getChildPath(moveFile).getVFSEntry();
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
