@@ -9,6 +9,8 @@ public class DiskConfiguration {
 	public static final String COMPRESSION_LZ77 = "LZ77";
 	public static final String COMPRESSION_RLE = "RLE";
 
+	public static final String ENCRYPTION_CAESAR = "CAESAR";
+
 	/**
 	 * Path where the virtual disk file is located on the host file system
 	 */
@@ -16,7 +18,7 @@ public class DiskConfiguration {
 
 	private String password;
 
-	private String encryptionAlgorithm = "";
+	private String encryptionAlgorithm = ENCRYPTION_CAESAR;
 
 	private String compressionAlgorithm = COMPRESSION_LZ77;
 

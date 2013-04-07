@@ -29,6 +29,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.encryption.CaesarInputStream;
+import ch.eth.jcd.badgers.vfs.encryption.CaesarOutputStream;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -257,15 +259,20 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 		InputStream result = inputStream;
 		String compressionAlgoName = config.getCompressionAlgorithm();
+		String encryptionAlgoName = config.getEncryptionAlgorithm();
 
-		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
-
+		// Compression
 		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedInputStream(result);
 			result = new BadgersLZ77CompressionInputStream(result);
 		} else if (DiskConfiguration.COMPRESSION_RLE.equals(compressionAlgoName)) {
 			result = new BufferedInputStream(result);
 			result = new BadgersRLECompressionInputStream(result);
+		}
+
+		// Encryption
+		if (DiskConfiguration.ENCRYPTION_CAESAR.equals(encryptionAlgoName)) {
+			result = new CaesarInputStream(result, 3);
 		}
 
 		return result;
@@ -279,16 +286,22 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public OutputStream wrapOutputStream(OutputStream outputStream) {
 		String compressionAlgoName = config.getCompressionAlgorithm();
-		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
+		String encryptionAlgoName = config.getEncryptionAlgorithm();
 
 		OutputStream result = outputStream;
 
+		// Compression
 		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedOutputStream(result);
 			result = new BadgersLZ77CompressionOutputStream(result);
 		} else if (DiskConfiguration.COMPRESSION_RLE.equals(compressionAlgoName)) {
 			result = new BufferedOutputStream(result);
 			result = new BadgersRLECompressionOutputStream(result);
+		}
+
+		// Encryption
+		if (DiskConfiguration.ENCRYPTION_CAESAR.equals(encryptionAlgoName)) {
+			result = new CaesarOutputStream(result, 3);
 		}
 
 		return result;

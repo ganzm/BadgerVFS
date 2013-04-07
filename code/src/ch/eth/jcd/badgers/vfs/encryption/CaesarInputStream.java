@@ -31,4 +31,9 @@ public class CaesarInputStream extends InputStream {
 			return data;
 		}
 	}
+
+	@Override
+	public void close() throws IOException {
+		in.close();
+	}
 }
