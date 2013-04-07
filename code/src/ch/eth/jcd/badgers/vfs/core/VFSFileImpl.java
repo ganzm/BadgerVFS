@@ -75,10 +75,14 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 		try {
 
-			VFSEntry newFile = newLocation.createFile();
+			VFSFileImpl newFile = (VFSFileImpl) newLocation.createFile();
 
-			out = newFile.getOutputStream(WRITE_MODE_OVERRIDE);
-			in = getInputStream();
+			// since we do an file system internal copy we bypass the getOutputStream/getInputStream method to avoid compression/decompression
+			// encryption/decryption
+			// get outputstream of new file
+			out = new VFSFileOutputStream(diskManager.getDataSectionHandler(), newFile.firstDataBlock);
+			// get input stream of this file
+			in = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 
 			byte[] buffer = new byte[DataBlock.USERDATA_SIZE];
 
