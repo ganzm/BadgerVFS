@@ -1,3 +1,91 @@
 \subsection{Requirements}
-% TODO: Remove this text and replace it with actual content
-\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+Below one will find a list of the requirements implemented in this project.
+
+\subsubsection {disk management}
+\begin{itemize}
+  \item \emph{The virtual disk must be stored in a single file in the working
+  directory in the host file system.}
+  \item \emph{VFS must support the creation of a new disk with the specified
+  maximum size at the specifieed location in the host file system. }
+  \item \emph{VFS must support several virtual disks in the host file system.}
+  \item \emph{VFS must support disposing of the virtual disk.}
+  \item \emph{VFS must support querying of free/occupied space in the virtual
+  disk.}
+\end{itemize}  These requirements are met with the classes
+\begin{verbatim}
+ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl
+ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration
+\end{verbatim} allow creation/deletion and opening of the disk on the host
+file system. Clients of the library have to pass a \textit{DiskConfiguration}
+to the \textit{VFSDiskManagerImpl} when calling \textit{create} or
+\textit{open}
+\subsubsection{file management}
+\begin{itemize}
+  \item \emph{VFS must support creating/deleting/renaming directories and files.}
+  \item \emph{VFS must support navigation: listing of files and folders, and
+  going to a location expressed by a concrete path.}
+  \item \emph{VFS must support moving/copying directories and files, including
+  hierarchy.}
+  \item \emph{VFS must support importing files and directories from
+  the host file system.}
+  \item \emph{VFS must support exporting files and directories to the host file
+  system.}
+\end{itemize} These requirements are met with the classes
+\begin{verbatim}
+ch.eth.jcd.badgers.vfs.core.VFSEntryImpl
+ch.eth.jcd.badgers.vfs.core.VFSPathImpl
+ch.eth.jcd.badgers.vfs.core.VFSFileInputStream
+ch.eth.jcd.badgers.vfs.core.VFSFileOutputStream
+\end{verbatim}The \textit{VFSEntryImpl} allows
+copy, move (and rename), delete, listing of children and going to the parent
+(navigation). Together with the streams it also supports importing/exporting
+to any location clients of the vfs library wish to. The classes
+\begin{verbatim}
+ch.eth.jcd.badgers.vfs.ui.VFSConsole
+ch.eth.jcd.badgers.vfs.ui.VFSUIController
+\end{verbatim} demonstrate this by importing and exporting to the host file
+system.
+
+\subsubsection {bonus features}
+\begin{itemize}
+  \item \emph{Elastic disk: Virtual disk can dynamically grow or shrink,
+  depending on its occupied space.}
+\end{itemize}
+The implementation only allows growing if more files are imported. Shrinking is
+not supported.
+
+\begin{itemize}
+  \item \emph{Compression, if implemented with 3d party library.}
+  \item \emph{Compression, if implemented by hand (you can take a look at
+  the arithmetic compression)}
+\end{itemize}
+
+The classes
+\begin{verbatim}
+ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionInputStream
+ch.eth.jcd.badgers.vfs.compression.BadgersLZ77CompressionOutputStream
+ch.eth.jcd.badgers.vfs.compression.BadgersRLECompressionInputStream
+ch.eth.jcd.badgers.vfs.compression.BadgersRLECompressionOutputStream
+\end{verbatim}
+implement streams that can be wrapped around \textit{VFSFileInputStream} and
+\textit{VFSFileOutputStream}. The \textit{DiskConfiguration} allows
+to switch compression on and to declare which algorithm shall be chosen. This
+allows easy configuration of any 3d party compression streams (which was not
+chosen to implement, because of the implementation of our own compression
+algorithm).
+
+\begin{itemize}
+  \item \emph{Encryption, if implemented with 3d party library.}
+  \item \emph{Encryption, if implemented by hand.}
+\end{itemize}
+
+The classes
+\begin{verbatim}
+ch.eth.jcd.badgers.vfs.encryption.CaesarInputStream
+ch.eth.jcd.badgers.vfs.encryption.CaesarOutputStream
+\end{verbatim}
+show how encryption can be implemented in the library. It was chosen to
+implement encryption similar to compression with streams, which allows easy
+configuration via \textit{DiskConfiguration}. These streams are mainly for
+demonstration how encryption should work and shall not be used in high
+security environments :-)
