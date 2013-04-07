@@ -80,7 +80,7 @@ public abstract class IVFSDiskManagerTest {
 		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath notFindDir2Path = rootEntry.getChildPath(findDir2);
 		assertFalse("Expected directory notFindDir2 not exists", notFindDir2Path.exists());
-		VFSEntry notFindDir2Entry = notFindDir2Path.createDirectory();
+		notFindDir2Path.createDirectory();
 		assertTrue("Expected directory notFindDir2 exists", notFindDir2Path.exists());
 
 		VFSPath dir1Path = rootEntry.getChildPath(dir1);

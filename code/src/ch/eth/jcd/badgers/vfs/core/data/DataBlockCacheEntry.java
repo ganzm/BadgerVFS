@@ -5,14 +5,14 @@ public class DataBlockCacheEntry {
 	/**
 	 * Start address of the first block
 	 */
-	private long firstBlockLocation;
+	private final long firstBlockLocation;
 
 	/**
 	 * Start address of the last block
 	 */
 	private long lastBlockLocation;
 
-	private DataBlockCacheEntryState state;
+	private final DataBlockCacheEntryState state;
 
 	public DataBlockCacheEntry(long firstBlockLocation, long lastBlockLocation, DataBlockCacheEntryState state) {
 		this.firstBlockLocation = firstBlockLocation;
@@ -58,7 +58,7 @@ public class DataBlockCacheEntry {
 
 	@Override
 	public String toString() {
-		return firstBlockLocation + " to " + lastBlockLocation + " - " + +(((lastBlockLocation - firstBlockLocation) / DataBlock.BLOCK_SIZE) + 1) + " Blocks "
+		return firstBlockLocation + " to " + lastBlockLocation + " - " + +((lastBlockLocation - firstBlockLocation) / DataBlock.BLOCK_SIZE + 1) + " Blocks "
 				+ state;
 	}
 

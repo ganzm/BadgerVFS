@@ -24,7 +24,7 @@ public final class DataSectionHandler {
 	/**
 	 * offset in bytes where the first byte of the data section is located on the virtual disk
 	 */
-	private long dataSectionOffset;
+	private final long dataSectionOffset;
 
 	/**
 	 * Size in bytes of the data section, may grow or shrink over time
@@ -171,9 +171,10 @@ public final class DataSectionHandler {
 						}
 					}
 				}
-			} else if (entry.getState() == DataBlockCacheEntryState.OCCUPIED) {
-
 			}
+			// else if (entry.getState() == DataBlockCacheEntryState.OCCUPIED) {
+			//
+			// }
 			entry = cache.getNextFreeOrUnkownDataBlocks();
 		}
 
@@ -192,7 +193,7 @@ public final class DataSectionHandler {
 		long newLength = endOfFilePos + tmpBlockIncrement * DataBlock.BLOCK_SIZE;
 		virtualDiskFile.setLength(newLength);
 
-		cache.addFreeBlocks(endOfFilePos, endOfFilePos + (DataBlock.BLOCK_SIZE * (tmpBlockIncrement - 1)));
+		cache.addFreeBlocks(endOfFilePos, endOfFilePos + DataBlock.BLOCK_SIZE * (tmpBlockIncrement - 1));
 
 		dataSectionSize = newLength - dataSectionOffset;
 		LOGGER.info("Expanded VirtualDiskFile by " + tmpBlockIncrement + " DataBlocks to " + virtualDiskFile.length());

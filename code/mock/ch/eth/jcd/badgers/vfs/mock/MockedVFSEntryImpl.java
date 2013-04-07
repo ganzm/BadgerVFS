@@ -229,7 +229,6 @@ public class MockedVFSEntryImpl implements VFSEntry {
 	private class FinderVisitor extends SimpleFileVisitor<Path> {
 
 		private final PathMatcher matcher;
-		private int numMatches = 0;
 		private final FindInFolderCallback observer;
 
 		FinderVisitor(String pattern, FindInFolderCallback observer) {
@@ -242,7 +241,6 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		private void find(Path file) {
 			Path name = file;
 			if (name != null && matcher.matches(name.getFileName()) && !name.getFileName().equals(fileEntry.getFileName())) {
-				numMatches++;
 				LOGGER.debug("Found: " + file);
 				VFSPath vfsPath = new MockedVFSPathImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1).replace("\\", "/"), pathToRoot);
 				observer.foundEntry(vfsPath);

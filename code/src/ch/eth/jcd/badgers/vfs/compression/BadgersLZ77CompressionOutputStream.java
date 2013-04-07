@@ -9,8 +9,6 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 	private final StringBuilder cachedString = new StringBuilder();
 	private final StringBuilder forwardString = new StringBuilder();
 
-	private final byte[] writeByteBuffer = new byte[3];
-
 	public BadgersLZ77CompressionOutputStream(OutputStream out) {
 		this.out = out;
 	}
@@ -86,6 +84,8 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 	}
 
 	private void write(OutputStream out, int matchLoc, int matchLength, String charFollowed) throws IOException {
+		byte[] writeByteBuffer = new byte[3];
+
 		int concat = (matchLoc << 4) | matchLength;
 		writeByteBuffer[0] = (byte) (concat >> 8);
 		writeByteBuffer[1] = (byte) concat;

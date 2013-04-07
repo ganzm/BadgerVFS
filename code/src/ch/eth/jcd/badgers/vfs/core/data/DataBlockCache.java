@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 
 public class DataBlockCache {
 
-	private static Logger LOGGER = Logger.getLogger(DataBlockCache.class);
+	private static final Logger LOGGER = Logger.getLogger(DataBlockCache.class);
 
-	private List<DataBlockCacheEntry> cache = new ArrayList<>();
+	private final List<DataBlockCacheEntry> cache = new ArrayList<>();
 
 	public DataBlockCache() {
 
