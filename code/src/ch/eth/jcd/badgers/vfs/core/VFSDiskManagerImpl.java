@@ -32,6 +32,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.encryption.CaesarInputStream;
 import ch.eth.jcd.badgers.vfs.encryption.CaesarOutputStream;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
  * class VirtualDiskManager
@@ -124,10 +126,14 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
-		VFSPathImpl rootPath = new VFSPathImpl(this, VFSPathImpl.FILE_SEPARATOR);
-		VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath, rootDirectoryDataBlock, rootDirectoryBlock);
+		try {
+			VFSPathImpl rootPath = new VFSPathImpl(this, VFSPathImpl.FILE_SEPARATOR);
+			VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath, rootDirectoryDataBlock, rootDirectoryBlock);
 
-		this.root = rootDirectory;
+			this.root = rootDirectory;
+		} catch (VFSInvalidPathException e) {
+			throw new VFSRuntimeException("Internal Error while preparing Root Folder", e);
+		}
 	}
 
 	/**

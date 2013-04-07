@@ -14,7 +14,7 @@ public class VFSPathImpl implements VFSPath {
 	private final String pathString;
 	private final String[] pathParts;
 
-	protected VFSPathImpl(VFSDiskManagerImpl vfsDiskManagerImpl, String absolutePathString) {
+	protected VFSPathImpl(VFSDiskManagerImpl vfsDiskManagerImpl, String absolutePathString) throws VFSInvalidPathException {
 		this.diskMgr = vfsDiskManagerImpl;
 		this.pathString = absolutePathString;
 		this.pathParts = validateAndSplitAbsolutePath(absolutePathString);
@@ -27,8 +27,10 @@ public class VFSPathImpl implements VFSPath {
 	 * <li>cut away stuff like /./ and /../</li>
 	 * <li>check if path starts with /</li>
 	 * <ul>
+	 * 
+	 * @throws VFSInvalidPathException
 	 */
-	public static String[] validateAndSplitAbsolutePath(String pathString) {
+	public static String[] validateAndSplitAbsolutePath(String pathString) throws VFSInvalidPathException {
 		// TODO do stuff here
 
 		String tmpPathString = pathString.trim();
@@ -173,8 +175,9 @@ public class VFSPathImpl implements VFSPath {
 	 * 
 	 * @param newFileName
 	 * @return
+	 * @throws VFSInvalidPathException
 	 */
-	public VFSPathImpl renameTo(String newFileName) {
+	public VFSPathImpl renameTo(String newFileName) throws VFSInvalidPathException {
 		String newPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
 		return new VFSPathImpl(diskMgr, newPath);
 	}

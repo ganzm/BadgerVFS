@@ -1,6 +1,6 @@
 package ch.eth.jcd.badgers.vfs.exception;
 
-public class VFSDuplicatedEntryException extends VFSRuntimeException {
+public class VFSDuplicatedEntryException extends VFSException {
 
 	private static final long serialVersionUID = 8249215540814299841L;
 
@@ -12,7 +12,7 @@ public class VFSDuplicatedEntryException extends VFSRuntimeException {
 		super("");
 	}
 
-	public static void throwIf(boolean b) {
+	public static void throwIf(boolean b) throws VFSDuplicatedEntryException {
 		if (b) {
 			throw new VFSDuplicatedEntryException();
 		}

@@ -1,6 +1,6 @@
 package ch.eth.jcd.badgers.vfs.exception;
 
-public class VFSInvalidPathException extends VFSRuntimeException {
+public class VFSInvalidPathException extends VFSException {
 
 	private static final long serialVersionUID = 5036406436697127986L;
 

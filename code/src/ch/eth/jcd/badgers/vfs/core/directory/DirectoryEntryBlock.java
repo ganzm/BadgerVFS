@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
  * $Id$
@@ -45,12 +46,12 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	 */
 	private long directoryEntryNodeLocation;
 
-	public DirectoryEntryBlock(String fileName) {
+	public DirectoryEntryBlock(String fileName) throws VFSInvalidPathException {
 		this.fileName = fileName;
 		checkFileNameConstraints(fileName);
 	}
 
-	private void checkFileNameConstraints(String fileName) {
+	private void checkFileNameConstraints(String fileName) throws VFSInvalidPathException {
 		if (fileName.contains(VFSPath.FILE_SEPARATOR)) {
 			throw new VFSInvalidPathException(fileName + " is an invalid FileName");
 		}
@@ -101,22 +102,26 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 	}
 
 	public static DirectoryEntryBlock deserialize(ByteBuffer buf) {
-		long newDataBlockLocation = buf.getLong();
-		if (newDataBlockLocation == 0) {
-			return null;
+		try {
+			long newDataBlockLocation = buf.getLong();
+			if (newDataBlockLocation == 0) {
+				return null;
+			}
+
+			long newDirectoryEntryNodeLocation = buf.getLong();
+
+			byte[] fileNameBuffer = new byte[MAX_FILENAME_SIZE];
+			buf.get(fileNameBuffer);
+			String newFileName = new String(fileNameBuffer, CS).trim();
+
+			DirectoryEntryBlock newBlock = new DirectoryEntryBlock(newFileName);
+			newBlock.dataBlockLocation = newDataBlockLocation;
+			newBlock.directoryEntryNodeLocation = newDirectoryEntryNodeLocation;
+
+			return newBlock;
+		} catch (VFSInvalidPathException ex) {
+			throw new VFSRuntimeException("Error while deserializing DirectoryEntryBlock - it may be corrupt", ex);
 		}
-
-		long newDirectoryEntryNodeLocation = buf.getLong();
-
-		byte[] fileNameBuffer = new byte[MAX_FILENAME_SIZE];
-		buf.get(fileNameBuffer);
-		String newFileName = new String(fileNameBuffer, CS).trim();
-
-		DirectoryEntryBlock newBlock = new DirectoryEntryBlock(newFileName);
-		newBlock.dataBlockLocation = newDataBlockLocation;
-		newBlock.directoryEntryNodeLocation = newDirectoryEntryNodeLocation;
-
-		return newBlock;
 	}
 
 	public void dump(StringBuffer buf, int depth) {
