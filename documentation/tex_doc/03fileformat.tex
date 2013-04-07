@@ -36,9 +36,9 @@ following table:
  DataSectionOffset & long (8 byte) &  File offset where our data section starts
 \\ \hline
  SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
-   file
+   file. (Not implemented yet)
  \\ \hline
-  Password & xxx bytes  & CryptoHash (SHA-whatever) of Password+SaltString
+  Password & xxx bytes  & CryptoHash (SHA-whatever) of Password+SaltString  (Not implemented yet)
 \\ \hline
 
 \end{tabular}
@@ -47,7 +47,7 @@ following table:
 \subparagraph{Directory Section}
 The directory section describes which files and folders belong to which parent
 directory. This section has a fixed size and contains so called
-\textit{DirectoryBlocks} which also have a fixed size. This makes management an
+\textit{DirectoryBlocks} which also have a fixed size. This makes management and
 manipulation easy. To each directory belongs a B-Tree structure which lists all
 contained entries.
 
@@ -119,7 +119,7 @@ Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree
 containing all entries of that directory specified by the current Directory Entry Block.
 \newline
 
-\textbf{This field containing a 0 indicates that this entry is a file not a directory}
+\textbf{This field containing a 0 indicates that this entry represents a file not a directory}
 
 
 
@@ -129,8 +129,8 @@ containing all entries of that directory specified by the current Directory Entr
 
 
 \subparagraph{Data Section}
-The data section is split into blocks where each of them is X bytes long.
-Each block contains some amount of data and points to a subsequent block
+The data section is split into blocks where each of them is 1024 bytes long.
+Each block contains some amount of data and points to a subsequent block (Simple linked list).
 
 
 Block layout \\
