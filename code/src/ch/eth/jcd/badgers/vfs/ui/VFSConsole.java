@@ -96,7 +96,6 @@ public class VFSConsole {
 		String helpMessage = "usage:\n"
 				+ "management mode:\n"
 				+ "\tcreate [c:\\path\\to\\disk.bfs 1024]\t creates virtual disk with a maximum quota of 1024 megabytes on the host system. The file may grow up to 1024 megabytes.\n"
-				+ "\tdispose [c:\\path\\to\\disk.bfs]\t deletes the given virtual disk\n" 
 				+ "\topen [c:\\path\\to\\disk.bfs]\t opens filesystem mode for the given virtual disk\n"
 				+ "\texit\t exits the console program\n"
 				+ "filesystem mode:\n"
@@ -112,6 +111,7 @@ public class VFSConsole {
 				+ "\timport [ext_src] [dst]\t imports a ext src from the host system to dst\n"
 				+ "\texport [src] [ext_src]\t exports a src file to the host system ext dst\n"
 				+ "\tfind [searchString]\t lists all filesystem entries below the current entry containing searchString\n"
+				+ "\tdispose deletes the currently opened virtual disk\n" 
 				+ "\tclose\t\t\t closes the filesystem mode, from now on management mode commands can be executed\n";
 		writeLn(helpMessage);
 		/*

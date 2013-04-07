@@ -258,7 +258,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 		// TODO String encryptionAlgoName = config.getEncryptionAlgorithm();
 
-		if (compressionAlgoName != null && DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
+		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedInputStream(result);
 			result = new BadgersLZ77CompressionInputStream(result);
 		}
@@ -278,7 +278,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 		OutputStream result = outputStream;
 
-		if (compressionAlgoName != null && DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
+		if (DiskConfiguration.COMPRESSION_LZ77.equals(compressionAlgoName)) {
 			result = new BufferedOutputStream(result);
 			result = new BadgersLZ77CompressionOutputStream(result);
 		}
