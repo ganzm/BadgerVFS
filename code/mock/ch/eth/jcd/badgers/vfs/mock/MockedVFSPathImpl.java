@@ -19,19 +19,15 @@ public class MockedVFSPathImpl implements VFSPath {
 	@Override
 	public VFSEntry createDirectory() {
 		MockedVFSEntryImpl entry = new MockedVFSEntryImpl(path, pathToRoot);
-		if (entry.createDirectory()) {
-			return entry;
-		}
-		return null;
+		entry.createDirectory();
+		return entry;
 	}
 
 	@Override
 	public VFSEntry createFile() {
 		MockedVFSEntryImpl entry = new MockedVFSEntryImpl(path, pathToRoot);
-		if (entry.createFile()) {
-			return entry;
-		}
-		return null;
+		entry.createFile();
+		return entry;
 	}
 
 	@Override

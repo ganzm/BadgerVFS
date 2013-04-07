@@ -262,19 +262,7 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		// method on each directory.
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-			if (observer.stopSearch(null)) {
-				return FileVisitResult.TERMINATE;
-			}
 			find(dir);
-			return FileVisitResult.CONTINUE;
-		}
-
-		@Override
-		public FileVisitResult visitFileFailed(Path file, IOException exc) {
-			if (observer.stopSearch(null)) {
-				return FileVisitResult.TERMINATE;
-			}
-			LOGGER.error("visitFileFailed", exc);
 			return FileVisitResult.CONTINUE;
 		}
 	}

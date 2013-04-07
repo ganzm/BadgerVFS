@@ -92,4 +92,19 @@ public abstract class IVFSPathTest {
 		assertEquals("Expected name = \"newName\"", newName, newDirEntry.getPath().getName());
 	}
 
+	@Test
+	public void testGetParentPath() throws VFSException {
+		String childFromParent = "childFromParent";
+		String FileChildFromParent = "childFromParent.txt";
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		assertEquals("Expected parentPath = \"/\"", "/", rootEntry.getPath().getParentPath());
+		VFSPath newDirPath = rootEntry.getChildPath(childFromParent);
+		assertEquals("Expected name = \"/\"", "/", newDirPath.getParentPath());
+		VFSEntry newDirEntry = newDirPath.createDirectory();
+		assertEquals("Expected still name = \"/\"", "/", newDirEntry.getPath().getParentPath());
+		VFSPath childFromParentFilePath = newDirEntry.getChildPath(FileChildFromParent);
+		assertEquals("Expected name = \"childFromParent\"", "/childFromParent", childFromParentFilePath.getParentPath());
+
+	}
+
 }
