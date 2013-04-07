@@ -115,6 +115,11 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
+	public long getMaxSpace() {
+		return 0;
+	}
+
+	@Override
 	public VFSEntry getRoot() {
 		return new MockedVFSPathImpl("", config.getHostFilePath()).getVFSEntry();
 	}
@@ -134,4 +139,5 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	public void find(String fileName, FindInFolderCallback observer) throws VFSException {
 		getRoot().findInFolder(fileName, observer);
 	}
+
 }

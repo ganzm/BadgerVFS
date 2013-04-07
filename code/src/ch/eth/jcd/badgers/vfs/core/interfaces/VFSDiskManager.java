@@ -18,11 +18,19 @@ public interface VFSDiskManager {
 	void dispose() throws VFSException;
 
 	/**
-	 * Remaining disk space
+	 * Remaining disk space on the available for user data
 	 * 
 	 * @return
 	 */
 	long getFreeSpace() throws VFSException;
+
+	/**
+	 * Total disk space available for user data
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
+	long getMaxSpace() throws VFSException;
 
 	/** returns the root folder of our file system */
 	VFSEntry getRoot();
