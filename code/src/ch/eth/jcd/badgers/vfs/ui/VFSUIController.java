@@ -353,7 +353,7 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentManager.find(param[0], new FindInFolderCallback() {
+					currentDirectory.findInFolder(param[0], new FindInFolderCallback() {
 
 						@Override
 						public void foundEntry(VFSPath path) {
@@ -581,6 +581,28 @@ public class VFSUIController {
 		};
 	}
 
+	public Command getPWDCommand() {
+		return new Command() {
+
+			@Override
+			public void execute(String[] param) {
+				LOGGER.debug("pwd command entering");
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
+					return;
+				}
+				try {
+					console.writeLn(currentDirectory.getPath().getAbsolutePath());
+				} catch (VFSException e) {
+					LOGGER.error("Error while pwd", e);
+				}
+				LOGGER.debug("pwd command leaving");
+
+			}
+		};
+	}
+
 	public Command getRemoveCommand() {
 		return new Command() {
 
@@ -621,28 +643,6 @@ public class VFSUIController {
 				}
 
 				LOGGER.debug("remove command leaving");
-
-			}
-		};
-	}
-
-	public Command getPWDCommand() {
-		return new Command() {
-
-			@Override
-			public void execute(String[] param) {
-				LOGGER.debug("pwd command entering");
-				if (currentManager == null || currentDirectory == null) {
-					LOGGER.warn(NO_DISK_OPEN_ERROR);
-					console.writeLn(NO_DISK_OPEN_ERROR);
-					return;
-				}
-				try {
-					console.writeLn(currentDirectory.getPath().getAbsolutePath());
-				} catch (VFSException e) {
-					LOGGER.error("Error while pwd", e);
-				}
-				LOGGER.debug("pwd command leaving");
 
 			}
 		};
