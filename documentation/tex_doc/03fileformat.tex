@@ -50,7 +50,7 @@ cipher\footnote{http://en.wikipedia.org/wiki/Caesar\_cipher}. These classes are
 mainly to show how encrpytion in VFS core can be implemented and configured. To
 enable encryption in a new virtual disk one has to enable it in the
 \textit{DiskConfiguration} that is passed to the \textit{VFSDiskManagerImpl} at
-creation. Upon selecting the encryption algorithm the encryption stream will be
+creation. Upon selecting the encryption algorithm the encryption streams will be
 wrapped around the \textit{VFSFileInput- and VFSFileOutputStream}s.
 
 \subparagraph{compression}
@@ -76,12 +76,12 @@ encoding \cite{rle} and LZ77 \cite{lz77}.
 \end{itemize}
 
 
-
-
 \paragraph{The File Format}\label{sec:file_format}
 This section describes the binary file format used by the file system inside a
 virtual disk. The file is separated into three major parts. The header, index
-and the data section. Each of them is described below.
+and the data section. Each of them is described below. Figure
+\ref{fig:disk_overview} gives an overview, of how the sections are distributed
+in the virutal disks and what contents they have.
 
 \begin{figure}[h!]
 \centering
