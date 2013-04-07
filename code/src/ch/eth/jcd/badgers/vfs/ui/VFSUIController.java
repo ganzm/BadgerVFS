@@ -286,10 +286,10 @@ public class VFSUIController {
 			}
 
 			private String getCurrentVFSPathString() throws VFSException {
-				StringBuilder path= new StringBuilder(currentDirectory.getPath().getAbsolutePath());
+				StringBuilder path = new StringBuilder(currentDirectory.getPath().getAbsolutePath());
 				int tabsToAdd = (23 - path.length()) / 8 + 1;
 				for (int i = 0; i < tabsToAdd; i++) {
-					path.append( "\t");
+					path.append('\t');
 				}
 				return path.toString();
 			}
