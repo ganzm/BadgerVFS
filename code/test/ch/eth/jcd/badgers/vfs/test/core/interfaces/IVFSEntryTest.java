@@ -431,7 +431,7 @@ public abstract class IVFSEntryTest {
 			}
 		});
 
-		assertTrue("Expected 2 files found", results.size() == 2);
+		assertTrue("Expected 2 files found, but founded: " + results.size(), results.size() == 2);
 
 		assertTrue("Expected FileName(0) exists in founded items", expectedFileNames.contains(results.get(0).getName()));
 		assertTrue("Expected FileName(1) exists in founded items", expectedFileNames.contains(results.get(1).getName()));

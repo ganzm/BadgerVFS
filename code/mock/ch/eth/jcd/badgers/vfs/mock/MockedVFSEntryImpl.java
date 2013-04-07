@@ -244,8 +244,8 @@ public class MockedVFSEntryImpl implements VFSEntry {
 			if (name != null && matcher.matches(name.getFileName()) && !name.getFileName().equals(fileEntry.getFileName())) {
 				numMatches++;
 				LOGGER.debug("Found: " + file);
-				VFSEntry entry = new MockedVFSEntryImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot);
-				observer.foundEntry(entry.getPath());
+				VFSPath vfsPath = new MockedVFSPathImpl(name.toAbsolutePath().toString().substring(pathToRoot.length() + 1).replace("\\", "/"), pathToRoot);
+				observer.foundEntry(vfsPath);
 			}
 		}
 

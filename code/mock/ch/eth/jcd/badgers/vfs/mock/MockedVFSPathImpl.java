@@ -1,6 +1,5 @@
 package ch.eth.jcd.badgers.vfs.mock;
 
-import java.io.File;
 import java.nio.file.Files;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
@@ -54,7 +53,7 @@ public class MockedVFSPathImpl implements VFSPath {
 	@Override
 	public String getName() throws VFSException {
 		String pathString = getAbsolutePath();
-		return pathString.substring(pathString.lastIndexOf(File.separatorChar) + 1);
+		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR) + 1);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedFindInFolderObserver implements FindInFolderCallback {
 	private static final Logger LOGGER = Logger.getLogger(MockedFindInFolderObserver.class);
-	private final boolean stopSearch = false;
 
 	@Override
 	public void foundEntry(VFSPath path) {
