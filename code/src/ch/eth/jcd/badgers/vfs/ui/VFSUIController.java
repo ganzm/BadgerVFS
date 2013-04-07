@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 
@@ -256,6 +257,72 @@ public class VFSUIController {
 				console.setPromptString(">");
 				LOGGER.debug("dispose command leaving");
 
+			}
+		};
+	}
+
+	public Command getDFCommand() {
+		return new Command() {
+
+			@Override
+			public void execute(String[] param) {
+				LOGGER.debug("df command entered");
+				if (currentManager == null || currentDirectory == null) {
+					LOGGER.warn(NO_DISK_OPEN_ERROR);
+					console.writeLn(NO_DISK_OPEN_ERROR);
+					return;
+				}
+				try {
+					console.writeLn("VirtualFileSystem\tSize \tUsed \tAvail \tUse% \tMounted on");
+					long freeSpace = currentManager.getFreeSpace();
+					long maxSpace = currentManager.getDiskConfiguration().getMaximumSize();
+					console.writeLn(getCurrentVFSPathString() + getFormattedSize(maxSpace) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
+							+ getFormattedSize(freeSpace) + "\t" + (int) ((maxSpace - freeSpace) * 100) / maxSpace + "%\t"
+							+ currentManager.getDiskConfiguration().getHostFilePath());
+				} catch (VFSException e) {
+					LOGGER.error("Error while listing files", e);
+				}
+				LOGGER.debug("df command leaving");
+			}
+
+			private String getCurrentVFSPathString() throws VFSException {
+				String path = currentDirectory.getPath().getAbsolutePath();
+				int tabsToAdd = (23 - path.length()) / 8 + 1;
+				for (int i = 0; i < tabsToAdd; i++) {
+					path += "\t";
+				}
+				return path;
+			}
+
+			private String getFormattedSize(long size) throws VFSException {
+				double tmpSize = size;
+				int unit = 0;
+				while (tmpSize > 1024) {
+					tmpSize = tmpSize / 1024;
+					unit++;
+				}
+				DecimalFormat df = new DecimalFormat("####.#");
+
+				return df.format(tmpSize) + getUnit(unit);
+			}
+
+			private String getUnit(int unit) {
+				switch (unit) {
+				case 0:
+					return "B";
+				case 1:
+					return "K";
+				case 2:
+					return "M";
+				case 3:
+					return "G";
+				case 4:
+					return "T";
+				case 5:
+					return "P";
+				default:
+					return "XL";
+				}
 			}
 		};
 	}

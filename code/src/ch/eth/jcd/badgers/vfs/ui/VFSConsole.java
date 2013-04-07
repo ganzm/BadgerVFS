@@ -41,6 +41,7 @@ public class VFSConsole {
 	private static final String OPEN_STRING = "open";
 	private static final String PWD_STRING = "pwd";
 	private static final String RM_STRING = "rm";
+	private static final String DF_STRING = "df";
 
 	/**
 	 * @param args
@@ -86,6 +87,7 @@ public class VFSConsole {
 		commands.put(EXPORT_STRING, controller.getExportCommand());
 		commands.put(CLOSE_STRING, controller.getCloseCommand());
 		commands.put(PWD_STRING, controller.getPWDCommand());
+		commands.put(DF_STRING, controller.getDFCommand());
 
 	}
 
