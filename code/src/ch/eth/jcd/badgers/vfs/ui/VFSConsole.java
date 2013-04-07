@@ -101,11 +101,11 @@ public class VFSConsole {
 				+ "\topen [c:\\path\\to\\disk.bfs]\t opens filesystem mode for the given virtual disk\n"
 				+ "\texit\t exits the console program\n"
 				+ "filesystem mode:\n"
-				+ "\tls lists current directory\n"
-				+ "\tpwd shows path to current directory\n"
-				+ "\tdf displays information about the usage of the current disk space"
+				+ "\tls\t\t\t lists current directory\n"
+				+ "\tpwd\t\t\t shows path to current directory\n"
+				+ "\tdf\t\t\t displays information about the usage of the current disk space\n"
 				+ "\tcd [dst]\t\t changes current directory to dst which must be either a child directory of the current path or “..”\n"
-				+ "\tfind [searchString]\t\t lists all files containing [searchString] in their file name"
+				+ "\tfind [searchString]\t lists all files containing [searchString] in their file name\n"
 				+ "\tmkdir [dirName]\t\t creates a new directory dirName in the current path\n"
 				+ "\tmkfile [fileName]\t creates a new empty file fileName in the current path - this is rather not usefull, as the “import” creates a file with content\n"
 				+ "\trm [file]\t\t deletes the entry denoted as file, it must be a child of the current path\n"
@@ -114,7 +114,7 @@ public class VFSConsole {
 				+ "\timport [ext_src] [dst]\t imports a ext src from the host system to dst\n"
 				+ "\texport [src] [ext_src]\t exports a src file to the host system ext dst\n"
 				+ "\tfind [searchString]\t lists all filesystem entries below the current entry containing searchString\n"
-				+ "\tdispose deletes the currently opened virtual disk\n" 
+				+ "\tdispose\t\t\t deletes the currently opened virtual disk\n" 
 				+ "\tclose\t\t\t closes the filesystem mode, from now on management mode commands can be executed\n";
 		writeLn(helpMessage);
 		/*
