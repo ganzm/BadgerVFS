@@ -1,7 +1,10 @@
-TODO
+-------------------------
+The documentation is found in
 
-- doku (Latex) setup
-- evaluation uml tool
+tex_doc\doc.pdf
+
+---------------------------
+
 
 
 
@@ -16,10 +19,10 @@ Project setup
 - Get project data from SVN Repository
 - Import code style formatter
    Windows / Preferences / Java / Codestyle / Formmater / Import
-- Eclipse Save-Action code formatting einricht
+- Eclipse Save-Action code formatting einrichten
 - Latex
--- TexLife Distribution
--- TexLibs Eclipse Plugin
+-- TeXlive 2012 Distribution
+-- TeXlipse Eclipse Plugin
 
 - ArgoUML (kann svg export)
 

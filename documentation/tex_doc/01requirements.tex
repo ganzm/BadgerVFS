@@ -6,7 +6,7 @@ Below one will find a list of the requirements implemented in this project.
   \item \emph{The virtual disk must be stored in a single file in the working
   directory in the host file system.}
   \item \emph{VFS must support the creation of a new disk with the specified
-  maximum size at the specifieed location in the host file system. }
+  maximum size at the specified location in the host file system. }
   \item \emph{VFS must support several virtual disks in the host file system.}
   \item \emph{VFS must support disposing of the virtual disk.}
   \item \emph{VFS must support querying of free/occupied space in the virtual
@@ -39,7 +39,7 @@ ch.eth.jcd.badgers.vfs.core.VFSFileOutputStream
 \end{verbatim}The \textit{VFSEntryImpl} allows
 copy, move (and rename), delete, listing of children and going to the parent
 (navigation). Together with the streams it also supports importing/exporting
-to any location clients of the vfs library wish to. The classes
+to any location clients of the VFS core library wish to. The classes
 \begin{verbatim}
 ch.eth.jcd.badgers.vfs.ui.VFSConsole
 ch.eth.jcd.badgers.vfs.ui.VFSUIController
@@ -70,12 +70,12 @@ ch.eth.jcd.badgers.vfs.compression.BadgersRLECompressionOutputStream
 implement streams that can be wrapped around \textit{VFSFileInputStream} and
 \textit{VFSFileOutputStream}. The \textit{DiskConfiguration} allows
 to switch compression on and to declare which algorithm shall be chosen. This
-allows easy configuration of any 3d party compression streams (which was not
+allows easy configuration of any 3rd party compression streams (which was not
 chosen to implement, because of the implementation of our own compression
 algorithm).
 
 \begin{itemize}
-  \item \emph{Encryption, if implemented with 3d party library.}
+  \item \emph{Encryption, if implemented with 3rd party library.}
   \item \emph{Encryption, if implemented by hand.}
 \end{itemize}
 

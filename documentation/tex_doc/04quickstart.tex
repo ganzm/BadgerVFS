@@ -13,9 +13,9 @@ plugin which pulls in all the required libraries.
 
 The command line client allows the usage of the VFS core and is mainly intended
 to test the basic functionalities. The console runs either in  management mode
-or in filesystem mode. The management mode is entered automatically when
+or in file system mode. The management mode is entered automatically when
 starting the command line client. It allows creating and opening virtual
-disks. The filesystem mode is entered as soon as a virtual disk is opened.
+disks. The file system mode is entered as soon as a virtual disk is opened.
 
 %\textbf{TODO: DISCUSSION: sollen ganze ordner importiert und exportiert werden
 %können? wird dies von der client-seite gehandelt?}
@@ -45,7 +45,7 @@ Following commands can be used with the command line client in management mode:
   \item {\textbf{exit}} exits the console program
 \end{itemize}
 
-follwing commands can be used in filesystem mode:
+following commands can be used in file system mode:
 
 \begin{itemize}
   \item {\textbf{ls}} lists the contents of the current directory
@@ -72,6 +72,6 @@ follwing commands can be used in filesystem mode:
   \item {\textbf{find searchString}} lists all filesystem entries below the
   current entry containing \textit{searchString}
   \item {\textbf{dispose}} deletes the currently opened virtual disk
-  \item {\textbf{close}} closes the filesystem mode, from now on management mode
+  \item {\textbf{close}} closes the file system mode, from now on management mode
   commands can be executed
 \end{itemize}
