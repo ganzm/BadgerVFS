@@ -38,8 +38,10 @@ Following commands can be used with the command line client in management mode:
 
 \begin{itemize}
   \item{\textbf{create c:\textbackslash path\textbackslash to\textbackslash
-  disk.bfs 1024}} creates virtual disk with a maximum quota of 1024 megabytes on the host system. The file may grow up to 1024 megabytes.
-  \textbf{TODO}: more parameters are needed (encryption, compression, password if there is encryption)
+  disk.bfs [size]}} creates virtual disk with a maximum quota of [size]
+  megabytes on the host system. The file may grow up to [size] megabytes. There
+  is curently no way to change encryption or compression by using the console
+  application. By default no encryption and the LZ77 compression will be used.
   \item {\textbf{open c:\textbackslash path\textbackslash to\textbackslash
   disk.bfs}} opens filesystem mode for the given virtual disk
   \item {\textbf{exit}} exits the console program
@@ -50,7 +52,7 @@ following commands can be used in file system mode:
 \begin{itemize}
   \item {\textbf{ls}} lists the contents of the current directory
   \item {\textbf{pwd}} shows the path to the current directory
-  \item {\textbf{df}} shows the usage of the current virtual disk
+  \item {\textbf{df}} shows the usage of the current virtual disk space
   \item {\textbf{cd dst}} changes current directory to \textit{dst} which must
   be either a child directory of the current path or ``..''
   \item {\textbf{find searchString}} lists absolute paths of all files
