@@ -40,6 +40,7 @@ public class VFSUIController {
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 
 	private static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
+	private static final char[] UNITS = { 'B', 'K', 'M', 'G', 'T', 'P' };
 
 	/**
 	 * Instantiates a VFSDiskManager Implementation. This is done via reflection, to easily switch between the mocked implementation and the final
@@ -303,27 +304,9 @@ public class VFSUIController {
 				}
 				DecimalFormat df = new DecimalFormat("####.#");
 
-				return df.format(tmpSize) + getUnit(unit);
+				return df.format(tmpSize) + (unit < UNITS.length ? UNITS[unit] : "XL");
 			}
 
-			private String getUnit(int unit) {
-				switch (unit) {
-				case 0:
-					return "B";
-				case 1:
-					return "K";
-				case 2:
-					return "M";
-				case 3:
-					return "G";
-				case 4:
-					return "T";
-				case 5:
-					return "P";
-				default:
-					return "XL";
-				}
-			}
 		};
 	}
 
