@@ -277,7 +277,7 @@ public class VFSUIController {
 					long freeSpace = currentManager.getFreeSpace();
 					long maxSpace = currentManager.getDiskConfiguration().getMaximumSize();
 					console.writeLn(getCurrentVFSPathString() + getFormattedSize(maxSpace) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
-							+ getFormattedSize(freeSpace) + "\t" + (int) ((maxSpace - freeSpace) * 100) / maxSpace + "%\t"
+							+ getFormattedSize(freeSpace) + "\t" + (int) (((maxSpace - freeSpace) * 100) / maxSpace) + "%\t"
 							+ currentManager.getDiskConfiguration().getHostFilePath());
 				} catch (VFSException e) {
 					LOGGER.error("Error while listing files", e);
@@ -286,12 +286,12 @@ public class VFSUIController {
 			}
 
 			private String getCurrentVFSPathString() throws VFSException {
-				String path = currentDirectory.getPath().getAbsolutePath();
+				StringBuilder path= new StringBuilder(currentDirectory.getPath().getAbsolutePath());
 				int tabsToAdd = (23 - path.length()) / 8 + 1;
 				for (int i = 0; i < tabsToAdd; i++) {
-					path += "\t";
+					path.append( "\t");
 				}
-				return path;
+				return path.toString();
 			}
 
 			private String getFormattedSize(long size) throws VFSException {
