@@ -21,6 +21,13 @@ filesystem.
 \item {\textit{VFSPath}} Represents a path on the file system to a given
 \textit{VFSEntry}. It has a slightly looser coupling to the file system as a
 path does not imperatively need to exist.
+\item {\textit{FindInFolderCallback}} The \textit{find} and
+\textit{findInFolder} methods on \textit{VFSDiskManager} and \textit{VFSEntry}
+require a callback object where the find mechanisms provided by the mock and the
+real implementations will notify the caller when a new entry is found. So a
+client can start the search asynchronously and can handle the notifications for
+example with updating lists. The console implementation simply lists the
+absolute paths to the found entries.
 \end{itemize}
 
 The intention of those interfaces is to hide the real implementation of the
@@ -42,8 +49,8 @@ the interfaces explained in \ref{sec:coreClasses} it was decided to implement a 
 that works against the host file system. The mock classes implement all
 the interfaces and were very helpful for acquiring a common understanding of how
 the interface shall be used by clients. In a further step it was very useful to have
-the mock classes while developing the console application which could be
-developed independently from the real implementation.
+the mock classes while developing the console application. Hence the console
+could be developed independently from the real implementation.
 \subsubsection{Test}
 During the development a bunch of test cases came to life. The tests solely
 depend on the interfaces and thus they can run against the mock classes and the
