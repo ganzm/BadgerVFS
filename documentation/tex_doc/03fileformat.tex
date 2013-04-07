@@ -1,15 +1,12 @@
-\subsection{The \emph{real} implemenation}
+\subsubsection{The \emph{real} implemenation}
 
-Eventually some code that handles a virtual disk was developed and is described
-in this section.
+Eventually some code was developed  that handles a virtual disk. This code and
+some details about the file format are described in this section.
 
-\subsubsection{The File Format}
-
-
+\paragraph{The File Format}
 This section describes the binary file format used by the file system inside a
-virtual disk.
-The file is separated into three major parts. The header, index and the data
-section. Each of them is described below.
+virtual disk. The file is separated into three major parts. The header, index
+and the data section. Each of them is described below.
 
 \begin{figure}[h!]
 \centering
@@ -18,7 +15,7 @@ section. Each of them is described below.
 \label{fig:disk_overview}
 \end{figure}
 
-\paragraph{Header Section} The header section contains some general information
+\subparagraph{Header Section} The header section contains some general information
 about the currently opened virtual disk. The details can be found in the
 following table:
 
@@ -34,8 +31,8 @@ following table:
 \\ \hline
   Encryption used & 20 byte UTF-8 String & null or indicates encryption used for this file
 \\ \hline
- DirectorySectionOffset & long (8 byte) &  File offset where our directory section
- starts \\ \hline
+ DirectorySectionOffset & long (8 byte) &  File offset where the directory
+ section starts \\ \hline
  DataSectionOffset & long (8 byte) &  File offset where our data section starts
 \\ \hline
  SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
@@ -47,48 +44,57 @@ following table:
 \end{tabular}
 
 
-\paragraph{Directory Section}
+\subparagraph{Directory Section}
+The directory section describes which files and folders belong to which parent
+directory. This section has a fixed size and contains so called
+\textit{DirectoryBlocks} which also have a fixed size. This makes management an
+manipulation easy. To each directory belongs a B-Tree structure which lists all
+contained entries.
 
-The directory section describes which files and folders belong to which parent directory. This section has a fixed size and contains so called DirectoryBlocks which also have a fixed size. This makes management an manipulation easy. To each directory belongs a B-Tree structure which lists all contained entries.
 
+\subparagraph*{DirectoryBlock}
 
-\subparagraph*{Directory Block}
-
-One Directory Block represents a Node in our B-Tree of order 2.
+One \textit{DirectoryBlock} represents a node in the B-Tree of order 2.
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
   \textbf{Name} & \textbf{Length} & \textbf{Description}
 \\  \hline
 
-DirectoryHeader & 1 byte & Header information. This header makes it easy to determine whether a DirecotryBlock is in used or not (memory management)
+DirectoryHeader & 1 byte & Header information. This header makes it easy to
+determine whether a \textit{DirectoryBlock} is in use or not (memory
+management)
 
 \\  \hline
 
-DirectoryEntryBlock1 & 128 byte & The smaller key inserted into our B-Tree
+DirectoryEntryBlock1 & 128 byte & The smaller key inserted into the
+B-Tree
 
 \\  \hline
 
-DirectoryEntryBlock2 & 128 byte & The bigger key inserted into our B-Tree
+DirectoryEntryBlock2 & 128 byte & The bigger key inserted into the B-Tree
 
 \\  \hline
 
-DirectoryBlockLink1 & 8 byte & Points to another DirectoryBlock which contains keys smaller than DirectoryEntryBlock1
+DirectoryBlockLink1 & 8 byte & Points to another DirectoryBlock which contains
+keys smaller than DirectoryEntryBlock1
 
 \\  \hline
 
-DirectoryBlockLink2 & 8 byte & Points to another DirectoryBlock which contains keys bigger than DirectoryEntryBlock1 but smaller than DirectoryEntryBlock2
+DirectoryBlockLink2 & 8 byte & Points to another DirectoryBlock which contains
+keys bigger than DirectoryEntryBlock1 but smaller than DirectoryEntryBlock2
 
 \\  \hline
 
-DirectoryBlockLink3 & 8 byte & Points to another DirectoryBlock which contains keys bigger than DirectoryEntryBlock2
+DirectoryBlockLink3 & 8 byte & Points to another DirectoryBlock which contains
+keys bigger than DirectoryEntryBlock2
 
 \\  \hline
 
 
 \end{tabular}
 
-\subparagraph*{Directory Entry Block}
+\subparagraph*{DirectoryEntryBlock}
 
 Represents a single directory or file.
 
@@ -122,7 +128,7 @@ containing all entries of that directory specified by the current Directory Entr
 \end{tabular}
 
 
-\paragraph{Data Section}
+\subparagraph{Data Section}
 The data section is split into blocks where each of them is X bytes long.
 Each block contains some amount of data and points to a subsequent block
 
@@ -154,7 +160,7 @@ Block layout \\
  
 \\  \hline
  NextDataBlock & 8 byte & 
- Points to the start address of the next Datablock (linked list).
+ Points to the start address of the next DataBlock (linked list).
     0 if this is the last DataBlock of a certain file or folder.
 \\  \hline
   CreationDate & 8 byte & UTC Time when this file was created
@@ -171,7 +177,7 @@ Block layout \\
 
 
 \paragraph{The root directory}
-
+\textbf{TODO: TEXT OR REMOVE}
 
 \subsubsection{compression layer}
 

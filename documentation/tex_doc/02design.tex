@@ -1,5 +1,8 @@
-
-\subsection{Core Classes}\label{sec:coreClasses}
+\subsection{Design}
+This section describes the main aspects of the VFS core library. It shows the
+implementation of the core interfaces and classes, explains the mock classes and
+tests and eventually describes the file format and its management classes.
+\subsubsection{Core Classes}\label{sec:coreClasses}
 Figure \ref{fig:core_classes} gives an overview of the main interfaces and
 classes that were implemented. The interfaces \textit{VFSDiskManager},
 \textit{VFSEntry} and \textit{VFSPath} can be used by clients using the library
@@ -30,7 +33,7 @@ a network layer upon the real implementation without changing client code.
 \label{fig:core_classes}
 \end{figure}
 
-\subsection{Mocking}
+\subsubsection{Mocking}
 For discussing the semantics of the virtual file system and the development of 
 the interfaces explained in \ref{sec:coreClasses} it was decided to implement a mock
 that works against the host file system. The mock classes implement all
@@ -38,7 +41,7 @@ the interfaces and were very helpful for acquiring a common understanding of how
 the interface shall be used by clients. In a further step it was very useful to have
 the mock classes while developing the console application which could be
 developed independently from the real implementation.
-\subsection{Test}
+\subsubsection{Test}
 During the development a bunch of test cases came to life. The tests solely
 depend on the interfaces and thus they can run against the mock classes and the
 real implementation. This was a huge help in finding bugs in the slightly more
