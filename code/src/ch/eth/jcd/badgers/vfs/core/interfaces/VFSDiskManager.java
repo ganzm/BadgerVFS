@@ -8,7 +8,7 @@ public interface VFSDiskManager {
 	/**
 	 * close this Manager and its corresponding virtual disk
 	 * 
-	 * releases any ressource associated with this Manager
+	 * releases any resource associated with this Manager
 	 */
 	void close() throws VFSException;
 
