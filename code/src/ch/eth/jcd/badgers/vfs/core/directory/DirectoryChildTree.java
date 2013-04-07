@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.core;
+package ch.eth.jcd.badgers.vfs.core.directory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,9 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
-import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
-import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
