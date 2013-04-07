@@ -25,6 +25,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
@@ -461,16 +463,30 @@ public class VFSUIController {
 					console.writeLn(warning);
 					return;
 				}
+
+				VFSPath path = null;
+				VFSEntry newFile = null;
 				try {
-					VFSEntry newFile = currentDirectory.getChildPath(param[1]).createFile();
+					path = currentDirectory.getChildPath(param[1]);
+					newFile = path.createFile();
 
 					FileInputStream fis = new FileInputStream(param[0]);
 					OutputStream os = newFile.getOutputStream(0);
 
 					ChannelUtil.fastStreamCopy(fis, os);
+				} catch (VFSOutOfMemoryException e) {
+					if (newFile != null) {
+						try {
+							LOGGER.debug("deleting partially created File at " + path.getAbsolutePath());
+							newFile.delete();
+						} catch (VFSException ex) {
+							throw new VFSRuntimeException("internal error while deleting partially created file");
+						}
+					}
 				} catch (IOException | VFSException e) {
 					LOGGER.error("Error while importing file: ", e);
 				}
+
 				LOGGER.debug("import command leaving");
 
 			}

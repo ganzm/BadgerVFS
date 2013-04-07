@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
+import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
@@ -166,7 +167,7 @@ public final class DataSectionHandler {
 
 						} else {
 							// found DataBlock Header Byte
-							// update cache so we dont have to check this block next time
+							// update cache so we don't have to check this block next time
 							cache.markOccupied(location);
 						}
 					}
@@ -188,6 +189,10 @@ public final class DataSectionHandler {
 			// there is a restriction about file size
 			long maxAllowedNewBlocks = (maximumFileSize - endOfFilePos) / DataBlock.BLOCK_SIZE;
 			tmpBlockIncrement = Math.min(maxAllowedNewBlocks, tmpBlockIncrement);
+		}
+
+		if (tmpBlockIncrement <= 0) {
+			throw new VFSOutOfMemoryException("Reached maximum file size of " + maximumFileSize + " bytes");
 		}
 
 		long newLength = endOfFilePos + tmpBlockIncrement * DataBlock.BLOCK_SIZE;
