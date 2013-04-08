@@ -12,16 +12,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -31,44 +29,11 @@ import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 public class VFSUIController {
 
 	private static final String NO_CORRECT_NUMBER_OF_PARAMS = "no correct number of parameters for %s command given: expected %s, got %s";
-	/**
-	 * needs to be set when using real implementation
-	 */
-
-	// public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = MockedVFSDiskManagerImpl.class;
-	public static final Class<? extends VFSDiskManager> DISKMANAGER_IMPLEMENTATION = VFSDiskManagerImpl.class;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 
 	private static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
 	private static final char[] UNITS = { 'B', 'K', 'M', 'G', 'T', 'P' };
-
-	/**
-	 * Instantiates a VFSDiskManager Implementation. This is done via reflection, to easily switch between the mocked implementation and the final
-	 * implementation.
-	 * 
-	 * @param methodName
-	 *            eather "create" or "open"
-	 * @param param
-	 * 
-	 * @return the created instance of VFSDiskManager
-	 * @throws VFSException
-	 */
-	private static VFSDiskManager getDiskManager(String methodName, String[] param) throws VFSException {
-		DiskConfiguration config = new DiskConfiguration();
-		config.setHostFilePath(param[0]);
-		if (param.length == 2) {
-			long maximumSizeInMb = Long.parseLong(param[1]);
-			config.setMaximumSize(maximumSizeInMb * 1024 * 1024);
-		}
-		try {
-			Method createMethod = DISKMANAGER_IMPLEMENTATION.getMethod(methodName, DiskConfiguration.class);
-			return (VFSDiskManager) createMethod.invoke(null, config);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			LOGGER.error("Error while instatiating VFSDiskManagerImplementation: ", e);
-		}
-		return null;
-	}
 
 	private final VFSConsole console;
 
@@ -225,7 +190,13 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentManager = getDiskManager("create", param);
+
+					DiskConfiguration config = new DiskConfiguration();
+					config.setHostFilePath(param[0]);
+					long maximumSizeInMb = Long.parseLong(param[1]);
+					config.setMaximumSize(maximumSizeInMb * 1024 * 1024);
+
+					currentManager = VFSDiskManagerFactory.getInstance().createDiskManager(config);
 					currentDirectory = currentManager.getRoot();
 					console.setPromptString(param[0] + ">");
 				} catch (VFSException e) {
@@ -634,7 +605,11 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					currentManager = getDiskManager("open", param);
+					// create configuration
+					DiskConfiguration config = new DiskConfiguration();
+					config.setHostFilePath(param[0]);
+
+					currentManager = VFSDiskManagerFactory.getInstance().openDiskManager(config);
 					currentDirectory = currentManager.getRoot();
 					console.setPromptString(param[0] + ">");
 				} catch (VFSException e) {

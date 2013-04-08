@@ -8,8 +8,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
+import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImplFactory;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnitTestUtils;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
@@ -28,7 +30,6 @@ public class BadgersVFSDiskManagerTest extends IVFSDiskManagerTest {
 	public static void afterClass() throws VFSException {
 		manager.dispose();
 		assertFalse("Expected File to be deleted", new File(manager.getDiskConfiguration().getHostFilePath()).exists());
-
 	}
 
 	@Override
@@ -42,14 +43,18 @@ public class BadgersVFSDiskManagerTest extends IVFSDiskManagerTest {
 
 	private static void initDiskManager() throws VFSException {
 		DiskConfiguration config = UnitTestUtils.getMockedConfig("BadgersVFSDiskManagerTest.bfs");
-
 		UnitTestUtils.deleteFileIfExist(config.getHostFilePath());
-
 		manager = VFSDiskManagerImpl.create(config);
 	}
 
 	@Override
-	public VFSDiskManager getVFSDiskManager() throws VFSException {
-		return manager;
+	public VFSDiskManagerFactory getVFSDiskManagerFactory() throws VFSException {
+		return new VFSDiskManagerImplFactory();
+	}
+
+	@Override
+	public DiskConfiguration getConfiguration() throws VFSException {
+		DiskConfiguration config = UnitTestUtils.getMockedConfig("BadgersVFSDiskManagerTest.bfs");
+		return config;
 	}
 }

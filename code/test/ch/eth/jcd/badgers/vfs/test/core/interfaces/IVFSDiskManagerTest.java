@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,56 +22,56 @@ import org.junit.Test;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public abstract class IVFSDiskManagerTest {
 
-	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
+	public abstract VFSDiskManagerFactory getVFSDiskManagerFactory() throws VFSException;
+
+	public abstract DiskConfiguration getConfiguration() throws VFSException;
 
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
+
+	protected VFSDiskManager diskManager;
 
 	@Before
 	public void beforeTest() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
-		Class<? extends VFSDiskManager> class1;
-		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-		DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
-		String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
-		setVFSDiskManager(null);
-		VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+
+		DiskConfiguration config = getConfiguration();
+		String filePath = config.getHostFilePath();
+		VFSDiskManagerFactory factory = getVFSDiskManagerFactory();
+		diskManager = factory.openDiskManager(config);
 		setVFSDiskManager(diskManager);
 		assertTrue("Expected File to exist", new File(filePath).exists());
 	}
 
 	@After
 	public void afterTest() throws VFSException {
-		getVFSDiskManager().close();
+		diskManager.close();
 	}
 
 	@Test
 	public void testCreateAndDispose() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
-		assertTrue("Expected File exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 
-		getVFSDiskManager().close();
+		diskManager.close();
 
-		assertTrue("Expected File still exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		assertTrue("Expected File still exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 
-		Class<? extends VFSDiskManager> class1;
-		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-		Method method = class1.getMethod("open", DiskConfiguration.class);
-		VFSDiskManager diskManager = (VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration());
-		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		diskManager = getVFSDiskManagerFactory().openDiskManager(getConfiguration());
+		assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
 		diskManager.close();
 	}
 
 	@Test
 	public void testGetRoot() throws VFSException {
-		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-		VFSEntry entry = getVFSDiskManager().getRoot();
+		assertTrue("Expected File to exist", new File(diskManager.getDiskConfiguration().getHostFilePath()).exists());
+		VFSEntry entry = diskManager.getRoot();
 		assertTrue("Expected Root Entry to exist", entry.getPath().exists());
 	}
 
@@ -97,7 +96,7 @@ public abstract class IVFSDiskManagerTest {
 		expectedAbsoluteFilePaths.add("/FindDir/SubFindDir");
 		expectedAbsoluteFilePaths.add("/FindDir/SubNotFDir/FindFile1.txt");
 
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath notFindDir2Path = rootEntry.getChildPath(findDir2);
 		assertFalse("Expected directory notFindDir2 not exists", notFindDir2Path.exists());
 		notFindDir2Path.createDirectory();
@@ -138,7 +137,7 @@ public abstract class IVFSDiskManagerTest {
 			br.write("Test2\n");
 		}
 
-		getVFSDiskManager().find("Find", new FindInFolderCallback() {
+		diskManager.find("Find", new FindInFolderCallback() {
 
 			@Override
 			public boolean stopSearch(VFSPath currentDirectory) {
@@ -164,7 +163,7 @@ public abstract class IVFSDiskManagerTest {
 		assertTrue("Expected AbsoluteFilePaths(2) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(2).getAbsolutePath()));
 		assertTrue("Expected AbsoluteFilePaths(3) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(3).getAbsolutePath()));
 
-		assertTrue("Expected free space > 0", getVFSDiskManager().getFreeSpace() > 0);
+		assertTrue("Expected free space > 0", diskManager.getFreeSpace() > 0);
 
 	}
 
@@ -173,7 +172,7 @@ public abstract class IVFSDiskManagerTest {
 		String createPathDir = "createPath";
 		String createPathFile = "createPath.txt";
 
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath createPathDirPath = rootEntry.getChildPath(createPathDir);
 		assertFalse("Expected directory IsDirectory not exists", createPathDirPath.exists());
@@ -181,7 +180,7 @@ public abstract class IVFSDiskManagerTest {
 		assertTrue("Expected directory IsDirectory exists", createPathDirPath.exists());
 		assertTrue("Expected isDirectory is true", createPathDirEntry.isDirectory());
 
-		VFSPath createPathFilePath = getVFSDiskManager().createPath("/" + createPathDir + "/" + createPathFile);
+		VFSPath createPathFilePath = diskManager.createPath("/" + createPathDir + "/" + createPathFile);
 		assertFalse("Expected file IsNotADirectory.txt not exists", createPathFilePath.exists());
 		createPathFilePath.createFile();
 		assertTrue("Expected file IsNotADirectory.txt exists", createPathFilePath.exists());
