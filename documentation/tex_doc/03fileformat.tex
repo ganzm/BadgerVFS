@@ -137,8 +137,7 @@ One \textit{DirectoryBlock} represents a node in the B-Tree of order 2.
 \\  \hline
 
 DirectoryHeader & 1 byte & Header information. This header makes it easy to
-determine whether a \textit{DirectoryBlock} is in use or not (memory
-management)
+determine whether a \textit{DirectoryBlock} is in use or not (a file delete operation only zeroes this DirecotryHeader byte)
 
 \\  \hline
 
