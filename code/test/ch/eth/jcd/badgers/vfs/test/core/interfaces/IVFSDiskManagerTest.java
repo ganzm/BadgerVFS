@@ -34,21 +34,17 @@ public abstract class IVFSDiskManagerTest {
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
 	@Before
-	public void beforeTest() throws VFSException {
+	public void beforeTest() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		Class<? extends VFSDiskManager> class1;
-		try {
-			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
-			String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
-			setVFSDiskManager(null);
-			VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
-			setVFSDiskManager(diskManager);
-			assertTrue("Expected File to exist", new File(filePath).exists());
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
-			throw new VFSException(e);
-		}
+		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+		DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
+		String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
+		setVFSDiskManager(null);
+		VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+		setVFSDiskManager(diskManager);
+		assertTrue("Expected File to exist", new File(filePath).exists());
 	}
 
 	@After
@@ -57,7 +53,8 @@ public abstract class IVFSDiskManagerTest {
 	}
 
 	@Test
-	public void testCreateAndDispose() throws VFSException {
+	public void testCreateAndDispose() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		assertTrue("Expected File exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 
 		getVFSDiskManager().close();
@@ -65,16 +62,11 @@ public abstract class IVFSDiskManagerTest {
 		assertTrue("Expected File still exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 
 		Class<? extends VFSDiskManager> class1;
-		try {
-			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-			Method method = class1.getMethod("open", DiskConfiguration.class);
-			VFSDiskManager diskManager = (VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration());
-			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-			diskManager.close();
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
-			throw new VFSException(e);
-		}
+		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+		Method method = class1.getMethod("open", DiskConfiguration.class);
+		VFSDiskManager diskManager = (VFSDiskManager) method.invoke(null, getVFSDiskManager().getDiskConfiguration());
+		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		diskManager.close();
 	}
 
 	@Test
@@ -85,7 +77,7 @@ public abstract class IVFSDiskManagerTest {
 	}
 
 	@Test
-	public void testFind() throws VFSException {
+	public void testFind() throws VFSException, IOException {
 		String dir1 = "FindDir";
 		String findDir2 = "FindDir2";
 		String dir2 = "SubFindDir";
@@ -134,8 +126,6 @@ public abstract class IVFSDiskManagerTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test\n");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 
 		VFSPath file2Path = dir2Entry.getChildPath(file2);
@@ -146,8 +136,6 @@ public abstract class IVFSDiskManagerTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test2\n");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 
 		getVFSDiskManager().find("Find", new FindInFolderCallback() {

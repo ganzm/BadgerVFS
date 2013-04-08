@@ -52,7 +52,7 @@ public class BadgersRLECompressionOutputStream extends OutputStream {
 			foundedDuplicates = -1;
 			duplicateFound = false;
 		}
-		super.flush();
+		out.flush();
 	}
 
 	@Override
@@ -62,6 +62,6 @@ public class BadgersRLECompressionOutputStream extends OutputStream {
 			foundedDuplicates = -1;
 			duplicateFound = false;
 		}
-		super.close();
+		out.close();
 	}
 }

@@ -25,18 +25,13 @@ public abstract class IVFSPathTest {
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
 	@Before
-	public void beforeTest() throws VFSException {
+	public void beforeTest() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		Class<? extends VFSDiskManager> class1;
-		try {
-			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
-			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
-			throw new VFSException(e);
-		}
-
+		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+		setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
+		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 	}
 
 	@After

@@ -40,21 +40,17 @@ public abstract class IVFSEntryTest {
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
 
 	@Before
-	public void beforeTest() throws VFSException {
+	public void beforeTest() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		Class<? extends VFSDiskManager> class1;
-		try {
-			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
-			String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
-			setVFSDiskManager(null);
-			VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
-			setVFSDiskManager(diskManager);
-			assertTrue("Expected File to exist", new File(filePath).exists());
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
-			throw new VFSException(e);
-		}
+		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+		DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
+		String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
+		setVFSDiskManager(null);
+		VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+		setVFSDiskManager(diskManager);
+		assertTrue("Expected File to exist", new File(filePath).exists());
 	}
 
 	@After
@@ -377,6 +373,7 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test\n");
+			br.flush();
 		}
 
 		VFSPath file2Path = dir2Entry.getChildPath(file2);
@@ -387,6 +384,7 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test2\n");
+			br.flush();
 		}
 
 		dir1Entry.findInFolder("Find", new FindInFolderCallback() {

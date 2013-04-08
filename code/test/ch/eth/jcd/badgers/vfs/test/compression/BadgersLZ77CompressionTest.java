@@ -32,6 +32,7 @@ public class BadgersLZ77CompressionTest {
 
 		BadgersLZ77CompressionOutputStream out = new BadgersLZ77CompressionOutputStream(outputStream);
 		out.write(rawData);
+		out.flush();
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
@@ -62,6 +63,7 @@ public class BadgersLZ77CompressionTest {
 
 		BadgersLZ77CompressionOutputStream out = new BadgersLZ77CompressionOutputStream(outputStream);
 		out.write(rawData);
+		out.flush();
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
@@ -91,6 +93,7 @@ public class BadgersLZ77CompressionTest {
 
 		BadgersLZ77CompressionOutputStream out = new BadgersLZ77CompressionOutputStream(outputStream);
 		out.write(stringDatas.getBytes());
+		out.flush();
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();

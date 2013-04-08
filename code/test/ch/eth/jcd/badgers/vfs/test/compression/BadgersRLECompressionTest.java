@@ -33,6 +33,7 @@ public class BadgersRLECompressionTest {
 
 		BadgersRLECompressionOutputStream out = new BadgersRLECompressionOutputStream(outputStream);
 		out.write(rawData);
+		out.flush();
 		out.close();
 
 		byte[] encrypted = outputStream.toByteArray();
@@ -53,10 +54,14 @@ public class BadgersRLECompressionTest {
 	@Test
 	public void testRandomInput() throws IOException {
 
-		byte[] rawData = new byte[2048];
-		byte[] rawDataCopy = new byte[2048];
-		new Random().nextBytes(rawData);
-
+		Random rnd = new Random();
+		byte[] rawData = new byte[rnd.nextInt(100000)];
+		// byte[] rawData = new byte[] { -1, -1, -2 };
+		byte[] rawDataCopy = new byte[rawData.length];// = new byte[2048];
+		rnd.nextBytes(rawData);
+		/*
+		 * byte[] rawData = new byte[2048]; byte[] rawDataCopy = new byte[2048]; new Random().nextBytes(rawData);
+		 */
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		BadgersRLECompressionOutputStream out = new BadgersRLECompressionOutputStream(outputStream);
@@ -82,7 +87,7 @@ public class BadgersRLECompressionTest {
 	public void testStringInput() throws IOException {
 
 		String stringDatas = "Miss Kalissippi from Mississippi is a " + "cowgirl who yells yippi when she rides her horse in "
-				+ "the horse show in Mississippi.";
+				+ "the horse show in Mississippiiiiiiii";
 		byte[] rawDataCopy = new byte[2048];
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
