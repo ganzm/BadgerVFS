@@ -16,7 +16,7 @@ import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
 
 public class BadgersVFSDiskManagerTest extends IVFSDiskManagerTest {
 
-	private static VFSDiskManagerImpl manager = null;
+	private static VFSDiskManager manager = null;
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
@@ -29,6 +29,15 @@ public class BadgersVFSDiskManagerTest extends IVFSDiskManagerTest {
 		manager.dispose();
 		assertFalse("Expected File to be deleted", new File(manager.getDiskConfiguration().getHostFilePath()).exists());
 
+	}
+
+	@Override
+	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
+		if (BadgersVFSDiskManagerTest.manager != null) {
+			BadgersVFSDiskManagerTest.manager.close();
+			BadgersVFSDiskManagerTest.manager = null;
+		}
+		BadgersVFSDiskManagerTest.manager = manager;
 	}
 
 	private static void initDiskManager() throws VFSException {

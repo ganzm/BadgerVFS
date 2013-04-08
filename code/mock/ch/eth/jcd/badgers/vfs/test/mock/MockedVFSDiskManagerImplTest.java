@@ -14,7 +14,7 @@ import ch.eth.jcd.badgers.vfs.test.testutil.UnitTestUtils;
 
 public class MockedVFSDiskManagerImplTest extends IVFSDiskManagerTest {
 
-	private static MockedVFSDiskManagerImpl manager = null;
+	private static VFSDiskManager manager = null;
 
 	@AfterClass
 	public static void afterClass() throws VFSException {
@@ -22,6 +22,11 @@ public class MockedVFSDiskManagerImplTest extends IVFSDiskManagerTest {
 		manager.dispose();
 		assertFalse("Expected File to be deleted", new File(manager.getDiskConfiguration().getHostFilePath()).exists());
 
+	}
+
+	@Override
+	public void setVFSDiskManager(VFSDiskManager manager) throws VFSException {
+		MockedVFSDiskManagerImplTest.manager = manager;
 	}
 
 	@Override

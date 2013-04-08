@@ -82,7 +82,7 @@ public abstract class IVFSEntryTest {
 	}
 
 	@Test
-	public void testGetOutputStreamTest() throws VFSException {
+	public void testGetOutputStreamTest() throws VFSException, IOException {
 		VFSEntry rootEntry = getVFSDiskManager().getRoot();
 		VFSPath newFile = rootEntry.getChildPath("newOutputStreamTest.txt");
 		assertFalse("Expected file newOutputStreamTest.txt not exists", newFile.exists());
@@ -92,14 +92,12 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("newOutputStreamTest String");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertTrue("Expected file newOutputStreamTest.txt still exists", newFile.exists());
 	}
 
 	@Test
-	public void testGetInputStreamTest() throws VFSException {
+	public void testGetInputStreamTest() throws VFSException, IOException {
 		String fileName = "newInputStreamTest.txt";
 		String fileContent = "newInputStreamTest String";
 		VFSEntry rootEntry = getVFSDiskManager().getRoot();
@@ -111,21 +109,17 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write(fileContent);
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertTrue("Expected file newInputStreamTest.txt still exists", newFile.exists());
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
 			readed = br.readLine();
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertEquals("Expected readed content in testGetInputStreamTest: " + fileContent, fileContent, readed);
 	}
 
 	@Test
-	public void testRenameTo() throws VFSException {
+	public void testRenameTo() throws VFSException, IOException {
 		String fileNameBefore = "beforeRename.txt";
 		String fileNameAfter = "afterRename.txt";
 		String fileContent = "Test String";
@@ -138,8 +132,6 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write(fileContent);
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertTrue("Expected file beforeRename.txt still exists", newFile.exists());
 
@@ -153,15 +145,13 @@ public abstract class IVFSEntryTest {
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
 			readed = br.readLine();
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertEquals("Expected readed content from testRenameTo: " + fileContent, fileContent, readed);
 
 	}
 
 	@Test
-	public void testCopyTo() throws VFSException {
+	public void testCopyTo() throws VFSException, IOException {
 		String copyFromFolder = "CopyFrom";
 		String copyToFolder = "CopyTo";
 		String copyFolder = "Copy";
@@ -189,8 +179,6 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write(fileContent);
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertTrue("Expected file copy.txt still exists", newFile.exists());
 
@@ -204,14 +192,12 @@ public abstract class IVFSEntryTest {
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
 			readed = br.readLine();
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 	}
 
 	@Test
-	public void testMoveTo() throws VFSException {
+	public void testMoveTo() throws VFSException, IOException {
 		String moveFromFolder = "MoveFrom";
 		String moveToFolder = "MoveTo";
 		String moveFolder = "Move";
@@ -237,10 +223,8 @@ public abstract class IVFSEntryTest {
 		assertTrue("Expected file move.txt exists", newFile.exists());
 		try (OutputStream out = entry.getOutputStream(0);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
-				BufferedWriter br = new BufferedWriter(writer)) {
+				BufferedWriter br = new BufferedWriter(writer);) {
 			br.write(fileContent);
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertTrue("Expected file move.txt exists", newFile.exists());
 
@@ -253,34 +237,29 @@ public abstract class IVFSEntryTest {
 		String readed = null;
 		try (InputStream in = entry.getInputStream(); InputStreamReader reader = new InputStreamReader(in); BufferedReader br = new BufferedReader(reader)) {
 			readed = br.readLine();
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 		assertEquals("Expected readed content: " + fileContent, fileContent, readed);
 	}
 
 	@Test
-	public void testGetChildren() throws VFSException {
+	public void testGetChildren() throws VFSException, IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
 		getVFSDiskManager().dispose();
 		Class<? extends VFSDiskManager> class1;
-		try {
-			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
 
-			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
-			Method methodCreate = class1.getMethod("create", DiskConfiguration.class);
-			VFSDiskManager createdDiskManager = (VFSDiskManager) methodCreate.invoke(null, config);
-			createdDiskManager.close();
+		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
 
-			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-			VFSDiskManager openedDiskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+		DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
+		Method methodCreate = class1.getMethod("create", DiskConfiguration.class);
+		VFSDiskManager createdDiskManager = (VFSDiskManager) methodCreate.invoke(null, config);
+		createdDiskManager.close();
 
-			setVFSDiskManager(openedDiskManager);
+		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+		VFSDiskManager openedDiskManager = (VFSDiskManager) methodOpen.invoke(null, config);
 
-			assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
-		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
-			throw new VFSException(e);
-		}
+		setVFSDiskManager(openedDiskManager);
+
+		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
 
 		String dir1 = "Dir1";
 		String dir2 = "Dir2";
@@ -305,12 +284,10 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test\n");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 
 		List<VFSEntry> childs = getVFSDiskManager().getRoot().getChildren();
-		assertTrue("Expected root has 3 children", childs.size() == 3);
+		assertEquals("Expected root has 3 children", childs.size(), 3);
 		for (VFSEntry child : childs) {
 			LOGGER.info(child);
 		}
@@ -355,7 +332,7 @@ public abstract class IVFSEntryTest {
 	}
 
 	@Test
-	public void testFindInDirectory() throws VFSException {
+	public void testFindInDirectory() throws VFSException, IOException {
 		String dir1 = "FindDir";
 		String notFindDir2 = "notFindDir2";
 		String dir2 = "SubFindDir";
@@ -400,8 +377,6 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test\n");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 
 		VFSPath file2Path = dir2Entry.getChildPath(file2);
@@ -412,8 +387,6 @@ public abstract class IVFSEntryTest {
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
 			br.write("Test2\n");
-		} catch (IOException e) {
-			throw new VFSException(e);
 		}
 
 		dir1Entry.findInFolder("Find", new FindInFolderCallback() {

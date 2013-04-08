@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.test.core.interfaces;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -15,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
@@ -27,6 +30,31 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 public abstract class IVFSDiskManagerTest {
 
 	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
+
+	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
+
+	@Before
+	public void beforeTest() throws VFSException {
+		Class<? extends VFSDiskManager> class1;
+		try {
+			class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
+			Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
+			DiskConfiguration config = getVFSDiskManager().getDiskConfiguration();
+			String filePath = getVFSDiskManager().getDiskConfiguration().getHostFilePath();
+			setVFSDiskManager(null);
+			VFSDiskManager diskManager = (VFSDiskManager) methodOpen.invoke(null, config);
+			setVFSDiskManager(diskManager);
+			assertTrue("Expected File to exist", new File(filePath).exists());
+		} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			throw new VFSException(e);
+		}
+	}
+
+	@After
+	public void afterTest() throws VFSException {
+		getVFSDiskManager().close();
+	}
 
 	@Test
 	public void testCreateAndDispose() throws VFSException {
@@ -136,7 +164,7 @@ public abstract class IVFSDiskManagerTest {
 			}
 		});
 
-		assertTrue("Expected 4 files found, but founded: " + results.size(), results.size() == 4);
+		assertEquals("Expected 4 files found, but founded: " + results.size(), 4, results.size());
 
 		assertTrue("Expected FileName(0) exists in founded items", expectedFileNames.contains(results.get(0).getName()));
 		assertTrue("Expected FileName(1) exists in founded items", expectedFileNames.contains(results.get(1).getName()));
@@ -147,6 +175,30 @@ public abstract class IVFSDiskManagerTest {
 		assertTrue("Expected AbsoluteFilePaths(1) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(1).getAbsolutePath()));
 		assertTrue("Expected AbsoluteFilePaths(2) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(2).getAbsolutePath()));
 		assertTrue("Expected AbsoluteFilePaths(3) exists in founded items", expectedAbsoluteFilePaths.contains(results.get(3).getAbsolutePath()));
+
+		assertTrue("Expected free space > 0", getVFSDiskManager().getFreeSpace() > 0);
+
+	}
+
+	@Test
+	public void testCreatePath() throws VFSException {
+		String createPathDir = "createPath";
+		String createPathFile = "createPath.txt";
+
+		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+
+		VFSPath createPathDirPath = rootEntry.getChildPath(createPathDir);
+		assertFalse("Expected directory IsDirectory not exists", createPathDirPath.exists());
+		VFSEntry createPathDirEntry = createPathDirPath.createDirectory();
+		assertTrue("Expected directory IsDirectory exists", createPathDirPath.exists());
+		assertTrue("Expected isDirectory is true", createPathDirEntry.isDirectory());
+
+		VFSPath createPathFilePath = getVFSDiskManager().createPath("/" + createPathDir + "/" + createPathFile);
+		assertFalse("Expected file IsNotADirectory.txt not exists", createPathFilePath.exists());
+		createPathFilePath.createFile();
+		assertTrue("Expected file IsNotADirectory.txt exists", createPathFilePath.exists());
+		assertEquals("Expected absolute path is /" + createPathDir + "/" + createPathFile, "/" + createPathDir + "/" + createPathFile,
+				createPathFilePath.getAbsolutePath());
 
 	}
 }

@@ -111,7 +111,7 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public long getFreeSpace() {
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -131,8 +131,7 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public VFSPath createPath(String path) throws VFSException {
-		// TODO Auto-generated method stub
-		return null;
+		return new MockedVFSPathImpl(path.replace(VFSPath.FILE_SEPARATOR.charAt(0), File.separatorChar).substring(1), config.getHostFilePath());
 	}
 
 	@Override
