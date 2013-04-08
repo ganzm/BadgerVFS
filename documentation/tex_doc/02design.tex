@@ -43,6 +43,14 @@ VFSPathImpl} implement all the management for actually using the VFS on a virtua
 \label{fig:core_classes}
 \end{figure}
 
+\subsubsection{Design on compression and encryption}
+
+Both compression and encryption is only applied to file content. 
+Neither file names nor folder structure is encrypted. 
+Encrypting the whole virtual disk would have greatly increased complexity of the virtual disk core.  
+Considering project deadlines it was decided to only compress and encrypt file content.
+
+
 \subsubsection{Mocking}
 For discussing the semantics of the virtual file system and the development of 
 the interfaces explained in \ref{sec:coreClasses} it was decided to implement a mock
