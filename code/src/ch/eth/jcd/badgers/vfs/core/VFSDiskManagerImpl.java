@@ -217,7 +217,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	public long getMaxSpace() throws VFSException {
 		LOGGER.info("Query max space");
 		try {
-			return dataSectionHandler.getMaximumPossibleDataBlocks();
+			return dataSectionHandler.getMaximumPossibleDataBlocks() * DataBlock.BLOCK_SIZE;
 		} catch (IOException ex) {
 			throw new VFSException("", ex);
 		}

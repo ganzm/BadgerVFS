@@ -277,7 +277,7 @@ public class VFSUIController {
 				try {
 					console.writeLn("VirtualFileSystem\tSize \tUsed \tAvail \tUse% \tMounted on");
 					long freeSpace = currentManager.getFreeSpace();
-					long maxSpace = currentManager.getDiskConfiguration().getMaximumSize();
+					long maxSpace = currentManager.getMaxSpace();
 					console.writeLn(getCurrentVFSPathString() + getFormattedSize(maxSpace) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
 							+ getFormattedSize(freeSpace) + "\t" + (int) (((maxSpace - freeSpace) * 100) / maxSpace) + "%\t"
 							+ currentManager.getDiskConfiguration().getHostFilePath());
