@@ -4,7 +4,7 @@
  * Group: Badgers
  * $Id$
  */
-package ch.eth.jcd.badgers.vfs.ui;
+package ch.eth.jcd.badgers.vfs.ui.shell;
 
 import java.io.BufferedReader;
 import java.io.IOException;
