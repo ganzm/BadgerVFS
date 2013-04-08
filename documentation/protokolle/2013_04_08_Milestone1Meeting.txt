@@ -1,0 +1,20 @@
+Meeting Milestone 1
+
+Pendenzen
+- 1. Version Dokumentation finalisieren (Philipp)
+- Abgabe (alles) (Philipp)
+- Weitere Arbeitspaketer identifizieren und zuweisen
+- UnitTest Coverage verbessern (low prio Thomas)
+ 
+ 
+ Milestone 2
+ --------------
+ - Swing GUI mit WindowBuilder
+ - GUI
+
+
+Known Bugs
+- create Disk wenn File schon existiert geht nöd
+- Compression ist langsam (cachedString.indexOf)
+- df berechnen disk size falsch. benutze VFSDiskManager.getMaxSpace() VFSDiskManager.getFreeSpace()
+- 
