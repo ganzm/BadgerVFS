@@ -18,8 +18,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
 /**
- * TODO describe class
- * 
+ * Main Class if you wan't to use the Badger File System TM with a command line client
  */
 public class VFSConsole {
 

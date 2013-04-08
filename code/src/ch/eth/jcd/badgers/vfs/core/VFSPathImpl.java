@@ -7,6 +7,16 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
+/**
+ * Represents an absolute path to a file or a directory
+ * 
+ * '/' acts as a directory separator char <br/>
+ * The root directory's path is '/'<br/>
+ * If a path points to a directory it may end with a '/' but doesn't have to<br/>
+ * If a path points to a file it should not end with a '/'
+ * 
+ * @see VFSPath#FILE_SEPARATOR
+ */
 public class VFSPathImpl implements VFSPath {
 
 	private final VFSDiskManagerImpl diskMgr;
@@ -82,17 +92,27 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public String getParentPath() throws VFSException {
-		String parentPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
-		if ("".equals(parentPath)) {
+		if (VFSPath.FILE_SEPARATOR.equals(pathString)) {
 			// found the root path
 			return VFSPath.FILE_SEPARATOR;
 		}
-		return parentPath;
+
+		if (pathParts.length <= 1) {
+			return VFSPath.FILE_SEPARATOR;
+		}
+
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < pathParts.length - 1; i++) {
+			buf.append(VFSPath.FILE_SEPARATOR);
+			buf.append(pathParts[i]);
+		}
+
+		return buf.toString();
 	}
 
 	@Override
 	public boolean exists() throws VFSException {
-		// we need to loop through the while directory tree to determine whether a path exists or not
+		// we need to loop through the whole directory tree to determine whether a path exists or not
 		VFSEntryImpl current = (VFSEntryImpl) diskMgr.getRoot();
 		for (String pathItem : pathParts) {
 			VFSEntryImpl child = current.getChildByName(pathItem);
@@ -167,7 +187,12 @@ public class VFSPathImpl implements VFSPath {
 
 	@Override
 	public String getName() throws VFSException {
-		return pathString.substring(pathString.lastIndexOf(VFSPath.FILE_SEPARATOR) + 1);
+		if (pathParts.length <= 0) {
+			// found the root path
+			return "";
+		}
+
+		return pathParts[pathParts.length - 1];
 	}
 
 	/**
@@ -178,7 +203,21 @@ public class VFSPathImpl implements VFSPath {
 	 * @throws VFSInvalidPathException
 	 */
 	public VFSPathImpl renameTo(String newFileName) throws VFSInvalidPathException {
-		String newPath = pathString.substring(0, pathString.lastIndexOf(VFSPath.FILE_SEPARATOR));
-		return new VFSPathImpl(diskMgr, newPath);
+
+		if (pathParts.length <= 0) {
+
+			return new VFSPathImpl(diskMgr, VFSPath.FILE_SEPARATOR + newFileName);
+		}
+
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < pathParts.length - 1; i++) {
+			buf.append(VFSPath.FILE_SEPARATOR);
+			buf.append(pathParts[i]);
+		}
+
+		buf.append(VFSPath.FILE_SEPARATOR);
+		buf.append(newFileName);
+
+		return new VFSPathImpl(diskMgr, buf.toString());
 	}
 }

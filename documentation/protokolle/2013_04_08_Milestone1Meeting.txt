@@ -8,49 +8,15 @@ Pendenzen
  - VFSDiskManager Factory erzeugen
  
  
- Ferienabwesenheit Thomas ab Freitag 12. April
+ Ferienabwesenheit Thomas ab Freitag 12. April bis ...
   
  
  Milestone 2
  --------------
  - Swing GUI mit WindowBuilder
- - GUI
 
 
 Known Bugs
 - create Disk wenn File schon existiert geht nöd
 - Compression ist langsam (cachedString.indexOf)
 - df berechnen disk size falsch. benutze VFSDiskManager.getMaxSpace() VFSDiskManager.getFreeSpace()
-
-
-- Philipps Create
-create /home/rop/testDisk.bfs 2048
-/home/rop/testDisk.bfs>
-/home/rop/testDisk.bfs>import /home/rop/backup.out import.txt
-/home/rop/testDisk.bfs>mkdir test
-/home/rop/testDisk.bfs>mv import.txt test
-/home/rop/testDisk.bfs>ls
-import.txt
-test
-/home/rop/testDisk.bfs>mv import.txt test/imported.txt
-/home/rop/testDisk.bfs>ls
-test
-/home/rop/testDisk.bfs>cd test
-/home/rop/testDisk.bfs>ls
-imported.txt
-/home/rop/testDisk.bfs>ls
-imported.txt
-/home/rop/testDisk.bfs>cd ..
-/home/rop/testDisk.bfs>ls
-test
-/home/rop/testDisk.bfs>mkdir test2
-/home/rop/testDisk.bfs>cp test test2/test3/
-
-Exception in thread "main" java.lang.NullPointerException
-	at ch.eth.jcd.badgers.vfs.core.VFSEntryImpl.insertEntryIntoParentFolder(VFSEntryImpl.java:110)
-	at ch.eth.jcd.badgers.vfs.core.VFSEntryImpl.createNewDirectory(VFSEntryImpl.java:54)
-	at ch.eth.jcd.badgers.vfs.core.VFSPathImpl.createDirectory(VFSPathImpl.java:61)
-	at ch.eth.jcd.badgers.vfs.core.VFSDirectoryImpl.copyTo(VFSDirectoryImpl.java:184)
-	at ch.eth.jcd.badgers.vfs.ui.VFSUIController$3.execute(VFSUIController.java:205)
-	at ch.eth.jcd.badgers.vfs.ui.VFSConsole.run(VFSConsole.java:156)
-	at ch.eth.jcd.badgers.vfs.ui.VFSConsole.main(VFSConsole.java:53)
