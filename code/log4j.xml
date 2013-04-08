@@ -10,7 +10,8 @@
 		</layout>
 	</appender>
 
-    <appender name="File" class="org.apache.log4j.FileAppender">
+    <appender name="File" class="org.apache.log4j.RollingFileAppender">
+        <param name="MaxFileSize" value="100KB" />
         <param name="File" value="./log/badger.log" />
         <param name="Append" value="true" />
         <layout class="org.apache.log4j.PatternLayout">
