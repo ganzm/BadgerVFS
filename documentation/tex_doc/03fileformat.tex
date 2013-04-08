@@ -40,7 +40,7 @@ the raw data bytes of files to the virtual disk.
 \subparagraph{core.directory}
 \textit{core.directory} contains the classes that manage the index of the file
 system. That means that the whole directory structure is maintained in here.
-This is done in a B-Tree that contains all references to directories and files
+This is done in a B-tree that contains all references to directories and files
 currently saved in the file system. More about the internals of directory
 section can be found in section \ref{sec:file_format}
 
@@ -81,7 +81,7 @@ This section describes the binary file format used by the file system inside a
 virtual disk. The file is separated into three major parts. The header, index
 and the data section. Each of them is described below. Figure
 \ref{fig:disk_overview} gives an overview, of how the sections are distributed
-in the virutal disks and what contents they have.
+in the virtual disk and what contents they have.
 
 \begin{figure}[h!]
 \centering
@@ -108,7 +108,7 @@ Encryption used & 20 byte UTF-8 String & null or indicates encryption used for t
 \\ \hline
 DirectorySectionOffset & long (8 byte) &  File offset where the directory
 section starts \\ \hline
-DataSectionOffset & long (8 byte) &  File offset where our data section starts
+DataSectionOffset & long (8 byte) &  File offset where the data section starts
 \\ \hline
  SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
    file. (Not implemented yet)
@@ -123,13 +123,13 @@ DataSectionOffset & long (8 byte) &  File offset where our data section starts
 The directory section describes which files and folders belong to which parent
 directory. This section has a fixed size and contains so called
 \textit{DirectoryBlocks} which also have a fixed size. This makes management and
-manipulation easy. To each directory belongs a B-Tree structure which lists all
+manipulation easy. To each directory belongs a B-tree structure which lists all
 contained entries.
 
 
 \subparagraph*{DirectoryBlock}
 
-One \textit{DirectoryBlock} represents a node in the B-Tree of order 2.
+One \textit{DirectoryBlock} represents a node in the B-tree of order 2.
 
 \begin{tabular}{|l|l|p{5cm}|}
 \hline
@@ -137,16 +137,17 @@ One \textit{DirectoryBlock} represents a node in the B-Tree of order 2.
 \\  \hline
 
 DirectoryHeader & 1 byte & Header information. This header makes it easy to
-determine whether a \textit{DirectoryBlock} is in use or not (a file delete operation only zeroes this DirecotryHeader byte)
+determine whether a \textit{DirectoryBlock} is in use or not (a file delete
+operation fills this DirectoryHeader byte with zeros)
 
 \\  \hline
 
 DirectoryEntryBlock1 & 128 byte & The smaller key inserted into the
-B-Tree
+B-tree
 
 \\  \hline
 
-DirectoryEntryBlock2 & 128 byte & The bigger key inserted into the B-Tree
+DirectoryEntryBlock2 & 128 byte & The bigger key inserted into the B-tree
 
 \\  \hline
 
@@ -189,8 +190,8 @@ This DataBlock holds some meta information about the current directory
 \\  \hline
 
 DirectoryEntryTreeRoot & 8 bytes & Pointer to a DirectoryBlock located in the
-Directory Section. This referenced DirectoryBlock is the Root Block of a B-Tree
-containing all entries of that directory specified by the current Directory Entry Block.
+Directory Section. This referenced DirectoryBlock is the root block of a B-tree
+containing all entries of that directory specified by the current DirectoryEntryBlock.
 \newline
 
 \textbf{This field containing a 0 indicates that this entry represents a file not a directory}
@@ -204,7 +205,7 @@ containing all entries of that directory specified by the current Directory Entr
 
 \subparagraph{Data Section}
 The data section is split into blocks where each of them is 1024 bytes long.
-Each block contains some amount of data and points to a subsequent block (Simple
+Each block contains some amount of data and points to a subsequent block (simple
 linked list).\newline\newline
 Block layout \\
 
@@ -236,7 +237,7 @@ NextDataBlock & 8 byte &
 Points to the start address of the next DataBlock (linked list).
 0 if this is the last DataBlock of a certain file or folder.
 \\  \hline
-CreationDate & 8 byte & UTC Time when this file was created
+CreationDate & 8 byte & UTC time when this file was created
 \newline \textit{This field only exists if Header-Bit is set to 1}
 \\  \hline
 
@@ -251,5 +252,6 @@ Data & n byte & user data (may be encrypted/compressed)
 
 \paragraph{The root directory}
 
-By definition the root directory's DataBlock and DIrectoryBlock are located at the very first position in their correspond sections.
+By definition the root directory's DataBlock and DirectoryBlock are located at
+the very first position in their correspond sections.
 

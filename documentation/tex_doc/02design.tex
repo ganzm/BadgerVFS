@@ -24,7 +24,7 @@ path does not imperatively need to exist.
 \item {\textit{FindInFolderCallback}} The \textit{find} and
 \textit{findInFolder} methods on \textit{VFSDiskManager} and \textit{VFSEntry}
 require a callback object where the find mechanisms provided by the mock and the
-real implementations will notify the caller when a new entry is found. So a
+real implementations will notify the caller when a new entry is found. A
 client can start the search asynchronously and can handle the notifications for
 example with updating lists. The console implementation simply lists the
 absolute paths to the found entries.
