@@ -26,7 +26,6 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
-import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
@@ -480,7 +479,7 @@ public class VFSUIController {
 							LOGGER.debug("deleting partially created File at " + path.getAbsolutePath());
 							newFile.delete();
 						} catch (VFSException ex) {
-							throw new VFSRuntimeException("internal error while deleting partially created file");
+							LOGGER.error("internal error while deleting partially created file", ex);
 						}
 					}
 				} catch (IOException | VFSException e) {
