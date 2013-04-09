@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import org.junit.After;
 import org.junit.Before;
@@ -14,34 +13,40 @@ import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public abstract class IVFSPathTest {
 
-	public abstract VFSDiskManager getVFSDiskManager() throws VFSException;
+	public abstract VFSDiskManagerFactory getVFSDiskManagerFactory() throws VFSException;
+
+	public abstract DiskConfiguration getConfiguration() throws VFSException;
 
 	public abstract void setVFSDiskManager(VFSDiskManager manager) throws VFSException;
+
+	protected VFSDiskManager diskManager;
 
 	@Before
 	public void beforeTest() throws VFSException, ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException {
-		Class<? extends VFSDiskManager> class1;
-		class1 = Class.forName(getVFSDiskManager().getClass().getName()).asSubclass(VFSDiskManager.class);
-		Method methodOpen = class1.getMethod("open", DiskConfiguration.class);
-		setVFSDiskManager((VFSDiskManager) methodOpen.invoke(null, getVFSDiskManager().getDiskConfiguration()));
-		assertTrue("Expected File to exist", new File(getVFSDiskManager().getDiskConfiguration().getHostFilePath()).exists());
+		DiskConfiguration config = getConfiguration();
+		String filePath = config.getHostFilePath();
+		VFSDiskManagerFactory factory = getVFSDiskManagerFactory();
+		diskManager = factory.openDiskManager(config);
+		setVFSDiskManager(diskManager);
+		assertTrue("Expected File to exist", new File(filePath).exists());
 	}
 
 	@After
 	public void afterTest() throws VFSException {
-		getVFSDiskManager().close();
+		diskManager.close();
 	}
 
 	@Test
 	public void testCreateDirectory() throws VFSException {
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath testDir = rootEntry.getChildPath("dirTest");
 		assertFalse("Expected directory not exists", testDir.exists());
 		testDir.createDirectory();
@@ -50,7 +55,7 @@ public abstract class IVFSPathTest {
 
 	@Test
 	public void testCreateFile() throws VFSException {
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 
 		VFSPath newFile = rootEntry.getChildPath("newFile.txt");
 		assertFalse("Expected file not exists", newFile.exists());
@@ -60,7 +65,7 @@ public abstract class IVFSPathTest {
 
 	@Test
 	public void testExists() throws VFSException {
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newFile = rootEntry.getChildPath("newExists.txt");
 		assertFalse("Expected file not exists", newFile.exists());
 		VFSEntry entry = newFile.createFile();
@@ -70,7 +75,7 @@ public abstract class IVFSPathTest {
 
 	@Test
 	public void testGetPathString() throws VFSException {
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		VFSPath newDir = rootEntry.getChildPath("newDir");
 		String newDirPath = newDir.getAbsolutePath();
 		assertEquals("Expected path = /newDir", "/newDir", newDirPath);
@@ -79,7 +84,7 @@ public abstract class IVFSPathTest {
 	@Test
 	public void testGetName() throws VFSException {
 		String newName = "newName";
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		assertEquals("Expected name = \"\"", "", rootEntry.getPath().getName());
 		VFSPath newDirPath = rootEntry.getChildPath(newName);
 		assertEquals("Expected name = \"newName\"", newName, newDirPath.getName());
@@ -91,7 +96,7 @@ public abstract class IVFSPathTest {
 	public void testGetParentPath() throws VFSException {
 		String childFromParent = "childFromParent";
 		String fileChildFromParent = "childFromParent.txt";
-		VFSEntry rootEntry = getVFSDiskManager().getRoot();
+		VFSEntry rootEntry = diskManager.getRoot();
 		assertEquals("Expected parentPath = \"/\"", "/", rootEntry.getPath().getParentPath());
 		VFSPath newDirPath = rootEntry.getChildPath(childFromParent);
 		assertEquals("Expected name = \"/\"", "/", newDirPath.getParentPath());

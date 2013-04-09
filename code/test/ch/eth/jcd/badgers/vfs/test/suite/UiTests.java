@@ -4,8 +4,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import ch.eth.jcd.badgers.vfs.test.ui.shell.VFSConsoleTest;
+
 @RunWith(Suite.class)
-@SuiteClasses({ CoreTests.class, EncryptionTests.class, CompressionTests.class, UiTests.class })
-public class AllTests {
+@SuiteClasses({ VFSConsoleTest.class })
+public class UiTests {
 
 }

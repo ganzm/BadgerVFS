@@ -8,8 +8,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
+import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImplFactory;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnitTestUtils;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
@@ -21,15 +23,17 @@ public class BadgersVFSEntryTest extends IVFSEntryTest {
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
 		UnittestLogger.init();
-
-		DiskConfiguration config = UnitTestUtils.getMockedConfig("VFSPathTestMockedRoot");
-		UnitTestUtils.deleteFileIfExist(config.getHostFilePath());
-		manager = VFSDiskManagerImpl.create(config);
+		initDiskManager();
 	}
 
 	@Override
-	public VFSDiskManager getVFSDiskManager() throws VFSException {
-		return manager;
+	public VFSDiskManagerFactory getVFSDiskManagerFactory() throws VFSException {
+		return new VFSDiskManagerImplFactory();
+	}
+
+	@Override
+	public DiskConfiguration getConfiguration() throws VFSException {
+		return UnitTestUtils.getMockedConfig("BadgersVFSEntryTest.bfs");
 	}
 
 	@Override
@@ -39,6 +43,12 @@ public class BadgersVFSEntryTest extends IVFSEntryTest {
 			BadgersVFSEntryTest.manager = null;
 		}
 		BadgersVFSEntryTest.manager = manager;
+	}
+
+	private static void initDiskManager() throws VFSException {
+		DiskConfiguration config = UnitTestUtils.getMockedConfig("BadgersVFSEntryTest.bfs");
+		UnitTestUtils.deleteFileIfExist(config.getHostFilePath());
+		manager = VFSDiskManagerImpl.create(config);
 	}
 
 	@AfterClass

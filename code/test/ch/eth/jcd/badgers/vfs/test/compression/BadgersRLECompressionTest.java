@@ -55,7 +55,7 @@ public class BadgersRLECompressionTest {
 	public void testRandomInput() throws IOException {
 
 		Random rnd = new Random();
-		byte[] rawData = new byte[rnd.nextInt(100000)];
+		byte[] rawData = new byte[rnd.nextInt(255)];
 		// byte[] rawData = new byte[] { -1, -1, -2 };
 		byte[] rawDataCopy = new byte[rawData.length];// = new byte[2048];
 		rnd.nextBytes(rawData);

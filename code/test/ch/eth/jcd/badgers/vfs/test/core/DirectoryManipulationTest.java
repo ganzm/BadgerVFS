@@ -25,7 +25,7 @@ public class DirectoryManipulationTest extends VFSDiskManagerTestBase {
 	public void testCreateSimpleDir() throws VFSException {
 
 		NumberFormat decimalFormat = new DecimalFormat("###");
-		int numEntries = 100;
+		int numEntries = 200;
 
 		VFSEntry rootEntry = diskManager.getRoot();
 
