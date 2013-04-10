@@ -50,20 +50,22 @@ public class BadgersLZ77CompressionOutputStream extends OutputStream {
 		int currentMatchLocation = 0;
 		int matchLength = 1;
 
-		if (cachedString.indexOf(currentChar) != -1 && forwardString.length() > 1) {
+		int currentMatchLocationTmp = cachedString.indexOf(currentChar);
+		if (currentMatchLocationTmp != -1 && forwardString.length() > 1) {
+			currentMatchLocation = currentMatchLocationTmp;
 			// find bigger match
 			matchLength++;
 			while (matchLength < forwardString.length()) {
-				if (cachedString.indexOf(forwardString.substring(0, matchLength)) != -1 && true) {
-					matchLength++;
-				} else {
+				currentMatchLocationTmp = cachedString.indexOf(forwardString.substring(0, matchLength), currentMatchLocation);
+				if (currentMatchLocationTmp == -1) {
 					break;
+				} else {
+					currentMatchLocation = currentMatchLocationTmp;
+					matchLength++;
 				}
 			}
 			// biggest match
 			matchLength--;
-			// get match location
-			currentMatchLocation = cachedString.indexOf(forwardString.substring(0, matchLength));
 			// remove matches from forwardString
 			cachedString.append(forwardString.substring(0, matchLength));
 			forwardString.delete(0, matchLength);
