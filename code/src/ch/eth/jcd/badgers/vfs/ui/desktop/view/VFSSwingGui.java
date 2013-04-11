@@ -18,10 +18,10 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
 
-public class VFSSwingGui extends JFrame {
+public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private static final long serialVersionUID = -8776317677851635247L;
 
@@ -29,7 +29,13 @@ public class VFSSwingGui extends JFrame {
 
 	private final JPanel contentPane;
 	private final JTextField txtFind;
-	private DesktopController desktopController = new DesktopController();
+	private final JButton btnTestBlockingAction;
+
+	private final DesktopController desktopController = new DesktopController(this);
+	private final JMenu mnActions;
+	private final JMenuItem mntmNew;
+	private final JMenuItem mntmOpen;
+	private final JMenuItem mntmClose;
 
 	/**
 	 * Launch the application.
@@ -41,6 +47,7 @@ public class VFSSwingGui extends JFrame {
 			public void run() {
 				try {
 					VFSSwingGui frame = new VFSSwingGui();
+					frame.update();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -62,8 +69,6 @@ public class VFSSwingGui extends JFrame {
 		}
 
 		initLog4J(log4JConfigurationPath);
-
-		WorkerController.setupWorker(null);
 	}
 
 	private static void initLog4J(String log4jConfigurationPath) {
@@ -89,24 +94,25 @@ public class VFSSwingGui extends JFrame {
 		mnDisk.setMnemonic('D');
 		menuBar.add(mnDisk);
 
-		JMenuItem mntmNew = new JMenuItem("New");
+		mntmNew = new JMenuItem("New");
 		mntmNew.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				desktopController.openCreateNewDiskDialog(getDesktopFrame());
 			}
 		});
 		mnDisk.add(mntmNew);
 
-		JMenuItem mntmOpen = new JMenuItem("Open");
+		mntmOpen = new JMenuItem("Open");
 		mnDisk.add(mntmOpen);
 
-		JMenuItem mntmClose = new JMenuItem("Close");
+		mntmClose = new JMenuItem("Close");
 		mnDisk.add(mntmClose);
 
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnDisk.add(mntmExit);
 
-		JMenu mnActions = new JMenu("Actions");
+		mnActions = new JMenu("Actions");
 		mnActions.setMnemonic('A');
 		menuBar.add(mnActions);
 
@@ -156,8 +162,9 @@ public class VFSSwingGui extends JFrame {
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
 
-		JButton btnTestBlockingAction = new JButton("Test Blocking Action");
+		btnTestBlockingAction = new JButton("Test Blocking Action");
 		btnTestBlockingAction.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				desktopController.testBlockingAction();
 			}
@@ -175,4 +182,16 @@ public class VFSSwingGui extends JFrame {
 		return this;
 	}
 
+	@Override
+	public void update() {
+		boolean diskMode = !desktopController.isInManagementMode();
+
+		btnTestBlockingAction.setEnabled(diskMode);
+
+		mnActions.setEnabled(diskMode);
+		mntmClose.setEnabled(diskMode);
+		mntmNew.setEnabled(!diskMode);
+		mntmOpen.setEnabled(!diskMode);
+
+	}
 }

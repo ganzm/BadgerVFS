@@ -1,15 +1,13 @@
 package ch.eth.jcd.badgers.vfs.core.config;
 
+import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.Encryption;
+
 /**
  * DiskConfiguration used to open/create a VirtualDisk
  * 
  */
 public class DiskConfiguration {
-
-	public static final String COMPRESSION_LZ77 = "LZ77";
-	public static final String COMPRESSION_RLE = "RLE";
-
-	public static final String ENCRYPTION_CAESAR = "CAESAR";
 
 	/**
 	 * Path where the virtual disk file is located on the host file system
@@ -18,9 +16,9 @@ public class DiskConfiguration {
 
 	private String password;
 
-	private String encryptionAlgorithm = ENCRYPTION_CAESAR;
+	private Encryption encryptionAlgorithm = Encryption.CAESAR;
 
-	private String compressionAlgorithm = COMPRESSION_LZ77;
+	private Compression compressionAlgorithm = Compression.LZ77;
 
 	/**
 	 * the maximum size in bytes of the file we store our data on the host file system <br>
@@ -29,11 +27,11 @@ public class DiskConfiguration {
 	 */
 	private long maximumSize = -1;
 
-	public String getCompressionAlgorithm() {
+	public Compression getCompressionAlgorithm() {
 		return compressionAlgorithm;
 	}
 
-	public String getEncryptionAlgorithm() {
+	public Encryption getEncryptionAlgorithm() {
 		return encryptionAlgorithm;
 	}
 
@@ -49,11 +47,11 @@ public class DiskConfiguration {
 		return password;
 	}
 
-	public void setCompressionAlgorithm(String compressionAlgorithm) {
+	public void setCompressionAlgorithm(Compression compressionAlgorithm) {
 		this.compressionAlgorithm = compressionAlgorithm;
 	}
 
-	public void setEncryptionAlgorithm(String encryptionAlgorithm) {
+	public void setEncryptionAlgorithm(Encryption encryptionAlgorithm) {
 		this.encryptionAlgorithm = encryptionAlgorithm;
 	}
 

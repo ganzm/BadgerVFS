@@ -10,9 +10,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 
 /**
  * This class handles access to the VFSDiskManager
- * 
- * 
- * 
  */
 public class WorkerController implements Runnable {
 
@@ -28,7 +25,7 @@ public class WorkerController implements Runnable {
 	/**
 	 * Queue contains unprocesses jobs
 	 */
-	private ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
+	private final ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
 
 	private Thread controllerThread = null;
 
@@ -50,6 +47,7 @@ public class WorkerController implements Runnable {
 			throw new VFSRuntimeException("WorkerController already instantiated");
 		}
 		instance = new WorkerController(diskManager);
+		instance.startWorkerController();
 
 	}
 
@@ -80,6 +78,7 @@ public class WorkerController implements Runnable {
 	@Override
 	public void run() {
 		try {
+			LOGGER.debug("Starting WorkerController Thread");
 			running = true;
 			BadgerAction action = null;
 

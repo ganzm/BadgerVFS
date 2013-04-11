@@ -2,7 +2,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.action;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 
-public class SampleAction extends BadgerAction implements Runnable {
+public class SampleAction extends BadgerAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) {

@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
+import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 
@@ -73,10 +75,10 @@ public final class HeaderSectionHandler {
 		virtualDiskFile.writeLong(header.maximumSize);
 
 		// Write compression Algorithm used
-		virtualDiskFile.write(Arrays.copyOf(config.getCompressionAlgorithm().getBytes(cs), COMPRESSION_FIELD_LENGTH));
+		virtualDiskFile.write(Arrays.copyOf(config.getCompressionAlgorithm().toString().getBytes(cs), COMPRESSION_FIELD_LENGTH));
 
 		// Write encryption Algorithm used
-		virtualDiskFile.write(Arrays.copyOf(config.getEncryptionAlgorithm().getBytes(cs), ENCRYPTION_FIELD_LENGTH));
+		virtualDiskFile.write(Arrays.copyOf(config.getEncryptionAlgorithm().toString().getBytes(cs), ENCRYPTION_FIELD_LENGTH));
 
 		long indexSectionOffsetIndicatorLocation = virtualDiskFile.getFilePointer();
 
@@ -147,14 +149,14 @@ public final class HeaderSectionHandler {
 		byte[] compressionBytes = new byte[COMPRESSION_FIELD_LENGTH];
 		virtualDiskFile.read(compressionBytes);
 		header.compressionString = new String(compressionBytes, cs).trim();
-		config.setCompressionAlgorithm(header.compressionString);
+		config.setCompressionAlgorithm(Compression.fromString(header.compressionString));
 		LOGGER.debug("Compression: " + header.compressionString);
 
 		// Read encryption
 		byte[] encryptionBytes = new byte[ENCRYPTION_FIELD_LENGTH];
 		virtualDiskFile.read(encryptionBytes);
 		header.encryptionString = new String(encryptionBytes, cs).trim();
-		config.setEncryptionAlgorithm(header.encryptionString);
+		config.setEncryptionAlgorithm(Encryption.fromString(header.encryptionString));
 		LOGGER.debug("Encryption: " + header.encryptionString);
 
 		// read 8 bytes - DirectorySectionOffset
