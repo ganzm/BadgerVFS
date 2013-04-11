@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,8 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +24,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
@@ -37,6 +41,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
+	private final JTable table;
 
 	/**
 	 * Launch the application.
@@ -51,7 +56,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					frame.update();
 					frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error("", e);
 				}
 			}
 		});
@@ -61,8 +66,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * Create the frame.
 	 */
 	public VFSSwingGui() {
+		setTitle("BadgerFS Client");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 300);
+		setBounds(100, 100, 900, 631);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -87,8 +93,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				try {
 					desktopController.openFileChooserForDiskOpen(getDesktopFrame());
 				} catch (Exception ex) {
-					LOGGER.error("", ex);
-					JOptionPane.showMessageDialog(getDesktopFrame(), ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
 		});
@@ -101,8 +106,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				try {
 					desktopController.closeDisk(getDesktopFrame());
 				} catch (Exception ex) {
-					LOGGER.error("", ex);
-					JOptionPane.showMessageDialog(getDesktopFrame(), ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
 		});
@@ -152,23 +156,43 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		txtFind.setColumns(10);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
 
-		JTree tree = new JTree();
-		contentPane.add(tree, BorderLayout.WEST);
+		JSplitPane splitPane = new JSplitPane();
+		contentPane.add(splitPane);
 
-		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.CENTER);
+		JPanel panelMiddle = new JPanel();
+		splitPane.setRightComponent(panelMiddle);
+		panelMiddle.setLayout(new BorderLayout(0, 0));
+
+		JScrollPane scrollPane = new JScrollPane();
+		panelMiddle.add(scrollPane);
+
+		table = new JTable();
+		scrollPane.setViewportView(table);
+
+		Panel panelLeft = new Panel();
+		splitPane.setLeftComponent(panelLeft);
+		panelLeft.setLayout(new BorderLayout(0, 0));
+
+		JScrollPane scrollPaneFolderTree = new JScrollPane();
+		panelLeft.add(scrollPaneFolderTree);
+
+		JTree folderTree = new JTree();
+		scrollPaneFolderTree.setViewportView(folderTree);
+
+		Panel panelBottom = new Panel();
+		contentPane.add(panelBottom, BorderLayout.SOUTH);
 
 		btnTestBlockingAction = new JButton("Test Blocking Action");
+		panelBottom.add(btnTestBlockingAction);
 		btnTestBlockingAction.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				desktopController.testBlockingAction();
 			}
 		});
-		panel.add(btnTestBlockingAction);
 	}
 
 	/**

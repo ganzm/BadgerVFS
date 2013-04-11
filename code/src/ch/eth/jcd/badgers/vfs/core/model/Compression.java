@@ -1,7 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.model;
 
 public enum Compression {
-	NONE("None"), RLE("Run Lenght Encoding"), LZ77("Lempel Ziff 77");
+	NONE("None"), LZ77("Lempel Ziff 77"), RLE("Run Lenght Encoding"), ;
 
 	private String str;
 

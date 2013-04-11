@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -8,13 +9,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +29,7 @@ import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 
@@ -42,6 +45,8 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 
 	private JComboBox<Encryption> cboEncryption;
 	private JComboBox<Compression> cboCompression;
+
+	private final String defaultFileName = "disk.bfs";
 
 	/**
 	 * Launch the application.
@@ -63,7 +68,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		super(owner, "Create new virtual disk", true);
 		this.ownerController = ownerController;
 
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 727, 213);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -94,6 +99,27 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		}
 		{
 			JButton btnShowFileChooser = new JButton("Browse");
+			btnShowFileChooser.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JFileChooser fc = new JFileChooser();
+					fc.setDialogTitle("Choose Disk File Path");
+					fc.setDialogType(JFileChooser.SAVE_DIALOG);
+					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+					int returnVal = fc.showDialog(getComponent(), "Ok");
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						File selected = fc.getSelectedFile();
+						String path;
+						if (selected.isDirectory()) {
+							path = selected.getAbsolutePath() + File.separator + defaultFileName;
+						} else {
+							path = selected.getAbsolutePath();
+						}
+						txtPath.setText(path);
+					}
+				}
+			});
 			btnShowFileChooser.setMnemonic('b');
 			GridBagConstraints gbc_btnShowFileChooser = new GridBagConstraints();
 			gbc_btnShowFileChooser.insets = new Insets(0, 0, 5, 0);
@@ -102,7 +128,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			contentPanel.add(btnShowFileChooser, gbc_btnShowFileChooser);
 		}
 		{
-			JLabel lblMaximumSize = new JLabel("Maximum Size");
+			JLabel lblMaximumSize = new JLabel("Maximum Size (mb)");
 			GridBagConstraints gbc_lblMaximumSize = new GridBagConstraints();
 			gbc_lblMaximumSize.anchor = GridBagConstraints.EAST;
 			gbc_lblMaximumSize.insets = new Insets(0, 0, 5, 5);
@@ -112,6 +138,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		}
 		{
 			txtMaximumSize = new JTextField();
+			txtMaximumSize.setText("1000");
 			GridBagConstraints gbc_txtMaximumSize = new GridBagConstraints();
 			gbc_txtMaximumSize.insets = new Insets(0, 0, 5, 5);
 			gbc_txtMaximumSize.fill = GridBagConstraints.HORIZONTAL;
@@ -191,10 +218,19 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 				buttonPane.add(btnCancel);
 			}
 		}
+
+		init();
+	}
+
+	private void init() {
+		String home = System.getProperty("user.home");
+		txtPath.setText(home + File.separator + defaultFileName);
 	}
 
 	private void createDisk() {
 		try {
+			LOGGER.info("Create Disk");
+
 			DiskConfiguration config = new DiskConfiguration();
 			config.setMaximumSize(1024 * 1024 * Long.parseLong(txtMaximumSize.getText()));
 
@@ -208,9 +244,12 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 
 			ownerController.createDisk(config);
 		} catch (VFSException e) {
-			LOGGER.error("", e);
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+			SwingUtil.handleException(this, e);
 		}
+	}
+
+	protected Component getComponent() {
+		return this;
 	}
 
 	@Override
