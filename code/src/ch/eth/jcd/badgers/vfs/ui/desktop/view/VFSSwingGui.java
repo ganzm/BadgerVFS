@@ -2,7 +2,10 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -12,15 +15,27 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
+
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
+
 public class VFSSwingGui extends JFrame {
+
+	private static final long serialVersionUID = -8776317677851635247L;
+
+	private static final Logger LOGGER = Logger.getLogger(VFSSwingGui.class);
 
 	private final JPanel contentPane;
 	private final JTextField txtFind;
+	private DesktopController desktopController = new DesktopController();
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		initApplication(args);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -34,6 +49,32 @@ public class VFSSwingGui extends JFrame {
 		});
 	}
 
+	private static void initApplication(String[] args) {
+		String log4JConfigurationPath = null;
+		for (int i = 0; i < args.length; i++) {
+
+			if ("-l".equals(args[i]) && (i + 1 < args.length)) {
+
+				log4JConfigurationPath = args[i + 1];
+
+			}
+
+		}
+
+		initLog4J(log4JConfigurationPath);
+
+		WorkerController.setupWorker(null);
+	}
+
+	private static void initLog4J(String log4jConfigurationPath) {
+		if (log4jConfigurationPath == null) {
+			log4jConfigurationPath = "log4j.xml";
+
+		}
+		DOMConfigurator.configure(log4jConfigurationPath);
+		LOGGER.info("Log4J initialized with " + log4jConfigurationPath);
+	}
+
 	/**
 	 * Create the frame.
 	 */
@@ -44,38 +85,61 @@ public class VFSSwingGui extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
+		JMenu mnDisk = new JMenu("Disk");
+		mnDisk.setMnemonic('D');
+		menuBar.add(mnDisk);
 
-		JMenuItem mntmCreate = new JMenuItem("Create");
-		mnFile.add(mntmCreate);
+		JMenuItem mntmNew = new JMenuItem("New");
+		mntmNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				desktopController.openCreateNewDiskDialog(getDesktopFrame());
+			}
+		});
+		mnDisk.add(mntmNew);
 
 		JMenuItem mntmOpen = new JMenuItem("Open");
-		mnFile.add(mntmOpen);
+		mnDisk.add(mntmOpen);
 
 		JMenuItem mntmClose = new JMenuItem("Close");
-		mnFile.add(mntmClose);
+		mnDisk.add(mntmClose);
 
-		JMenuItem mntmDispose = new JMenuItem("Dispose");
-		mnFile.add(mntmDispose);
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mnDisk.add(mntmExit);
 
-		JMenu mnEdit = new JMenu("Edit");
-		menuBar.add(mnEdit);
+		JMenu mnActions = new JMenu("Actions");
+		mnActions.setMnemonic('A');
+		menuBar.add(mnActions);
 
-		JMenuItem mntmCreateNewDirectory = new JMenuItem("Create New Directory");
-		mnEdit.add(mntmCreateNewDirectory);
+		JMenuItem mntmNewFolder = new JMenuItem("New Folder");
+		mnActions.add(mntmNewFolder);
 
-		JMenuItem mntmCreateNewFile = new JMenuItem("Create New File");
-		mnEdit.add(mntmCreateNewFile);
-
-		JMenuItem mntmCopyto = new JMenuItem("CopyTo");
-		mnEdit.add(mntmCopyto);
-
-		JMenuItem mntmMoveto = new JMenuItem("MoveTo");
-		mnEdit.add(mntmMoveto);
+		JMenuItem mntmRename = new JMenuItem("Rename");
+		mnActions.add(mntmRename);
 
 		JMenuItem mntmDelete = new JMenuItem("Delete");
-		mnEdit.add(mntmDelete);
+		mnActions.add(mntmDelete);
+
+		JMenuItem mntmNewFile = new JMenuItem("New File");
+		mnActions.add(mntmNewFile);
+
+		JMenuItem mntmImport = new JMenuItem("Import");
+		mnActions.add(mntmImport);
+
+		JMenuItem mntmExport = new JMenuItem("Export");
+		mnActions.add(mntmExport);
+
+		JMenuItem mntmCopyto = new JMenuItem("CopyTo");
+		mnActions.add(mntmCopyto);
+
+		JMenuItem mntmMoveto = new JMenuItem("MoveTo");
+		mnActions.add(mntmMoveto);
+
+		JMenu mnHelp = new JMenu("Help");
+		mnHelp.setMnemonic('H');
+		menuBar.add(mnHelp);
+
+		JMenuItem mntmInfo = new JMenuItem("Info");
+		mnHelp.add(mntmInfo);
 
 		txtFind = new JTextField();
 		txtFind.setText("Find");
@@ -91,6 +155,24 @@ public class VFSSwingGui extends JFrame {
 
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.CENTER);
+
+		JButton btnTestBlockingAction = new JButton("Test Blocking Action");
+		btnTestBlockingAction.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				desktopController.testBlockingAction();
+			}
+		});
+		panel.add(btnTestBlockingAction);
+	}
+
+	/**
+	 * helper method for anonymous inner classes (ActionListenerImpl.) to get "this"
+	 * 
+	 * 
+	 * @return
+	 */
+	private JFrame getDesktopFrame() {
+		return this;
 	}
 
 }
