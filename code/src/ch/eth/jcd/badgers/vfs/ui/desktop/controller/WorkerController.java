@@ -132,8 +132,11 @@ public class WorkerController implements Runnable {
 	}
 
 	private void dispose() {
-		running = false;
-		// wake me up
-		monitorObject.notify();
+		synchronized (monitorObject) {
+			running = false;
+			// wake me up
+
+			monitorObject.notify();
+		}
 	}
 }

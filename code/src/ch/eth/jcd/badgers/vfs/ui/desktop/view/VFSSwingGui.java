@@ -10,14 +10,15 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 
@@ -41,7 +42,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		initApplication(args);
+		Initialisation.initApplication(args);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -54,30 +55,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				}
 			}
 		});
-	}
-
-	private static void initApplication(String[] args) {
-		String log4JConfigurationPath = null;
-		for (int i = 0; i < args.length; i++) {
-
-			if ("-l".equals(args[i]) && (i + 1 < args.length)) {
-
-				log4JConfigurationPath = args[i + 1];
-
-			}
-
-		}
-
-		initLog4J(log4JConfigurationPath);
-	}
-
-	private static void initLog4J(String log4jConfigurationPath) {
-		if (log4jConfigurationPath == null) {
-			log4jConfigurationPath = "log4j.xml";
-
-		}
-		DOMConfigurator.configure(log4jConfigurationPath);
-		LOGGER.info("Log4J initialized with " + log4jConfigurationPath);
 	}
 
 	/**
@@ -104,9 +81,31 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnDisk.add(mntmNew);
 
 		mntmOpen = new JMenuItem("Open");
+		mntmOpen.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					desktopController.openFileChooserForDiskOpen(getDesktopFrame());
+				} catch (Exception ex) {
+					LOGGER.error("", ex);
+					JOptionPane.showMessageDialog(getDesktopFrame(), ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnDisk.add(mntmOpen);
 
 		mntmClose = new JMenuItem("Close");
+		mntmClose.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					desktopController.closeDisk(getDesktopFrame());
+				} catch (Exception ex) {
+					LOGGER.error("", ex);
+					JOptionPane.showMessageDialog(getDesktopFrame(), ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		mnDisk.add(mntmClose);
 
 		JMenuItem mntmExit = new JMenuItem("Exit");

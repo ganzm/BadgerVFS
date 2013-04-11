@@ -1,6 +1,10 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
+import java.awt.Component;
+import java.io.File;
+
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
@@ -34,6 +38,37 @@ public class DesktopController extends BadgerController {
 		dialog.setVisible(true);
 	}
 
+	public void openFileChooserForDiskOpen(Component parent) throws VFSException {
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setDialogTitle("Open Badger Disk");
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+
+		int returnVal = fileChooser.showOpenDialog(parent);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fileChooser.getSelectedFile();
+			openDisk(selectedFile.getAbsolutePath());
+		}
+	}
+
+	private void openDisk(String path) throws VFSException {
+		if (!isInManagementMode()) {
+			throw new VFSException("Cannot open Disk on " + path + " - close current disk first");
+		}
+
+		DiskConfiguration config = new DiskConfiguration();
+		config.setHostFilePath(path);
+
+		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
+		VFSDiskManager diskManager = factory.openDiskManager(config);
+		WorkerController.setupWorker(diskManager);
+
+		updateGUI();
+	}
+
 	public void createDisk(DiskConfiguration config) throws VFSException {
 		if (!isInManagementMode()) {
 			throw new VFSException("Cannot create new Disk - close current disk first");
@@ -48,5 +83,14 @@ public class DesktopController extends BadgerController {
 
 	public boolean isInManagementMode() {
 		return WorkerController.getInstance() == null;
+	}
+
+	public void closeDisk(JFrame desktopFrame) throws VFSException {
+		if (isInManagementMode()) {
+			throw new VFSException("Cannot close new Disk - no current disk opened");
+		}
+
+		WorkerController.disposeWorker();
+		updateGUI();
 	}
 }
