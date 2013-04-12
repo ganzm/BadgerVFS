@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class VFSSwingGui extends JFrame implements BadgerViewBase {
@@ -195,10 +196,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panel.add(textField, gbc_textField);
 		textField.setColumns(10);
 
-		JList list = new JList();
-		panelMiddle.add(list, BorderLayout.CENTER);
+		JList<EntryUiModel> entryList = new JList<EntryUiModel>();
+		ListModel<EntryUiModel> entryListModel = desktopController.getEntryListModel();
+		entryList.setModel(entryListModel);
+		panelMiddle.add(entryList, BorderLayout.CENTER);
 
-		Panel panelLeft = new Panel();
+		JPanel panelLeft = new JPanel();
 		splitPane.setLeftComponent(panelLeft);
 		panelLeft.setLayout(new BorderLayout(0, 0));
 
@@ -208,7 +211,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JTree folderTree = new JTree();
 		scrollPaneFolderTree.setViewportView(folderTree);
 
-		Panel panelBottom = new Panel();
+		JPanel panelBottom = new JPanel();
 		contentPane.add(panelBottom, BorderLayout.SOUTH);
 
 		btnTestBlockingAction = new JButton("Test Blocking Action");

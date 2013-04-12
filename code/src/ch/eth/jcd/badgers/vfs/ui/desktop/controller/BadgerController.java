@@ -5,7 +5,7 @@ public abstract class BadgerController {
 	/**
 	 * Reference to the view component
 	 */
-	private final BadgerViewBase badgerView;
+	protected final BadgerViewBase badgerView;
 
 	public BadgerController(BadgerViewBase badgerView) {
 		this.badgerView = badgerView;

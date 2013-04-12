@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
@@ -22,6 +23,7 @@ public class GetRootFolderContentAction extends BadgerAction {
 
 		List<VFSEntry> entries = rootEntry.getChildren();
 
+		rootEntries = new ArrayList<EntryUiModel>();
 		for (VFSEntry entry : entries) {
 			rootEntries.add(new EntryUiModel(entry));
 		}

@@ -14,4 +14,9 @@ public class SwingUtil {
 		LOGGER.error("", ex);
 		JOptionPane.showMessageDialog(parent, ex.getClass().getName() + ":" + ex.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
 	}
+
+	public static void handleError(Component parent, String error) {
+		LOGGER.error(error);
+		JOptionPane.showMessageDialog(parent, error, "Exception", JOptionPane.ERROR_MESSAGE);
+	}
 }

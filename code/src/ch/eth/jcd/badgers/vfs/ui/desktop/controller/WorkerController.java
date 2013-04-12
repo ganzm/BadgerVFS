@@ -48,13 +48,14 @@ public class WorkerController implements Runnable {
 		this.diskManager = diskManager;
 	}
 
-	public static void setupWorker(VFSDiskManager diskManager) {
+	public static WorkerController setupWorker(VFSDiskManager diskManager) {
 		if (instance != null) {
 			throw new VFSRuntimeException("WorkerController already instantiated");
 		}
 		instance = new WorkerController(diskManager);
 		instance.startWorkerController();
 
+		return instance;
 	}
 
 	public static void disposeWorker() {
@@ -137,13 +138,23 @@ public class WorkerController implements Runnable {
 	}
 
 	private void actionFailed(BadgerAction action, VFSException e) {
-		// TODO Auto-generated method stub
-
+		for (ActionObserver obs : actionObservers) {
+			try {
+				obs.onActionFailed(action, e);
+			} catch (Exception ex) {
+				LOGGER.error("Error while notifying Observer" + obs, ex);
+			}
+		}
 	}
 
 	private void actionFinished(BadgerAction action) {
-		// TODO Auto-generated method stub
-
+		for (ActionObserver obs : actionObservers) {
+			try {
+				obs.onActionFinished(action);
+			} catch (Exception ex) {
+				LOGGER.error("Error while notifying Observer" + obs, ex);
+			}
+		}
 	}
 
 	/**
