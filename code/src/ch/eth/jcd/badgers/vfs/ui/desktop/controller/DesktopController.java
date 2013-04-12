@@ -11,6 +11,7 @@ import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetRootFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SampleAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 
@@ -65,6 +66,13 @@ public class DesktopController extends BadgerController {
 		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		VFSDiskManager diskManager = factory.openDiskManager(config);
 		WorkerController.setupWorker(diskManager);
+
+		GetRootFolderContentAction getFolderContentAction = new GetRootFolderContentAction();
+
+		WorkerController workerController = WorkerController.getInstance();
+		workerController.enqueue(getFolderContentAction);
+
+		boolean b = workerController.isBusy();
 
 		updateGUI();
 	}

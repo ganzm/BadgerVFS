@@ -2,19 +2,23 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
@@ -41,7 +45,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
-	private final JTable table;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -166,11 +170,33 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		splitPane.setRightComponent(panelMiddle);
 		panelMiddle.setLayout(new BorderLayout(0, 0));
 
-		JScrollPane scrollPane = new JScrollPane();
-		panelMiddle.add(scrollPane);
+		JPanel panel = new JPanel();
+		panelMiddle.add(panel, BorderLayout.NORTH);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 0, 0, 0 };
+		gbl_panel.rowHeights = new int[] { 0, 0 };
+		gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panel.setLayout(gbl_panel);
 
-		table = new JTable();
-		scrollPane.setViewportView(table);
+		JLabel lblPath = new JLabel("Path");
+		GridBagConstraints gbc_lblPath = new GridBagConstraints();
+		gbc_lblPath.insets = new Insets(0, 0, 0, 5);
+		gbc_lblPath.anchor = GridBagConstraints.EAST;
+		gbc_lblPath.gridx = 0;
+		gbc_lblPath.gridy = 0;
+		panel.add(lblPath, gbc_lblPath);
+
+		textField = new JTextField();
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 1;
+		gbc_textField.gridy = 0;
+		panel.add(textField, gbc_textField);
+		textField.setColumns(10);
+
+		JList list = new JList();
+		panelMiddle.add(list, BorderLayout.CENTER);
 
 		Panel panelLeft = new Panel();
 		splitPane.setLeftComponent(panelLeft);
@@ -216,5 +242,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
 
+		contentPane.setVisible(diskMode);
+		contentPane.setEnabled(diskMode);
 	}
 }

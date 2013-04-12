@@ -1,11 +1,15 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 
 /**
@@ -26,6 +30,8 @@ public class WorkerController implements Runnable {
 	 * Queue contains unprocesses jobs
 	 */
 	private final ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
+
+	private final List<ActionObserver> actionObservers = new ArrayList<ActionObserver>();
 
 	private Thread controllerThread = null;
 
@@ -117,9 +123,27 @@ public class WorkerController implements Runnable {
 		try {
 			LOGGER.info("Perform Action " + action);
 			action.runDiskAction(diskManager);
+		} catch (VFSException e) {
+			LOGGER.error("", e);
+			actionFailed(action, e);
 		} finally {
 			LOGGER.info("Finished Action " + action);
+			actionFinished(action);
 		}
+	}
+
+	public void addActionObserver(ActionObserver actionObserver) {
+		actionObservers.add(actionObserver);
+	}
+
+	private void actionFailed(BadgerAction action, VFSException e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void actionFinished(BadgerAction action) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
