@@ -9,37 +9,29 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListModel;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetRootFolderContentAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.SampleAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiListModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class DesktopController extends BadgerController implements ActionObserver {
 
-	private EntryUiListModel entryListModel = new EntryUiListModel();
+	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
+
+	private final EntryUiListModel entryListModel = new EntryUiListModel();
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
-	}
-
-	public void testBlockingAction() {
-		// TODO this is Test CODE
-
-		WorkerController workerController = WorkerController.getInstance();
-
-		SampleAction sampleAction = new SampleAction();
-
-		workerController.enqueue(sampleAction);
-		boolean b = workerController.isBusy();
 	}
 
 	/**
@@ -85,6 +77,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 			throw new VFSException("Cannot open Disk on " + path + " - close current disk first");
 		}
 
+		LOGGER.debug("Opening Disk from Path " + path);
+
 		DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(path);
 
@@ -117,7 +111,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	private void loadRootFolder() {
-		GetRootFolderContentAction getFolderContentAction = new GetRootFolderContentAction();
+		GetFolderContentAction getFolderContentAction = new GetFolderContentAction();
 
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(getFolderContentAction);
@@ -152,12 +146,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	@Override
 	public void onActionFinished(BadgerAction action) {
-		if (action instanceof GetRootFolderContentAction) {
+		if (action instanceof GetFolderContentAction) {
+			GetFolderContentAction getFolderAction = (GetFolderContentAction) action;
+			ParentFolderEntryUiModel parentFolderEntryModel = getFolderAction.getParentFolderEntryModel();
+			List<EntryUiModel> entries = getFolderAction.getEntries();
 
-			GetRootFolderContentAction getRootFolderAction = (GetRootFolderContentAction) action;
-			List<EntryUiModel> entries = getRootFolderAction.getRootEntries();
-
-			setCurrentFolder(VFSPath.FILE_SEPARATOR, entries);
+			setCurrentFolder(getFolderAction.getFolderPath(), parentFolderEntryModel, entries);
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -165,11 +159,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
-	private void setCurrentFolder(String path, List<EntryUiModel> entries) {
-
-		entryListModel.setEntries(entries);
+	private void setCurrentFolder(String path, ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> entries) {
+		entryListModel.setEntries(parentFolderEntryModel, entries);
 		updateGUI();
-		// TODO
 	}
 
 	public boolean isBusy() {
@@ -182,5 +174,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public ListModel<EntryUiModel> getEntryListModel() {
 		return entryListModel;
+	}
+
+	public void openEntry(EntryUiModel entry) {
+		GetFolderContentAction action = new GetFolderContentAction(entry);
+		WorkerController workerController = WorkerController.getInstance();
+		workerController.enqueue(action);
+
 	}
 }

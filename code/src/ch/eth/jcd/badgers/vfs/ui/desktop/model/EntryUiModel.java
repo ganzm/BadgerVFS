@@ -17,11 +17,16 @@ import ch.eth.jcd.badgers.vfs.util.ResourceLocator;
 public class EntryUiModel {
 	private static final Logger LOGGER = Logger.getLogger(EntryUiModel.class);
 
-	private static ImageIcon fileIcon;
-	private static ImageIcon folderIcon;
+	public static ImageIcon fileIcon;
+	public static ImageIcon folderIcon;
 
 	private final VFSEntry entry;
 
+	private final boolean isDirectory;
+
+	/**
+	 * Static constructor load some images
+	 */
 	static {
 		try {
 			fileIcon = ResourceLocator.getResourceAsIcon("images/Document-Blank-icon.png");
@@ -31,8 +36,23 @@ public class EntryUiModel {
 		}
 	}
 
-	public EntryUiModel(VFSEntry entry) {
+	/**
+	 * Constructor
+	 * 
+	 * @param entry
+	 */
+	public EntryUiModel(VFSEntry entry, boolean isDirectory) {
 		this.entry = entry;
+		this.isDirectory = isDirectory;
+	}
+
+	public void toggleRename() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public boolean isDirectory() {
+		return isDirectory;
 	}
 
 	public ImageIcon getIcon() {
@@ -61,4 +81,19 @@ public class EntryUiModel {
 			return "ERROR";
 		}
 	}
+
+	/**
+	 * Don't use this in GUI context
+	 * 
+	 * @return
+	 */
+	public VFSEntry getEntry() {
+		return entry;
+	}
+
+	@Override
+	public String toString() {
+		return "Entry " + getFullPath();
+	}
+
 }

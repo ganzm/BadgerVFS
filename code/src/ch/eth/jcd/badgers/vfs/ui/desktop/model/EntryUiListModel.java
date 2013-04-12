@@ -9,9 +9,9 @@ import javax.swing.event.ListDataListener;
 
 public class EntryUiListModel implements ListModel<EntryUiModel> {
 
-	private List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+	private final List<ListDataListener> listeners = new ArrayList<ListDataListener>();
 
-	private List<EntryUiModel> entries = new ArrayList<>();
+	private final List<EntryUiModel> entries = new ArrayList<>();
 
 	@Override
 	public void addListDataListener(ListDataListener l) {
@@ -33,13 +33,17 @@ public class EntryUiListModel implements ListModel<EntryUiModel> {
 		return entries.size();
 	}
 
-	public void setEntries(List<EntryUiModel> newEntries) {
+	public void setEntries(ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> newEntries) {
 		int oldSize = entries.size();
 		entries.clear();
 
 		ListDataEvent removeEvent = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize);
 		for (ListDataListener listener : listeners) {
 			listener.intervalRemoved(removeEvent);
+		}
+
+		if (parentFolderEntryModel != null) {
+			entries.add(parentFolderEntryModel);
 		}
 
 		for (EntryUiModel newEntry : newEntries) {
