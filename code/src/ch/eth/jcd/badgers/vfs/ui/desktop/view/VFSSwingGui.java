@@ -197,6 +197,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		textField.setColumns(10);
 
 		JList<EntryUiModel> entryList = new JList<EntryUiModel>();
+		entryList.setCellRenderer(new EntryListCellRenderer());
 		ListModel<EntryUiModel> entryListModel = desktopController.getEntryListModel();
 		entryList.setModel(entryListModel);
 		panelMiddle.add(entryList, BorderLayout.CENTER);

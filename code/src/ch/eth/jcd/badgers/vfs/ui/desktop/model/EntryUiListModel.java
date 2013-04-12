@@ -34,9 +34,7 @@ public class EntryUiListModel implements ListModel<EntryUiModel> {
 	}
 
 	public void setEntries(List<EntryUiModel> newEntries) {
-
 		int oldSize = entries.size();
-
 		entries.clear();
 
 		ListDataEvent removeEvent = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize);
