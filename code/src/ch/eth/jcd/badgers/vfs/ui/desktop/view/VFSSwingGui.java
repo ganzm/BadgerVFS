@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,6 +17,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -25,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
@@ -72,7 +76,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 */
 	public VFSSwingGui() {
 		setTitle("BadgerFS Client");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent ev) {
+				beforeWindowClosing();
+			}
+		});
 		setBounds(100, 100, 900, 631);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -233,6 +242,25 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 */
 	private JFrame getDesktopFrame() {
 		return this;
+	}
+
+	private void beforeWindowClosing() {
+		if (!desktopController.isInManagementMode()) {
+			Object[] options = new Object[] { "Yes", "No" };
+			int retVal = JOptionPane.showOptionDialog(getDesktopFrame(), "Disk is still opened. Do you want me to close it before we exit?", "Close Disk?",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			if (retVal == JOptionPane.YES_OPTION) {
+				try {
+					desktopController.closeDisk(getDesktopFrame());
+				} catch (VFSException e) {
+					SwingUtil.handleException(getDesktopFrame(), e);
+				}
+			} else {
+				return;
+			}
+		}
+
+		dispose();
 	}
 
 	@Override
