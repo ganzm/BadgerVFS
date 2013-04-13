@@ -181,6 +181,16 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(mntmRename);
 
 		JMenuItem mntmDelete = new JMenuItem("Delete");
+		mntmDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					startDelete();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
 		mnActions.add(mntmDelete);
 
 		JMenuItem mntmNewFile = new JMenuItem("New File");
@@ -347,6 +357,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		entryCellEditor.setAllowEditing(true);
 		tableFolderEntries.editCellAt(currentRow, 0);
+	}
+
+	protected void startDelete() {
+		int currentRow = tableFolderEntries.getSelectedRow();
+		if (currentRow < 0) {
+			JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
+		desktopController.startDelete(entry, currentRow);
 	}
 
 	/**

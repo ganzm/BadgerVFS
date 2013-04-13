@@ -20,6 +20,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
@@ -178,6 +179,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTreeModel.removeChildsFromParent(parent);
 			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
 			entryTreeModel.reload();
+		} else if (action instanceof DeleteEntryAction) {
+			DeleteEntryAction deleteAction = (DeleteEntryAction) action;
+			entryTableModel.removeAtIndex(deleteAction.getRowIndexToRemove());
 		} else if (action instanceof CreateFolderAction) {
 			CreateFolderAction createAction = (CreateFolderAction) action;
 			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
@@ -226,6 +230,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 
+	}
+
+	public void startDelete(EntryUiModel entry, int editedRow) {
+		DeleteEntryAction action = new DeleteEntryAction(entry, editedRow);
+		WorkerController.getInstance().enqueue(action);
 	}
 
 	public void StartRenameEntry(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {

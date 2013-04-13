@@ -132,4 +132,12 @@ public class EntryTableModel implements TableModel {
 			listener.tableChanged(addedEvent);
 		}
 	}
+
+	public void removeAtIndex(int rowIndexToRemove) {
+		entries.remove(rowIndexToRemove);
+		TableModelEvent addedEvent = new TableModelEvent(this, rowIndexToRemove, rowIndexToRemove, 0, TableModelEvent.DELETE);
+		for (TableModelListener listener : listeners) {
+			listener.tableChanged(addedEvent);
+		}
+	}
 }
