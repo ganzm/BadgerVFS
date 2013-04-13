@@ -8,6 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListModel;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 
@@ -56,6 +57,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setDialogTitle("Open Badger Disk");
 		fileChooser.setMultiSelectionEnabled(false);
+		FileFilter bfsType = new ExtensionFilter("Badger File System (.bfs)", ".bfs");
+		fileChooser.addChoosableFileFilter(bfsType);
+		fileChooser.setFileFilter(bfsType);
 		fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
 		int returnVal = fileChooser.showOpenDialog(parent);
@@ -181,5 +185,41 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 
+	}
+	
+	public class ExtensionFilter extends FileFilter {
+		private final String extensions[];
+
+		private final String description;
+
+		public ExtensionFilter(String description, String extension) {
+			this(description, new String[] { extension });
+		}
+
+		public ExtensionFilter(String description, String extensions[]) {
+			this.description = description;
+			this.extensions = extensions.clone();
+		}
+
+		@Override
+		public boolean accept(File file) {
+			if (file.isDirectory()) {
+				return true;
+			}
+			int count = extensions.length;
+			String path = file.getAbsolutePath();
+			for (int i = 0; i < count; i++) {
+				String ext = extensions[i];
+				if (path.endsWith(ext) && path.charAt(path.length() - ext.length()) == '.') {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public String getDescription() {
+			return (description == null ? extensions[0] : description);
+		}
 	}
 }
