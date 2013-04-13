@@ -26,6 +26,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
@@ -35,6 +42,8 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class VFSSwingGui extends JFrame implements BadgerViewBase {
@@ -54,6 +63,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmClose;
 	private final JTextField textField;
 	private final JTable tableFolderEntries;
+	private final JTree folderTree;
 
 	/**
 	 * Launch the application.
@@ -68,6 +78,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					frame.update();
 					frame.setVisible(true);
 				} catch (Exception e) {
+					e.printStackTrace();
 					LOGGER.error("", e);
 				}
 			}
@@ -239,9 +250,30 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JScrollPane scrollPaneFolderTree = new JScrollPane();
 		panelLeft.add(scrollPaneFolderTree);
 
-		JTree folderTree = new JTree();
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("/", true);
+		folderTree = new JTree(desktopController.getEntryTreeModel());
+		folderTree.setCellRenderer(new EntryTreeCellRenderer());
+		folderTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		scrollPaneFolderTree.setViewportView(folderTree);
-
+		
+		folderTree.addTreeSelectionListener(new TreeSelectionListener() {
+			
+			@Override
+			public void valueChanged(TreeSelectionEvent evt) {
+				TreePath[] paths = evt.getPaths();
+				 
+				// Iterate through all affected nodes
+				for (int i=0; i<paths.length; i++) {
+					if (evt.isAddedPath(i)) {
+						// This node has been selected
+						desktopController.openTree((EntryUiTreeNode) paths[i].getLastPathComponent());
+						break;
+					} 
+				}
+				
+			}
+		});
+		
 		JPanel panelBottom = new JPanel();
 		contentPane.add(panelBottom, BorderLayout.SOUTH);
 
@@ -254,7 +286,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 	}
-
+	
 	/**
 	 * helper method for anonymous inner classes (ActionListenerImpl.) to get "this"
 	 * 

@@ -2,12 +2,15 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -18,8 +21,11 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -29,6 +35,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
 	private final EntryTableModel entryTableModel = new EntryTableModel();
+	
+	private final EntryUiTreeModel entryTreeModel = new EntryUiTreeModel();
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
@@ -115,9 +123,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private void loadRootFolder() {
 		GetFolderContentAction getFolderContentAction = new GetFolderContentAction();
+		GetTreeContentAction getTreeContentAction = new GetTreeContentAction();
 
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(getFolderContentAction);
+		workerController.enqueue(getTreeContentAction);
 	}
 
 	public boolean isInManagementMode() {
@@ -155,6 +165,17 @@ public class DesktopController extends BadgerController implements ActionObserve
 			List<EntryUiModel> entries = getFolderAction.getEntries();
 
 			setCurrentFolder(getFolderAction.getFolderPath(), parentFolderEntryModel, entries);
+		} else if (action instanceof GetTreeContentAction){
+			GetTreeContentAction getTreeAction = (GetTreeContentAction) action;
+			EntryUiTreeNode parent = getTreeAction.getParent();
+			List<EntryUiModel> entries = getTreeAction.getEntries();
+			List<EntryUiTreeNode> treeEntries = new LinkedList<>();
+			for(EntryUiModel entry : entries){
+				treeEntries.add(new EntryUiTreeNode(entry.toString(), true, entry));
+			}
+			entryTreeModel.removeChildsFromParent(parent);
+			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
+			entryTreeModel.reload();
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -177,6 +198,17 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public EntryTableModel getEntryTableModel() {
 		return entryTableModel;
+	}
+
+	public EntryUiTreeModel getEntryTreeModel() {
+		return entryTreeModel;
+	}
+	
+	public void openTree(EntryUiTreeNode entry) {
+		GetTreeContentAction action = new GetTreeContentAction(entry);
+		WorkerController workerController = WorkerController.getInstance();
+		workerController.enqueue(action);
+
 	}
 
 	public void openEntry(EntryUiModel entry) {
