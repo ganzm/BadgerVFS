@@ -187,6 +187,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			String oldName = getPath().getName();
 			VFSDirectoryImpl parent = getParentProtected();
 			parent.renameDirectoryEntryBlock(oldName, newName);
+			this.path = this.path.renameTo(newName);
 		} catch (IOException ex) {
 			throw new VFSException(ex);
 		}
