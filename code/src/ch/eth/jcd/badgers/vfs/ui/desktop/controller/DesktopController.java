@@ -2,7 +2,6 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
 import java.awt.Component;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -22,6 +20,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
@@ -35,7 +34,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
 	private final EntryTableModel entryTableModel = new EntryTableModel();
-	
+
 	private final EntryUiTreeModel entryTreeModel = new EntryUiTreeModel();
 
 	public DesktopController(BadgerViewBase desktopView) {
@@ -151,9 +150,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	@Override
 	public void onActionFailed(BadgerAction action, VFSException e) {
-
 		SwingUtil.handleException(null, e);
-
 		updateGUI();
 	}
 
@@ -165,17 +162,20 @@ public class DesktopController extends BadgerController implements ActionObserve
 			List<EntryUiModel> entries = getFolderAction.getEntries();
 
 			setCurrentFolder(getFolderAction.getFolderPath(), parentFolderEntryModel, entries);
-		} else if (action instanceof GetTreeContentAction){
+		} else if (action instanceof GetTreeContentAction) {
 			GetTreeContentAction getTreeAction = (GetTreeContentAction) action;
 			EntryUiTreeNode parent = getTreeAction.getParent();
 			List<EntryUiModel> entries = getTreeAction.getEntries();
 			List<EntryUiTreeNode> treeEntries = new LinkedList<>();
-			for(EntryUiModel entry : entries){
+			for (EntryUiModel entry : entries) {
 				treeEntries.add(new EntryUiTreeNode(entry.toString(), true, entry));
 			}
 			entryTreeModel.removeChildsFromParent(parent);
 			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
 			entryTreeModel.reload();
+		} else if (action instanceof RenameEntryAction) {
+			RenameEntryAction renameAction = (RenameEntryAction) action;
+			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -203,7 +203,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	public EntryUiTreeModel getEntryTreeModel() {
 		return entryTreeModel;
 	}
-	
+
 	public void openTree(EntryUiTreeNode entry) {
 		GetTreeContentAction action = new GetTreeContentAction(entry);
 		WorkerController workerController = WorkerController.getInstance();
@@ -252,5 +252,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		public String getDescription() {
 			return (description == null ? extensions[0] : description);
 		}
+	}
+
+	public void StartRenameEntry(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
+		RenameEntryAction action = new RenameEntryAction(currentEditedValue, editedRow, newEntryName);
+		WorkerController.getInstance().enqueue(action);
 	}
 }

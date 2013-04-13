@@ -49,24 +49,47 @@ public class EntryTableModel implements TableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		EntryUiModel entry = entries.get(rowIndex);
-		if (columnIndex == 0) {
-			return entry;
+		if (rowIndex < entries.size()) {
+			EntryUiModel entry = entries.get(rowIndex);
+			if (columnIndex == 0) {
+				return entry;
+			}
 		}
 
 		return null;
+	}
 
+	public void updatedValueAt(int currentEditedRow, int currentEditedColumn) {
+		TableModelEvent updateEvent = new TableModelEvent(this, currentEditedColumn, currentEditedColumn, TableModelEvent.UPDATE);
+		for (TableModelListener listener : listeners) {
+			listener.tableChanged(updateEvent);
+		}
 	}
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		return false;
+		Object entryModel = getValueAt(rowIndex, columnIndex);
+		if (entryModel != null && entryModel instanceof ParentFolderEntryUiModel) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
+
+		// strange code with strange behaviour of CellEditor - dont touch
+		if (!(aValue instanceof EntryUiModel)) {
+			return;
+		}
+
+		entries.remove(rowIndex);
+		entries.add(rowIndex, (EntryUiModel) aValue);
+
+		TableModelEvent updateEvent = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.UPDATE);
+		for (TableModelListener listener : listeners) {
+			listener.tableChanged(updateEvent);
+		}
 
 	}
 
@@ -74,7 +97,6 @@ public class EntryTableModel implements TableModel {
 		int oldSize = entries.size();
 		entries.clear();
 
-		// DataEvent removeEvent = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, 0, oldSize);
 		TableModelEvent removeEvent = new TableModelEvent(this, 0, oldSize, TableModelEvent.DELETE);
 		for (TableModelListener listener : listeners) {
 			listener.tableChanged(removeEvent);

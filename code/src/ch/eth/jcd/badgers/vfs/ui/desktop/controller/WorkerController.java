@@ -142,7 +142,7 @@ public class WorkerController implements Runnable {
 			try {
 				obs.onActionFailed(action, e);
 			} catch (Exception ex) {
-				LOGGER.error("Error while notifying Observer" + obs, ex);
+				LOGGER.error("Error while notifying Observer " + obs, ex);
 			}
 		}
 	}

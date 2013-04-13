@@ -7,12 +7,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -25,15 +28,14 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 
@@ -41,8 +43,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
@@ -51,6 +53,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private static final long serialVersionUID = -8776317677851635247L;
 
 	private static final Logger LOGGER = Logger.getLogger(VFSSwingGui.class);
+
+	private final EntryCellEditor entryCellEditor;
 
 	private final JPanel contentPane;
 	private final JTextField txtFind;
@@ -97,6 +101,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				beforeWindowClosing();
 			}
 		});
+
 		setBounds(100, 100, 900, 631);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -152,6 +157,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(mntmNewFolder);
 
 		JMenuItem mntmRename = new JMenuItem("Rename");
+		mntmRename.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+		mntmRename.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					startRename();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
 		mnActions.add(mntmRename);
 
 		JMenuItem mntmDelete = new JMenuItem("Delete");
@@ -222,12 +238,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		tableFolderEntries = new JTable();
 		tableFolderEntries.setShowGrid(false);
-		tableFolderEntries.setColumnSelectionAllowed(false);
 		tableFolderEntries.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
 		tableFolderEntries.setRowHeight(40);
-		panelMiddle.add(tableFolderEntries, BorderLayout.CENTER);
-		TableModel entryTableModel = desktopController.getEntryTableModel();
+
+		EntryTableModel entryTableModel = desktopController.getEntryTableModel();
 		tableFolderEntries.setModel(entryTableModel);
+
+		entryCellEditor = new EntryCellEditor(tableFolderEntries, desktopController);
+		TableColumn columnModel = tableFolderEntries.getColumnModel().getColumn(0);
+		columnModel.setCellEditor(entryCellEditor);
+
+		panelMiddle.add(tableFolderEntries, BorderLayout.CENTER);
 
 		tableFolderEntries.addMouseListener(new MouseAdapter() {
 			@Override
@@ -243,6 +264,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 
+		performUglyF2KeyStrokeHack(tableFolderEntries);
+
 		JPanel panelLeft = new JPanel();
 		splitPane.setLeftComponent(panelLeft);
 		panelLeft.setLayout(new BorderLayout(0, 0));
@@ -255,25 +278,25 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		folderTree.setCellRenderer(new EntryTreeCellRenderer());
 		folderTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		scrollPaneFolderTree.setViewportView(folderTree);
-		
+
 		folderTree.addTreeSelectionListener(new TreeSelectionListener() {
-			
+
 			@Override
 			public void valueChanged(TreeSelectionEvent evt) {
 				TreePath[] paths = evt.getPaths();
-				 
+
 				// Iterate through all affected nodes
-				for (int i=0; i<paths.length; i++) {
+				for (int i = 0; i < paths.length; i++) {
 					if (evt.isAddedPath(i)) {
 						// This node has been selected
 						desktopController.openTree((EntryUiTreeNode) paths[i].getLastPathComponent());
 						break;
-					} 
+					}
 				}
-				
+
 			}
 		});
-		
+
 		JPanel panelBottom = new JPanel();
 		contentPane.add(panelBottom, BorderLayout.SOUTH);
 
@@ -286,7 +309,31 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 	}
-	
+
+	/**
+	 * copied from http://stackoverflow.com/questions/2019371/swing-setting-a-function-key-f2-as-an-accelerator
+	 * 
+	 * @param tableFolderEntries2
+	 */
+	private void performUglyF2KeyStrokeHack(JTable tableFolderEntries2) {
+		KeyStroke keyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
+
+		InputMap imap = tableFolderEntries.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		while (imap != null) {
+			imap.remove(keyToRemove);
+			imap = imap.getParent();
+		}
+	}
+
+	protected void startRename() {
+		int currentRow = tableFolderEntries.getSelectedRow();
+		EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
+		LOGGER.debug("Start renaming " + entry);
+
+		entryCellEditor.setAllowEditing(true);
+		tableFolderEntries.editCellAt(currentRow, 0);
+	}
+
 	/**
 	 * helper method for anonymous inner classes (ActionListenerImpl.) to get "this"
 	 * 

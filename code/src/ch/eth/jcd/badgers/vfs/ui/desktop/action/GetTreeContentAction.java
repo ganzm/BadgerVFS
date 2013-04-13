@@ -7,9 +7,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 
 public class GetTreeContentAction extends BadgerAction {
 
@@ -18,7 +16,7 @@ public class GetTreeContentAction extends BadgerAction {
 	/**
 	 * folder for which we want to load entries
 	 */
-	private EntryUiTreeNode folderEntryModel;
+	private final EntryUiTreeNode folderEntryModel;
 
 	/**
 	 * 
@@ -49,7 +47,7 @@ public class GetTreeContentAction extends BadgerAction {
 		List<VFSEntry> entries = folder.getChildren();
 		uiEntries = new ArrayList<EntryUiModel>();
 		for (VFSEntry entry : entries) {
-			if(entry.isDirectory())
+			if (entry.isDirectory())
 				uiEntries.add(new EntryUiModel(entry, entry.isDirectory()));
 		}
 	}
@@ -57,13 +55,13 @@ public class GetTreeContentAction extends BadgerAction {
 	public List<EntryUiModel> getEntries() {
 		return uiEntries;
 	}
-	
-	public EntryUiTreeNode getParent(){
+
+	public EntryUiTreeNode getParent() {
 		return folderEntryModel;
 	}
 
 	public String getFolderPath() {
-		if(folderEntryModel == null){
+		if (folderEntryModel == null) {
 			return "/";
 		}
 		return folderEntryModel.getUiEntry().getFullPath();

@@ -1,15 +1,10 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.model;
 
-
-import java.util.Enumeration;
-
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
+public class EntryUiTreeNode extends DefaultMutableTreeNode {
 
-public class EntryUiTreeNode extends DefaultMutableTreeNode{
+	private static final long serialVersionUID = -6288068772437793999L;
 
 	private final EntryUiModel entry;
 
@@ -21,9 +16,9 @@ public class EntryUiTreeNode extends DefaultMutableTreeNode{
 	public EntryUiModel getUiEntry() {
 		return entry;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return super.toString();
 	}
 }
