@@ -13,6 +13,10 @@ public class EntryTableModel implements TableModel {
 
 	private final List<EntryUiModel> entries = new ArrayList<EntryUiModel>();
 
+	public List<EntryUiModel> getEntries() {
+		return entries;
+	}
+
 	@Override
 	public void addTableModelListener(TableModelListener l) {
 		listeners.add(l);
@@ -86,7 +90,7 @@ public class EntryTableModel implements TableModel {
 		entries.remove(rowIndex);
 		entries.add(rowIndex, (EntryUiModel) aValue);
 
-		TableModelEvent updateEvent = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.UPDATE);
+		TableModelEvent updateEvent = new TableModelEvent(this, rowIndex, rowIndex, 0, TableModelEvent.UPDATE);
 		for (TableModelListener listener : listeners) {
 			listener.tableChanged(updateEvent);
 		}
@@ -97,7 +101,7 @@ public class EntryTableModel implements TableModel {
 		int oldSize = entries.size();
 		entries.clear();
 
-		TableModelEvent removeEvent = new TableModelEvent(this, 0, oldSize, TableModelEvent.DELETE);
+		TableModelEvent removeEvent = new TableModelEvent(this, 0, oldSize, 0, TableModelEvent.DELETE);
 		for (TableModelListener listener : listeners) {
 			listener.tableChanged(removeEvent);
 		}
@@ -113,6 +117,17 @@ public class EntryTableModel implements TableModel {
 		int newSize = entries.size();
 
 		TableModelEvent addedEvent = new TableModelEvent(this, 0, newSize, 0, TableModelEvent.INSERT);
+		for (TableModelListener listener : listeners) {
+			listener.tableChanged(addedEvent);
+		}
+	}
+
+	public void appendEntry(EntryUiModel entryModel) {
+		entries.add(entryModel);
+
+		int newSize = entries.size();
+
+		TableModelEvent addedEvent = new TableModelEvent(this, newSize - 1, newSize, 0, TableModelEvent.INSERT);
 		for (TableModelListener listener : listeners) {
 			listener.tableChanged(addedEvent);
 		}

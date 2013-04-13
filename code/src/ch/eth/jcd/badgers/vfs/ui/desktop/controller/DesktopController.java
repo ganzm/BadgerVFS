@@ -15,12 +15,15 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
@@ -36,6 +39,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private final EntryTableModel entryTableModel = new EntryTableModel();
 
 	private final EntryUiTreeModel entryTreeModel = new EntryUiTreeModel();
+
+	private VFSPath currentFolder;
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
@@ -63,7 +68,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setDialogTitle("Open Badger Disk");
 		fileChooser.setMultiSelectionEnabled(false);
-		FileFilter bfsType = new ExtensionFilter("Badger File System (.bfs)", ".bfs");
+		FileFilter bfsType = new BadgerFileExtensionFilter();
 		fileChooser.addChoosableFileFilter(bfsType);
 		fileChooser.setFileFilter(bfsType);
 		fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
@@ -173,6 +178,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTreeModel.removeChildsFromParent(parent);
 			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
 			entryTreeModel.reload();
+		} else if (action instanceof CreateFolderAction) {
+			CreateFolderAction createAction = (CreateFolderAction) action;
+			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
+			entryTableModel.appendEntry(entryModel);
 		} else if (action instanceof RenameEntryAction) {
 			RenameEntryAction renameAction = (RenameEntryAction) action;
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
@@ -183,8 +192,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
-	private void setCurrentFolder(String path, ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> entries) {
+	private void setCurrentFolder(VFSPath path, ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> entries) {
 		entryTableModel.setEntries(parentFolderEntryModel, entries);
+		this.currentFolder = path;
 		updateGUI();
 	}
 
@@ -218,44 +228,42 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	}
 
-	public class ExtensionFilter extends FileFilter {
-		private final String extensions[];
-
-		private final String description;
-
-		public ExtensionFilter(String description, String extension) {
-			this(description, new String[] { extension });
-		}
-
-		public ExtensionFilter(String description, String extensions[]) {
-			this.description = description;
-			this.extensions = extensions.clone();
-		}
-
-		@Override
-		public boolean accept(File file) {
-			if (file.isDirectory()) {
-				return true;
-			}
-			int count = extensions.length;
-			String path = file.getAbsolutePath();
-			for (int i = 0; i < count; i++) {
-				String ext = extensions[i];
-				if (path.endsWith(ext) && path.charAt(path.length() - ext.length()) == '.') {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		@Override
-		public String getDescription() {
-			return (description == null ? extensions[0] : description);
-		}
-	}
-
 	public void StartRenameEntry(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
 		RenameEntryAction action = new RenameEntryAction(currentEditedValue, editedRow, newEntryName);
 		WorkerController.getInstance().enqueue(action);
 	}
+
+	private String getUniquieFolderName(List<EntryUiModel> entries) {
+		String praefix = "NewFolder";
+		String newFolderName = praefix;
+		int count = 0;
+		boolean isUnique;
+
+		do {
+			isUnique = true;
+			for (EntryUiModel entry : entries) {
+				if (newFolderName.equals(entry.getDisplayName())) {
+					isUnique = false;
+					newFolderName = praefix + (++count);
+
+					// break for loop
+					break;
+				}
+			}
+		} while (!isUnique);
+
+		return newFolderName;
+	}
+
+	public void startCreatenewFolder() {
+		List<EntryUiModel> entries = entryTableModel.getEntries();
+		String newFolderName = getUniquieFolderName(entries);
+		startCreateNewFolder(newFolderName);
+	}
+
+	public void startCreateNewFolder(String name) {
+		CreateFolderAction action = new CreateFolderAction(currentFolder, name);
+		WorkerController.getInstance().enqueue(action);
+	}
+
 }

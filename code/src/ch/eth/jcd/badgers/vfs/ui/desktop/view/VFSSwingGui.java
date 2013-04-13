@@ -154,6 +154,16 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		menuBar.add(mnActions);
 
 		JMenuItem mntmNewFolder = new JMenuItem("New Folder");
+		mntmNewFolder.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					desktopController.startCreatenewFolder();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
 		mnActions.add(mntmNewFolder);
 
 		JMenuItem mntmRename = new JMenuItem("Rename");
@@ -327,6 +337,11 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	protected void startRename() {
 		int currentRow = tableFolderEntries.getSelectedRow();
+		if (currentRow < 0) {
+			JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
 		EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
 		LOGGER.debug("Start renaming " + entry);
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
@@ -65,8 +66,12 @@ public class GetFolderContentAction extends BadgerAction {
 		return uiEntries;
 	}
 
-	public String getFolderPath() {
+	public String getFolderPathString() {
 		return folderEntryModel.getFullPath();
+	}
+
+	public VFSPath getFolderPath() {
+		return folderEntryModel.getEntry().getPath();
 	}
 
 	public ParentFolderEntryUiModel getParentFolderEntryModel() {
