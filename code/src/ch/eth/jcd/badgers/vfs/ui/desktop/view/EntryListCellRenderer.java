@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
 import javax.swing.JList;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -13,7 +12,8 @@ public class EntryListCellRenderer extends DefaultListCellRenderer {
 
 	private static final long serialVersionUID = -1506119105265047133L;
 
-	private JLabel label;
+	// private JLabel label;
+	private EntryPanel entryPanel;
 
 	private Color textSelectionColor = Color.BLACK;
 	private Color backgroundSelectionColor = Color.CYAN;
@@ -21,26 +21,29 @@ public class EntryListCellRenderer extends DefaultListCellRenderer {
 	private Color backgroundNonSelectionColor = Color.WHITE;
 
 	public EntryListCellRenderer() {
-		label = new JLabel();
-		label.setOpaque(true);
+		// label = new JLabel();
+		// label.setOpaque(true);
 	}
 
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean expanded) {
 		EntryUiModel entry = (EntryUiModel) value;
 
-		label.setIcon(entry.getIcon());
-		label.setText(entry.getDisplayName());
-		label.setToolTipText(entry.getFullPath());
+		entryPanel = new EntryPanel();
+		// entryPanel.setOpaque(true);
+
+		entryPanel.setIcon(entry.getIcon());
+		entryPanel.setText(entry.getDisplayName());
+		entryPanel.setToolTipText(entry.getFullPath());
 
 		if (selected) {
-			label.setBackground(backgroundSelectionColor);
-			label.setForeground(textSelectionColor);
+			entryPanel.setBackground(backgroundSelectionColor);
+			entryPanel.setForeground(textSelectionColor);
 		} else {
-			label.setBackground(backgroundNonSelectionColor);
-			label.setForeground(textNonSelectionColor);
+			entryPanel.setBackground(backgroundNonSelectionColor);
+			entryPanel.setForeground(textNonSelectionColor);
 		}
 
-		return label;
+		return entryPanel;
 	}
 }
