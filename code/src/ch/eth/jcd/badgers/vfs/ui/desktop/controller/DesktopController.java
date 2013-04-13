@@ -7,7 +7,6 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.ListModel;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
@@ -19,7 +18,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiListModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
@@ -29,7 +28,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
-	private final EntryUiListModel entryListModel = new EntryUiListModel();
+	private final EntryTableModel entryTableModel = new EntryTableModel();
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
@@ -164,7 +163,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	private void setCurrentFolder(String path, ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> entries) {
-		entryListModel.setEntries(parentFolderEntryModel, entries);
+		entryTableModel.setEntries(parentFolderEntryModel, entries);
 		updateGUI();
 	}
 
@@ -176,8 +175,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		return false;
 	}
 
-	public ListModel<EntryUiModel> getEntryListModel() {
-		return entryListModel;
+	public EntryTableModel getEntryTableModel() {
+		return entryTableModel;
 	}
 
 	public void openEntry(EntryUiModel entry) {
@@ -186,7 +185,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		workerController.enqueue(action);
 
 	}
-	
+
 	public class ExtensionFilter extends FileFilter {
 		private final String extensions[];
 

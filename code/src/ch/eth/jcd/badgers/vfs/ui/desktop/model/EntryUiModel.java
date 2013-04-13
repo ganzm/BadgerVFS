@@ -24,6 +24,8 @@ public class EntryUiModel {
 
 	private final boolean isDirectory;
 
+	private boolean isBeeingRenaming = false;
+
 	/**
 	 * Static constructor load some images
 	 */
@@ -47,8 +49,11 @@ public class EntryUiModel {
 	}
 
 	public void toggleRename() {
-		// TODO Auto-generated method stub
+		this.isBeeingRenaming = !isBeeingRenaming;
+	}
 
+	public boolean isBeeingRenamed() {
+		return isBeeingRenaming;
 	}
 
 	public boolean isDirectory() {

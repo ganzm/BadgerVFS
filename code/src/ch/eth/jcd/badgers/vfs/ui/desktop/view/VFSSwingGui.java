@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -23,10 +22,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.ListModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 
@@ -43,11 +43,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private static final Logger LOGGER = Logger.getLogger(VFSSwingGui.class);
 
-	/**
-	 * remember which file entry item we clicked the last time
-	 */
-	private int lastSelectedIndex = -1;
-
 	private final JPanel contentPane;
 	private final JTextField txtFind;
 	private final JButton btnTestBlockingAction;
@@ -58,7 +53,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
 	private final JTextField textField;
-	private final JList<EntryUiModel> entryList;
+	private final JTable tableFolderEntries;
 
 	/**
 	 * Launch the application.
@@ -214,35 +209,28 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panel.add(textField, gbc_textField);
 		textField.setColumns(10);
 
-		entryList = new JList<EntryUiModel>();
-		entryList.addMouseListener(new MouseAdapter() {
+		tableFolderEntries = new JTable();
+		tableFolderEntries.setShowGrid(false);
+		tableFolderEntries.setColumnSelectionAllowed(false);
+		tableFolderEntries.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
+		tableFolderEntries.setRowHeight(40);
+		panelMiddle.add(tableFolderEntries, BorderLayout.CENTER);
+		TableModel entryTableModel = desktopController.getEntryTableModel();
+		tableFolderEntries.setModel(entryTableModel);
+
+		tableFolderEntries.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent event) {
-
 				if (event.getClickCount() == 2) {
 					// doubleclicked on
-					EntryUiModel entry = entryList.getModel().getElementAt(entryList.getSelectedIndex());
+					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(tableFolderEntries.getSelectedRow(), 0);
 					LOGGER.debug("Doubleclicked " + entry);
 					if (entry.isDirectory()) {
 						desktopController.openEntry(entry);
 					}
-				} else {
-
-					if (lastSelectedIndex == entryList.getSelectedIndex()) {
-						EntryUiModel entry = entryList.getModel().getElementAt(entryList.getSelectedIndex());
-						LOGGER.info("Toggle rename on" + entry);
-						entry.toggleRename();
-					}
-
-					lastSelectedIndex = entryList.getSelectedIndex();
 				}
 			}
 		});
-
-		entryList.setCellRenderer(new EntryListCellRenderer());
-		ListModel<EntryUiModel> entryListModel = desktopController.getEntryListModel();
-		entryList.setModel(entryListModel);
-		panelMiddle.add(entryList, BorderLayout.CENTER);
 
 		JPanel panelLeft = new JPanel();
 		splitPane.setLeftComponent(panelLeft);
@@ -257,7 +245,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JPanel panelBottom = new JPanel();
 		contentPane.add(panelBottom, BorderLayout.SOUTH);
 
-		btnTestBlockingAction = new JButton("Test Blocking Action");
+		btnTestBlockingAction = new JButton("Test Button");
 		panelBottom.add(btnTestBlockingAction);
 		btnTestBlockingAction.addActionListener(new ActionListener() {
 			@Override
@@ -269,7 +257,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	/**
 	 * helper method for anonymous inner classes (ActionListenerImpl.) to get "this"
-	 * 
 	 * 
 	 * @return
 	 */
@@ -293,6 +280,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		}
 
+		// close the main window
 		dispose();
 	}
 
@@ -309,5 +297,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		contentPane.setVisible(diskMode);
 		contentPane.setEnabled(diskMode);
+	}
+
+	private void clearTableSelection() {
+		tableFolderEntries.clearSelection();
 	}
 }
