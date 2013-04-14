@@ -218,11 +218,21 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem mntmExport = new JMenuItem("Export");
 		mnActions.add(mntmExport);
 
-		JMenuItem mntmCopyto = new JMenuItem("CopyTo");
-		mnActions.add(mntmCopyto);
+		mnActions.addSeparator();
 
-		JMenuItem mntmMoveto = new JMenuItem("MoveTo");
-		mnActions.add(mntmMoveto);
+		JMenuItem mntmQueryDiskspace = new JMenuItem("Query Diskspace");
+		mnActions.add(mntmQueryDiskspace);
+
+		mnActions.addSeparator();
+
+		JMenuItem mntmCopy = new JMenuItem("Copy");
+		mnActions.add(mntmCopy);
+
+		JMenuItem mntmCut = new JMenuItem("Cut");
+		mnActions.add(mntmCut);
+
+		JMenuItem mntmPaste = new JMenuItem("Paste");
+		mnActions.add(mntmPaste);
 
 		JMenu mnHelp = new JMenu("Help");
 		mnHelp.setMnemonic('H');

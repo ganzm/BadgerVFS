@@ -128,5 +128,6 @@ public class ImportDialog extends JDialog {
 		String sourcePath = textFieldSource.getText();
 		// TODO validate source path
 		ownerController.startImportFromHostFs(sourcePath);
+		dispose();
 	}
 }
