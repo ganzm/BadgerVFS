@@ -27,7 +27,7 @@ public interface VFSPath {
 	 * @return returns the complete path of this current object as string
 	 * @throws VFSException
 	 */
-	String getAbsolutePath() throws VFSException;
+	String getAbsolutePath();
 
 	String getParentPath() throws VFSException;
 
@@ -38,7 +38,7 @@ public interface VFSPath {
 	 * 
 	 * @throws VFSException
 	 */
-	String getName() throws VFSException;
+	String getName();
 
 	VFSEntry getVFSEntry() throws VFSException;
 }

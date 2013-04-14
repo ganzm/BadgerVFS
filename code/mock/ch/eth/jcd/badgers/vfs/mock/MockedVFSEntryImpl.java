@@ -41,7 +41,7 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		try {
 			Files.walkFileTree(fileEntry,
 					new CopyDirVisitor(fileEntry, Paths.get(pathToRoot + File.separatorChar + newLocation.getAbsolutePath().substring(1))));
-		} catch (IOException | VFSException e) {
+		} catch (IOException e) {
 			LOGGER.error("", e);
 		}
 	}

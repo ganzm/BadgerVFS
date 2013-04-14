@@ -7,7 +7,6 @@ import javax.swing.ImageIcon;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.util.ResourceLocator;
 
 /**
@@ -70,21 +69,11 @@ public class EntryUiModel {
 	}
 
 	public String getDisplayName() {
-		try {
-			return entry.getPath().getName();
-		} catch (VFSException ex) {
-			LOGGER.error("", ex);
-			return "ERROR";
-		}
+		return entry.getPath().getName();
 	}
 
 	public String getFullPath() {
-		try {
-			return entry.getPath().getAbsolutePath();
-		} catch (VFSException ex) {
-			LOGGER.error("", ex);
-			return "ERROR";
-		}
+		return entry.getPath().getAbsolutePath();
 	}
 
 	/**

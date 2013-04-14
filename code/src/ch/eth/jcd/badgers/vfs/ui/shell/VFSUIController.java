@@ -379,20 +379,12 @@ public class VFSUIController {
 
 						@Override
 						public void foundEntry(VFSPath path) {
-							try {
-								console.writeLn(path.getAbsolutePath());
-							} catch (VFSException e) {
-								LOGGER.error("Error while getting absolutePath:", e);
-							}
+							console.writeLn(path.getAbsolutePath());
 						}
 
 						@Override
 						public boolean stopSearch(VFSPath currentDirectory) {
-							try {
-								LOGGER.debug("currently looking in:" + currentDirectory.getAbsolutePath());
-							} catch (VFSException e) {
-								LOGGER.error("Error while getting absolutePath:", e);
-							}
+							LOGGER.debug("currently looking in:" + currentDirectory.getAbsolutePath());
 							// do not stop search
 							return false;
 						}
@@ -632,13 +624,9 @@ public class VFSUIController {
 					console.writeLn(NO_DISK_OPEN_ERROR);
 					return;
 				}
-				try {
-					console.writeLn(currentDirectory.getPath().getAbsolutePath());
-				} catch (VFSException e) {
-					LOGGER.error("Error while pwd", e);
-				}
-				LOGGER.debug("pwd command leaving");
+				console.writeLn(currentDirectory.getPath().getAbsolutePath());
 
+				LOGGER.debug("pwd command leaving");
 			}
 		};
 	}

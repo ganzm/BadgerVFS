@@ -207,6 +207,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(mntmNewFile);
 
 		JMenuItem mntmImport = new JMenuItem("Import");
+		mntmImport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.openImportDialog(getDesktopFrame());
+			}
+		});
 		mnActions.add(mntmImport);
 
 		JMenuItem mntmExport = new JMenuItem("Export");

@@ -186,7 +186,7 @@ public class VFSPathImpl implements VFSPath {
 	}
 
 	@Override
-	public String getName() throws VFSException {
+	public String getName() {
 		if (pathParts.length <= 0) {
 			// found the root path
 			return "";

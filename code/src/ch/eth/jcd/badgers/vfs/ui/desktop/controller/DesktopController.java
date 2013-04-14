@@ -23,6 +23,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
@@ -30,6 +31,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
@@ -54,6 +56,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 	 */
 	public void openCreateNewDiskDialog(JFrame desktop) {
 		NewDiskCreationDialog dialog = new NewDiskCreationDialog(desktop, this);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openImportDialog(JFrame desktop) {
+		ImportDialog dialog = new ImportDialog(desktop, this, currentFolder.getAbsolutePath());
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -275,4 +283,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController.getInstance().enqueue(action);
 	}
 
+	public void startImportFromHostFs(String sourcePath) {
+
+		ImportAction action = new ImportAction(sourcePath, currentFolder);
+		WorkerController.getInstance().enqueue(action);
+
+	}
 }
