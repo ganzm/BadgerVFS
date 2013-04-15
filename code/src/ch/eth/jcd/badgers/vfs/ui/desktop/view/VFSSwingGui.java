@@ -70,6 +70,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
+	private final JMenuItem mntmExport;
+	private final JMenuItem mntmPaste;
 	private final JTextField textFieldCurrentPath;
 	private final JTable tableFolderEntries;
 	private final JTree folderTree;
@@ -82,9 +84,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * State Variable determines whether search or browse gui is shown
 	 */
 	private boolean searching = false;
-
-	private final JMenuItem mntmExport;
-	private final JMenuItem mntmPaste;
 
 	/**
 	 * Launch the application.
@@ -407,7 +406,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void valueChanged(ListSelectionEvent e) {
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				adjustActionMenus(entry);
-
 			}
 
 		});
@@ -421,6 +419,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (tableFolderEntries.isEditing()) {
+					// we are currently renaming an entry
+					// hitting Enter should stop that
+					entryCellEditor.stopCellEditing();
+					return;
+				}
+
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				if (entry.isDirectory()) {
 					desktopController.openEntry(entry, null);
