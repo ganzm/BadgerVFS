@@ -24,9 +24,9 @@ public class VFSImporter {
 	 *            e.g. c:\temp\folderToImport
 	 * @param path
 	 *            e.g. /home/imported
-	 * @throws VFSInvalidPathException
+	 * @throws VFSException
 	 */
-	public void importFileOrFolder(String pathToImportFile, VFSPath path) throws VFSInvalidPathException {
+	public void importFileOrFolder(String pathToImportFile, VFSPath path) throws VFSInvalidPathException, VFSException {
 		File importFile = new File(pathToImportFile);
 		if (!importFile.exists()) {
 			throw new VFSInvalidPathException("Path on host file system does not exist" + pathToImportFile);
@@ -43,8 +43,8 @@ public class VFSImporter {
 			} else {
 				importFile(importFile, path);
 			}
-		} catch (IOException | VFSException e) {
-			LOGGER.error("Error while importing file: ", e);
+		} catch (IOException e) {
+			throw new VFSException(e);
 		}
 	}
 

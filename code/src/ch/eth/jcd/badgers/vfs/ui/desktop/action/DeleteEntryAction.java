@@ -9,7 +9,8 @@ public class DeleteEntryAction extends BadgerAction {
 	private final EntryUiModel entry;
 	private final int rowIndexToDelete;
 
-	public DeleteEntryAction(EntryUiModel entry, int rowIndexToDelete) {
+	public DeleteEntryAction(ActionObserver actionObserver, EntryUiModel entry, int rowIndexToDelete) {
+		super(actionObserver);
 		this.entry = entry;
 		this.rowIndexToDelete = rowIndexToDelete;
 	}

@@ -10,7 +10,8 @@ public class ImportAction extends BadgerAction {
 	private final String hostFsSourcePath;
 	private final String destinationPath;
 
-	public ImportAction(String hostFsSourcePath, String destinationPath) {
+	public ImportAction(ActionObserver actionObserver, String hostFsSourcePath, String destinationPath) {
+		super(actionObserver);
 		this.hostFsSourcePath = hostFsSourcePath;
 		this.destinationPath = destinationPath;
 	}

@@ -1,7 +1,5 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -33,8 +31,6 @@ public class WorkerController implements Runnable {
 	 * Queue contains unprocesses jobs
 	 */
 	private final ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
-
-	private final List<ActionObserver> actionObservers = new ArrayList<ActionObserver>();
 
 	private Thread controllerThread;
 
@@ -134,21 +130,17 @@ public class WorkerController implements Runnable {
 		try {
 			LOGGER.info("Perform Action " + action);
 			action.runDiskAction(diskManager);
+			LOGGER.info("Finished Action " + action);
+			actionFinished(action);
 		} catch (VFSException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
-		} finally {
-			LOGGER.info("Finished Action " + action);
-			actionFinished(action);
 		}
 	}
 
-	public void addActionObserver(ActionObserver actionObserver) {
-		actionObservers.add(actionObserver);
-	}
-
 	private void actionFailed(BadgerAction action, VFSException e) {
-		for (ActionObserver obs : actionObservers) {
+		ActionObserver obs = action.getActionObserver();
+		if (obs != null) {
 			try {
 				obs.onActionFailed(action, e);
 			} catch (Exception ex) {
@@ -158,7 +150,8 @@ public class WorkerController implements Runnable {
 	}
 
 	private void actionFinished(BadgerAction action) {
-		for (ActionObserver obs : actionObservers) {
+		ActionObserver obs = action.getActionObserver();
+		if (obs != null) {
 			try {
 				obs.onActionFinished(action);
 			} catch (Exception ex) {

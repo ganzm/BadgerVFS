@@ -10,7 +10,8 @@ public class CopyAction extends BadgerAction {
 	private final VFSEntry source;
 	private final VFSEntry destinationFolder;
 
-	public CopyAction(VFSEntry source, VFSEntry destinationFolder) {
+	public CopyAction(ActionObserver actionObserver, VFSEntry source, VFSEntry destinationFolder) {
+		super(actionObserver);
 		this.source = source;
 		this.destinationFolder = destinationFolder;
 	}

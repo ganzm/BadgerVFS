@@ -16,13 +16,21 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
-public class SearchPanel extends JPanel implements BadgerViewBase {
+public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserver {
+	private static final Logger LOGGER = Logger.getLogger(SearchPanel.class);
+
 	private static final long serialVersionUID = 6942548578015341003L;
 
 	private SearchParameter searchParameter = new SearchParameter();
@@ -171,7 +179,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		searchParameter.setCaseSensitive(chckbxSearchCaseSensitiv.isSelected());
 
 		WorkerController controller = WorkerController.getInstance();
-		currentSearchAction = new SearchAction(searchParameter, searchFolder);
+		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
 		controller.enqueue(currentSearchAction);
 
 		update();
@@ -205,5 +213,22 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnCancelSearch.setEnabled(searching && !canceling);
 		btnStartSearch.setEnabled(!searching);
 		btnBack.setEnabled(!searching);
+	}
+
+	@Override
+	public void onActionFailed(BadgerAction action, VFSException e) {
+		SwingUtil.handleException(this, e);
+	}
+
+	@Override
+	public void onActionFinished(BadgerAction action) {
+		if (action instanceof SearchAction) {
+			LOGGER.debug("Search finished " + action);
+			currentSearchAction = null;
+			update();
+		} else {
+			SwingUtil.handleError(this, "Unexpected Action " + action);
+		}
+
 	}
 }

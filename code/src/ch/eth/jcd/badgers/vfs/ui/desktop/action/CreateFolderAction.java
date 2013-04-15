@@ -11,7 +11,8 @@ public class CreateFolderAction extends BadgerAction {
 	private final String name;
 	private VFSEntry newFolder;
 
-	public CreateFolderAction(VFSPath currentFolder, String name) {
+	public CreateFolderAction(ActionObserver actionObserver, VFSPath currentFolder, String name) {
+		super(actionObserver);
 		this.parentFolderPath = currentFolder;
 		this.name = name;
 	}

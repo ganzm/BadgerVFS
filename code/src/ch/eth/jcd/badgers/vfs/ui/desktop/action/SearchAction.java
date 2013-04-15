@@ -23,7 +23,8 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	 */
 	private String currentDirectory;
 
-	public SearchAction(SearchParameter searchParameter, String searchFolder) {
+	public SearchAction(ActionObserver actionObserver, SearchParameter searchParameter, String searchFolder) {
+		super(actionObserver);
 		this.searchParameter = searchParameter;
 		this.searchFolder = searchFolder;
 	}

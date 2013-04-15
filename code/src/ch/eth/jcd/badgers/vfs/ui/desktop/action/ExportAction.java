@@ -23,7 +23,8 @@ public class ExportAction extends BadgerAction {
 
 	private final JFrame desktopFrame;
 
-	public ExportAction(VFSEntry entryToExport, File destination, JFrame desktopFrame) {
+	public ExportAction(ActionObserver actionObserver, VFSEntry entryToExport, File destination, JFrame desktopFrame) {
+		super(actionObserver);
 		LOGGER.debug("ExportAction created: source=" + entryToExport.getPath().toString() + " destination=" + destination.getAbsolutePath());
 		this.entry = entryToExport;
 		this.destination = destination;

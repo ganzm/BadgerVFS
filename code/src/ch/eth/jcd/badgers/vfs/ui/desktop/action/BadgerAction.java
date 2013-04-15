@@ -5,8 +5,14 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public abstract class BadgerAction {
 
-	// callback to be executed after the action, is allowed to be null
-	private Callback callback;
+	/**
+	 * callback to be executed after the action, is allowed to be null
+	 */
+	private final ActionObserver actionObserver;
+
+	public BadgerAction(ActionObserver actionObserver) {
+		this.actionObserver = actionObserver;
+	}
 
 	/**
 	 * Performs this method decoupled of the GUI thread
@@ -16,12 +22,7 @@ public abstract class BadgerAction {
 	 */
 	public abstract void runDiskAction(VFSDiskManager diskManager) throws VFSException;
 
-	public Callback getCallback() {
-		return callback;
+	public ActionObserver getActionObserver() {
+		return actionObserver;
 	}
-
-	public void setCallback(Callback cb) {
-		this.callback = cb;
-	}
-
 }

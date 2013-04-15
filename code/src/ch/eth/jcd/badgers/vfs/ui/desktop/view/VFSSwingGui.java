@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.Callback;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -225,7 +224,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(mntmImport);
 
 		mntmExport = new JMenuItem("Export");
-		mntmImport.addActionListener(new ActionListener() {
+		mntmExport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
@@ -366,12 +365,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			@Override
 			// doubleclick
 			public void mouseClicked(MouseEvent event) {
-				if (event.getClickCount() == 2) {
+				if (event.getClickCount() >= 2) {
 					int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
 					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
 					if (entry != null && entry.isDirectory()) {
-						desktopController.openEntry(entry, null);
+						desktopController.openEntry(entry);
 					}
 				}
 			}
@@ -428,7 +427,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				if (entry.isDirectory()) {
-					desktopController.openEntry(entry, null);
+					desktopController.openEntry(entry);
 				} else {
 					desktopController.startExport(getDesktopFrame(), entry);
 				}
@@ -547,7 +546,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	}
 
 	private void doContextMenuOnEntry(MouseEvent e, final EntryUiModel entry) {
-		LOGGER.debug("OPENING POPUP ON ENTRY: " + entry.getFullPath());
+		LOGGER.debug("Opening popup on entry: " + entry.getFullPath());
 		JPopupMenu menu = new JPopupMenu();
 		if (entry.isDirectory()) {
 
@@ -555,19 +554,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			mntmNewFolder.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-
-						desktopController.openEntry(entry, new Callback() {
-							@Override
-							public void execute() {
-								desktopController.startCreateNewFolder();
-							}
-						});
-					} catch (Exception ex) {
-						SwingUtil.handleException(getDesktopFrame(), ex);
-					}
+					desktopController.createNewFolderFromContextMenu(entry);
 				}
 			});
+
 			menu.add(mntmNewFolder);
 			// Todo: implement "New File"
 			JMenuItem mntmNewFile = new JMenuItem("TODO:New File");
@@ -577,13 +567,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			mntmImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					desktopController.openEntry(entry, new Callback() {
-						@Override
-						public void execute() {
-							desktopController.openImportDialog(getDesktopFrame());
-
-						}
-					});
+					desktopController.importFromContextMenu(entry, getDesktopFrame());
 				}
 			});
 			menu.add(mntmImport);

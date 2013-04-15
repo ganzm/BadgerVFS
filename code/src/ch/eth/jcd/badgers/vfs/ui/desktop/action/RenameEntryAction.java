@@ -10,7 +10,8 @@ public class RenameEntryAction extends BadgerAction {
 	private final int editedRow;
 	private final String newEntryName;
 
-	public RenameEntryAction(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
+	public RenameEntryAction(ActionObserver actionObserver, EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
+		super(actionObserver);
 		this.entryModel = currentEditedValue;
 		this.editedRow = editedRow;
 		this.newEntryName = newEntryName;

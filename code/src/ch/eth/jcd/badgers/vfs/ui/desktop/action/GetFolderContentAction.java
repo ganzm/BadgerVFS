@@ -26,18 +26,21 @@ public class GetFolderContentAction extends BadgerAction {
 	 * @param folderEntryModel
 	 *            folder for which we want to load entries
 	 */
-	public GetFolderContentAction(EntryUiModel folderEntryModel) {
+	public GetFolderContentAction(ActionObserver actionObserver, EntryUiModel folderEntryModel) {
+		super(actionObserver);
 		this.vfsFolderPath = folderEntryModel.getEntry().getPath();
 	}
 
-	public GetFolderContentAction(VFSPath vfsFolderPath) {
+	public GetFolderContentAction(ActionObserver actionObserver, VFSPath vfsFolderPath) {
+		super(actionObserver);
 		this.vfsFolderPath = vfsFolderPath;
 	}
 
 	/**
 	 * Use this constructor to load from root directory
 	 */
-	public GetFolderContentAction() {
+	public GetFolderContentAction(ActionObserver actionObserver) {
+		super(actionObserver);
 		this.vfsFolderPath = null;
 	}
 

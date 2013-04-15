@@ -10,7 +10,8 @@ public class CutAction extends BadgerAction {
 	private final VFSEntry source;
 	private final VFSEntry destinationFolder;
 
-	public CutAction(VFSEntry source, VFSEntry destinationFolder) {
+	public CutAction(ActionObserver actionObserver, VFSEntry source, VFSEntry destinationFolder) {
+		super(actionObserver);
 		this.source = source;
 		this.destinationFolder = destinationFolder;
 	}

@@ -23,14 +23,16 @@ public class GetTreeContentAction extends BadgerAction {
 	 * @param folderEntryModel
 	 *            folder for which we want to load entries
 	 */
-	public GetTreeContentAction(EntryUiTreeNode folderEntryModel) {
+	public GetTreeContentAction(ActionObserver actionObserver, EntryUiTreeNode folderEntryModel) {
+		super(actionObserver);
 		this.folderEntryModel = folderEntryModel;
 	}
 
 	/**
 	 * Use this constructor to load from root directory
 	 */
-	public GetTreeContentAction() {
+	public GetTreeContentAction(ActionObserver actionObserver) {
+		super(actionObserver);
 		this.folderEntryModel = null;
 	}
 
