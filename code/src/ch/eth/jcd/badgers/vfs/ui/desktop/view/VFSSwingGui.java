@@ -153,6 +153,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					desktopController.closeDisk(getDesktopFrame());
+					// if we open/create another disk the Browser Panel is shown
+					showCardLayoutPanel(BROWSE_PANEL_NAME);
 				} catch (Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
@@ -238,7 +240,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnActions.addSeparator();
 
-		JMenuItem mntmQueryDiskspace = new JMenuItem("Query Diskspace");
+		JMenuItem mntmQueryDiskspace = new JMenuItem("Query Diskspace TODO");
 		mnActions.add(mntmQueryDiskspace);
 
 		mnActions.addSeparator();
