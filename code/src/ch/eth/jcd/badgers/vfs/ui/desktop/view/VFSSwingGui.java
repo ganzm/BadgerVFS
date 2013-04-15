@@ -242,7 +242,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnActions.addSeparator();
 
-		JMenuItem mntmCopy = new JMenuItem("Copy");
+		JMenuItem mntmCopy = new JMenuItem("Copy", KeyEvent.VK_COPY);
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
 		mntmCopy.addActionListener(new ActionListener() {
 
@@ -255,7 +255,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCopy);
 
-		JMenuItem mntmCut = new JMenuItem("Cut");
+		JMenuItem mntmCut = new JMenuItem("Cut", KeyEvent.VK_CUT);
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
 		mnActions.addActionListener(new ActionListener() {
 
@@ -267,7 +267,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCut);
 
-		mntmPaste = new JMenuItem("Paste");
+		mntmPaste = new JMenuItem("Paste", KeyEvent.VK_PASTE);
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
 		mntmPaste.addActionListener(new ActionListener() {
 
@@ -578,7 +578,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			menu.add(mntmImport);
 
 			JMenuItem mntmPaste = new JMenuItem("Paste");
-			mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
+			// mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
 			mntmPaste.addActionListener(new ActionListener() {
 
 				@Override
@@ -633,7 +633,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		menu.add(mntmDelete);
 		menu.addSeparator();
 		JMenuItem mntmCopy = new JMenuItem("Copy");
-		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
+		// mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
 		mntmCopy.addActionListener(new ActionListener() {
 
 			@Override
@@ -644,7 +644,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		menu.add(mntmCopy);
 
 		JMenuItem mntmCut = new JMenuItem("Cut");
-		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
+		// mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
 		mntmCut.addActionListener(new ActionListener() {
 
 			@Override

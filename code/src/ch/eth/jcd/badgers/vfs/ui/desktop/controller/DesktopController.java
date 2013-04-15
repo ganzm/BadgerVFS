@@ -186,7 +186,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 			GetFolderContentAction getFolderAction = (GetFolderContentAction) action;
 			ParentFolderEntryUiModel parentFolderEntryModel = getFolderAction.getParentFolderEntryModel();
 			List<EntryUiModel> entries = getFolderAction.getEntries();
-
 			setCurrentFolder(getFolderAction.getFolderPath(), parentFolderEntryModel, entries);
 		} else if (action instanceof GetTreeContentAction) {
 			GetTreeContentAction getTreeAction = (GetTreeContentAction) action;
@@ -200,35 +199,28 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
 			entryTreeModel.reload();
 		} else if (action instanceof DeleteEntryAction) {
-			DeleteEntryAction deleteAction = (DeleteEntryAction) action;
-			entryTableModel.removeAtIndex(deleteAction.getRowIndexToRemove());
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof CreateFolderAction) {
-			CreateFolderAction createAction = (CreateFolderAction) action;
-			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
-			entryTableModel.appendEntry(entryModel);
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof ImportAction) {
 			// reload current folder after import
 			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
 			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof RenameEntryAction) {
-			RenameEntryAction renameAction = (RenameEntryAction) action;
-			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof ExportAction) {
 			ExportAction exportAction = (ExportAction) action;
 			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntry().getPath().getAbsolutePath()
 					+ " to " + exportAction.getDestination().getAbsolutePath());
 		} else if (action instanceof CopyAction) {
-			try {
-				openEntry(new ParentFolderEntryUiModel(currentFolder.getVFSEntry()), null);
-			} catch (VFSException e) {
-				LOGGER.error("Error after copy:", e);
-			}
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof CutAction) {
-			try {
-				openEntry(new ParentFolderEntryUiModel(currentFolder.getVFSEntry()), null);
-			} catch (VFSException e) {
-				LOGGER.error("Error after cut:", e);
-			}
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -377,6 +369,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 				WorkerController.getInstance().enqueue(cut);
 				break;
 			}
+			clipboard = null;
 		} catch (VFSException e) {
 			LOGGER.error("Erro during clipoard action", e);
 		}
