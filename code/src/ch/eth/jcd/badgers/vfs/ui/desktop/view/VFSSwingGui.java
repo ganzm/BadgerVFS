@@ -74,8 +74,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JTable tableFolderEntries;
 	private final JTree folderTree;
 	private final JTable tableSearchResult;
-	private static final String SEARCH_PANNEL_NAME = "searchpanel";
-	private static final String BROWS_PANNEL_NAME = "browsepanel";
+	private static final String SEARCH_PANEL_NAME = "searchpanel";
+	private static final String BROWSE_PANEL_NAME = "browsepanel";
 	private final JPanel panelSearch;
 	private final JPanel panelBrowsing;
 	private final JButton btnSearch;
@@ -278,7 +278,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.setLayout(new CardLayout());
 
 		panelBrowsing = new JPanel();
-		contentPane.add(panelBrowsing, BROWS_PANNEL_NAME);
+		contentPane.add(panelBrowsing, BROWSE_PANEL_NAME);
 		panelBrowsing.setLayout(new BorderLayout(0, 0));
 
 		JSplitPane splitPane = new JSplitPane();
@@ -413,7 +413,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelBrowseBottom.add(btnTestBlockingAction);
 
 		panelSearch = new JPanel();
-		contentPane.add(panelSearch, SEARCH_PANNEL_NAME);
+		contentPane.add(panelSearch, SEARCH_PANEL_NAME);
 		panelSearch.setLayout(new BorderLayout(0, 0));
 
 		JPanel panelSearchBottom = new JPanel();
@@ -424,7 +424,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				CardLayout cl = (CardLayout) (contentPane.getLayout());
-				cl.show(contentPane, BROWS_PANNEL_NAME);
+				cl.show(contentPane, BROWSE_PANEL_NAME);
 			}
 		});
 		panelSearchBottom.add(btnSearchBack);
@@ -448,7 +448,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	protected void startSearch() {
 		CardLayout cl = (CardLayout) (contentPane.getLayout());
-		cl.show(contentPane, SEARCH_PANNEL_NAME);
+		cl.show(contentPane, SEARCH_PANEL_NAME);
 		// TODO
 	}
 
