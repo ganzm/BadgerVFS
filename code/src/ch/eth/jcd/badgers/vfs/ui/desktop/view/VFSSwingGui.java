@@ -81,6 +81,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JButton btnSearch;
 
 	private final JMenuItem mntmExport;
+	private final JMenuItem mntmPaste;
 
 	/**
 	 * Launch the application.
@@ -242,12 +243,41 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.addSeparator();
 
 		JMenuItem mntmCopy = new JMenuItem("Copy");
+		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
+		mntmCopy.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				desktopController.copyToClipboard(entry);
+
+			}
+		});
 		mnActions.add(mntmCopy);
 
 		JMenuItem mntmCut = new JMenuItem("Cut");
+		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
+		mnActions.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				desktopController.cutToClipboard(entry);
+			}
+		});
 		mnActions.add(mntmCut);
 
-		JMenuItem mntmPaste = new JMenuItem("Paste");
+		mntmPaste = new JMenuItem("Paste");
+		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
+		mntmPaste.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				desktopController.pasteFromClipboardTo(entry);
+
+			}
+		});
 		mnActions.add(mntmPaste);
 
 		JMenu mnHelp = new JMenu("Help");
@@ -444,6 +474,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private void adjustActionMenus(EntryUiModel entry) {
 		mntmExport.setEnabled(entry != null && !entry.isDirectory());
+
+		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
 	protected void startSearch() {
@@ -515,10 +547,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					try {
 
 						desktopController.openEntry(entry, new Callback() {
-
 							@Override
 							public void execute() {
-
 								desktopController.startCreateNewFolder();
 							}
 						});
@@ -536,9 +566,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			mntmImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-
 					desktopController.openEntry(entry, new Callback() {
-
 						@Override
 						public void execute() {
 							desktopController.openImportDialog(getDesktopFrame());
@@ -548,6 +576,18 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				}
 			});
 			menu.add(mntmImport);
+
+			JMenuItem mntmPaste = new JMenuItem("Paste");
+			mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
+			mntmPaste.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					desktopController.pasteFromClipboardTo(entry);
+
+				}
+			});
+			menu.add(mntmPaste);
 
 		} else {
 
@@ -591,6 +631,29 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 		menu.add(mntmDelete);
+		menu.addSeparator();
+		JMenuItem mntmCopy = new JMenuItem("Copy");
+		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
+		mntmCopy.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.copyToClipboard(entry);
+			}
+		});
+		menu.add(mntmCopy);
+
+		JMenuItem mntmCut = new JMenuItem("Cut");
+		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
+		mntmCut.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.cutToClipboard(entry);
+
+			}
+		});
+		menu.add(mntmCut);
 
 		menu.show(tableFolderEntries.getComponentAt(e.getPoint()), e.getX(), e.getY());
 

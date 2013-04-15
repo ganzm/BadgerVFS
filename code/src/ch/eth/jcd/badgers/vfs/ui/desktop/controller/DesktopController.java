@@ -16,12 +16,15 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.Callback;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.CopyAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.CutAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
@@ -36,9 +39,13 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
+import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class DesktopController extends BadgerController implements ActionObserver {
+	public enum ClipboardAction {
+		COPY, CUT
+	}
 
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
@@ -47,6 +54,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private final EntryUiTreeModel entryTreeModel = new EntryUiTreeModel();
 
 	private VFSPath currentFolder;
+
+	private Pair<ClipboardAction, EntryUiModel> clipboard;
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
@@ -208,6 +217,18 @@ public class DesktopController extends BadgerController implements ActionObserve
 			ExportAction exportAction = (ExportAction) action;
 			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntry().getPath().getAbsolutePath()
 					+ " to " + exportAction.getDestination().getAbsolutePath());
+		} else if (action instanceof CopyAction) {
+			try {
+				openEntry(new ParentFolderEntryUiModel(currentFolder.getVFSEntry()), null);
+			} catch (VFSException e) {
+				LOGGER.error("Error after copy:", e);
+			}
+		} else if (action instanceof CutAction) {
+			try {
+				openEntry(new ParentFolderEntryUiModel(currentFolder.getVFSEntry()), null);
+			} catch (VFSException e) {
+				LOGGER.error("Error after cut:", e);
+			}
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -328,5 +349,37 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 			}
 		}
+	}
+
+	public void copyToClipboard(EntryUiModel entry) {
+		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.COPY, entry);
+	}
+
+	public void cutToClipboard(EntryUiModel entry) {
+		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.CUT, entry);
+	}
+
+	public void pasteFromClipboardTo(EntryUiModel toFolder) {
+
+		if (clipboard == null || (toFolder != null && !toFolder.getEntry().isDirectory())) {
+			return;
+		}
+		try {
+			VFSEntry destinationFolder = toFolder != null ? toFolder.getEntry() : currentFolder.getVFSEntry();
+
+			switch (clipboard.getFirst()) {
+			case COPY:
+				CopyAction copy = new CopyAction(clipboard.getSecond().getEntry(), destinationFolder);
+				WorkerController.getInstance().enqueue(copy);
+				break;
+			case CUT:
+				CutAction cut = new CutAction(clipboard.getSecond().getEntry(), destinationFolder);
+				WorkerController.getInstance().enqueue(cut);
+				break;
+			}
+		} catch (VFSException e) {
+			LOGGER.error("Erro during clipoard action", e);
+		}
+
 	}
 }
