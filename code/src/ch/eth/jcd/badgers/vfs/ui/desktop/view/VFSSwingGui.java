@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -228,7 +229,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void actionPerformed(ActionEvent e) {
 
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				if (entry.isDirectory()) {
+				if (entry != null && entry.isDirectory()) {
 					desktopController.startExport(getDesktopFrame(), entry);
 				}
 			}
@@ -242,8 +243,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnActions.addSeparator();
 
-		JMenuItem mntmCopy = new JMenuItem("Copy", KeyEvent.VK_COPY);
-		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
+		JMenuItem mntmCopy = new JMenuItem("Copy");
+		mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
+
 		mntmCopy.addActionListener(new ActionListener() {
 
 			@Override
@@ -255,8 +257,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCopy);
 
-		JMenuItem mntmCut = new JMenuItem("Cut", KeyEvent.VK_CUT);
-		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
+		JMenuItem mntmCut = new JMenuItem("Cut");
+		mntmCut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
 		mnActions.addActionListener(new ActionListener() {
 
 			@Override
@@ -267,8 +269,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCut);
 
-		mntmPaste = new JMenuItem("Paste", KeyEvent.VK_PASTE);
-		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
+		mntmPaste = new JMenuItem("Paste");
+		mntmPaste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
 		mntmPaste.addActionListener(new ActionListener() {
 
 			@Override
@@ -358,12 +360,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		entryCellEditor = new EntryCellEditor(tableFolderEntries, desktopController);
 		columnModel.setCellEditor(entryCellEditor);
 
+		// mouse listeners ond jtable
 		tableFolderEntries.addMouseListener(new MouseAdapter() {
+
 			@Override
+			// doubleclick
 			public void mouseClicked(MouseEvent event) {
 				if (event.getClickCount() == 2) {
-					// doubleclicked on
-
 					int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
 					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
@@ -374,6 +377,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 
 			@Override
+			// rightclick windows/linux
 			public void mousePressed(MouseEvent e) {
 				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
@@ -384,6 +388,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 
 			@Override
+			// rightclick mac
 			public void mouseReleased(MouseEvent e) {
 				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
@@ -395,6 +400,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		});
 
+		// adjusting menuItems when selection in table changes
 		tableFolderEntries.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 			@Override
@@ -404,6 +410,24 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			}
 
+		});
+
+		// ADDING "Enter" handler on table item
+		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		tableFolderEntries.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "enter");
+		tableFolderEntries.getActionMap().put("enter", new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				if (entry.isDirectory()) {
+					desktopController.openEntry(entry, null);
+				} else {
+					desktopController.startExport(getDesktopFrame(), entry);
+				}
+			}
 		});
 
 		performUglyF2KeyStrokeHack(tableFolderEntries);
@@ -578,7 +602,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			menu.add(mntmImport);
 
 			JMenuItem mntmPaste = new JMenuItem("Paste");
-			// mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, InputEvent.CTRL_MASK));
+			// mntmPaste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
 			mntmPaste.addActionListener(new ActionListener() {
 
 				@Override
@@ -633,7 +657,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		menu.add(mntmDelete);
 		menu.addSeparator();
 		JMenuItem mntmCopy = new JMenuItem("Copy");
-		// mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, InputEvent.CTRL_MASK));
+		// mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
 		mntmCopy.addActionListener(new ActionListener() {
 
 			@Override
@@ -644,7 +668,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		menu.add(mntmCopy);
 
 		JMenuItem mntmCut = new JMenuItem("Cut");
-		// mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_CUT, InputEvent.CTRL_MASK));
+		// mntmCut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
 		mntmCut.addActionListener(new ActionListener() {
 
 			@Override

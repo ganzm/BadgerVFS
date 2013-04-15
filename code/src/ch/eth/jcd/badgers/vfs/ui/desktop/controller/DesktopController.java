@@ -344,10 +344,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void copyToClipboard(EntryUiModel entry) {
+		LOGGER.debug("Adding " + entry.getDisplayName() + " to clipboard for copy");
 		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.COPY, entry);
 	}
 
 	public void cutToClipboard(EntryUiModel entry) {
+		LOGGER.debug("Adding " + entry.getDisplayName() + " to clipboard for cut");
 		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.CUT, entry);
 	}
 
