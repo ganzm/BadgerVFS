@@ -95,6 +95,39 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 		}
 	}
 
+	@Test
+	public void testDuplicatedFileNames() throws VFSException {
+
+		String folder = "DuplicatedFileNamesFolder";
+
+		VFSEntry root = diskManager.getRoot();
+		VFSPath testDirPath = root.getChildPath(folder);
+
+		VFSEntry testDir = testDirPath.createDirectory();
+		String c1 = "Collision1";
+
+		testDir.getChildPath(c1).createFile();
+		try {
+			testDir.getChildPath(c1).createFile();
+			Assert.fail("Expected Exception about having create two file with the same name");
+		} catch (Exception ex) {
+			LOGGER.info("Expected Exception " + ex.getMessage());
+		}
+
+		String c2 = "Collision2";
+		String c3 = "Collision3";
+
+		testDir.getChildPath(c2).createDirectory();
+		VFSEntry directoryToRename = testDir.getChildPath(c3).createDirectory();
+
+		try {
+			directoryToRename.renameTo(c2);
+			Assert.fail("Expected Exception about having create two file with the same name");
+		} catch (Exception ex) {
+			LOGGER.info("Expected Exception " + ex.getMessage());
+		}
+	}
+
 	private byte[] generateRandomData() {
 		byte[] bytes = new byte[rnd.nextInt(10000)];
 		rnd.nextBytes(bytes);

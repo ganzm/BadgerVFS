@@ -12,6 +12,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
@@ -186,6 +187,13 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			LOGGER.info("Rename " + getPath().getAbsolutePath() + " to " + newName);
 			String oldName = getPath().getName();
 			VFSDirectoryImpl parent = getParentProtected();
+			
+			// validation
+			DirectoryEntryBlock childDirBlock = parent.getChildDirectoryEntryBlockByName(newName);
+			if (childDirBlock != null) {
+				throw new VFSDuplicatedEntryException("Rename " + getPath().getAbsolutePath() + " to " + newName + " failed because name is already taken");
+			}
+			
 			parent.renameDirectoryEntryBlock(oldName, newName);
 			this.path = this.path.renameTo(newName);
 		} catch (IOException ex) {

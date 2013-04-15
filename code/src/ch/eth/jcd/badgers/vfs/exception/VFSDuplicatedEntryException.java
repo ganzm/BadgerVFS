@@ -4,6 +4,10 @@ public class VFSDuplicatedEntryException extends VFSException {
 
 	private static final long serialVersionUID = 8249215540814299841L;
 
+	public VFSDuplicatedEntryException(String cause) {
+		super(cause);
+	}
+
 	public VFSDuplicatedEntryException(String cause, Exception exception) {
 		super(cause, exception);
 	}
