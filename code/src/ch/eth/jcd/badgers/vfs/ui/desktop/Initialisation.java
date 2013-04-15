@@ -9,25 +9,17 @@ public class Initialisation {
 
 	public static void initApplication(String[] args) {
 		String log4JConfigurationPath = null;
+
 		for (int i = 0; i < args.length; i++) {
-
-			if ("-l".equals(args[i]) && (i + 1 < args.length)) {
-
+			if ("-l".equals(args[i]) && i + 1 < args.length) {
 				log4JConfigurationPath = args[i + 1];
-
 			}
-
 		}
 
-		initLog4J(log4JConfigurationPath);
+		log4JConfigurationPath = log4JConfigurationPath == null ? "log4j.xml" : log4JConfigurationPath;
+
+		DOMConfigurator.configure(log4JConfigurationPath);
+		LOGGER.info("Log4J initialized with " + log4JConfigurationPath);
 	}
 
-	private static void initLog4J(String log4jConfigurationPath) {
-		if (log4jConfigurationPath == null) {
-			log4jConfigurationPath = "log4j.xml";
-
-		}
-		DOMConfigurator.configure(log4jConfigurationPath);
-		LOGGER.info("Log4J initialized with " + log4jConfigurationPath);
-	}
 }
