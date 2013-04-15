@@ -107,7 +107,7 @@ public class EntryCellEditor implements TableCellEditor {
 			if (!currentEditedValue.getDisplayName().equals(textField.getText())) {
 
 				// the user changed the name of the entry
-				desktopController.StartRenameEntry(currentEditedValue, currentEditedRow, textField.getText());
+				desktopController.startRenameEntry(currentEditedValue, currentEditedRow, textField.getText());
 			}
 		}
 		allowEditing = false;
@@ -145,6 +145,7 @@ public class EntryCellEditor implements TableCellEditor {
 		this.currentEditedValue = (EntryUiModel) value;
 
 		textField.setText(currentEditedValue.getDisplayName());
+		textField.selectAll();
 		return textField;
 	}
 

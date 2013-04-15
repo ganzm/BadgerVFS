@@ -248,7 +248,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController.getInstance().enqueue(action);
 	}
 
-	public void StartRenameEntry(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
+	public void startRenameEntry(EntryUiModel currentEditedValue, int editedRow, String newEntryName) {
 		RenameEntryAction action = new RenameEntryAction(currentEditedValue, editedRow, newEntryName);
 		WorkerController.getInstance().enqueue(action);
 	}

@@ -25,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -318,13 +319,36 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void mouseClicked(MouseEvent event) {
 				if (event.getClickCount() == 2) {
 					// doubleclicked on
-					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(tableFolderEntries.getSelectedRow(), 0);
+
+					int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
+					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
 					if (entry.isDirectory()) {
 						desktopController.openEntry(entry);
 					}
 				}
 			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
+				tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+				if (e.isPopupTrigger()) {
+					doContextMenuOnEntry(e, entry);
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
+				tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+				if (e.isPopupTrigger()) {
+					doContextMenuOnEntry(e, entry);
+				}
+			}
+
 		});
 
 		performUglyF2KeyStrokeHack(tableFolderEntries);
@@ -433,7 +457,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	protected void startDelete() {
 		int currentRow = tableFolderEntries.getSelectedRow();
 		if (currentRow < 0) {
-			JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
@@ -448,6 +472,78 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 */
 	private JFrame getDesktopFrame() {
 		return this;
+	}
+
+	private void doContextMenuOnEntry(MouseEvent e, final EntryUiModel entry) {
+		LOGGER.debug("OPENING POPUP ON ENTRY: " + entry.getFullPath());
+		JPopupMenu menu = new JPopupMenu();
+		if (entry.isDirectory()) {
+
+			JMenuItem mntmNewFolder = new JMenuItem("New Folder");
+			mntmNewFolder.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						desktopController.startCreatenewFolder();
+					} catch (Exception ex) {
+						SwingUtil.handleException(getDesktopFrame(), ex);
+					}
+				}
+			});
+			menu.add(mntmNewFolder);
+
+			JMenuItem mntmNewFile = new JMenuItem("New File");
+			menu.add(mntmNewFile);
+
+			JMenuItem mntmImport = new JMenuItem("Import");
+			mntmImport.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+
+					desktopController.openImportDialog(getDesktopFrame());
+				}
+			});
+			menu.add(mntmImport);
+
+		} else {
+
+			menu.add(new JMenuItem("foo"));
+			menu.add(new JMenuItem("bar"));
+		}
+
+		menu.addSeparator();
+		JMenuItem mntmRename = new JMenuItem("Rename");
+		mntmRename.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+		mntmRename.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				LOGGER.debug("RENAME ON ENTRY: " + entry.getFullPath());
+				try {
+					startRename();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
+		menu.add(mntmRename);
+
+		JMenuItem mntmDelete = new JMenuItem("Delete");
+		mntmDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		mntmDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				LOGGER.debug("DELET ON ENTRY: " + entry.getFullPath());
+				try {
+					startDelete();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
+		menu.add(mntmDelete);
+
+		menu.show(tableFolderEntries.getComponentAt(e.getPoint()), e.getX(), e.getY());
+
 	}
 
 	private void beforeWindowClosing() {
