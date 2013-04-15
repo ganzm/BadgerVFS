@@ -3,6 +3,9 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
@@ -33,9 +36,10 @@ public class WorkerController implements Runnable {
 
 	private final List<ActionObserver> actionObservers = new ArrayList<ActionObserver>();
 
-	private Thread controllerThread = null;
+	private Thread controllerThread;
 
-	private final Object monitorObject = new Object();
+	private final Lock lock = new ReentrantLock();
+	private final Condition condition = lock.newCondition();
 
 	/**
 	 * indicates whether the worker is doing anything
@@ -76,9 +80,12 @@ public class WorkerController implements Runnable {
 	}
 
 	public void enqueue(BadgerAction action) {
-		synchronized (monitorObject) {
+		try {
+			lock.lock();
 			actionQueue.offer(action);
-			monitorObject.notify();
+			condition.signalAll();
+		} finally {
+			lock.unlock();
 		}
 	}
 
@@ -92,21 +99,24 @@ public class WorkerController implements Runnable {
 			busy = true;
 			while (running) {
 
-				synchronized (monitorObject) {
+				try {
+					lock.lock();
+
 					action = actionQueue.poll();
 					if (action == null) {
 						try {
 							busy = false;
 							// queue is empty there is no work
-							monitorObject.wait();
+							condition.await();
 							busy = true;
 						} catch (InterruptedException e) {
 							// not too bad - ignore me
 							LOGGER.info("WorkerController was interrupted " + e.getMessage());
 						}
 					}
+				} finally {
+					lock.unlock();
 				}
-
 				if (action != null) {
 					try {
 						performAction(action);
@@ -167,11 +177,14 @@ public class WorkerController implements Runnable {
 	}
 
 	private void dispose() {
-		synchronized (monitorObject) {
+		try {
+			lock.lock();
 			running = false;
 			// wake me up
 
-			monitorObject.notify();
+			condition.signalAll();
+		} finally {
+			lock.unlock();
 		}
 	}
 }
