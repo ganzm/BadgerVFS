@@ -191,6 +191,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(mntmRename);
 
 		JMenuItem mntmDelete = new JMenuItem("Delete");
+		mntmDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		mntmDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -403,11 +404,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * @param tableFolderEntries2
 	 */
 	private void performUglyF2KeyStrokeHack(JTable tableFolderEntries2) {
-		KeyStroke keyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
+		KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
+		KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
 
 		InputMap imap = tableFolderEntries.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		while (imap != null) {
-			imap.remove(keyToRemove);
+			imap.remove(f2KeyToRemove);
+			imap.remove(deleteKeyToRemove);
 			imap = imap.getParent();
 		}
 	}

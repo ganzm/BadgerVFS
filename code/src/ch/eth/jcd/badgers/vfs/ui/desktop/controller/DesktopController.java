@@ -194,6 +194,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 			CreateFolderAction createAction = (CreateFolderAction) action;
 			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
 			entryTableModel.appendEntry(entryModel);
+		} else if (action instanceof ImportAction) {
+			// reload current folder after import
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof RenameEntryAction) {
 			RenameEntryAction renameAction = (RenameEntryAction) action;
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
@@ -237,7 +241,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 		GetFolderContentAction action = new GetFolderContentAction(entry);
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
-
 	}
 
 	public void startDelete(EntryUiModel entry, int editedRow) {
@@ -283,10 +286,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController.getInstance().enqueue(action);
 	}
 
-	public void startImportFromHostFs(String sourcePath) {
-
-		ImportAction action = new ImportAction(sourcePath, currentFolder);
+	public void startImportFromHostFs(String sourcePath, String targetPath) {
+		ImportAction action = new ImportAction(sourcePath, targetPath);
 		WorkerController.getInstance().enqueue(action);
-
 	}
 }

@@ -19,7 +19,7 @@ public class GetFolderContentAction extends BadgerAction {
 	/**
 	 * folder for which we want to load entries
 	 */
-	private EntryUiModel folderEntryModel;
+	private VFSPath vfsFolderPath;
 
 	/**
 	 * 
@@ -27,25 +27,29 @@ public class GetFolderContentAction extends BadgerAction {
 	 *            folder for which we want to load entries
 	 */
 	public GetFolderContentAction(EntryUiModel folderEntryModel) {
-		this.folderEntryModel = folderEntryModel;
+		this.vfsFolderPath = folderEntryModel.getEntry().getPath();
+	}
+
+	public GetFolderContentAction(VFSPath vfsFolderPath) {
+		this.vfsFolderPath = vfsFolderPath;
 	}
 
 	/**
 	 * Use this constructor to load from root directory
 	 */
 	public GetFolderContentAction() {
-		this.folderEntryModel = null;
+		this.vfsFolderPath = null;
 	}
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 
 		VFSEntry folder;
-		if (folderEntryModel == null) {
+		if (vfsFolderPath == null) {
 			folder = diskManager.getRoot();
-			folderEntryModel = new EntryUiModel(folder, true);
+			vfsFolderPath = folder.getPath();
 		} else {
-			folder = folderEntryModel.getEntry();
+			folder = vfsFolderPath.getVFSEntry();
 		}
 
 		VFSEntry parentEntry = folder.getParent();
@@ -67,11 +71,11 @@ public class GetFolderContentAction extends BadgerAction {
 	}
 
 	public String getFolderPathString() {
-		return folderEntryModel.getFullPath();
+		return vfsFolderPath.getAbsolutePath();
 	}
 
 	public VFSPath getFolderPath() {
-		return folderEntryModel.getEntry().getPath();
+		return vfsFolderPath;
 	}
 
 	public ParentFolderEntryUiModel getParentFolderEntryModel() {

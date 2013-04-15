@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.VFSImporter;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
@@ -23,6 +24,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
@@ -398,6 +400,45 @@ public class VFSUIController {
 		};
 	}
 
+	/**
+	 * 
+	 * @param importFile
+	 *            e.g. c:\temp\folderToImport
+	 * @param pathOnVfs
+	 *            e.g. /home/imported
+	 * @throws VFSInvalidPathException
+	 */
+	public void importFileOrFolder(String pathToImportFile, String pathOnVfs) throws VFSInvalidPathException {
+
+		File importFile = new File(pathToImportFile);
+		if (!importFile.exists()) {
+			throw new VFSInvalidPathException("Path on host file system does not exist" + pathToImportFile);
+		}
+
+		VFSPath path = null;
+		VFSEntry newFile = null;
+		try {
+			path = currentDirectory.getChildPath(pathOnVfs);
+			newFile = path.createFile();
+
+			FileInputStream fis = new FileInputStream(importFile);
+			OutputStream os = newFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE);
+
+			ChannelUtil.fastStreamCopy(fis, os);
+		} catch (VFSOutOfMemoryException e) {
+			if (newFile != null) {
+				try {
+					LOGGER.debug("deleting partially created File at " + path.getAbsolutePath());
+					newFile.delete();
+				} catch (VFSException ex) {
+					LOGGER.error("internal error while deleting partially created file", ex);
+				}
+			}
+		} catch (IOException | VFSException e) {
+			LOGGER.error("Error while importing file: ", e);
+		}
+	}
+
 	public Command getImportCommand() {
 		return new Command() {
 
@@ -418,35 +459,16 @@ public class VFSUIController {
 					return;
 				}
 
-				File importFile = new File(param[0]);
-				if (!importFile.exists()) {
-					String warning = String.format("file to import does not exist: %s", param[0]);
-					LOGGER.warn(warning);
-					console.writeLn(warning);
-					return;
-				}
-
-				VFSPath path = null;
-				VFSEntry newFile = null;
 				try {
-					path = currentDirectory.getChildPath(param[1]);
-					newFile = path.createFile();
-
-					FileInputStream fis = new FileInputStream(param[0]);
-					OutputStream os = newFile.getOutputStream(0);
-
-					ChannelUtil.fastStreamCopy(fis, os);
-				} catch (VFSOutOfMemoryException e) {
-					if (newFile != null) {
-						try {
-							LOGGER.debug("deleting partially created File at " + path.getAbsolutePath());
-							newFile.delete();
-						} catch (VFSException ex) {
-							LOGGER.error("internal error while deleting partially created file", ex);
-						}
-					}
-				} catch (IOException | VFSException e) {
-					LOGGER.error("Error while importing file: ", e);
+					VFSPath importDestinationPath = currentDirectory.getChildPath(param[1]);
+					VFSImporter importer = new VFSImporter();
+					importer.importFileOrFolder(param[0], importDestinationPath);
+				} catch (VFSInvalidPathException ex) {
+					LOGGER.info("Invalid User Input for path " + ex.getMessage());
+					console.writeLn(ex.getMessage());
+				} catch (VFSException ex) {
+					LOGGER.error("Error while importing file: ", ex);
+					console.writeLn("There was an error: " + ex.getMessage());
 				}
 
 				LOGGER.debug("import command leaving");
