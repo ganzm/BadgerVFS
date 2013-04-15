@@ -103,7 +103,7 @@ public class EntryCellEditor implements TableCellEditor {
 	 */
 	@Override
 	public boolean stopCellEditing() {
-		LOGGER.debug("EntryCellEditor - stopCellEditing");
+		LOGGER.trace("EntryCellEditor - stopCellEditing");
 		if (allowEditing && !currentEditedValue.getDisplayName().equals(textField.getText())) {
 
 			// the user changed the name of the entry
@@ -149,8 +149,8 @@ public class EntryCellEditor implements TableCellEditor {
 
 			@Override
 			public void run() {
+				textField.requestFocus();
 				textField.selectAll();
-
 			}
 		});
 		return textField;
