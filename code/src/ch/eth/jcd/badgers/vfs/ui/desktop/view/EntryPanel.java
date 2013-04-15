@@ -43,7 +43,6 @@ public class EntryPanel extends JPanel {
 		textField = new JTextField();
 		add(textField);
 
-		// TODO Auto-generated constructor stub
 	}
 
 	public void setIcon(ImageIcon icon) {

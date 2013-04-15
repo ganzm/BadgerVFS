@@ -53,7 +53,7 @@ public class EntryTableModel implements TableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		if (rowIndex < entries.size()) {
+		if (rowIndex >= 0 && rowIndex < entries.size()) {
 			EntryUiModel entry = entries.get(rowIndex);
 			if (columnIndex == 0) {
 				return entry;
