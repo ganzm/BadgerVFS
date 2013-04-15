@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.Callback;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
@@ -202,6 +204,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		} else if (action instanceof RenameEntryAction) {
 			RenameEntryAction renameAction = (RenameEntryAction) action;
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
+		} else if (action instanceof ExportAction) {
+			ExportAction exportAction = (ExportAction) action;
+			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntry().getPath().getAbsolutePath()
+					+ " to " + exportAction.getDestination().getAbsolutePath());
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
@@ -302,5 +308,25 @@ public class DesktopController extends BadgerController implements ActionObserve
 			return "";
 		}
 		return currentFolder.getAbsolutePath();
+	}
+
+	public void openExportDialog(JFrame desktopFrame, EntryUiModel entry) {
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Choose File to export to");
+		fc.setDialogType(JFileChooser.SAVE_DIALOG);
+		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+		int returnVal = fc.showDialog(desktopFrame, "Ok");
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File selected = fc.getSelectedFile();
+
+			if (!selected.exists()
+					|| (selected.exists() && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
+							"The selected file already exists, do you really want do overwrite it?"))) {
+				ExportAction action = new ExportAction(entry.getEntry(), selected, desktopFrame);
+				WorkerController.getInstance().enqueue(action);
+
+			}
+		}
 	}
 }

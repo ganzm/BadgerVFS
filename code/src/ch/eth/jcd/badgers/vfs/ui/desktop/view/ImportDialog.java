@@ -76,7 +76,7 @@ public class ImportDialog extends JDialog {
 				public void actionPerformed(ActionEvent event) {
 					JFileChooser fc = new JFileChooser();
 					fc.setDialogTitle("Choose File/Folder to import");
-					fc.setDialogType(JFileChooser.SAVE_DIALOG);
+					fc.setDialogType(JFileChooser.OPEN_DIALOG);
 					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
 					int returnVal = fc.showDialog(getComponent(), "Ok");

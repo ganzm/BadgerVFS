@@ -499,8 +499,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				}
 			});
 			menu.add(mntmNewFolder);
-
-			JMenuItem mntmNewFile = new JMenuItem("New File");
+			// Todo: implement "New File"
+			JMenuItem mntmNewFile = new JMenuItem("TODO:New File");
 			menu.add(mntmNewFile);
 
 			JMenuItem mntmImport = new JMenuItem("Import");
@@ -522,8 +522,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		} else {
 
-			menu.add(new JMenuItem("foo"));
-			menu.add(new JMenuItem("bar"));
+			JMenuItem mntmImport = new JMenuItem("Export");
+			mntmImport.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					desktopController.openExportDialog(getDesktopFrame(), entry);
+				}
+			});
+			menu.add(mntmImport);
 		}
 
 		menu.addSeparator();
