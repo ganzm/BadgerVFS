@@ -66,7 +66,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
-	private final JTextField textField;
+	private final JTextField textFieldCurrentPath;
 	private final JTable tableFolderEntries;
 	private final JTree folderTree;
 	private final JTable tableSearchResult;
@@ -290,13 +290,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		gbc_lblPath.gridy = 0;
 		panel.add(lblPath, gbc_lblPath);
 
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 0;
-		panel.add(textField, gbc_textField);
-		textField.setColumns(10);
+		textFieldCurrentPath = new JTextField();
+		textFieldCurrentPath.setEditable(false);
+		GridBagConstraints gbc_textFieldCurrentPath = new GridBagConstraints();
+		gbc_textFieldCurrentPath.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textFieldCurrentPath.gridx = 1;
+		gbc_textFieldCurrentPath.gridy = 0;
+		panel.add(textFieldCurrentPath, gbc_textFieldCurrentPath);
+		textFieldCurrentPath.setColumns(10);
 
 		JScrollPane scrollPane = new JScrollPane();
 		panelBrowseMiddle.add(scrollPane, BorderLayout.CENTER);
@@ -484,6 +485,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.setEnabled(diskMode);
 
 		btnSearch.setEnabled(diskMode);
+
+		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 	}
 
 	private void clearTableSelection() {

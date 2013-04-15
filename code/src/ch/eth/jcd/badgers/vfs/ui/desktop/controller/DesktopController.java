@@ -290,4 +290,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 		ImportAction action = new ImportAction(sourcePath, targetPath);
 		WorkerController.getInstance().enqueue(action);
 	}
+
+	public String getCurrentFolderAsString() {
+		if (currentFolder == null) {
+			return "";
+		}
+		return currentFolder.getAbsolutePath();
+	}
 }
