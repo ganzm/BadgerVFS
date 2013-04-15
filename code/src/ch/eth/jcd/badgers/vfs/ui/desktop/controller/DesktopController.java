@@ -19,6 +19,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.Callback;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
@@ -204,6 +205,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		} else {
 			SwingUtil.handleError(null, "Unhandled Action " + action);
 		}
+		Callback cb = action.getCallback();
+		if (cb != null) {
+			cb.execute();
+		}
 
 		updateGUI();
 	}
@@ -237,8 +242,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	}
 
-	public void openEntry(EntryUiModel entry) {
+	public void openEntry(EntryUiModel entry, Callback cb) {
 		GetFolderContentAction action = new GetFolderContentAction(entry);
+		action.setCallback(cb);
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 	}
@@ -275,7 +281,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		return newFolderName;
 	}
 
-	public void startCreatenewFolder() {
+	public void startCreateNewFolder() {
 		List<EntryUiModel> entries = entryTableModel.getEntries();
 		String newFolderName = getUniquieFolderName(entries);
 		startCreateNewFolder(newFolderName);

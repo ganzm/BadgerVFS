@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.Callback;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -90,7 +91,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					frame.update();
 					frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
 					LOGGER.error("", e);
 				}
 			}
@@ -169,7 +169,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					desktopController.startCreatenewFolder();
+					desktopController.startCreateNewFolder();
 				} catch (Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
@@ -324,7 +324,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
 					if (entry.isDirectory()) {
-						desktopController.openEntry(entry);
+						desktopController.openEntry(entry, null);
 					}
 				}
 			}
@@ -484,7 +484,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						desktopController.startCreatenewFolder();
+
+						desktopController.openEntry(entry, new Callback() {
+
+							@Override
+							public void execute() {
+
+								desktopController.startCreateNewFolder();
+							}
+						});
 					} catch (Exception ex) {
 						SwingUtil.handleException(getDesktopFrame(), ex);
 					}
@@ -500,7 +508,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					desktopController.openImportDialog(getDesktopFrame());
+					desktopController.openEntry(entry, new Callback() {
+
+						@Override
+						public void execute() {
+							desktopController.openImportDialog(getDesktopFrame());
+
+						}
+					});
 				}
 			});
 			menu.add(mntmImport);

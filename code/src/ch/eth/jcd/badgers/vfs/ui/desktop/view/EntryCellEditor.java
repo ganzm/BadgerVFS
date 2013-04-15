@@ -103,12 +103,11 @@ public class EntryCellEditor implements TableCellEditor {
 	@Override
 	public boolean stopCellEditing() {
 		LOGGER.debug("EntryCellEditor - stopCellEditing");
-		if (allowEditing) {
-			if (!currentEditedValue.getDisplayName().equals(textField.getText())) {
+		if (allowEditing && !currentEditedValue.getDisplayName().equals(textField.getText())) {
 
-				// the user changed the name of the entry
-				desktopController.startRenameEntry(currentEditedValue, currentEditedRow, textField.getText());
-			}
+			// the user changed the name of the entry
+			desktopController.startRenameEntry(currentEditedValue, currentEditedRow, textField.getText());
+
 		}
 		allowEditing = false;
 
@@ -145,7 +144,6 @@ public class EntryCellEditor implements TableCellEditor {
 		this.currentEditedValue = (EntryUiModel) value;
 
 		textField.setText(currentEditedValue.getDisplayName());
-		textField.selectAll();
 		return textField;
 	}
 

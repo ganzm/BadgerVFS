@@ -21,8 +21,6 @@ public class EntryTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	private static final long serialVersionUID = -1506119105265047133L;
 
-	private JLabel label;
-
 	private final Color textSelectionColor = Color.BLACK;
 	private final Color backgroundSelectionColor = Color.CYAN;
 	private final Color textNonSelectionColor = Color.BLACK;
@@ -63,7 +61,7 @@ public class EntryTreeCellRenderer extends DefaultTreeCellRenderer {
 		 * if (selected) { entryPanel.setBackground(backgroundSelectionColor); entryPanel.setForeground(textSelectionColor); } else {
 		 * entryPanel.setBackground(backgroundNonSelectionColor); entryPanel.setForeground(textNonSelectionColor); }
 		 */
-		label = new JLabel();
+		JLabel label = new JLabel();
 		EntryUiTreeNode node = (EntryUiTreeNode) value;
 		String labelText;
 		labelText = node.getUiEntry() == null ? node.toString() : node.getUiEntry().getDisplayName();
