@@ -11,6 +11,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -116,4 +117,8 @@ public class VFSFileImpl extends VFSEntryImpl {
 		throw new VFSException("find operation not supported for files");
 	}
 
+	@Override
+	public void findInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException {
+		throw new VFSException("find operation not supported for files");
+	}
 }

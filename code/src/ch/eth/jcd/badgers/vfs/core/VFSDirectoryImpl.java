@@ -15,6 +15,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
 
@@ -208,14 +209,20 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException {
+		SearchParameter param = new SearchParameter();
+		param.setSearchString(fileName);
+		findInFolder(param, observer);
+	}
+
+	@Override
+	public void findInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException {
 		LOGGER.debug("Find in Fold " + path.getAbsolutePath());
-		String lowerFileName = fileName.toLowerCase();
 
 		List<DirectoryEntryBlock> toDeepSearch = new ArrayList<DirectoryEntryBlock>();
 		List<DirectoryEntryBlock> children = childTree.traverseTree(diskManager.getDirectorySectionHandler());
 		for (DirectoryEntryBlock child : children) {
 
-			if (child.getFileName().toLowerCase().contains(lowerFileName)) {
+			if (searchParameter.matches(child.getFileName())) {
 				// found it
 				LOGGER.debug("Found File " + child.getFileName() + " in Folder " + this.getPath().getAbsolutePath());
 
@@ -225,7 +232,8 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 				observer.foundEntry(path);
 			}
 
-			if (child.isFolderEntryBlock()) {
+			if (searchParameter.isIncludeSubFolders() && child.isFolderEntryBlock()) {
+				// remember folder to search only if the user want us to do deep search
 				toDeepSearch.add(child);
 			}
 		}
@@ -233,7 +241,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		for (DirectoryEntryBlock entry : toDeepSearch) {
 			VFSPath path = this.getChildPath(entry.getFileName());
 			VFSDirectoryImpl directory = (VFSDirectoryImpl) path.getVFSEntry();
-			directory.findInFolder(fileName, observer);
+			directory.findInFolder(searchParameter, observer);
 		}
 	}
 }

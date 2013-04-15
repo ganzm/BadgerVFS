@@ -63,8 +63,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final EntryCellEditor entryCellEditor;
 
 	private final JPanel contentPane;
-	private final JTextField txtFind;
-	private final JButton btnTestBlockingAction;
+	private final JTextField textFieldFind;
 
 	private final DesktopController desktopController = new DesktopController(this);
 	private final JMenu mnActions;
@@ -74,12 +73,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JTextField textFieldCurrentPath;
 	private final JTable tableFolderEntries;
 	private final JTree folderTree;
-	private final JTable tableSearchResult;
-	private static final String SEARCH_PANEL_NAME = "searchpanel";
-	private static final String BROWSE_PANEL_NAME = "browsepanel";
-	private final JPanel panelSearch;
+	public static final String SEARCH_PANEL_NAME = "searchpanel";
+	public static final String BROWSE_PANEL_NAME = "browsepanel";
+	private final SearchPanel panelSearch;
 	private final JPanel panelBrowsing;
 	private final JButton btnSearch;
+	/**
+	 * State Variable determines whether search or browse gui is shown
+	 */
+	private boolean searching = false;
 
 	private final JMenuItem mntmExport;
 	private final JMenuItem mntmPaste;
@@ -245,7 +247,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		JMenuItem mntmCopy = new JMenuItem("Copy");
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
-
 		mntmCopy.addActionListener(new ActionListener() {
 
 			@Override
@@ -289,10 +290,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem mntmInfo = new JMenuItem("Info");
 		mnHelp.add(mntmInfo);
 
-		txtFind = new JTextField();
-		txtFind.setText("Find");
-		menuBar.add(txtFind);
-		txtFind.setColumns(10);
+		textFieldFind = new JTextField();
+		textFieldFind.setText("Find");
+		menuBar.add(textFieldFind);
+		textFieldFind.setColumns(10);
 
 		btnSearch = new JButton("Search");
 		btnSearch.addActionListener(new ActionListener() {
@@ -402,7 +403,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		// adjusting menuItems when selection in table changes
 		tableFolderEntries.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
@@ -430,7 +430,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 
-		performUglyF2KeyStrokeHack(tableFolderEntries);
+		removeKeysFromJTableInputMap(tableFolderEntries);
 
 		JPanel panelBrowseLeft = new JPanel();
 		splitPane.setLeftComponent(panelBrowseLeft);
@@ -460,40 +460,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 
-		JPanel panelBrowseBottom = new JPanel();
-		panelBrowsing.add(panelBrowseBottom, BorderLayout.SOUTH);
-
-		btnTestBlockingAction = new JButton("Test Button");
-		panelBrowseBottom.add(btnTestBlockingAction);
-
-		panelSearch = new JPanel();
+		panelSearch = new SearchPanel(this);
 		contentPane.add(panelSearch, SEARCH_PANEL_NAME);
-		panelSearch.setLayout(new BorderLayout(0, 0));
-
-		JPanel panelSearchBottom = new JPanel();
-		panelSearch.add(panelSearchBottom, BorderLayout.SOUTH);
-
-		JButton btnSearchBack = new JButton("Back to browsing");
-		btnSearchBack.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				CardLayout cl = (CardLayout) (contentPane.getLayout());
-				cl.show(contentPane, BROWSE_PANEL_NAME);
-			}
-		});
-		panelSearchBottom.add(btnSearchBack);
-
-		tableSearchResult = new JTable();
-		panelSearch.add(tableSearchResult, BorderLayout.CENTER);
-
-		JLabel lblNowSearching = new JLabel("searching....");
-		panelSearch.add(lblNowSearching, BorderLayout.NORTH);
-		btnTestBlockingAction.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				LOGGER.info("Does nothing");
-			}
-		});
 	}
 
 	private void adjustActionMenus(EntryUiModel entry) {
@@ -503,9 +471,19 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	}
 
 	protected void startSearch() {
+		panelSearch.resetSearch();
+		panelSearch.setSearchTextAndContext(textFieldFind.getText(), desktopController.getCurrentFolderAsString());
+
+		showCardLayoutPanel(SEARCH_PANEL_NAME);
+	}
+
+	public void showCardLayoutPanel(String pannelName) {
 		CardLayout cl = (CardLayout) (contentPane.getLayout());
-		cl.show(contentPane, SEARCH_PANEL_NAME);
-		// TODO
+		cl.show(contentPane, pannelName);
+
+		searching = SEARCH_PANEL_NAME.equals(pannelName);
+
+		update();
 	}
 
 	/**
@@ -513,7 +491,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * 
 	 * @param tableFolderEntries2
 	 */
-	private void performUglyF2KeyStrokeHack(JTable tableFolderEntries2) {
+	private void removeKeysFromJTableInputMap(JTable tableFolderEntries2) {
 		KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
 		KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
 
@@ -705,11 +683,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	@Override
 	public void update() {
+
 		boolean diskMode = !desktopController.isInManagementMode();
 
-		btnTestBlockingAction.setEnabled(diskMode);
-
-		mnActions.setEnabled(diskMode);
+		mnActions.setEnabled(diskMode && (!searching));
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
@@ -717,8 +694,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.setVisible(diskMode);
 		contentPane.setEnabled(diskMode);
 
-		btnSearch.setEnabled(diskMode);
-
+		btnSearch.setEnabled(diskMode && (!searching));
+		textFieldFind.setEnabled(!searching);
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 	}
 

@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MockedVFSEntryImpl implements VFSEntry {
@@ -213,17 +214,23 @@ public class MockedVFSEntryImpl implements VFSEntry {
 	}
 
 	@Override
-	public void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException {
+	public void findInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException {
 		if (!this.isDirectory()) {
 			throw new VFSException("this is not a directory, search not allowed");
 		}
 
 		try {
-			Files.walkFileTree(fileEntry, new FinderVisitor(fileName, observer));
+			Files.walkFileTree(fileEntry, new FinderVisitor(searchParameter, observer));
 		} catch (IOException e) {
 			LOGGER.error("", e);
 		}
+	}
 
+	@Override
+	public void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException {
+		SearchParameter searchParameter = new SearchParameter();
+		searchParameter.setSearchString(fileName);
+		findInFolder(searchParameter, observer);
 	}
 
 	private class FinderVisitor extends SimpleFileVisitor<Path> {
@@ -231,8 +238,8 @@ public class MockedVFSEntryImpl implements VFSEntry {
 		private final PathMatcher matcher;
 		private final FindInFolderCallback observer;
 
-		FinderVisitor(String pattern, FindInFolderCallback observer) {
-			matcher = FileSystems.getDefault().getPathMatcher("glob:*" + pattern + "*");
+		FinderVisitor(SearchParameter searchParameter, FindInFolderCallback observer) {
+			matcher = FileSystems.getDefault().getPathMatcher("glob:*" + searchParameter.getSearchString() + "*");
 			this.observer = observer;
 		}
 

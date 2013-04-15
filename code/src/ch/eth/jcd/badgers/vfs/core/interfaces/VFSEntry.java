@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 /**
@@ -115,9 +116,24 @@ public interface VFSEntry {
 	 * 
 	 * Whenever a file is found the observer callback is called. Further search is blocked by the call to the observer
 	 * 
+	 * convenience method for
+	 * 
+	 * @see this{@link #findInFolder(SearchParameter, FindInFolderCallback)}
 	 * @param fileName
 	 * @param observer
 	 */
 	void findInFolder(String fileName, FindInFolderCallback observer) throws VFSException;
+
+	/**
+	 * search for file or folders
+	 * 
+	 * @param searchParameter
+	 *            contains search string and sear parameters
+	 * 
+	 * @param observer
+	 *            callback which receives events when an entry was found
+	 * @throws VFSException
+	 */
+	void findInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException;
 
 }
