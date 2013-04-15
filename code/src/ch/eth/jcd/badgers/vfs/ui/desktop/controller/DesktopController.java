@@ -310,7 +310,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		return currentFolder.getAbsolutePath();
 	}
 
-	public void openExportDialog(JFrame desktopFrame, EntryUiModel entry) {
+	public void startExport(JFrame desktopFrame, EntryUiModel entry) {
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle("Choose File to export to");
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);

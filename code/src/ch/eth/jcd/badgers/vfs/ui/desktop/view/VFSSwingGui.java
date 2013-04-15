@@ -33,6 +33,8 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableColumn;
@@ -77,6 +79,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JPanel panelSearch;
 	private final JPanel panelBrowsing;
 	private final JButton btnSearch;
+
+	private final JMenuItem mntmExport;
 
 	/**
 	 * Launch the application.
@@ -205,7 +209,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmDelete);
 
-		JMenuItem mntmNewFile = new JMenuItem("New File");
+		JMenuItem mntmNewFile = new JMenuItem("TODO: New File");
 		mnActions.add(mntmNewFile);
 
 		JMenuItem mntmImport = new JMenuItem("Import");
@@ -217,7 +221,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmImport);
 
-		JMenuItem mntmExport = new JMenuItem("Export");
+		mntmExport = new JMenuItem("Export");
+		mntmImport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				if (entry.isDirectory()) {
+					desktopController.startExport(getDesktopFrame(), entry);
+				}
+			}
+		});
 		mnActions.add(mntmExport);
 
 		mnActions.addSeparator();
@@ -323,7 +337,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
 					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
-					if (entry.isDirectory()) {
+					if (entry != null && entry.isDirectory()) {
 						desktopController.openEntry(entry, null);
 					}
 				}
@@ -347,6 +361,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				if (e.isPopupTrigger()) {
 					doContextMenuOnEntry(e, entry);
 				}
+			}
+
+		});
+
+		tableFolderEntries.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				adjustActionMenus(entry);
+
 			}
 
 		});
@@ -415,6 +440,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 				LOGGER.info("Does nothing");
 			}
 		});
+	}
+
+	private void adjustActionMenus(EntryUiModel entry) {
+		mntmExport.setEnabled(entry != null && !entry.isDirectory());
 	}
 
 	protected void startSearch() {
@@ -526,7 +555,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			mntmImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					desktopController.openExportDialog(getDesktopFrame(), entry);
+					desktopController.startExport(getDesktopFrame(), entry);
 				}
 			});
 			menu.add(mntmImport);
