@@ -222,7 +222,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(currentFolder);
 			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else {
-			SwingUtil.handleError(null, "Unhandled Action " + action);
+			LOGGER.debug("Action " + action.getClass().getName() + " not handled in " + this.getClass().getName());
 		}
 		Callback cb = action.getCallback();
 		if (cb != null) {

@@ -28,15 +28,15 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	private SearchParameter searchParameter = new SearchParameter();
 	private SearchAction currentSearchAction = null;
 
-	private JTextField textFieldSearchString;
-	private JTable tableSearchResult;
-	private JTextField textFieldSearchFolder;
-	private JCheckBox chckbxSearchCaseSensitiv;
-	private JCheckBox chckbxSearchSubfolders;
+	private final JTextField textFieldSearchString;
+	private final JTable tableSearchResult;
+	private final JTextField textFieldSearchFolder;
+	private final JCheckBox chckbxSearchCaseSensitiv;
+	private final JCheckBox chckbxSearchSubfolders;
 	private final VFSSwingGui parent;
-	private JButton btnStartSearch;
-	private JButton btnBack;
-	private JButton btnCancelSearch;
+	private final JButton btnStartSearch;
+	private final JButton btnBack;
+	private final JButton btnCancelSearch;
 
 	/**
 	 * Create the panel.
@@ -125,6 +125,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 		btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
 			}
@@ -134,6 +135,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 		btnStartSearch = new JButton("Search");
 		btnStartSearch.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				startSearch();
 			}
@@ -143,6 +145,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 		btnCancelSearch = new JButton("Cancel");
 		btnCancelSearch.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				cancelSearch();
 			}
@@ -183,8 +186,6 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		currentSearchAction.tryCancelSearch();
 
 		update();
-		// TODO Auto-generated method stub
-
 	}
 
 	public void resetSearch() {

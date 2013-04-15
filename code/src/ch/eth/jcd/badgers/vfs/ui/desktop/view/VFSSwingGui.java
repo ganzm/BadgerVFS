@@ -482,11 +482,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		showCardLayoutPanel(SEARCH_PANEL_NAME);
 	}
 
-	public void showCardLayoutPanel(String pannelName) {
+	public void showCardLayoutPanel(String panelName) {
 		CardLayout cl = (CardLayout) (contentPane.getLayout());
-		cl.show(contentPane, pannelName);
+		cl.show(contentPane, panelName);
 
-		searching = SEARCH_PANEL_NAME.equals(pannelName);
+		searching = SEARCH_PANEL_NAME.equals(panelName);
+
+		if (searching) {
+			panelSearch.update();
+		}
 
 		update();
 	}
@@ -704,7 +708,4 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 	}
 
-	private void clearTableSelection() {
-		tableFolderEntries.clearSelection();
-	}
 }

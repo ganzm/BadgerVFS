@@ -9,6 +9,10 @@ import javax.swing.table.TableCellRenderer;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 
+/**
+ * Renders a single File/Folder Cell of the Browsing Table
+ * 
+ */
 public class EntryListCellRenderer implements TableCellRenderer {
 
 	private final JLabel label;
