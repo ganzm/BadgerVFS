@@ -278,7 +278,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		WorkerController.getInstance().enqueue(action);
 	}
 
-	private String getUniquieFolderName(List<EntryUiModel> entries) {
+	private String getUniqueFolderName(List<EntryUiModel> entries) {
 		String praefix = "NewFolder";
 		String newFolderName = praefix;
 		int count = 0;
@@ -302,7 +302,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void startCreateNewFolder() {
 		List<EntryUiModel> entries = entryTableModel.getEntries();
-		String newFolderName = getUniquieFolderName(entries);
+		String newFolderName = getUniqueFolderName(entries);
 		startCreateNewFolder(newFolderName);
 	}
 
