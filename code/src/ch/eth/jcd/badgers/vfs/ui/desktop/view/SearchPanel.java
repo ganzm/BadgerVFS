@@ -26,7 +26,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 	private SearchParameter searchParameter = new SearchParameter();
 	private final JTextField textFieldSearchString;
-	private final JTable tableSearchResult;
+
 	private final JTextField textFieldSearchFolder;
 	private final JCheckBox chckbxSearchCaseSensitiv;
 	private final JCheckBox chckbxSearchSubfolders;
@@ -40,23 +40,23 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	/**
 	 * Create the panel.
 	 */
-	public SearchPanel(VFSSwingGui parentGui) {
+	public SearchPanel(final VFSSwingGui parentGui) {
 		this.parent = parentGui;
 		this.searchController = new SearchController(this);
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel panelSearchParameter = new JPanel();
+		final JPanel panelSearchParameter = new JPanel();
 		panelSearchParameter.setBorder(new EmptyBorder(3, 3, 3, 3));
 		add(panelSearchParameter, BorderLayout.NORTH);
-		GridBagLayout gbl_panelSearchParameter = new GridBagLayout();
+		final GridBagLayout gbl_panelSearchParameter = new GridBagLayout();
 		gbl_panelSearchParameter.columnWidths = new int[] { 0, 0, 0 };
 		gbl_panelSearchParameter.rowHeights = new int[] { 0, 0, 0, 0, 0 };
 		gbl_panelSearchParameter.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		gbl_panelSearchParameter.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panelSearchParameter.setLayout(gbl_panelSearchParameter);
 
-		JLabel lblSearchString = new JLabel("Search String");
-		GridBagConstraints gbc_lblSearchString = new GridBagConstraints();
+		final JLabel lblSearchString = new JLabel("Search String");
+		final GridBagConstraints gbc_lblSearchString = new GridBagConstraints();
 		gbc_lblSearchString.anchor = GridBagConstraints.EAST;
 		gbc_lblSearchString.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSearchString.gridx = 0;
@@ -64,7 +64,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(lblSearchString, gbc_lblSearchString);
 
 		textFieldSearchString = new JTextField();
-		GridBagConstraints gbc_textFieldSearchString = new GridBagConstraints();
+		final GridBagConstraints gbc_textFieldSearchString = new GridBagConstraints();
 		gbc_textFieldSearchString.insets = new Insets(0, 0, 5, 0);
 		gbc_textFieldSearchString.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldSearchString.gridx = 1;
@@ -72,8 +72,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(textFieldSearchString, gbc_textFieldSearchString);
 		textFieldSearchString.setColumns(10);
 
-		JLabel lblCaseSensitiv = new JLabel("Case sensitiv");
-		GridBagConstraints gbc_lblCaseSensitiv = new GridBagConstraints();
+		final JLabel lblCaseSensitiv = new JLabel("Case sensitiv");
+		final GridBagConstraints gbc_lblCaseSensitiv = new GridBagConstraints();
 		gbc_lblCaseSensitiv.anchor = GridBagConstraints.EAST;
 		gbc_lblCaseSensitiv.insets = new Insets(0, 0, 5, 5);
 		gbc_lblCaseSensitiv.gridx = 0;
@@ -81,15 +81,15 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(lblCaseSensitiv, gbc_lblCaseSensitiv);
 
 		chckbxSearchCaseSensitiv = new JCheckBox("");
-		GridBagConstraints gbc_chckbxSearchCaseSensitiv = new GridBagConstraints();
+		final GridBagConstraints gbc_chckbxSearchCaseSensitiv = new GridBagConstraints();
 		gbc_chckbxSearchCaseSensitiv.anchor = GridBagConstraints.WEST;
 		gbc_chckbxSearchCaseSensitiv.insets = new Insets(0, 0, 5, 0);
 		gbc_chckbxSearchCaseSensitiv.gridx = 1;
 		gbc_chckbxSearchCaseSensitiv.gridy = 1;
 		panelSearchParameter.add(chckbxSearchCaseSensitiv, gbc_chckbxSearchCaseSensitiv);
 
-		JLabel lblSearchInFolder = new JLabel("Search folder");
-		GridBagConstraints gbc_lblSearchInFolder = new GridBagConstraints();
+		final JLabel lblSearchInFolder = new JLabel("Search folder");
+		final GridBagConstraints gbc_lblSearchInFolder = new GridBagConstraints();
 		gbc_lblSearchInFolder.anchor = GridBagConstraints.EAST;
 		gbc_lblSearchInFolder.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSearchInFolder.gridx = 0;
@@ -97,7 +97,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(lblSearchInFolder, gbc_lblSearchInFolder);
 
 		textFieldSearchFolder = new JTextField();
-		GridBagConstraints gbc_textFieldSearchFolder = new GridBagConstraints();
+		final GridBagConstraints gbc_textFieldSearchFolder = new GridBagConstraints();
 		gbc_textFieldSearchFolder.insets = new Insets(0, 0, 5, 0);
 		gbc_textFieldSearchFolder.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldSearchFolder.gridx = 1;
@@ -105,8 +105,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(textFieldSearchFolder, gbc_textFieldSearchFolder);
 		textFieldSearchFolder.setColumns(10);
 
-		JLabel lblFolderOnly = new JLabel("Search subfolders");
-		GridBagConstraints gbc_lblFolderOnly = new GridBagConstraints();
+		final JLabel lblFolderOnly = new JLabel("Search subfolders");
+		final GridBagConstraints gbc_lblFolderOnly = new GridBagConstraints();
 		gbc_lblFolderOnly.anchor = GridBagConstraints.EAST;
 		gbc_lblFolderOnly.insets = new Insets(0, 0, 0, 5);
 		gbc_lblFolderOnly.gridx = 0;
@@ -114,19 +114,19 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(lblFolderOnly, gbc_lblFolderOnly);
 
 		chckbxSearchSubfolders = new JCheckBox("");
-		GridBagConstraints gbc_chckbxSearchSubfolders = new GridBagConstraints();
+		final GridBagConstraints gbc_chckbxSearchSubfolders = new GridBagConstraints();
 		gbc_chckbxSearchSubfolders.anchor = GridBagConstraints.WEST;
 		gbc_chckbxSearchSubfolders.gridx = 1;
 		gbc_chckbxSearchSubfolders.gridy = 3;
 		panelSearchParameter.add(chckbxSearchSubfolders, gbc_chckbxSearchSubfolders);
 
-		JPanel panelBottom = new JPanel();
+		final JPanel panelBottom = new JPanel();
 		add(panelBottom, BorderLayout.SOUTH);
 
 		btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent arg0) {
 				parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
 			}
 		});
@@ -136,7 +136,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnStartSearch = new JButton("Search");
 		btnStartSearch.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent arg0) {
 				startSearch();
 			}
 		});
@@ -146,16 +146,16 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnCancelSearch = new JButton("Cancel");
 		btnCancelSearch.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent arg0) {
 				cancelSearch();
 			}
 		});
 		panelBottom.add(btnCancelSearch);
 
-		JScrollPane scrollPaneSearchResult = new JScrollPane();
+		final JScrollPane scrollPaneSearchResult = new JScrollPane();
 		add(scrollPaneSearchResult, BorderLayout.CENTER);
 
-		tableSearchResult = new JTable();
+		final JTable tableSearchResult = new JTable();
 		tableSearchResult.setModel(searchController.getSearchResultModel());
 		scrollPaneSearchResult.setViewportView(tableSearchResult);
 	}
@@ -163,7 +163,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	protected void startSearch() {
 
 		searchParameter.setSearchString(textFieldSearchString.getText());
-		String searchFolder = textFieldSearchFolder.getText();
+		final String searchFolder = textFieldSearchFolder.getText();
 		searchParameter.setIncludeSubFolders(chckbxSearchSubfolders.isSelected());
 		searchParameter.setCaseSensitive(chckbxSearchCaseSensitiv.isSelected());
 
@@ -180,16 +180,16 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		searchParameter = new SearchParameter();
 	}
 
-	public void setSearchTextAndContext(String text, String searchFolder) {
+	public void setSearchTextAndContext(final String text, final String searchFolder) {
 		textFieldSearchString.setText(text);
 		textFieldSearchFolder.setText(searchFolder);
 	}
 
 	@Override
 	public void update() {
-		SearchAction currentSearchAction = searchController.getCurrentSearchAction();
-		boolean searching = currentSearchAction != null;
-		boolean canceling = currentSearchAction != null && currentSearchAction.isCanceling();
+		final SearchAction currentSearchAction = searchController.getCurrentSearchAction();
+		final boolean searching = currentSearchAction != null;
+		final boolean canceling = currentSearchAction != null && currentSearchAction.isCanceling();
 
 		btnCancelSearch.setEnabled(searching && !canceling);
 		btnStartSearch.setEnabled(!searching);
