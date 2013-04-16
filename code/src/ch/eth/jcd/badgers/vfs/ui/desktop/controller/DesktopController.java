@@ -34,6 +34,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.DiskSpaceDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.InfoDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -74,6 +75,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void openDiskSpaceDialog(JFrame desktop) {
 		DiskSpaceDialog dialog = new DiskSpaceDialog(desktop);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openInfoDialog(JFrame desktop) {
+		InfoDialog dialog = new InfoDialog(desktop);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}

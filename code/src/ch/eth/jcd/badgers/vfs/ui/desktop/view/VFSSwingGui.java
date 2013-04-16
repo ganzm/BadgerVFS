@@ -220,7 +220,16 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnHelp.setMnemonic('H');
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmInfo = new JMenuItem("Info");
+		JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					desktopController.openInfoDialog(getDesktopFrame());
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
 		mnHelp.add(mntmInfo);
 
 		textFieldFind = new JTextField();

@@ -35,7 +35,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	 * Create the dialog.
 	 */
 	public DiskSpaceDialog(JFrame owner) {
-		super(owner);
+		super(owner, true);
 		setTitle("Disk Space");
 		setBounds(100, 100, 450, 180);
 		getContentPane().setLayout(new BorderLayout());
