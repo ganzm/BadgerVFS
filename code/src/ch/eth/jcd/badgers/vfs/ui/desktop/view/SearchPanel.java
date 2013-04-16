@@ -16,26 +16,15 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
-
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
-import ch.eth.jcd.badgers.vfs.util.SwingUtil;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
 
-public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserver {
-	private static final Logger LOGGER = Logger.getLogger(SearchPanel.class);
-
+public class SearchPanel extends JPanel implements BadgerViewBase {
 	private static final long serialVersionUID = 6942548578015341003L;
 
 	private SearchParameter searchParameter = new SearchParameter();
-	private SearchAction currentSearchAction = null;
-
 	private final JTextField textFieldSearchString;
 	private final JTable tableSearchResult;
 	private final JTextField textFieldSearchFolder;
@@ -46,11 +35,14 @@ public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserve
 	private final JButton btnBack;
 	private final JButton btnCancelSearch;
 
+	private final SearchController searchController;
+
 	/**
 	 * Create the panel.
 	 */
 	public SearchPanel(VFSSwingGui parentGui) {
 		this.parent = parentGui;
+		this.searchController = new SearchController(this);
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel panelSearchParameter = new JPanel();
@@ -164,34 +156,22 @@ public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserve
 		add(scrollPaneSearchResult, BorderLayout.CENTER);
 
 		tableSearchResult = new JTable();
+		tableSearchResult.setModel(searchController.getSearchResultModel());
 		scrollPaneSearchResult.setViewportView(tableSearchResult);
-
 	}
 
 	protected void startSearch() {
-		if (currentSearchAction != null) {
-			throw new VFSRuntimeException("Don't do that. There is already a search in process");
-		}
 
 		searchParameter.setSearchString(textFieldSearchString.getText());
 		String searchFolder = textFieldSearchFolder.getText();
 		searchParameter.setIncludeSubFolders(chckbxSearchSubfolders.isSelected());
 		searchParameter.setCaseSensitive(chckbxSearchCaseSensitiv.isSelected());
 
-		WorkerController controller = WorkerController.getInstance();
-		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
-		controller.enqueue(currentSearchAction);
-
-		update();
+		searchController.startSearch(searchParameter, searchFolder);
 	}
 
 	protected void cancelSearch() {
-
-		if (currentSearchAction == null) {
-			throw new VFSRuntimeException("Internal Error - you are not supposed to be able to cancel search");
-		}
-
-		currentSearchAction.tryCancelSearch();
+		searchController.cancelSearch();
 
 		update();
 	}
@@ -207,6 +187,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserve
 
 	@Override
 	public void update() {
+		SearchAction currentSearchAction = searchController.getCurrentSearchAction();
 		boolean searching = currentSearchAction != null;
 		boolean canceling = currentSearchAction != null && currentSearchAction.isCanceling();
 
@@ -215,20 +196,4 @@ public class SearchPanel extends JPanel implements BadgerViewBase, ActionObserve
 		btnBack.setEnabled(!searching);
 	}
 
-	@Override
-	public void onActionFailed(BadgerAction action, VFSException e) {
-		SwingUtil.handleException(this, e);
-	}
-
-	@Override
-	public void onActionFinished(BadgerAction action) {
-		if (action instanceof SearchAction) {
-			LOGGER.debug("Search finished " + action);
-			currentSearchAction = null;
-			update();
-		} else {
-			SwingUtil.handleError(this, "Unexpected Action " + action);
-		}
-
-	}
 }
