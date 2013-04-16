@@ -400,13 +400,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void importFromContextMenu(final EntryUiModel entry, final JFrame parent) {
-		final JFrame thisParent = parent;
+
 		final GetFolderContentAction action = new GetFolderContentAction(new ActionObserver() {
 
 			@Override
 			public void onActionFinished(final BadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
-				openImportDialog(thisParent);
+				openImportDialog(parent);
 			}
 
 			@Override

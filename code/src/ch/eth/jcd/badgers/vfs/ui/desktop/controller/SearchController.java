@@ -18,11 +18,11 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class SearchController extends BadgerController implements ActionObserver {
 	private static final Logger LOGGER = Logger.getLogger(SearchController.class);
 
-	private EntryTableModel searchResultTableModel;
+	private final EntryTableModel searchResultTableModel;
 
 	private SearchAction currentSearchAction = null;
 
-	public SearchController(BadgerViewBase badgerView) {
+	public SearchController(final BadgerViewBase badgerView) {
 		super(badgerView);
 		searchResultTableModel = new EntryTableModel();
 	}
@@ -31,12 +31,12 @@ public class SearchController extends BadgerController implements ActionObserver
 		return searchResultTableModel;
 	}
 
-	public void startSearch(SearchParameter searchParameter, String searchFolder) {
+	public void startSearch(final SearchParameter searchParameter, final String searchFolder) {
 		if (currentSearchAction != null) {
 			throw new VFSRuntimeException("Don't do that. There is already a search in process");
 		}
 
-		WorkerController controller = WorkerController.getInstance();
+		final WorkerController controller = WorkerController.getInstance();
 		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
 		controller.enqueue(currentSearchAction);
 
@@ -48,12 +48,12 @@ public class SearchController extends BadgerController implements ActionObserver
 	}
 
 	@Override
-	public void onActionFailed(BadgerAction action, VFSException e) {
+	public void onActionFailed(final BadgerAction action, final VFSException e) {
 		SwingUtil.handleException((Component) badgerView, e);
 	}
 
 	@Override
-	public void onActionFinished(BadgerAction action) {
+	public void onActionFinished(final BadgerAction action) {
 		if (action instanceof SearchAction) {
 			LOGGER.debug("Search finished " + action);
 			currentSearchAction = null;
