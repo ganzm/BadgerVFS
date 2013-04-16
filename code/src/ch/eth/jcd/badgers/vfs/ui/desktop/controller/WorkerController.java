@@ -32,8 +32,6 @@ public class WorkerController implements Runnable {
 	 */
 	private final ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
 
-	private Thread controllerThread;
-
 	private final Lock lock = new ReentrantLock();
 	private final Condition condition = lock.newCondition();
 
@@ -44,11 +42,11 @@ public class WorkerController implements Runnable {
 
 	private boolean running = false;
 
-	public WorkerController(VFSDiskManager diskManager) {
+	public WorkerController(final VFSDiskManager diskManager) {
 		this.diskManager = diskManager;
 	}
 
-	public static WorkerController setupWorker(VFSDiskManager diskManager) {
+	public static WorkerController setupWorker(final VFSDiskManager diskManager) {
 		if (instance != null) {
 			throw new VFSRuntimeException("WorkerController already instantiated");
 		}
@@ -70,12 +68,12 @@ public class WorkerController implements Runnable {
 	}
 
 	public void startWorkerController() {
-		controllerThread = new Thread(this);
+		final Thread controllerThread = new Thread(this);
 		controllerThread.setName("WorkerController");
 		controllerThread.start();
 	}
 
-	public void enqueue(BadgerAction action) {
+	public void enqueue(final BadgerAction action) {
 		try {
 			lock.lock();
 			actionQueue.offer(action);
@@ -105,7 +103,7 @@ public class WorkerController implements Runnable {
 							// queue is empty there is no work
 							condition.await();
 							busy = true;
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							// not too bad - ignore me
 							LOGGER.info("WorkerController was interrupted " + e.getMessage());
 						}
@@ -116,7 +114,7 @@ public class WorkerController implements Runnable {
 				if (action != null) {
 					try {
 						performAction(action);
-					} catch (Exception ex) {
+					} catch (final Exception ex) {
 						LOGGER.error("Error while performing Action " + action, ex);
 					}
 				}
@@ -126,35 +124,35 @@ public class WorkerController implements Runnable {
 		}
 	}
 
-	private void performAction(BadgerAction action) {
+	private void performAction(final BadgerAction action) {
 		try {
 			LOGGER.info("Perform Action " + action);
 			action.runDiskAction(diskManager);
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
-		} catch (VFSException e) {
+		} catch (final VFSException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
 		}
 	}
 
-	private void actionFailed(BadgerAction action, VFSException e) {
-		ActionObserver obs = action.getActionObserver();
+	private void actionFailed(final BadgerAction action, final VFSException e) {
+		final ActionObserver obs = action.getActionObserver();
 		if (obs != null) {
 			try {
 				obs.onActionFailed(action, e);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.error("Error while notifying Observer " + obs, ex);
 			}
 		}
 	}
 
-	private void actionFinished(BadgerAction action) {
-		ActionObserver obs = action.getActionObserver();
+	private void actionFinished(final BadgerAction action) {
+		final ActionObserver obs = action.getActionObserver();
 		if (obs != null) {
 			try {
 				obs.onActionFinished(action);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.error("Error while notifying Observer" + obs, ex);
 			}
 		}

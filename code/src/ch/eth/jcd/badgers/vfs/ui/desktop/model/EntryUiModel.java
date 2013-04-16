@@ -21,7 +21,7 @@ public class EntryUiModel {
 
 	private final VFSEntry entry;
 
-	private final boolean isDirectory;
+	private final boolean directory;
 
 	private boolean isBeeingRenaming = false;
 
@@ -32,7 +32,7 @@ public class EntryUiModel {
 		try {
 			fileIcon = ResourceLocator.getResourceAsIcon("images/Document-Blank-icon.png");
 			folderIcon = ResourceLocator.getResourceAsIcon("images/Folder-icon.png");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.error("Error while loading ImageIcons", e);
 		}
 	}
@@ -42,9 +42,9 @@ public class EntryUiModel {
 	 * 
 	 * @param entry
 	 */
-	public EntryUiModel(VFSEntry entry, boolean isDirectory) {
+	public EntryUiModel(final VFSEntry entry, final boolean isDirectory) {
 		this.entry = entry;
-		this.isDirectory = isDirectory;
+		this.directory = isDirectory;
 	}
 
 	public void toggleRename() {
@@ -56,7 +56,7 @@ public class EntryUiModel {
 	}
 
 	public boolean isDirectory() {
-		return isDirectory;
+		return directory;
 	}
 
 	public ImageIcon getIcon() {

@@ -73,30 +73,29 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	public static final String SEARCH_PANEL_NAME = "searchpanel";
 	public static final String BROWSE_PANEL_NAME = "browsepanel";
 	private final SearchPanel panelSearch;
-	private final JPanel panelBrowsing;
 	private final JButton btnSearch;
 	/**
 	 * State Variable determines whether search or browse gui is shown
 	 */
 	private boolean searching = false;
 
-	private JMenuItem mntmQueryDiskspace;
+	private final JMenuItem mntmQueryDiskspace;
 
-	private JScrollPane scrollPaneBrowseTable;
+	private final JScrollPane scrollPaneBrowseTable;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Initialisation.initApplication(args);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					VFSSwingGui frame = new VFSSwingGui();
+					final VFSSwingGui frame = new VFSSwingGui();
 					frame.update();
 					frame.setVisible(true);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					LOGGER.error("", e);
 				}
 			}
@@ -111,23 +110,23 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent ev) {
+			public void windowClosing(final WindowEvent ev) {
 				beforeWindowClosing();
 			}
 		});
 
 		setBounds(100, 100, 900, 631);
 
-		JMenuBar menuBar = new JMenuBar();
+		final JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JMenu mnDisk = new JMenu("Disk");
+		final JMenu mnDisk = new JMenu("Disk");
 		mnDisk.setMnemonic('D');
 		menuBar.add(mnDisk);
 
 		mntmNew = new JMenuItem(new AbstractAction("New") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				desktopController.openCreateNewDiskDialog(getDesktopFrame());
 			}
 		});
@@ -136,10 +135,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mntmOpen = new JMenuItem(new AbstractAction("Open") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.openFileChooserForDiskOpen(getDesktopFrame());
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -149,12 +148,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mntmClose = new JMenuItem(new AbstractAction("Close") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.closeDisk(getDesktopFrame());
 					// if we open/create another disk the Browser Panel is shown
 					showCardLayoutPanel(BROWSE_PANEL_NAME);
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -165,7 +164,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mntmQueryDiskspace = new JMenuItem(new AbstractAction("Query Diskspace") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				desktopController.openDiskSpaceDialog(getDesktopFrame());
 			}
 		});
@@ -173,7 +172,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnDisk.addSeparator();
 
-		JMenuItem mntmExit = new JMenuItem("Exit");
+		final JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
 		mnDisk.add(mntmExit);
 
@@ -186,10 +185,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnActions.add(new JMenuItem(new AbstractAction("New Folder") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.startCreateNewFolder();
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -202,7 +201,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		// open import dialog, using current folder
 		mnActions.add(new JMenuItem(new AbstractAction("Import") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				desktopController.openImportDialog(getDesktopFrame());
 			}
 		}));
@@ -218,16 +217,16 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.add(getCopyMenuItem());
 		mnActions.add(getCutMenuItem());
 
-		JMenu mnHelp = new JMenu("Help");
+		final JMenu mnHelp = new JMenu("Help");
 		mnHelp.setMnemonic('H');
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
+		final JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.openInfoDialog(getDesktopFrame());
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -241,7 +240,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		btnSearch = new JButton(new AbstractAction("Search") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				startSearch();
 			}
 		});
@@ -253,24 +252,24 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		contentPane.setLayout(new CardLayout());
 
-		panelBrowsing = new JPanel();
+		final JPanel panelBrowsing = new JPanel();
 		contentPane.add(panelBrowsing, BROWSE_PANEL_NAME);
 		panelBrowsing.setLayout(new BorderLayout(0, 0));
 
 		// ADDING "Enter" handler on table item
-		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-		JPanel panelPathLocator = new JPanel();
+		final JPanel panelPathLocator = new JPanel();
 		panelBrowsing.add(panelPathLocator, BorderLayout.NORTH);
-		GridBagLayout gbl_panelPathLocator = new GridBagLayout();
+		final GridBagLayout gbl_panelPathLocator = new GridBagLayout();
 		gbl_panelPathLocator.columnWidths = new int[] { 0, 0, 0 };
 		gbl_panelPathLocator.rowHeights = new int[] { 0, 0 };
 		gbl_panelPathLocator.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		gbl_panelPathLocator.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
 		panelPathLocator.setLayout(gbl_panelPathLocator);
 
-		JLabel lblPath = new JLabel("Path");
-		GridBagConstraints gbc_lblPath = new GridBagConstraints();
+		final JLabel lblPath = new JLabel("Path");
+		final GridBagConstraints gbc_lblPath = new GridBagConstraints();
 		gbc_lblPath.insets = new Insets(0, 0, 0, 5);
 		gbc_lblPath.anchor = GridBagConstraints.EAST;
 		gbc_lblPath.gridx = 0;
@@ -279,14 +278,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		textFieldCurrentPath = new JTextField();
 		textFieldCurrentPath.setEditable(false);
-		GridBagConstraints gbc_textFieldCurrentPath = new GridBagConstraints();
+		final GridBagConstraints gbc_textFieldCurrentPath = new GridBagConstraints();
 		gbc_textFieldCurrentPath.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldCurrentPath.gridx = 1;
 		gbc_textFieldCurrentPath.gridy = 0;
 		panelPathLocator.add(textFieldCurrentPath, gbc_textFieldCurrentPath);
 		textFieldCurrentPath.setColumns(10);
 
-		JPanel panelBrowseMiddle = new JPanel();
+		final JPanel panelBrowseMiddle = new JPanel();
 		panelBrowsing.add(panelBrowseMiddle, BorderLayout.CENTER);
 		panelBrowseMiddle.setLayout(new BorderLayout(0, 0));
 
@@ -295,13 +294,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			@Override
 			// rightclick windows/linux
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(final MouseEvent e) {
 				doContextMenuOnTable(e);
 			}
 
 			@Override
 			// rightclick mac
-			public void mouseReleased(MouseEvent e) {
+			public void mouseReleased(final MouseEvent e) {
 				doContextMenuOnTable(e);
 			}
 		});
@@ -315,7 +314,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		tableFolderEntries.setRowHeight(40);
 		tableFolderEntries.setModel(desktopController.getEntryTableModel());
 
-		TableColumn columnModel = tableFolderEntries.getColumnModel().getColumn(0);
+		final TableColumn columnModel = tableFolderEntries.getColumnModel().getColumn(0);
 		entryCellEditor = new EntryCellEditor(tableFolderEntries, desktopController);
 		columnModel.setCellEditor(entryCellEditor);
 
@@ -324,10 +323,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			@Override
 			// doubleclick
-			public void mouseClicked(MouseEvent event) {
+			public void mouseClicked(final MouseEvent event) {
 				if (event.getClickCount() >= 2) {
-					int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
-					EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
+					final int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
+					final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
 					LOGGER.debug("Doubleclicked " + entry);
 					if (entry != null && entry.isDirectory()) {
 						desktopController.openEntry(entry);
@@ -337,13 +336,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			@Override
 			// rightclick windows/linux
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(final MouseEvent e) {
 				doContextMenuOnTable(e);
 			}
 
 			@Override
 			// rightclick mac
-			public void mouseReleased(MouseEvent e) {
+			public void mouseReleased(final MouseEvent e) {
 				doContextMenuOnTable(e);
 			}
 
@@ -352,8 +351,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		// adjusting menuItems when selection in table changes
 		tableFolderEntries.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+			public void valueChanged(final ListSelectionEvent e) {
+				final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				adjustActionMenus(entry);
 			}
 
@@ -364,14 +363,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				if (tableFolderEntries.isEditing()) {
 					// we are currently renaming an entry
 					// hitting Enter should stop that
 					entryCellEditor.stopCellEditing();
 					return;
 				}
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				if (entry.isDirectory()) {
 					desktopController.openEntry(entry);
 				} else {
@@ -388,9 +387,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getPasteMenuItem(final EntryUiModel entry) {
 		// paste into the current folder
-		JMenuItem mntmPaste = new JMenuItem(new AbstractAction("Paste") {
+		final JMenuItem mntmPaste = new JMenuItem(new AbstractAction("Paste") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				// null means use current folder
 				desktopController.pasteFromClipboardTo(entry);
 			}
@@ -401,9 +400,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getCutMenuItem() {
 		// cuts the currently selected entries to the clipboard
-		JMenuItem retVal = new JMenuItem(new AbstractAction("Cut") {
+		final JMenuItem retVal = new JMenuItem(new AbstractAction("Cut") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				desktopController.cutToClipboard(getSelectedEntries());
 			}
 		});
@@ -413,9 +412,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getCopyMenuItem() {
 		// copies the currently selected entry to the clipboard
-		JMenuItem retVal = new JMenuItem(new AbstractAction("Copy") {
+		final JMenuItem retVal = new JMenuItem(new AbstractAction("Copy") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				desktopController.copyToClipboard(getSelectedEntries());
 			}
 		});
@@ -425,14 +424,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getExportMenuItem() {
 		// exports the currently selected entry
-		JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
+		final JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				startExport();
 			}
 
 			private void startExport() {
-				List<EntryUiModel> selectedItems = getSelectedEntries();
+				final List<EntryUiModel> selectedItems = getSelectedEntries();
 				if (selectedItems.isEmpty()) {
 					selectedItems.add(desktopController.getParentFolderEntry());
 				}
@@ -446,9 +445,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getDeleteMenuItem() {
 		// deletes the currently selected entry
-		JMenuItem retVal = new JMenuItem(new AbstractAction("Delete") {
+		final JMenuItem retVal = new JMenuItem(new AbstractAction("Delete") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				startDelete();
 			}
 		});
@@ -458,9 +457,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getRenameMenuItem() {
 		// renames the currently selected entry
-		JMenuItem retVal = new JMenuItem(new AbstractAction("Rename") {
+		final JMenuItem retVal = new JMenuItem(new AbstractAction("Rename") {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				startRename();
 			}
 		});
@@ -468,7 +467,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		return retVal;
 	}
 
-	private void adjustActionMenus(EntryUiModel entry) {
+	private void adjustActionMenus(final EntryUiModel entry) {
 		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
@@ -479,8 +478,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		showCardLayoutPanel(SEARCH_PANEL_NAME);
 	}
 
-	public void showCardLayoutPanel(String panelName) {
-		CardLayout cl = (CardLayout) (contentPane.getLayout());
+	public void showCardLayoutPanel(final String panelName) {
+		final CardLayout cl = (CardLayout) (contentPane.getLayout());
 		cl.show(contentPane, panelName);
 
 		searching = SEARCH_PANEL_NAME.equals(panelName);
@@ -497,12 +496,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * 
 	 * @param tableFolderEntries2
 	 */
-	private void removeKeysFromJTableInputMap(JTable tableFolderEntries2) {
-		KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
-		KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-		KeyStroke ctrlC = KeyStroke.getKeyStroke('C', KeyEvent.CTRL_DOWN_MASK);
-		KeyStroke ctrlX = KeyStroke.getKeyStroke('X', KeyEvent.CTRL_DOWN_MASK);
-		KeyStroke ctrlV = KeyStroke.getKeyStroke('V', KeyEvent.CTRL_DOWN_MASK);
+	private void removeKeysFromJTableInputMap(final JTable tableFolderEntries2) {
+		final KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
+		final KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+		final KeyStroke ctrlC = KeyStroke.getKeyStroke('C', KeyEvent.CTRL_DOWN_MASK);
+		final KeyStroke ctrlX = KeyStroke.getKeyStroke('X', KeyEvent.CTRL_DOWN_MASK);
+		final KeyStroke ctrlV = KeyStroke.getKeyStroke('V', KeyEvent.CTRL_DOWN_MASK);
 
 		InputMap imap = tableFolderEntries.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		while (imap != null) {
@@ -517,41 +516,41 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private void startRename() {
 		try {
-			int currentRow = tableFolderEntries.getSelectedRow();
+			final int currentRow = tableFolderEntries.getSelectedRow();
 			if (currentRow < 0) {
 				JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 
-			EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
+			final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
 			LOGGER.debug("Start renaming " + entry);
 
 			entryCellEditor.setAllowEditing(true);
 			tableFolderEntries.editCellAt(currentRow, 0);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			SwingUtil.handleException(getDesktopFrame(), ex);
 		}
 	}
 
 	private void startDelete() {
 		try {
-			List<EntryUiModel> selectedEntries = getSelectedEntries();
+			final List<EntryUiModel> selectedEntries = getSelectedEntries();
 			if (selectedEntries.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
 				return;
 
 			}
 			desktopController.startDelete(selectedEntries);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			SwingUtil.handleException(getDesktopFrame(), ex);
 		}
 	}
 
 	private List<EntryUiModel> getSelectedEntries() {
-		int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
-		List<EntryUiModel> selectedEntries = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
-		for (int i : selectedRowIdexes) {
-			EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
+		final int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
+		final List<EntryUiModel> selectedEntries = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
+		for (final int i : selectedRowIdexes) {
+			final EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
 			if (!(uiEntry instanceof ParentFolderEntryUiModel)) {
 				selectedEntries.add(uiEntry);
 			}
@@ -568,12 +567,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		return this;
 	}
 
-	private void doContextMenuOnTable(MouseEvent e) {
+	private void doContextMenuOnTable(final MouseEvent e) {
 		if (!e.isPopupTrigger()) {
 			return;
 		}
 		LOGGER.trace(e);
-		int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
+		final int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
 		// rowIndex = -1 means that the user clicked in grey area where no items are --> we use the parentfolder in this case otherwise we get the item at the
 		// selected row
 		final EntryUiModel entry = rowIndex == -1 ? desktopController.getParentFolderEntry() : (EntryUiModel) tableFolderEntries.getModel().getValueAt(
@@ -581,13 +580,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		// tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
 
 		LOGGER.debug("Opening popup on entry: " + entry.getFullPath());
-		JPopupMenu menu = new JPopupMenu();
+		final JPopupMenu menu = new JPopupMenu();
 		if (entry.isDirectory()) {
 
 			// new folder
 			menu.add(new JMenuItem(new AbstractAction("New Folder") {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					desktopController.createNewFolderFromContextMenu(entry);
 				}
 			}));
@@ -598,7 +597,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			// import
 			menu.add(new JMenuItem(new AbstractAction("Import") {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					desktopController.importFromContextMenu(entry, getDesktopFrame());
 				}
 			}));
@@ -620,13 +619,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private void beforeWindowClosing() {
 		if (!desktopController.isInManagementMode()) {
-			Object[] options = new Object[] { "Yes", "No" };
-			int retVal = JOptionPane.showOptionDialog(getDesktopFrame(), "Disk is still opened. Do you want me to close it before we exit?", "Close Disk?",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			final Object[] options = new Object[] { "Yes", "No" };
+			final int retVal = JOptionPane.showOptionDialog(getDesktopFrame(), "Disk is still opened. Do you want me to close it before we exit?",
+					"Close Disk?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if (retVal == JOptionPane.YES_OPTION) {
 				try {
 					desktopController.closeDisk(getDesktopFrame());
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					SwingUtil.handleException(getDesktopFrame(), e);
 				}
 			} else {
@@ -641,9 +640,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	@Override
 	public void update() {
 
-		boolean diskMode = !desktopController.isInManagementMode();
+		final boolean diskMode = !desktopController.isInManagementMode();
 
-		mnActions.setEnabled(diskMode && (!searching));
+		mnActions.setEnabled(diskMode && !searching);
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
@@ -652,7 +651,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.setVisible(diskMode);
 		contentPane.setEnabled(diskMode);
 
-		btnSearch.setEnabled(diskMode && (!searching));
+		btnSearch.setEnabled(diskMode && !searching);
 		textFieldFind.setEnabled(!searching);
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 	}

@@ -27,9 +27,9 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	private static final long serialVersionUID = 6008623672955958103L;
 
 	private final JPanel contentPanel = new JPanel();
-	private JTextField textFieldMaxSpace;
-	private JTextField textFieldFreeSpace;
-	private JLabel lblStatus;
+	private final JTextField textFieldMaxSpace;
+	private final JTextField textFieldFreeSpace;
+	private final JLabel lblStatus;
 
 	/**
 	 * Create the dialog.
@@ -45,49 +45,49 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel);
-			GridBagLayout gbl_panel = new GridBagLayout();
-			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-			gbl_panel.rowHeights = new int[] { 0, 0, 0 };
-			gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
-			panel.setLayout(gbl_panel);
+			GridBagLayout gblPanel = new GridBagLayout();
+			gblPanel.columnWidths = new int[] { 0, 0, 0 };
+			gblPanel.rowHeights = new int[] { 0, 0, 0 };
+			gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+			gblPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+			panel.setLayout(gblPanel);
 			{
 				JLabel lblMaximumSpace = new JLabel("Maximum Space");
-				GridBagConstraints gbc_lblMaximumSpace = new GridBagConstraints();
-				gbc_lblMaximumSpace.anchor = GridBagConstraints.EAST;
-				gbc_lblMaximumSpace.insets = new Insets(0, 0, 5, 5);
-				gbc_lblMaximumSpace.gridx = 0;
-				gbc_lblMaximumSpace.gridy = 0;
-				panel.add(lblMaximumSpace, gbc_lblMaximumSpace);
+				GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
+				gbcLblMaximumSpace.insets = new Insets(0, 0, 5, 5);
+				gbcLblMaximumSpace.gridx = 0;
+				gbcLblMaximumSpace.gridy = 0;
+				panel.add(lblMaximumSpace, gbcLblMaximumSpace);
 			}
 			{
 				textFieldMaxSpace = new JTextField();
 				textFieldMaxSpace.setEditable(false);
-				GridBagConstraints gbc_textFieldMaxSpace = new GridBagConstraints();
-				gbc_textFieldMaxSpace.insets = new Insets(0, 0, 5, 0);
-				gbc_textFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldMaxSpace.gridx = 1;
-				gbc_textFieldMaxSpace.gridy = 0;
-				panel.add(textFieldMaxSpace, gbc_textFieldMaxSpace);
+				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 5, 0);
+				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldMaxSpace.gridx = 1;
+				gbcTextFieldMaxSpace.gridy = 0;
+				panel.add(textFieldMaxSpace, gbcTextFieldMaxSpace);
 				textFieldMaxSpace.setColumns(10);
 			}
 			{
 				JLabel lblFreeSpace = new JLabel("Free Space");
-				GridBagConstraints gbc_lblFreeSpace = new GridBagConstraints();
-				gbc_lblFreeSpace.anchor = GridBagConstraints.EAST;
-				gbc_lblFreeSpace.insets = new Insets(0, 0, 0, 5);
-				gbc_lblFreeSpace.gridx = 0;
-				gbc_lblFreeSpace.gridy = 1;
-				panel.add(lblFreeSpace, gbc_lblFreeSpace);
+				GridBagConstraints gbcLblFreeSpace = new GridBagConstraints();
+				gbcLblFreeSpace.anchor = GridBagConstraints.EAST;
+				gbcLblFreeSpace.insets = new Insets(0, 0, 0, 5);
+				gbcLblFreeSpace.gridx = 0;
+				gbcLblFreeSpace.gridy = 1;
+				panel.add(lblFreeSpace, gbcLblFreeSpace);
 			}
 			{
 				textFieldFreeSpace = new JTextField();
 				textFieldFreeSpace.setEditable(false);
-				GridBagConstraints gbc_textFieldFreeSpace = new GridBagConstraints();
-				gbc_textFieldFreeSpace.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldFreeSpace.gridx = 1;
-				gbc_textFieldFreeSpace.gridy = 1;
-				panel.add(textFieldFreeSpace, gbc_textFieldFreeSpace);
+				GridBagConstraints gbcTextFieldFreeSpace = new GridBagConstraints();
+				gbcTextFieldFreeSpace.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldFreeSpace.gridx = 1;
+				gbcTextFieldFreeSpace.gridy = 1;
+				panel.add(textFieldFreeSpace, gbcTextFieldFreeSpace);
 				textFieldFreeSpace.setColumns(10);
 			}
 		}
@@ -102,6 +102,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 			{
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent arg0) {
 						dispose();
 					}

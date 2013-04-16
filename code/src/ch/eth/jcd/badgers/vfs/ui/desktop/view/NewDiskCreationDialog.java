@@ -34,37 +34,23 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 
 	private static final Logger LOGGER = Logger.getLogger(NewDiskCreationDialog.class);
+	private static final String DEFAULT_FILE_NAME = "disk.bfs";
 
 	private static final long serialVersionUID = -2652867330270571476L;
 
 	private final DesktopController ownerController;
 
 	private final JPanel contentPanel = new JPanel();
-	private JTextField txtPath;
-	private JTextField txtMaximumSize;
+	private final JTextField txtPath;
+	private final JTextField txtMaximumSize;
 
-	private JComboBox<Encryption> cboEncryption;
-	private JComboBox<Compression> cboCompression;
-
-	private final String defaultFileName = "disk.bfs";
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			NewDiskCreationDialog dialog = new NewDiskCreationDialog(null, null);
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private final JComboBox<Encryption> cboEncryption;
+	private final JComboBox<Compression> cboCompression;
 
 	/**
 	 * Create the dialog.
 	 */
-	public NewDiskCreationDialog(Frame owner, DesktopController ownerController) {
+	public NewDiskCreationDialog(final Frame owner, final DesktopController ownerController) {
 		super(owner, "Create new virtual disk", true);
 		this.ownerController = ownerController;
 
@@ -72,15 +58,15 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_contentPanel = new GridBagLayout();
-		gbl_contentPanel.columnWidths = new int[] { 0, 0, 0, 0 };
-		gbl_contentPanel.rowHeights = new int[] { 0, 0, 0, 0, 0 };
-		gbl_contentPanel.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
-		gbl_contentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		contentPanel.setLayout(gbl_contentPanel);
+		final GridBagLayout gblContentPanel = new GridBagLayout();
+		gblContentPanel.columnWidths = new int[] { 0, 0, 0, 0 };
+		gblContentPanel.rowHeights = new int[] { 0, 0, 0, 0, 0 };
+		gblContentPanel.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gblContentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		contentPanel.setLayout(gblContentPanel);
 		{
-			JLabel lblPath = new JLabel("Path");
-			GridBagConstraints gbc_lblPath = new GridBagConstraints();
+			final JLabel lblPath = new JLabel("Path");
+			final GridBagConstraints gbc_lblPath = new GridBagConstraints();
 			gbc_lblPath.anchor = GridBagConstraints.EAST;
 			gbc_lblPath.insets = new Insets(0, 0, 5, 5);
 			gbc_lblPath.gridx = 0;
@@ -89,7 +75,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		}
 		{
 			txtPath = new JTextField();
-			GridBagConstraints gbc_txtPath = new GridBagConstraints();
+			final GridBagConstraints gbc_txtPath = new GridBagConstraints();
 			gbc_txtPath.insets = new Insets(0, 0, 5, 5);
 			gbc_txtPath.fill = GridBagConstraints.HORIZONTAL;
 			gbc_txtPath.gridx = 1;
@@ -98,21 +84,21 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			txtPath.setColumns(10);
 		}
 		{
-			JButton btnShowFileChooser = new JButton("Browse");
+			final JButton btnShowFileChooser = new JButton("Browse");
 			btnShowFileChooser.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser fc = new JFileChooser();
+				public void actionPerformed(final ActionEvent e) {
+					final JFileChooser fc = new JFileChooser();
 					fc.setDialogTitle("Choose Disk File Path");
 					fc.setDialogType(JFileChooser.SAVE_DIALOG);
 					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-					int returnVal = fc.showDialog(getComponent(), "Ok");
+					final int returnVal = fc.showDialog(getComponent(), "Ok");
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File selected = fc.getSelectedFile();
+						final File selected = fc.getSelectedFile();
 						String path;
 						if (selected.isDirectory()) {
-							path = selected.getAbsolutePath() + File.separator + defaultFileName;
+							path = selected.getAbsolutePath() + File.separator + DEFAULT_FILE_NAME;
 						} else {
 							path = selected.getAbsolutePath();
 						}
@@ -121,15 +107,15 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 				}
 			});
 			btnShowFileChooser.setMnemonic('b');
-			GridBagConstraints gbc_btnShowFileChooser = new GridBagConstraints();
+			final GridBagConstraints gbc_btnShowFileChooser = new GridBagConstraints();
 			gbc_btnShowFileChooser.insets = new Insets(0, 0, 5, 0);
 			gbc_btnShowFileChooser.gridx = 2;
 			gbc_btnShowFileChooser.gridy = 0;
 			contentPanel.add(btnShowFileChooser, gbc_btnShowFileChooser);
 		}
 		{
-			JLabel lblMaximumSize = new JLabel("Maximum Size (mb)");
-			GridBagConstraints gbc_lblMaximumSize = new GridBagConstraints();
+			final JLabel lblMaximumSize = new JLabel("Maximum Size (mb)");
+			final GridBagConstraints gbc_lblMaximumSize = new GridBagConstraints();
 			gbc_lblMaximumSize.anchor = GridBagConstraints.EAST;
 			gbc_lblMaximumSize.insets = new Insets(0, 0, 5, 5);
 			gbc_lblMaximumSize.gridx = 0;
@@ -139,7 +125,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		{
 			txtMaximumSize = new JTextField();
 			txtMaximumSize.setText("1000");
-			GridBagConstraints gbc_txtMaximumSize = new GridBagConstraints();
+			final GridBagConstraints gbc_txtMaximumSize = new GridBagConstraints();
 			gbc_txtMaximumSize.insets = new Insets(0, 0, 5, 5);
 			gbc_txtMaximumSize.fill = GridBagConstraints.HORIZONTAL;
 			gbc_txtMaximumSize.gridx = 1;
@@ -148,8 +134,8 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			txtMaximumSize.setColumns(10);
 		}
 		{
-			JLabel lblEncryption = new JLabel("Encryption");
-			GridBagConstraints gbc_lblEncryption = new GridBagConstraints();
+			final JLabel lblEncryption = new JLabel("Encryption");
+			final GridBagConstraints gbc_lblEncryption = new GridBagConstraints();
 			gbc_lblEncryption.anchor = GridBagConstraints.EAST;
 			gbc_lblEncryption.insets = new Insets(0, 0, 5, 5);
 			gbc_lblEncryption.gridx = 0;
@@ -159,7 +145,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		{
 			cboEncryption = new JComboBox<Encryption>();
 			cboEncryption.setModel(new DefaultComboBoxModel<Encryption>(Encryption.values()));
-			GridBagConstraints gbc_cboEncryption = new GridBagConstraints();
+			final GridBagConstraints gbc_cboEncryption = new GridBagConstraints();
 			gbc_cboEncryption.insets = new Insets(0, 0, 5, 5);
 			gbc_cboEncryption.fill = GridBagConstraints.HORIZONTAL;
 			gbc_cboEncryption.gridx = 1;
@@ -167,8 +153,8 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			contentPanel.add(cboEncryption, gbc_cboEncryption);
 		}
 		{
-			JLabel lblCompression = new JLabel("Compression");
-			GridBagConstraints gbc_lblCompression = new GridBagConstraints();
+			final JLabel lblCompression = new JLabel("Compression");
+			final GridBagConstraints gbc_lblCompression = new GridBagConstraints();
 			gbc_lblCompression.anchor = GridBagConstraints.EAST;
 			gbc_lblCompression.insets = new Insets(0, 0, 0, 5);
 			gbc_lblCompression.gridx = 0;
@@ -178,7 +164,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		{
 			cboCompression = new JComboBox<Compression>();
 			cboCompression.setModel(new DefaultComboBoxModel<Compression>(Compression.values()));
-			GridBagConstraints gbc_cboCompression = new GridBagConstraints();
+			final GridBagConstraints gbc_cboCompression = new GridBagConstraints();
 			gbc_cboCompression.insets = new Insets(0, 0, 0, 5);
 			gbc_cboCompression.fill = GridBagConstraints.HORIZONTAL;
 			gbc_cboCompression.gridx = 1;
@@ -186,14 +172,14 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			contentPanel.add(cboCompression, gbc_cboCompression);
 		}
 		{
-			JPanel buttonPane = new JPanel();
+			final JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton btnOk = new JButton("OK");
+				final JButton btnOk = new JButton("OK");
 				btnOk.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent e) {
+					public void actionPerformed(final ActionEvent e) {
 						createDisk();
 						dispose();
 
@@ -206,10 +192,10 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 				getRootPane().setDefaultButton(btnOk);
 			}
 			{
-				JButton btnCancel = new JButton("Cancel");
+				final JButton btnCancel = new JButton("Cancel");
 				btnCancel.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent arg0) {
+					public void actionPerformed(final ActionEvent arg0) {
 						dispose();
 					}
 				});
@@ -223,19 +209,19 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 	}
 
 	private void init() {
-		String home = System.getProperty("user.home");
-		txtPath.setText(home + File.separator + defaultFileName);
+		final String home = System.getProperty("user.home");
+		txtPath.setText(home + File.separator + DEFAULT_FILE_NAME);
 	}
 
 	private void createDisk() {
 		try {
 			LOGGER.info("Create Disk");
 
-			DiskConfiguration config = new DiskConfiguration();
+			final DiskConfiguration config = new DiskConfiguration();
 			config.setMaximumSize(1024 * 1024 * Long.parseLong(txtMaximumSize.getText()));
 
-			Compression compression = (Compression) cboCompression.getSelectedItem();
-			Encryption encryption = (Encryption) cboEncryption.getSelectedItem();
+			final Compression compression = (Compression) cboCompression.getSelectedItem();
+			final Encryption encryption = (Encryption) cboEncryption.getSelectedItem();
 
 			config.setCompressionAlgorithm(compression);
 			config.setEncryptionAlgorithm(encryption);
@@ -243,7 +229,7 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			config.setHostFilePath(txtPath.getText());
 
 			ownerController.createDisk(config);
-		} catch (VFSException e) {
+		} catch (final VFSException e) {
 			SwingUtil.handleException(this, e);
 		}
 	}

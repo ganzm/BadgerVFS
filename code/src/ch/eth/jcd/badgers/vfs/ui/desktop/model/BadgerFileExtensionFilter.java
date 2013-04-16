@@ -13,24 +13,24 @@ public class BadgerFileExtensionFilter extends FileFilter {
 		this("Badger File System (.bfs)", ".bfs");
 	}
 
-	public BadgerFileExtensionFilter(String description, String extension) {
+	public BadgerFileExtensionFilter(final String description, final String extension) {
 		this(description, new String[] { extension });
 	}
 
-	public BadgerFileExtensionFilter(String description, String extensions[]) {
+	public BadgerFileExtensionFilter(final String description, final String extensions[]) {
 		this.description = description;
 		this.extensions = extensions.clone();
 	}
 
 	@Override
-	public boolean accept(File file) {
+	public boolean accept(final File file) {
 		if (file.isDirectory()) {
 			return true;
 		}
-		int count = extensions.length;
-		String path = file.getAbsolutePath();
+		final int count = extensions.length;
+		final String path = file.getAbsolutePath();
 		for (int i = 0; i < count; i++) {
-			String ext = extensions[i];
+			final String ext = extensions[i];
 			if (path.endsWith(ext) && path.charAt(path.length() - ext.length()) == '.') {
 				return true;
 			}
@@ -40,7 +40,7 @@ public class BadgerFileExtensionFilter extends FileFilter {
 
 	@Override
 	public String getDescription() {
-		return (description == null ? extensions[0] : description);
+		return description == null ? extensions[0] : description;
 	}
 
 }
