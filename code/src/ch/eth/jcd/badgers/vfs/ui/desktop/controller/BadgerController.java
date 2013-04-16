@@ -5,13 +5,17 @@ public abstract class BadgerController {
 	/**
 	 * Reference to the view component
 	 */
-	protected final BadgerViewBase badgerView;
+	private final BadgerViewBase badgerView;
 
-	public BadgerController(BadgerViewBase badgerView) {
+	public BadgerController(final BadgerViewBase badgerView) {
 		this.badgerView = badgerView;
 	}
 
 	protected void updateGUI() {
 		badgerView.update();
+	}
+
+	protected BadgerViewBase getView() {
+		return badgerView;
 	}
 }

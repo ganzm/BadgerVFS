@@ -44,6 +44,7 @@ import javax.swing.table.TableColumn;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
@@ -90,13 +91,9 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				try {
-					final VFSSwingGui frame = new VFSSwingGui();
-					frame.update();
-					frame.setVisible(true);
-				} catch (final Exception e) {
-					LOGGER.error("", e);
-				}
+				final VFSSwingGui frame = new VFSSwingGui();
+				frame.update();
+				frame.setVisible(true);
 			}
 		});
 	}
@@ -137,7 +134,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.openFileChooserForDiskOpen(getDesktopFrame());
-				} catch (final Exception ex) {
+				} catch (final VFSException ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -152,7 +149,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					desktopController.closeDisk(getDesktopFrame());
 					// if we open/create another disk the Browser Panel is shown
 					showCardLayoutPanel(BROWSE_PANEL_NAME);
-				} catch (final Exception ex) {
+				} catch (final VFSException ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -187,7 +184,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					desktopController.startCreateNewFolder();
-				} catch (final Exception ex) {
+				} catch (final VFSRuntimeException ex) {
 					SwingUtil.handleException(getDesktopFrame(), ex);
 				}
 			}
@@ -223,11 +220,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		final JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				try {
-					desktopController.openInfoDialog(getDesktopFrame());
-				} catch (final Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
+				desktopController.openInfoDialog(getDesktopFrame());
 			}
 		});
 		mnHelp.add(mntmInfo);
@@ -497,14 +490,14 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 * 
 	 * @param tableFolderEntries2
 	 */
-	private void removeKeysFromJTableInputMap(final JTable tableFolderEntries2) {
+	private static void removeKeysFromJTableInputMap(final JTable table) {
 		final KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
 		final KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
 		final KeyStroke ctrlC = KeyStroke.getKeyStroke('C', KeyEvent.CTRL_DOWN_MASK);
 		final KeyStroke ctrlX = KeyStroke.getKeyStroke('X', KeyEvent.CTRL_DOWN_MASK);
 		final KeyStroke ctrlV = KeyStroke.getKeyStroke('V', KeyEvent.CTRL_DOWN_MASK);
 
-		InputMap imap = tableFolderEntries.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		InputMap imap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		while (imap != null) {
 			imap.remove(f2KeyToRemove);
 			imap.remove(deleteKeyToRemove);
@@ -528,7 +521,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			entryCellEditor.setAllowEditing(true);
 			tableFolderEntries.editCellAt(currentRow, 0);
-		} catch (final Exception ex) {
+		} catch (final VFSRuntimeException ex) {
 			SwingUtil.handleException(getDesktopFrame(), ex);
 		}
 	}
@@ -542,7 +535,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 			}
 			desktopController.startDelete(selectedEntries);
-		} catch (final Exception ex) {
+		} catch (final VFSRuntimeException ex) {
 			SwingUtil.handleException(getDesktopFrame(), ex);
 		}
 	}

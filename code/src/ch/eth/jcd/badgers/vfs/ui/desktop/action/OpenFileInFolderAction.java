@@ -13,30 +13,30 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 public class OpenFileInFolderAction extends BadgerAction {
 	private final EntryUiModel entryModel;
 
-	private List<EntryUiModel> entries = new ArrayList<EntryUiModel>();
+	private final List<EntryUiModel> entries = new ArrayList<EntryUiModel>();
 
 	private VFSPath folderPath;
 
 	private ParentFolderEntryUiModel parentFolderEntryUiModel = null;
 
-	public OpenFileInFolderAction(ActionObserver actionObserver, EntryUiModel entryModel) {
+	public OpenFileInFolderAction(final ActionObserver actionObserver, final EntryUiModel entryModel) {
 		super(actionObserver);
 		this.entryModel = entryModel;
 	}
 
 	@Override
-	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		VFSEntry entry = entryModel.getEntry();
+	public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
+		final VFSEntry entry = entryModel.getEntry();
 		// the folder we want to open
-		VFSEntry folder = entry.getParent();
-		VFSEntry parent = folder.getParent();
+		final VFSEntry folder = entry.getParent();
+		final VFSEntry parent = folder.getParent();
 		if (folder != parent) {
 			parentFolderEntryUiModel = new ParentFolderEntryUiModel(parent);
 		}
 
 		folderPath = folder.getPath();
-		List<VFSEntry> childEntries = folder.getChildren();
-		for (VFSEntry vfsEntry : childEntries) {
+		final List<VFSEntry> childEntries = folder.getChildren();
+		for (final VFSEntry vfsEntry : childEntries) {
 			entries.add(new EntryUiModel(vfsEntry, vfsEntry.isDirectory()));
 		}
 	}

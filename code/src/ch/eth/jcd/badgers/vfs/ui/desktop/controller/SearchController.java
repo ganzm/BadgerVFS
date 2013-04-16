@@ -24,9 +24,9 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	private SearchAction currentSearchAction = null;
 
-	private DesktopController parentController;
+	private final DesktopController parentController;
 
-	public SearchController(DesktopController parentController, BadgerViewBase badgerView) {
+	public SearchController(final DesktopController parentController, final BadgerViewBase badgerView) {
 		super(badgerView);
 		this.parentController = parentController;
 		searchResultTableModel = new EntryTableModel();
@@ -47,7 +47,7 @@ public class SearchController extends BadgerController implements ActionObserver
 		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
 		controller.enqueue(currentSearchAction);
 
-		badgerView.update();
+		updateGUI();
 	}
 
 	public SearchAction getCurrentSearchAction() {
@@ -56,7 +56,7 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	@Override
 	public void onActionFailed(final BadgerAction action, final VFSException e) {
-		SwingUtil.handleException((Component) badgerView, e);
+		SwingUtil.handleException((Component) getView(), e);
 	}
 
 	@Override
@@ -64,9 +64,9 @@ public class SearchController extends BadgerController implements ActionObserver
 		if (action instanceof SearchAction) {
 			LOGGER.debug("Search finished " + action);
 			currentSearchAction = null;
-			badgerView.update();
+			updateGUI();
 		} else {
-			SwingUtil.handleError((Component) badgerView, "Unexpected Action " + action);
+			SwingUtil.handleError((Component) getView(), "Unexpected Action " + action);
 		}
 	}
 
@@ -78,13 +78,13 @@ public class SearchController extends BadgerController implements ActionObserver
 		currentSearchAction.tryCancelSearch();
 	}
 
-	public void foundEntry(EntryUiModel entryModel) {
+	public void foundEntry(final EntryUiModel entryModel) {
 		searchResultTableModel.appendEntry(entryModel);
 	}
 
-	public void openSearchEntryAtRow(int rowIndex) {
-		EntryUiModel entryModel = (EntryUiModel) searchResultTableModel.getValueAt(rowIndex, 0);
-		OpenFileInFolderAction action = new OpenFileInFolderAction(parentController, entryModel);
+	public void openSearchEntryAtRow(final int rowIndex) {
+		final EntryUiModel entryModel = (EntryUiModel) searchResultTableModel.getValueAt(rowIndex, 0);
+		final OpenFileInFolderAction action = new OpenFileInFolderAction(parentController, entryModel);
 		WorkerController.getInstance().enqueue(action);
 	}
 

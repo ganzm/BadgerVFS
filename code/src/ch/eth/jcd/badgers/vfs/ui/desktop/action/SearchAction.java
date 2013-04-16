@@ -26,7 +26,7 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	 */
 	private String currentDirectory;
 
-	public SearchAction(SearchController searchController, SearchParameter searchParameter, String searchFolder) {
+	public SearchAction(final SearchController searchController, final SearchParameter searchParameter, final String searchFolder) {
 		super(searchController);
 		this.searchParameter = searchParameter;
 		this.searchFolder = searchFolder;
@@ -34,9 +34,9 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	}
 
 	@Override
-	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		VFSPath searchFolderPath = diskManager.createPath(searchFolder);
-		VFSEntry searchFolder = searchFolderPath.getVFSEntry();
+	public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
+		final VFSPath searchFolderPath = diskManager.createPath(this.searchFolder);
+		final VFSEntry searchFolder = searchFolderPath.getVFSEntry();
 
 		searchFolder.findInFolder(searchParameter.getSearchString(), this);
 	}
@@ -50,22 +50,22 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	}
 
 	@Override
-	public void foundEntry(VFSPath path) {
+	public void foundEntry(final VFSPath path) {
 		LOGGER.debug("Found Entry " + path.getAbsolutePath());
 
 		try {
-			VFSEntry entry = path.getVFSEntry();
-			EntryUiModel entryModel = new EntryUiModel(entry, entry.isDirectory());
+			final VFSEntry entry = path.getVFSEntry();
+			final EntryUiModel entryModel = new EntryUiModel(entry, entry.isDirectory());
 
 			// forward to our controller
 			searchController.foundEntry(entryModel);
-		} catch (VFSException e) {
+		} catch (final VFSException e) {
 			LOGGER.error("Internal Error", e);
 		}
 	}
 
 	@Override
-	public boolean stopSearch(VFSPath currentDirectory) {
+	public boolean stopSearch(final VFSPath currentDirectory) {
 		this.currentDirectory = currentDirectory.getAbsolutePath();
 		return canceling;
 	}
