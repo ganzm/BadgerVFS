@@ -30,6 +30,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.encryption.CaesarInputStream;
 import ch.eth.jcd.badgers.vfs.encryption.CaesarOutputStream;
@@ -222,6 +223,25 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 			return dataSectionHandler.getMaximumPossibleDataBlocks() * DataBlock.BLOCK_SIZE;
 		} catch (IOException ex) {
 			throw new VFSException("", ex);
+		}
+	}
+
+	public DiskSpaceUsage getDiskSpaceUsage() throws VFSException {
+		try {
+			DiskSpaceUsage du = new DiskSpaceUsage();
+
+			long maxData = dataSectionHandler.getMaximumPossibleDataBlocks();
+			du.setMaxDataBlocks(maxData);
+			du.setFreeDataBlocks(maxData - dataSectionHandler.getNumberOfOccupiedBlocks());
+
+			du.setMaxData(maxData * DataBlock.BLOCK_SIZE);
+			du.setFreeData((maxData - dataSectionHandler.getNumberOfOccupiedBlocks()) * DataBlock.BLOCK_SIZE);
+
+			du.setMaxDirectoryBlocks(directorySectionHandler.getMaxNumDirectoryBlocks());
+			du.setFreeDirectoryBlocks(directorySectionHandler.getNumberOfFreeDirectoryBlocks());
+			return du;
+		} catch (IOException e) {
+			throw new VFSException("", e);
 		}
 	}
 

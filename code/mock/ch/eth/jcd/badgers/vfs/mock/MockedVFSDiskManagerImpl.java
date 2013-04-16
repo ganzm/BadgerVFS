@@ -16,6 +16,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
@@ -117,6 +118,11 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	@Override
 	public long getMaxSpace() {
 		return 0;
+	}
+
+	@Override
+	public DiskSpaceUsage getDiskSpaceUsage() throws VFSException {
+		return new DiskSpaceUsage();
 	}
 
 	@Override

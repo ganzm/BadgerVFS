@@ -1,11 +1,11 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class QueryDiskSpaceAction extends BadgerAction {
-	private long freeSpace;
-	private long maxSpace;
+	private DiskSpaceUsage diskSpaceUsage;
 
 	public QueryDiskSpaceAction(ActionObserver actionObserver) {
 		super(actionObserver);
@@ -13,15 +13,10 @@ public class QueryDiskSpaceAction extends BadgerAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		freeSpace = diskManager.getFreeSpace();
-		maxSpace = diskManager.getMaxSpace();
+		diskSpaceUsage = diskManager.getDiskSpaceUsage();
 	}
 
-	public long getFreeSpace() {
-		return freeSpace;
-	}
-
-	public long getMaxSpace() {
-		return maxSpace;
+	public DiskSpaceUsage getDiskSpaceUsage() {
+		return diskSpaceUsage;
 	}
 }

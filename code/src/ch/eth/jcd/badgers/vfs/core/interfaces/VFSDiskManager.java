@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public interface VFSDiskManager {
@@ -31,6 +32,11 @@ public interface VFSDiskManager {
 	 * @throws VFSException
 	 */
 	long getMaxSpace() throws VFSException;
+
+	/**
+	 * get a summary about disk space used
+	 */
+	DiskSpaceUsage getDiskSpaceUsage() throws VFSException;
 
 	/** returns the root folder of our file system */
 	VFSEntry getRoot();

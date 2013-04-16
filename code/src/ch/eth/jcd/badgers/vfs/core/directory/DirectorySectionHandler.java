@@ -13,14 +13,14 @@ import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 /**
  * $Id$
  * 
- * TODO describe DirectorySectionHandler
+ * Handles Access to the Directory section of the virtual file system
  * 
  */
 public final class DirectorySectionHandler {
 
 	private static Logger logger = Logger.getLogger(DirectorySectionHandler.class);
 
-	public static final long MAX_NUM_DIRECTORY_BLOCKS = 10000;
+	public static final long MAX_NUM_DIRECTORY_BLOCKS = 100000;
 
 	/**
 	 * Default size of the directory section of our file system
@@ -95,6 +95,32 @@ public final class DirectorySectionHandler {
 		directoryBlock.persist(virtualDiskFile);
 	}
 
+	public long getNumberOfFreeDirectoryBlocks() throws IOException {
+		long result = 0;
+
+		// go to start of DataSection
+		virtualDiskFile.seek(sectionOffset);
+
+		long maxNumDirectoryBlocks = sectionSize / DirectoryBlock.BLOCK_SIZE;
+		for (int i = 0; i < maxNumDirectoryBlocks; i++) {
+
+			int byteAsInt = virtualDiskFile.read();
+			if ((byteAsInt & 1) == 0) {
+				// block free
+				++result;
+			} // else: block already occupied
+
+			// skip to next block
+			virtualDiskFile.skipBytes(DirectoryBlock.BLOCK_SIZE - 1);
+		}
+
+		return result;
+	}
+
+	public long getMaxNumDirectoryBlocks() {
+		return sectionSize / DirectoryBlock.BLOCK_SIZE;
+	}
+
 	private long getNextFreeDirectorySectionPosition() throws IOException {
 
 		// go to start of DataSection
@@ -109,8 +135,8 @@ public final class DirectorySectionHandler {
 				// block free
 				logger.debug("Found free DirectoryBlock at " + currentLocation + " Block Nr " + (currentLocation - sectionOffset) / DirectoryBlock.BLOCK_SIZE);
 				return currentLocation;
-				
-			}  // else: block already occupied
+
+			} // else: block already occupied
 
 			int skipedBytes = virtualDiskFile.skipBytes(DirectoryBlock.BLOCK_SIZE - 1);
 			currentLocation = virtualDiskFile.getFilePointer();
