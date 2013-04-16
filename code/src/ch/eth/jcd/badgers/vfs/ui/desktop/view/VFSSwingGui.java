@@ -221,76 +221,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		// TODO: allow multiple selection and do all the stuff on the selected entries (except renaming?)
 		// actions on the currently selected entry
-		// renames the currently selected entry
-		JMenuItem mntmRename = new JMenuItem("Rename");
-		mntmRename.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-		mntmRename.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					startRename();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
-			}
-		});
-		mnActions.add(mntmRename);
 
-		// deletes the currently selected entry
-		JMenuItem mntmDelete = new JMenuItem("Delete");
-		mntmDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-		mntmDelete.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					startDelete();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
-			}
-		});
-		mnActions.add(mntmDelete);
-
-		// exports the currently selected entry
-		mntmExport = new JMenuItem("Export");
-		mntmExport.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				if (entry != null && entry.isDirectory()) {
-					desktopController.startExport(getDesktopFrame(), entry);
-				}
-			}
-		});
+		mnActions.add(getRenameMenuItem());
+		mnActions.add(getDeleteMenuItem());
+		mntmExport = getExportMenuItem();
 		mnActions.add(mntmExport);
-
-		// copies the currently selected entry to the clipboard
-		JMenuItem mntmCopy = new JMenuItem("Copy");
-		mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
-		mntmCopy.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.copyToClipboard(entry);
-
-			}
-		});
-		mnActions.add(mntmCopy);
-
-		// cuts the currently selected entries to the clipboard
-		JMenuItem mntmCut = new JMenuItem("Cut");
-		mntmCut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
-		mnActions.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.cutToClipboard(entry);
-			}
-		});
-		mnActions.add(mntmCut);
+		mnActions.add(getCopyMenuItem());
+		mnActions.add(getCutMenuItem());
 
 		JMenu mnHelp = new JMenu("Help");
 		mnHelp.setMnemonic('H');
@@ -479,9 +416,79 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.add(panelSearch, SEARCH_PANEL_NAME);
 	}
 
+	private static JMenuItem createMenuItem(String text, KeyStroke keyStroke, ActionListener action) {
+		JMenuItem retVal = new JMenuItem(text);
+		retVal.setAccelerator(keyStroke);
+		retVal.addActionListener(action);
+		return retVal;
+	}
+
+	private JMenuItem getCutMenuItem() {
+		// cuts the currently selected entries to the clipboard
+		return createMenuItem("Cut", KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK), new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				desktopController.cutToClipboard(entry);
+			}
+		});
+	}
+
+	private JMenuItem getCopyMenuItem() {
+		// copies the currently selected entry to the clipboard
+		return createMenuItem("Copy", KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK), new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				desktopController.copyToClipboard(entry);
+			}
+		});
+	}
+
+	private JMenuItem getExportMenuItem() {
+		// exports the currently selected entry
+		return createMenuItem("Export", null, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
+				if (entry != null && entry.isDirectory()) {
+					desktopController.startExport(getDesktopFrame(), entry);
+				}
+			}
+		});
+	}
+
+	private JMenuItem getDeleteMenuItem() {
+		// deletes the currently selected entry
+		return createMenuItem("Delete", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					startDelete();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
+	}
+
+	private JMenuItem getRenameMenuItem() {
+		// renames the currently selected entry
+
+		return createMenuItem("Rename", KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					startRename();
+				} catch (Exception ex) {
+					SwingUtil.handleException(getDesktopFrame(), ex);
+				}
+			}
+		});
+	}
+
 	private void adjustActionMenus(EntryUiModel entry) {
 		mntmExport.setEnabled(entry != null && !entry.isDirectory());
-
 		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
@@ -600,67 +607,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		}
 
 		menu.addSeparator();
-		JMenuItem mntmRename = new JMenuItem("Rename");
-		mntmRename.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-		mntmRename.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LOGGER.debug("RENAME ON ENTRY: " + entry.getFullPath());
-				try {
-					startRename();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
-			}
-		});
-		menu.add(mntmRename);
 
-		JMenuItem mntmDelete = new JMenuItem("Delete");
-		mntmDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-		mntmDelete.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				LOGGER.debug("DELET ON ENTRY: " + entry.getFullPath());
-				try {
-					startDelete();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
-			}
-		});
-		menu.add(mntmDelete);
-
-		JMenuItem mntmImport = new JMenuItem("Export");
-		mntmImport.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				desktopController.startExport(getDesktopFrame(), entry);
-			}
-		});
-		menu.add(mntmImport);
-
-		JMenuItem mntmCopy = new JMenuItem("Copy");
-		// mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
-		mntmCopy.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				desktopController.copyToClipboard(entry);
-			}
-		});
-		menu.add(mntmCopy);
-
-		JMenuItem mntmCut = new JMenuItem("Cut");
-		// mntmCut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
-		mntmCut.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				desktopController.cutToClipboard(entry);
-
-			}
-		});
-		menu.add(mntmCut);
+		menu.add(getRenameMenuItem());
+		menu.add(getDeleteMenuItem());
+		menu.add(getExportMenuItem());
+		menu.add(getCopyMenuItem());
+		menu.add(getCutMenuItem());
 
 		menu.show(tableFolderEntries.getComponentAt(e.getPoint()), e.getX(), e.getY());
 
