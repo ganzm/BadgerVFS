@@ -1,20 +1,20 @@
 package ch.eth.jcd.badgers.vfs.util;
 
-public class Pair<T1, T2> {
+public class Pair<T, K> {
 
-	private final T1 first;
-	private final T2 second;
+	private final T first;
+	private final K second;
 
-	public Pair(T1 first, T2 second) {
+	public Pair(T first, K second) {
 		this.first = first;
 		this.second = second;
 	}
 
-	public T1 getFirst() {
+	public T getFirst() {
 		return first;
 	}
 
-	public T2 getSecond() {
+	public K getSecond() {
 		return second;
 	}
 
