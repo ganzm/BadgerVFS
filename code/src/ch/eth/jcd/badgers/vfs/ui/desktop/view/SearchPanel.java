@@ -78,7 +78,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(textFieldSearchString, gbc_textFieldSearchString);
 		textFieldSearchString.setColumns(10);
 
-		final JLabel lblCaseSensitiv = new JLabel("Case sensitiv");
+		final JLabel lblCaseSensitiv = new JLabel("Case sensitive");
 		final GridBagConstraints gbc_lblCaseSensitiv = new GridBagConstraints();
 		gbc_lblCaseSensitiv.anchor = GridBagConstraints.EAST;
 		gbc_lblCaseSensitiv.insets = new Insets(0, 0, 5, 5);
@@ -168,14 +168,14 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		tableSearchResult.setModel(searchController.getSearchResultModel());
 		scrollPaneSearchResult.setViewportView(tableSearchResult);
 
-		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 		tableSearchResult.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "enter");
 		tableSearchResult.getActionMap().put("enter", new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				int rowIndex = tableSearchResult.getSelectedRow();
+			public void actionPerformed(final ActionEvent e) {
+				final int rowIndex = tableSearchResult.getSelectedRow();
 				openSearchEntryAtRow(rowIndex);
 			}
 		});
@@ -184,16 +184,16 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		tableSearchResult.addMouseListener(new MouseAdapter() {
 			@Override
 			// doubleclick
-			public void mouseClicked(MouseEvent event) {
+			public void mouseClicked(final MouseEvent event) {
 				if (event.getClickCount() == 2) {
-					int rowIndex = tableSearchResult.getSelectedRow();
+					final int rowIndex = tableSearchResult.getSelectedRow();
 					openSearchEntryAtRow(rowIndex);
 				}
 			}
 		});
 	}
 
-	protected void openSearchEntryAtRow(int rowIndex) {
+	protected void openSearchEntryAtRow(final int rowIndex) {
 		searchController.openSearchEntryAtRow(rowIndex);
 		parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
 	}
