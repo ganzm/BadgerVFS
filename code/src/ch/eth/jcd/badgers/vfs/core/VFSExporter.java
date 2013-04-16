@@ -11,7 +11,6 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
@@ -42,10 +41,10 @@ public class VFSExporter {
 	 * @param path
 	 * @param destination
 	 */
-	public void exportFileOrFolder(VFSPath path, File destination) throws VFSException {
+	public void exportFileOrFolder(VFSEntry entry, File destination) throws VFSException {
 		Queue<ExportItem> queue = new LinkedList<ExportItem>();
 
-		queue.add(new ExportItem(path.getVFSEntry(), destination));
+		queue.add(new ExportItem(entry, destination));
 		while (!queue.isEmpty()) {
 			ExportItem item = queue.remove();
 			if (item.getFrom().isDirectory()) {

@@ -29,7 +29,7 @@ public class ExportAction extends BadgerAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		new VFSExporter().exportFileOrFolder(entry.getPath(), destination);
+		new VFSExporter().exportFileOrFolder(entry, destination);
 	}
 
 	public File getDestination() {
