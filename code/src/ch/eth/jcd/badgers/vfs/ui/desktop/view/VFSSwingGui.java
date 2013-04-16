@@ -63,7 +63,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmClose;
-	private final JMenuItem mntmExport;
 	private final JMenuItem mntmPaste;
 	private final JTextField textFieldCurrentPath;
 	private final JTable tableFolderEntries;
@@ -211,8 +210,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		mnActions.add(getRenameMenuItem());
 		mnActions.add(getDeleteMenuItem());
-		mntmExport = getExportMenuItem();
-		mnActions.add(mntmExport);
+		mnActions.add(getExportMenuItem());
 		mnActions.add(getCopyMenuItem());
 		mnActions.add(getCutMenuItem());
 
@@ -426,13 +424,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getExportMenuItem() {
 		// exports the currently selected entry
-		return new JMenuItem(new AbstractAction("Export") {
+		JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				desktopController.startExport(getDesktopFrame(), entry != null ? entry : desktopController.getParentFolderEntry());
 			}
 		});
+		exportItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
+		return exportItem;
 	}
 
 	private JMenuItem getDeleteMenuItem() {
@@ -468,7 +468,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	}
 
 	private void adjustActionMenus(EntryUiModel entry) {
-		mntmExport.setEnabled(entry != null && !entry.isDirectory());
 		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
