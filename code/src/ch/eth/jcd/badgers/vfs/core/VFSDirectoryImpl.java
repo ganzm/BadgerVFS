@@ -182,10 +182,13 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		}
 		LOGGER.info("Copy Folder " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
 
+		// list children before creating the target directory
+		// avoid bug where you copy a folder into itself
+		List<VFSEntry> childEntries = getChildren();
+
 		VFSEntry newDir = newLocation.createDirectory();
 
 		// copy child entries
-		List<VFSEntry> childEntries = getChildren();
 		for (VFSEntry child : childEntries) {
 			VFSPath newChildLocation = newDir.getChildPath(child.getPath().getName());
 			child.copyTo(newChildLocation);
