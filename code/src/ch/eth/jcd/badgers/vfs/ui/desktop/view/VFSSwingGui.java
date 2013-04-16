@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +43,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 @SuppressWarnings("serial")
@@ -76,6 +78,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private boolean searching = false;
 
 	private JMenuItem mntmQueryDiskspace;
+
+	private JScrollPane scrollPaneBrowseTable;
 
 	/**
 	 * Launch the application.
@@ -270,7 +274,21 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelBrowsing.add(panelBrowseMiddle, BorderLayout.CENTER);
 		panelBrowseMiddle.setLayout(new BorderLayout(0, 0));
 
-		JScrollPane scrollPaneBrowseTable = new JScrollPane();
+		scrollPaneBrowseTable = new JScrollPane();
+		scrollPaneBrowseTable.addMouseListener(new MouseAdapter() {
+
+			@Override
+			// rightclick windows/linux
+			public void mousePressed(MouseEvent e) {
+				doContextMenuOnTable(e);
+			}
+
+			@Override
+			// rightclick mac
+			public void mouseReleased(MouseEvent e) {
+				doContextMenuOnTable(e);
+			}
+		});
 		panelBrowseMiddle.add(scrollPaneBrowseTable, BorderLayout.CENTER);
 
 		tableFolderEntries = new JTable();
@@ -303,23 +321,13 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			@Override
 			// rightclick windows/linux
 			public void mousePressed(MouseEvent e) {
-				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
-				tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
-				if (e.isPopupTrigger()) {
-					doContextMenuOnEntry(e, entry);
-				}
+				doContextMenuOnTable(e);
 			}
 
 			@Override
 			// rightclick mac
 			public void mouseReleased(MouseEvent e) {
-				int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
-				tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
-				if (e.isPopupTrigger()) {
-					doContextMenuOnEntry(e, entry);
-				}
+				doContextMenuOnTable(e);
 			}
 
 		});
@@ -529,7 +537,18 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		return this;
 	}
 
-	private void doContextMenuOnEntry(MouseEvent e, final EntryUiModel entry) {
+	private void doContextMenuOnTable(MouseEvent e) {
+		if (!e.isPopupTrigger()) {
+			return;
+		}
+		LOGGER.trace(e);
+		int rowIndex = tableFolderEntries.rowAtPoint(e.getPoint());
+		// rowIndex = -1 means that the user clicked in grey area where no items are --> we use the parentfolder in this case otherwise we get the item at the
+		// selected row
+		final EntryUiModel entry = rowIndex == -1 ? desktopController.getParentFolderEntry() : (EntryUiModel) tableFolderEntries.getModel().getValueAt(
+				rowIndex, 0);
+		tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+
 		LOGGER.debug("Opening popup on entry: " + entry.getFullPath());
 		JPopupMenu menu = new JPopupMenu();
 		if (entry.isDirectory()) {
@@ -556,13 +575,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 		menu.addSeparator();
 
-		menu.add(getRenameMenuItem());
-		menu.add(getDeleteMenuItem());
+		if (!(entry instanceof ParentFolderEntryUiModel)) {
+			menu.add(getRenameMenuItem());
+			menu.add(getDeleteMenuItem());
+		}
 		menu.add(getExportMenuItem());
 		menu.add(getCopyMenuItem());
 		menu.add(getCutMenuItem());
 
-		menu.show(tableFolderEntries.getComponentAt(e.getPoint()), e.getX(), e.getY());
+		menu.show(((Container) e.getSource()).getComponentAt(e.getPoint()), e.getX(), e.getY());
 
 	}
 
