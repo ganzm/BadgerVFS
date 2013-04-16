@@ -338,6 +338,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 				WorkerController.getInstance().enqueue(copy);
 				break;
 			case CUT:
+				VFSEntry cutSource = clipboard.getSecond().getEntry();
+				String cutSourcePath = cutSource.getPath().getAbsolutePath();
+
+				if (destinationFolder.getPath().getAbsolutePath().contains(cutSourcePath)) {
+					SwingUtil.showWarning(null, "No can do! Target folder is a descendant of cut source folder");
+					return;
+				}
+
 				CutAction cut = new CutAction(this, clipboard.getSecond().getEntry(), destinationFolder);
 				WorkerController.getInstance().enqueue(cut);
 				break;

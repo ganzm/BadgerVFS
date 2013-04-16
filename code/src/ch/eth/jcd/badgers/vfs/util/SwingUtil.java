@@ -19,4 +19,8 @@ public class SwingUtil {
 		LOGGER.error(error);
 		JOptionPane.showMessageDialog(parent, error, "Exception", JOptionPane.ERROR_MESSAGE);
 	}
+
+	public static void showWarning(Component parent, String warnMessage) {
+		JOptionPane.showMessageDialog(parent, warnMessage, "Warning", JOptionPane.WARNING_MESSAGE);
+	}
 }
