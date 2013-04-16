@@ -401,12 +401,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private JMenuItem getCutMenuItem() {
 		// cuts the currently selected entries to the clipboard
-
 		JMenuItem retVal = new JMenuItem(new AbstractAction("Cut") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.cutToClipboard(entry);
+				desktopController.cutToClipboard(getSelectedEntries());
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
@@ -418,8 +416,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem retVal = new JMenuItem(new AbstractAction("Copy") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.copyToClipboard(entry);
+				desktopController.copyToClipboard(getSelectedEntries());
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
@@ -431,17 +428,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
-				List<EntryUiModel> selectedItems = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
+				startExport();
+			}
 
-				if (selectedRowIdexes.length != 0) {
-					for (int i : selectedRowIdexes) {
-						EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
-						if (!(uiEntry instanceof ParentFolderEntryUiModel)) {
-							selectedItems.add(uiEntry);
-						}
-					}
-				} else {
+			private void startExport() {
+				List<EntryUiModel> selectedItems = getSelectedEntries();
+				if (selectedItems.isEmpty()) {
 					selectedItems.add(desktopController.getParentFolderEntry());
 				}
 
@@ -457,11 +449,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem retVal = new JMenuItem(new AbstractAction("Delete") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					startDelete();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
+				startDelete();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -473,11 +461,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem retVal = new JMenuItem(new AbstractAction("Rename") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					startRename();
-				} catch (Exception ex) {
-					SwingUtil.handleException(getDesktopFrame(), ex);
-				}
+				startRename();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
@@ -532,37 +516,47 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	}
 
 	private void startRename() {
-		int currentRow = tableFolderEntries.getSelectedRow();
-		if (currentRow < 0) {
-			JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
-			return;
+		try {
+			int currentRow = tableFolderEntries.getSelectedRow();
+			if (currentRow < 0) {
+				JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+
+			EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
+			LOGGER.debug("Start renaming " + entry);
+
+			entryCellEditor.setAllowEditing(true);
+			tableFolderEntries.editCellAt(currentRow, 0);
+		} catch (Exception ex) {
+			SwingUtil.handleException(getDesktopFrame(), ex);
 		}
-
-		EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
-		LOGGER.debug("Start renaming " + entry);
-
-		entryCellEditor.setAllowEditing(true);
-		tableFolderEntries.editCellAt(currentRow, 0);
 	}
 
 	private void startDelete() {
+		try {
+			List<EntryUiModel> selectedEntries = getSelectedEntries();
+			if (selectedEntries.isEmpty()) {
+				JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
+				return;
 
+			}
+			desktopController.startDelete(selectedEntries);
+		} catch (Exception ex) {
+			SwingUtil.handleException(getDesktopFrame(), ex);
+		}
+	}
+
+	private List<EntryUiModel> getSelectedEntries() {
 		int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
 		List<EntryUiModel> selectedEntries = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
-
-		if (selectedRowIdexes.length == 0) {
-			JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
-			return;
-
-		}
 		for (int i : selectedRowIdexes) {
 			EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
 			if (!(uiEntry instanceof ParentFolderEntryUiModel)) {
 				selectedEntries.add(uiEntry);
 			}
 		}
-
-		desktopController.startDelete(selectedEntries);
+		return selectedEntries;
 	}
 
 	/**

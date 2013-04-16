@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action;
 
+import java.util.List;
+
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -7,10 +9,10 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class CopyAction extends BadgerAction {
 
-	private final VFSEntry source;
+	private final List<VFSEntry> source;
 	private final VFSEntry destinationFolder;
 
-	public CopyAction(ActionObserver actionObserver, VFSEntry source, VFSEntry destinationFolder) {
+	public CopyAction(ActionObserver actionObserver, List<VFSEntry> source, VFSEntry destinationFolder) {
 		super(actionObserver);
 		this.source = source;
 		this.destinationFolder = destinationFolder;
@@ -18,9 +20,11 @@ public class CopyAction extends BadgerAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		String destinationStringName = source.getPath().getName();
-		VFSPath destination = destinationFolder.getChildPath(destinationStringName);
-		source.copyTo(destination);
+		for (VFSEntry sourceEntry : source) {
+			String destinationStringName = sourceEntry.getPath().getName();
+			VFSPath destination = destinationFolder.getChildPath(destinationStringName);
+			sourceEntry.copyTo(destination);
+		}
 	}
 
 }

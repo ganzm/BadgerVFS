@@ -51,7 +51,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private VFSPath currentFolder;
 
-	private Pair<ClipboardAction, EntryUiModel> clipboard;
+	private Pair<ClipboardAction, List<EntryUiModel>> clipboard;
 
 	public DesktopController(BadgerViewBase desktopView) {
 		super(desktopView);
@@ -331,14 +331,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 		}
 	}
 
-	public void copyToClipboard(EntryUiModel entry) {
-		LOGGER.debug("Adding " + entry.getDisplayName() + " to clipboard for copy");
-		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.COPY, entry);
+	public void copyToClipboard(List<EntryUiModel> entries) {
+		LOGGER.debug("Adding " + entries + " to clipboard for copy");
+		clipboard = new Pair<ClipboardAction, List<EntryUiModel>>(ClipboardAction.COPY, entries);
 	}
 
-	public void cutToClipboard(EntryUiModel entry) {
-		LOGGER.debug("Adding " + entry.getDisplayName() + " to clipboard for cut");
-		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.CUT, entry);
+	public void cutToClipboard(List<EntryUiModel> entries) {
+		LOGGER.debug("Adding " + entries + " to clipboard for cut");
+		clipboard = new Pair<ClipboardAction, List<EntryUiModel>>(ClipboardAction.CUT, entries);
 	}
 
 	/**
@@ -353,22 +353,25 @@ public class DesktopController extends BadgerController implements ActionObserve
 		}
 		try {
 			VFSEntry destinationFolder = toFolder != null ? toFolder.getEntry() : currentFolder.getVFSEntry();
-
+			List<VFSEntry> vfsEntries = new ArrayList<VFSEntry>(clipboard.getSecond().size());
+			for (EntryUiModel entry : clipboard.getSecond()) {
+				vfsEntries.add(entry.getEntry());
+			}
 			switch (clipboard.getFirst()) {
 			case COPY:
-				CopyAction copy = new CopyAction(this, clipboard.getSecond().getEntry(), destinationFolder);
+				CopyAction copy = new CopyAction(this, vfsEntries, destinationFolder);
 				WorkerController.getInstance().enqueue(copy);
 				break;
 			case CUT:
-				VFSEntry cutSource = clipboard.getSecond().getEntry();
-				String cutSourcePath = cutSource.getPath().getAbsolutePath();
+				for (VFSEntry cutSource : vfsEntries) {
+					String cutSourcePath = cutSource.getPath().getAbsolutePath();
 
-				if (destinationFolder.getPath().getAbsolutePath().contains(cutSourcePath)) {
-					SwingUtil.showWarning(null, "No can do! Target folder is a descendant of cut source folder");
-					return;
+					if (destinationFolder.getPath().getAbsolutePath().contains(cutSourcePath)) {
+						SwingUtil.showWarning(null, "No can do! Target folder is a descendant of cut source folder");
+						return;
+					}
 				}
-
-				CutAction cut = new CutAction(this, clipboard.getSecond().getEntry(), destinationFolder);
+				CutAction cut = new CutAction(this, vfsEntries, destinationFolder);
 				WorkerController.getInstance().enqueue(cut);
 				break;
 			}
