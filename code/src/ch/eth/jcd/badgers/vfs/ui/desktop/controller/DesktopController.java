@@ -308,13 +308,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 		fc.setDialogTitle("Choose File to export to");
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
 		fc.setFileSelectionMode(entry.isDirectory() ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
-
+		fc.setSelectedFile(new File(entry.getDisplayName()));
 		int returnVal = fc.showDialog(desktopFrame, "Ok");
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
+
 			File selected = fc.getSelectedFile();
 
 			if (!selected.exists()
-					|| (selected.exists() && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
+					|| (selected.exists() && !selected.isDirectory() && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
 							"The selected file already exists, do you really want do overwrite it?"))) {
 				ExportAction action = new ExportAction(this, entry.getEntry(), selected, desktopFrame);
 				WorkerController.getInstance().enqueue(action);
