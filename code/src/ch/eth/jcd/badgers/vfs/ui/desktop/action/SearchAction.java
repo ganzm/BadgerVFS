@@ -8,11 +8,14 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 
 public class SearchAction extends BadgerAction implements FindInFolderCallback {
 
 	private static final Logger LOGGER = Logger.getLogger(SearchAction.class);
 
+	private final SearchController searchController;
 	private final SearchParameter searchParameter;
 	private final String searchFolder;
 
@@ -23,10 +26,11 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	 */
 	private String currentDirectory;
 
-	public SearchAction(ActionObserver actionObserver, SearchParameter searchParameter, String searchFolder) {
-		super(actionObserver);
+	public SearchAction(SearchController searchController, SearchParameter searchParameter, String searchFolder) {
+		super(searchController);
 		this.searchParameter = searchParameter;
 		this.searchFolder = searchFolder;
+		this.searchController = searchController;
 	}
 
 	@Override
@@ -49,13 +53,20 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 	public void foundEntry(VFSPath path) {
 		LOGGER.debug("Found Entry " + path.getAbsolutePath());
 
+		try {
+			VFSEntry entry = path.getVFSEntry();
+			EntryUiModel entryModel = new EntryUiModel(entry, entry.isDirectory());
+
+			// forward to our controller
+			searchController.foundEntry(entryModel);
+		} catch (VFSException e) {
+			LOGGER.error("Internal Error", e);
+		}
 	}
 
 	@Override
 	public boolean stopSearch(VFSPath currentDirectory) {
-
 		this.currentDirectory = currentDirectory.getAbsolutePath();
-
 		return canceling;
 	}
 

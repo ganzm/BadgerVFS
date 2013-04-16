@@ -61,7 +61,7 @@ public class EntryUiModel {
 
 	public ImageIcon getIcon() {
 
-		if (entry.isDirectory()) {
+		if (directory) {
 			return folderIcon;
 		} else {
 			return fileIcon;

@@ -6,7 +6,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -14,19 +18,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 
 public class SearchPanel extends JPanel implements BadgerViewBase {
 	private static final long serialVersionUID = 6942548578015341003L;
 
 	private SearchParameter searchParameter = new SearchParameter();
 	private final JTextField textFieldSearchString;
-
+	private final JTable tableSearchResult;
 	private final JTextField textFieldSearchFolder;
 	private final JCheckBox chckbxSearchCaseSensitiv;
 	private final JCheckBox chckbxSearchSubfolders;
@@ -42,7 +48,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	 */
 	public SearchPanel(final VFSSwingGui parentGui) {
 		this.parent = parentGui;
-		this.searchController = new SearchController(this);
+		this.searchController = new SearchController(parentGui.getController(), this);
 		setLayout(new BorderLayout(0, 0));
 
 		final JPanel panelSearchParameter = new JPanel();
@@ -155,13 +161,44 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		final JScrollPane scrollPaneSearchResult = new JScrollPane();
 		add(scrollPaneSearchResult, BorderLayout.CENTER);
 
-		final JTable tableSearchResult = new JTable();
+		tableSearchResult = new JTable();
+		tableSearchResult.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
+		tableSearchResult.setRowHeight(40);
+		tableSearchResult.setShowGrid(false);
 		tableSearchResult.setModel(searchController.getSearchResultModel());
 		scrollPaneSearchResult.setViewportView(tableSearchResult);
+
+		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		tableSearchResult.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "enter");
+		tableSearchResult.getActionMap().put("enter", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int rowIndex = tableSearchResult.getSelectedRow();
+				openSearchEntryAtRow(rowIndex);
+			}
+		});
+
+		// mouse listeners on jtable
+		tableSearchResult.addMouseListener(new MouseAdapter() {
+			@Override
+			// doubleclick
+			public void mouseClicked(MouseEvent event) {
+				if (event.getClickCount() == 2) {
+					int rowIndex = tableSearchResult.getSelectedRow();
+					openSearchEntryAtRow(rowIndex);
+				}
+			}
+		});
+	}
+
+	protected void openSearchEntryAtRow(int rowIndex) {
+		searchController.openSearchEntryAtRow(rowIndex);
+		parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
 	}
 
 	protected void startSearch() {
-
 		searchParameter.setSearchString(textFieldSearchString.getText());
 		final String searchFolder = textFieldSearchFolder.getText();
 		searchParameter.setIncludeSubFolders(chckbxSearchSubfolders.isSelected());
@@ -172,12 +209,12 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 	protected void cancelSearch() {
 		searchController.cancelSearch();
-
 		update();
 	}
 
 	public void resetSearch() {
 		searchParameter = new SearchParameter();
+		searchController.resetSearchResult();
 	}
 
 	public void setSearchTextAndContext(final String text, final String searchFolder) {

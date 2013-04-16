@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
@@ -22,7 +23,7 @@ public class EntryCellEditor implements TableCellEditor {
 
 	private final List<CellEditorListener> listeners = new ArrayList<CellEditorListener>();
 
-	private final JTextField textField = new JTextField();
+	private final JTextField textField;
 	private final DesktopController desktopController;
 	private int currentEditedRow;
 	private EntryUiModel currentEditedValue;
@@ -33,6 +34,9 @@ public class EntryCellEditor implements TableCellEditor {
 	public EntryCellEditor(JTable table, DesktopController desktopController) {
 		this.desktopController = desktopController;
 		this.table = table;
+
+		textField = new JTextField();
+		textField.setFont(new Font("Tahoma", Font.BOLD, 12));
 	}
 
 	/**

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -275,6 +276,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelPathLocator.add(lblPath, gbc_lblPath);
 
 		textFieldCurrentPath = new JTextField();
+		textFieldCurrentPath.setFont(new Font("Tahoma", Font.BOLD, 12));
 		textFieldCurrentPath.setEditable(false);
 		final GridBagConstraints gbc_textFieldCurrentPath = new GridBagConstraints();
 		gbc_textFieldCurrentPath.fill = GridBagConstraints.HORIZONTAL;
@@ -316,7 +318,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		entryCellEditor = new EntryCellEditor(tableFolderEntries, desktopController);
 		columnModel.setCellEditor(entryCellEditor);
 
-		// mouse listeners ond jtable
+		// mouse listeners on jtable
 		tableFolderEntries.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -369,10 +371,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					return;
 				}
 				final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				if (entry.isDirectory()) {
-					desktopController.openEntry(entry);
-				} else {
-					desktopController.startExport(getDesktopFrame(), Arrays.asList(new EntryUiModel[] { entry }));
+				if (entry != null) {
+					if (entry.isDirectory()) {
+						desktopController.openEntry(entry);
+					} else {
+						desktopController.startExport(getDesktopFrame(), Arrays.asList(new EntryUiModel[] { entry }));
+					}
 				}
 			}
 		});
@@ -472,7 +476,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	protected void startSearch() {
 		panelSearch.resetSearch();
 		panelSearch.setSearchTextAndContext(textFieldFind.getText(), desktopController.getCurrentFolderAsString());
-
 		showCardLayoutPanel(SEARCH_PANEL_NAME);
 	}
 
@@ -637,7 +640,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	@Override
 	public void update() {
-
 		final boolean diskMode = !desktopController.isInManagementMode();
 
 		mnActions.setEnabled(diskMode && !searching);
@@ -654,4 +656,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 	}
 
+	public DesktopController getController() {
+		return desktopController;
+	}
 }

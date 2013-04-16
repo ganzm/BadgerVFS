@@ -11,8 +11,10 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class SearchController extends BadgerController implements ActionObserver {
@@ -22,8 +24,11 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	private SearchAction currentSearchAction = null;
 
-	public SearchController(final BadgerViewBase badgerView) {
+	private DesktopController parentController;
+
+	public SearchController(DesktopController parentController, BadgerViewBase badgerView) {
 		super(badgerView);
+		this.parentController = parentController;
 		searchResultTableModel = new EntryTableModel();
 	}
 
@@ -35,6 +40,8 @@ public class SearchController extends BadgerController implements ActionObserver
 		if (currentSearchAction != null) {
 			throw new VFSRuntimeException("Don't do that. There is already a search in process");
 		}
+
+		searchResultTableModel.clear();
 
 		final WorkerController controller = WorkerController.getInstance();
 		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
@@ -69,5 +76,19 @@ public class SearchController extends BadgerController implements ActionObserver
 		}
 
 		currentSearchAction.tryCancelSearch();
+	}
+
+	public void foundEntry(EntryUiModel entryModel) {
+		searchResultTableModel.appendEntry(entryModel);
+	}
+
+	public void openSearchEntryAtRow(int rowIndex) {
+		EntryUiModel entryModel = (EntryUiModel) searchResultTableModel.getValueAt(rowIndex, 0);
+		OpenFileInFolderAction action = new OpenFileInFolderAction(parentController, entryModel);
+		WorkerController.getInstance().enqueue(action);
+	}
+
+	public void resetSearchResult() {
+		searchResultTableModel.clear();
 	}
 }

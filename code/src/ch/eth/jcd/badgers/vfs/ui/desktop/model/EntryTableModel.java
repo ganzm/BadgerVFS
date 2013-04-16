@@ -94,16 +94,11 @@ public class EntryTableModel implements TableModel {
 
 	}
 
-	public void setEntries(final ParentFolderEntryUiModel parentFolderEntryModel, final List<EntryUiModel> newEntries) {
-		final int oldSize = entries.size();
-		entries.clear();
-
-		final TableModelEvent removeEvent = new TableModelEvent(this, 0, oldSize, 0, TableModelEvent.DELETE);
-		for (final TableModelListener listener : listeners) {
-			listener.tableChanged(removeEvent);
-		}
+	public void setEntries(ParentFolderEntryUiModel parentFolderEntryModel, List<EntryUiModel> newEntries) {
+		clear();
 
 		if (parentFolderEntryModel != null) {
+			// add the ".." folder
 			entries.add(parentFolderEntryModel);
 		}
 
@@ -135,6 +130,16 @@ public class EntryTableModel implements TableModel {
 		final TableModelEvent addedEvent = new TableModelEvent(this, rowIndexToRemove, rowIndexToRemove, 0, TableModelEvent.DELETE);
 		for (final TableModelListener listener : listeners) {
 			listener.tableChanged(addedEvent);
+		}
+	}
+
+	public void clear() {
+		int oldSize = entries.size();
+		entries.clear();
+
+		TableModelEvent removeEvent = new TableModelEvent(this, 0, oldSize, 0, TableModelEvent.DELETE);
+		for (TableModelListener listener : listeners) {
+			listener.tableChanged(removeEvent);
 		}
 	}
 }

@@ -28,6 +28,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
@@ -192,6 +193,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 			// after deletion of multiple items we cannot operate anymore with table indices
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
 			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+		} else if (action instanceof OpenFileInFolderAction) {
+			OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
+			VFSPath folderPath = openInFolder.getFolderPath();
+			List<EntryUiModel> entries = openInFolder.getEntries();
+			ParentFolderEntryUiModel parentFolderEntryModel = openInFolder.getParentFolderEntryUiModel();
+			setCurrentFolder(folderPath, parentFolderEntryModel, entries);
 		} else if (action instanceof CreateFolderAction) {
 			final CreateFolderAction createAction = (CreateFolderAction) action;
 			final EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
