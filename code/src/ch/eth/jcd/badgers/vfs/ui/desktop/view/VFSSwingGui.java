@@ -160,7 +160,12 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnDisk.add(mntmClose);
 		mnDisk.addSeparator();
 
-		mntmQueryDiskspace = new JMenuItem("Query Diskspace TODO");
+		mntmQueryDiskspace = new JMenuItem(new AbstractAction("Query Diskspace") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.openDiskSpaceDialog(getDesktopFrame());
+			}
+		});
 		mnDisk.add(mntmQueryDiskspace);
 
 		mnDisk.addSeparator();
