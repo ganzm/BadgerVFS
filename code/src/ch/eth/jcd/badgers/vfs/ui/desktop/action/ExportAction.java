@@ -5,16 +5,12 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import org.apache.log4j.Logger;
-
 import ch.eth.jcd.badgers.vfs.core.VFSExporter;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class ExportAction extends BadgerAction {
-	private static final Logger LOGGER = Logger.getLogger(ExportAction.class);
-
 	private final List<VFSEntry> entries;
 	private final File destination;
 

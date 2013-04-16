@@ -189,8 +189,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		if (action instanceof GetFolderContentAction) {
 			getFolderContentActionFinished((GetFolderContentAction) action);
 		} else if (action instanceof DeleteEntryAction) {
-			DeleteEntryAction deleteAction = (DeleteEntryAction) action;
-			entryTableModel.removeAtIndex(deleteAction.getRowIndexToRemove());
+			// after deletion of multiple items we cannot operate anymore with table indices
+			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
+			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof CreateFolderAction) {
 			CreateFolderAction createAction = (CreateFolderAction) action;
 			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
@@ -249,8 +250,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		workerController.enqueue(action);
 	}
 
-	public void startDelete(EntryUiModel entry, int editedRow) {
-		DeleteEntryAction action = new DeleteEntryAction(this, entry, editedRow);
+	public void startDelete(List<EntryUiModel> entries) {
+		DeleteEntryAction action = new DeleteEntryAction(this, entries);
 		WorkerController.getInstance().enqueue(action);
 	}
 

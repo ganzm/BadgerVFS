@@ -308,7 +308,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelBrowseMiddle.add(scrollPaneBrowseTable, BorderLayout.CENTER);
 
 		tableFolderEntries = new JTable();
-		tableFolderEntries.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		tableFolderEntries.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		scrollPaneBrowseTable.setViewportView(tableFolderEntries);
 		tableFolderEntries.setShowGrid(false);
 		tableFolderEntries.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
@@ -436,7 +436,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 				if (selectedRowIdexes.length != 0) {
 					for (int i : selectedRowIdexes) {
-						selectedItems.add((EntryUiModel) tableFolderEntries.getValueAt(i, 0));
+						EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
+						if (!(uiEntry instanceof ParentFolderEntryUiModel)) {
+							selectedItems.add(uiEntry);
+						}
 					}
 				} else {
 					selectedItems.add(desktopController.getParentFolderEntry());
@@ -528,7 +531,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		}
 	}
 
-	protected void startRename() {
+	private void startRename() {
 		int currentRow = tableFolderEntries.getSelectedRow();
 		if (currentRow < 0) {
 			JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
@@ -542,15 +545,24 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		tableFolderEntries.editCellAt(currentRow, 0);
 	}
 
-	protected void startDelete() {
-		int currentRow = tableFolderEntries.getSelectedRow();
-		if (currentRow < 0) {
+	private void startDelete() {
+
+		int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
+		List<EntryUiModel> selectedEntries = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
+
+		if (selectedRowIdexes.length == 0) {
 			JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
 			return;
+
+		}
+		for (int i : selectedRowIdexes) {
+			EntryUiModel uiEntry = (EntryUiModel) tableFolderEntries.getValueAt(i, 0);
+			if (!(uiEntry instanceof ParentFolderEntryUiModel)) {
+				selectedEntries.add(uiEntry);
+			}
 		}
 
-		EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(currentRow, 0);
-		desktopController.startDelete(entry, currentRow);
+		desktopController.startDelete(selectedEntries);
 	}
 
 	/**

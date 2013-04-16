@@ -46,7 +46,7 @@ public class VFSExporter {
 		Queue<ExportItem> queue = new LinkedList<ExportItem>();
 
 		for (VFSEntry vfsEntry : entries) {
-			queue.add(new ExportItem(vfsEntry, new File(destination, vfsEntry.getPath().getName())));
+			queue.add(new ExportItem(vfsEntry, destination.isDirectory() ? new File(destination, vfsEntry.getPath().getName()) : destination));
 		}
 
 		while (!queue.isEmpty()) {
