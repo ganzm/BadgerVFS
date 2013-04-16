@@ -81,8 +81,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 
 	private final JMenuItem mntmQueryDiskspace;
 
-	private final JScrollPane scrollPaneBrowseTable;
-
 	/**
 	 * Launch the application.
 	 */
@@ -289,7 +287,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelBrowsing.add(panelBrowseMiddle, BorderLayout.CENTER);
 		panelBrowseMiddle.setLayout(new BorderLayout(0, 0));
 
-		scrollPaneBrowseTable = new JScrollPane();
+		final JScrollPane scrollPaneBrowseTable = new JScrollPane();
 		scrollPaneBrowseTable.addMouseListener(new MouseAdapter() {
 
 			@Override
