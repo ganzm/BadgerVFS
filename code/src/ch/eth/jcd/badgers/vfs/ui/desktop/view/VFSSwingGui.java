@@ -416,9 +416,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				if (entry != null && entry.isDirectory()) {
-					desktopController.startExport(getDesktopFrame(), entry);
-				}
+				desktopController.startExport(getDesktopFrame(), entry != null ? entry : desktopController.getParentFolderEntry());
 			}
 		});
 	}

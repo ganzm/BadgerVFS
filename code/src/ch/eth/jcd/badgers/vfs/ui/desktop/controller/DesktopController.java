@@ -293,7 +293,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle("Choose File to export to");
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
-		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		fc.setFileSelectionMode(entry.isDirectory() ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
 
 		int returnVal = fc.showDialog(desktopFrame, "Ok");
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -387,5 +387,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
+	}
+
+	public EntryUiModel getParentFolderEntry() {
+		try {
+			return new ParentFolderEntryUiModel(currentFolder.getVFSEntry());
+		} catch (VFSException e) {
+			LOGGER.error("error getting parentFolder entry", e);
+		}
+		return null;
 	}
 }
