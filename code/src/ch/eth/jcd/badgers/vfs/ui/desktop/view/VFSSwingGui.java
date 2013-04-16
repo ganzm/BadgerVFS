@@ -27,20 +27,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.log4j.Logger;
 
@@ -49,7 +42,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 @SuppressWarnings("serial")
@@ -73,7 +65,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JMenuItem mntmPaste;
 	private final JTextField textFieldCurrentPath;
 	private final JTable tableFolderEntries;
-	private final JTree folderTree;
 	public static final String SEARCH_PANEL_NAME = "searchpanel";
 	public static final String BROWSE_PANEL_NAME = "browsepanel";
 	private final SearchPanel panelSearch;
@@ -240,28 +231,23 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("/", true);
 		contentPane.setLayout(new CardLayout());
 
 		panelBrowsing = new JPanel();
 		contentPane.add(panelBrowsing, BROWSE_PANEL_NAME);
 		panelBrowsing.setLayout(new BorderLayout(0, 0));
 
-		JSplitPane splitPane = new JSplitPane();
-		panelBrowsing.add(splitPane, BorderLayout.CENTER);
+		// ADDING "Enter" handler on table item
+		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-		JPanel panelBrowseMiddle = new JPanel();
-		splitPane.setRightComponent(panelBrowseMiddle);
-		panelBrowseMiddle.setLayout(new BorderLayout(0, 0));
-
-		JPanel panel = new JPanel();
-		panelBrowseMiddle.add(panel, BorderLayout.NORTH);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-		gbl_panel.rowHeights = new int[] { 0, 0 };
-		gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		panel.setLayout(gbl_panel);
+		JPanel panelPathLocator = new JPanel();
+		panelBrowsing.add(panelPathLocator, BorderLayout.NORTH);
+		GridBagLayout gbl_panelPathLocator = new GridBagLayout();
+		gbl_panelPathLocator.columnWidths = new int[] { 0, 0, 0 };
+		gbl_panelPathLocator.rowHeights = new int[] { 0, 0 };
+		gbl_panelPathLocator.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panelPathLocator.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panelPathLocator.setLayout(gbl_panelPathLocator);
 
 		JLabel lblPath = new JLabel("Path");
 		GridBagConstraints gbc_lblPath = new GridBagConstraints();
@@ -269,7 +255,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		gbc_lblPath.anchor = GridBagConstraints.EAST;
 		gbc_lblPath.gridx = 0;
 		gbc_lblPath.gridy = 0;
-		panel.add(lblPath, gbc_lblPath);
+		panelPathLocator.add(lblPath, gbc_lblPath);
 
 		textFieldCurrentPath = new JTextField();
 		textFieldCurrentPath.setEditable(false);
@@ -277,14 +263,18 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		gbc_textFieldCurrentPath.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldCurrentPath.gridx = 1;
 		gbc_textFieldCurrentPath.gridy = 0;
-		panel.add(textFieldCurrentPath, gbc_textFieldCurrentPath);
+		panelPathLocator.add(textFieldCurrentPath, gbc_textFieldCurrentPath);
 		textFieldCurrentPath.setColumns(10);
 
-		JScrollPane scrollPane = new JScrollPane();
-		panelBrowseMiddle.add(scrollPane, BorderLayout.CENTER);
+		JPanel panelBrowseMiddle = new JPanel();
+		panelBrowsing.add(panelBrowseMiddle, BorderLayout.CENTER);
+		panelBrowseMiddle.setLayout(new BorderLayout(0, 0));
+
+		JScrollPane scrollPaneBrowseTable = new JScrollPane();
+		panelBrowseMiddle.add(scrollPaneBrowseTable, BorderLayout.CENTER);
 
 		tableFolderEntries = new JTable();
-		scrollPane.setViewportView(tableFolderEntries);
+		scrollPaneBrowseTable.setViewportView(tableFolderEntries);
 		tableFolderEntries.setShowGrid(false);
 		tableFolderEntries.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
 		tableFolderEntries.setRowHeight(40);
@@ -343,9 +333,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 
 		});
-
-		// ADDING "Enter" handler on table item
-		KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 		tableFolderEntries.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "enter");
 		tableFolderEntries.getActionMap().put("enter", new AbstractAction() {
 
@@ -370,34 +357,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 
 		removeKeysFromJTableInputMap(tableFolderEntries);
-
-		JPanel panelBrowseLeft = new JPanel();
-		splitPane.setLeftComponent(panelBrowseLeft);
-		panelBrowseLeft.setLayout(new BorderLayout(0, 0));
-
-		JScrollPane scrollPaneFolderTree = new JScrollPane();
-		panelBrowseLeft.add(scrollPaneFolderTree);
-		folderTree = new JTree(desktopController.getEntryTreeModel());
-		folderTree.setCellRenderer(new EntryTreeCellRenderer());
-		folderTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		scrollPaneFolderTree.setViewportView(folderTree);
-
-		folderTree.addTreeSelectionListener(new TreeSelectionListener() {
-
-			@Override
-			public void valueChanged(TreeSelectionEvent evt) {
-				TreePath[] paths = evt.getPaths();
-
-				// Iterate through all affected nodes
-				for (int i = 0; i < paths.length; i++) {
-					if (evt.isAddedPath(i)) {
-						// This node has been selected
-						desktopController.openTree((EntryUiTreeNode) paths[i].getLastPathComponent());
-						break;
-					}
-				}
-			}
-		});
 
 		panelSearch = new SearchPanel(this);
 		contentPane.add(panelSearch, SEARCH_PANEL_NAME);

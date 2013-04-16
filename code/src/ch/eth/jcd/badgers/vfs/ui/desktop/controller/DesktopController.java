@@ -2,7 +2,6 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
 import java.awt.Component;
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -27,14 +26,11 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.CutAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetTreeContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeModel;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiTreeNode;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
@@ -49,8 +45,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
 	private final EntryTableModel entryTableModel = new EntryTableModel();
-
-	private final EntryUiTreeModel entryTreeModel = new EntryUiTreeModel();
 
 	private VFSPath currentFolder;
 
@@ -145,11 +139,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private void loadRootFolder() {
 		GetFolderContentAction getFolderContentAction = new GetFolderContentAction(this);
-		GetTreeContentAction getTreeContentAction = new GetTreeContentAction(this);
 
 		WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(getFolderContentAction);
-		workerController.enqueue(getTreeContentAction);
 	}
 
 	public boolean isInManagementMode() {
@@ -181,17 +173,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 	public void onActionFinished(BadgerAction action) {
 		if (action instanceof GetFolderContentAction) {
 			getFolderContentActionFinished((GetFolderContentAction) action);
-		} else if (action instanceof GetTreeContentAction) {
-			GetTreeContentAction getTreeAction = (GetTreeContentAction) action;
-			EntryUiTreeNode parent = getTreeAction.getParent();
-			List<EntryUiModel> entries = getTreeAction.getEntries();
-			List<EntryUiTreeNode> treeEntries = new LinkedList<>();
-			for (EntryUiModel entry : entries) {
-				treeEntries.add(new EntryUiTreeNode(entry.toString(), true, entry));
-			}
-			entryTreeModel.removeChildsFromParent(parent);
-			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
-			entryTreeModel.reload();
 		} else if (action instanceof DeleteEntryAction) {
 			DeleteEntryAction deleteAction = (DeleteEntryAction) action;
 			entryTableModel.removeAtIndex(deleteAction.getRowIndexToRemove());
@@ -245,17 +226,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public EntryTableModel getEntryTableModel() {
 		return entryTableModel;
-	}
-
-	public EntryUiTreeModel getEntryTreeModel() {
-		return entryTreeModel;
-	}
-
-	public void openTree(EntryUiTreeNode entry) {
-		GetTreeContentAction action = new GetTreeContentAction(this, entry);
-		WorkerController workerController = WorkerController.getInstance();
-		workerController.enqueue(action);
-
 	}
 
 	public void openEntry(EntryUiModel entry) {
