@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action;
 
 import java.io.File;
+import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -14,30 +15,29 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 public class ExportAction extends BadgerAction {
 	private static final Logger LOGGER = Logger.getLogger(ExportAction.class);
 
-	private final VFSEntry entry;
+	private final List<VFSEntry> entries;
 	private final File destination;
 
 	private final JFrame desktopFrame;
 
-	public ExportAction(ActionObserver actionObserver, VFSEntry entryToExport, File destination, JFrame desktopFrame) {
+	public ExportAction(ActionObserver actionObserver, List<VFSEntry> entriesToExport, File destination, JFrame desktopFrame) {
 		super(actionObserver);
-		LOGGER.debug("ExportAction created: source=" + entryToExport.getPath().toString() + " destination=" + destination.getAbsolutePath());
-		this.entry = entryToExport;
+		this.entries = entriesToExport;
 		this.destination = destination;
 		this.desktopFrame = desktopFrame;
 	}
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		new VFSExporter().exportFileOrFolder(entry, destination);
+		new VFSExporter().exportFileOrFolder(entries, destination);
 	}
 
 	public File getDestination() {
 		return destination;
 	}
 
-	public VFSEntry getEntry() {
-		return entry;
+	public List<VFSEntry> getEntries() {
+		return entries;
 	}
 
 	public JFrame getDesktopFrame() {

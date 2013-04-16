@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -41,10 +42,13 @@ public class VFSExporter {
 	 * @param path
 	 * @param destination
 	 */
-	public void exportFileOrFolder(VFSEntry entry, File destination) throws VFSException {
+	public void exportFileOrFolder(List<VFSEntry> entries, File destination) throws VFSException {
 		Queue<ExportItem> queue = new LinkedList<ExportItem>();
 
-		queue.add(new ExportItem(entry, destination));
+		for (VFSEntry vfsEntry : entries) {
+			queue.add(new ExportItem(vfsEntry, new File(destination, vfsEntry.getPath().getName())));
+		}
+
 		while (!queue.isEmpty()) {
 			ExportItem nextItem = queue.remove();
 			if (nextItem.getFrom().isDirectory()) {
@@ -60,7 +64,8 @@ public class VFSExporter {
 					os = new FileOutputStream(nextItem.getTo());
 					ChannelUtil.fastStreamCopy(is, os);
 				} catch (IOException e) {
-					LOGGER.error("ERROR while exporting: source=" + nextItem.getFrom().getPath().toString() + " destination=" + nextItem.getTo().getAbsolutePath());
+					LOGGER.error("ERROR while exporting: source=" + nextItem.getFrom().getPath().toString() + " destination="
+							+ nextItem.getTo().getAbsolutePath());
 				}
 			}
 		}

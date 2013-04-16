@@ -14,6 +14,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -31,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -304,6 +308,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		panelBrowseMiddle.add(scrollPaneBrowseTable, BorderLayout.CENTER);
 
 		tableFolderEntries = new JTable();
+		tableFolderEntries.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		scrollPaneBrowseTable.setViewportView(tableFolderEntries);
 		tableFolderEntries.setShowGrid(false);
 		tableFolderEntries.setDefaultRenderer(EntryUiModel.class, new EntryListCellRenderer());
@@ -366,12 +371,11 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					entryCellEditor.stopCellEditing();
 					return;
 				}
-
 				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
 				if (entry.isDirectory()) {
 					desktopController.openEntry(entry);
 				} else {
-					desktopController.startExport(getDesktopFrame(), entry);
+					desktopController.startExport(getDesktopFrame(), Arrays.asList(new EntryUiModel[] { entry }));
 				}
 			}
 		});
@@ -427,8 +431,18 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.startExport(getDesktopFrame(), entry != null ? entry : desktopController.getParentFolderEntry());
+				int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
+				List<EntryUiModel> selectedItems = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
+
+				if (selectedRowIdexes.length != 0) {
+					for (int i : selectedRowIdexes) {
+						selectedItems.add((EntryUiModel) tableFolderEntries.getValueAt(i, 0));
+					}
+				} else {
+					selectedItems.add(desktopController.getParentFolderEntry());
+				}
+
+				desktopController.startExport(getDesktopFrame(), selectedItems);
 			}
 		});
 		exportItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
@@ -558,7 +572,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		// selected row
 		final EntryUiModel entry = rowIndex == -1 ? desktopController.getParentFolderEntry() : (EntryUiModel) tableFolderEntries.getModel().getValueAt(
 				rowIndex, 0);
-		tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+		// tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
 
 		LOGGER.debug("Opening popup on entry: " + entry.getFullPath());
 		JPopupMenu menu = new JPopupMenu();

@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -203,8 +204,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
 		} else if (action instanceof ExportAction) {
 			ExportAction exportAction = (ExportAction) action;
-			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntry().getPath().getAbsolutePath()
-					+ " to " + exportAction.getDestination().getAbsolutePath());
+			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntries() + " to "
+					+ exportAction.getDestination().getAbsolutePath());
 		} else if (action instanceof CopyAction) {
 			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
 			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
@@ -303,21 +304,26 @@ public class DesktopController extends BadgerController implements ActionObserve
 		return currentFolder.getAbsolutePath();
 	}
 
-	public void startExport(JFrame desktopFrame, EntryUiModel entry) {
+	public void startExport(JFrame desktopFrame, List<EntryUiModel> entries) {
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle("Choose File to export to");
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
-		fc.setFileSelectionMode(entry.isDirectory() ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
-		fc.setSelectedFile(new File(entry.getDisplayName()));
+		fc.setFileSelectionMode(entries.size() > 1 || (entries.size() == 1 && entries.get(0).isDirectory()) ? JFileChooser.DIRECTORIES_ONLY
+				: JFileChooser.FILES_ONLY);
 		int returnVal = fc.showDialog(desktopFrame, "Ok");
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 
 			File selected = fc.getSelectedFile();
+			List<VFSEntry> vfsEntries = new ArrayList<VFSEntry>(entries.size());
+			for (EntryUiModel uiEntry : entries) {
+				vfsEntries.add(uiEntry.getEntry());
+			}
 
-			if (!selected.exists()
-					|| (selected.exists() && !selected.isDirectory() && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
-							"The selected file already exists, do you really want do overwrite it?"))) {
-				ExportAction action = new ExportAction(this, entry.getEntry(), selected, desktopFrame);
+			if (selected.isDirectory()
+					|| !selected.exists()
+					|| JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
+							"The selected file already exists, do you really want do overwrite it?")) {
+				ExportAction action = new ExportAction(this, vfsEntries, selected, desktopFrame);
 				WorkerController.getInstance().enqueue(action);
 
 			}
