@@ -205,6 +205,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 
+		mnActions.add(mntmPaste);
+
 		// open import dialog, using current folder
 		JMenuItem mntmImport = new JMenuItem("Import");
 		mntmImport.addActionListener(new ActionListener() {
@@ -289,8 +291,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 		mnActions.add(mntmCut);
-
-		mnActions.add(mntmPaste);
 
 		JMenu mnHelp = new JMenu("Help");
 		mnHelp.setMnemonic('H');
