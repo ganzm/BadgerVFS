@@ -46,21 +46,21 @@ public class VFSExporter {
 
 		queue.add(new ExportItem(entry, destination));
 		while (!queue.isEmpty()) {
-			ExportItem item = queue.remove();
-			if (item.getFrom().isDirectory()) {
-				item.getTo().mkdirs();
-				for (VFSEntry e : item.getFrom().getChildren()) {
-					queue.add(new ExportItem(e, new File(item.getTo(), e.getPath().getName())));
+			ExportItem nextItem = queue.remove();
+			if (nextItem.getFrom().isDirectory()) {
+				nextItem.getTo().mkdirs();
+				for (VFSEntry e : nextItem.getFrom().getChildren()) {
+					queue.add(new ExportItem(e, new File(nextItem.getTo(), e.getPath().getName())));
 				}
 			} else {
-				LOGGER.debug("Exporting! source=" + item.getFrom().getPath().toString() + " destination=" + item.getTo().getAbsolutePath());
-				InputStream is = item.getFrom().getInputStream();
+				LOGGER.debug("Exporting! source=" + nextItem.getFrom().getPath().toString() + " destination=" + nextItem.getTo().getAbsolutePath());
+				InputStream is = nextItem.getFrom().getInputStream();
 				OutputStream os;
 				try {
-					os = new FileOutputStream(item.getTo());
+					os = new FileOutputStream(nextItem.getTo());
 					ChannelUtil.fastStreamCopy(is, os);
 				} catch (IOException e) {
-					LOGGER.error("ERROR while exporting: source=" + item.getFrom().getPath().toString() + " destination=" + item.getTo().getAbsolutePath());
+					LOGGER.error("ERROR while exporting: source=" + nextItem.getFrom().getPath().toString() + " destination=" + nextItem.getTo().getAbsolutePath());
 				}
 			}
 		}
