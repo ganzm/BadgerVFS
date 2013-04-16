@@ -193,18 +193,19 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTreeModel.updateTreeAddChilds(parent, treeEntries);
 			entryTreeModel.reload();
 		} else if (action instanceof DeleteEntryAction) {
-			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			DeleteEntryAction deleteAction = (DeleteEntryAction) action;
+			entryTableModel.removeAtIndex(deleteAction.getRowIndexToRemove());
 		} else if (action instanceof CreateFolderAction) {
-			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			CreateFolderAction createAction = (CreateFolderAction) action;
+			EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
+			entryTableModel.appendEntry(entryModel);
 		} else if (action instanceof ImportAction) {
 			// reload current folder after import
 			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
 			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof RenameEntryAction) {
-			GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			RenameEntryAction renameAction = (RenameEntryAction) action;
+			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
 		} else if (action instanceof ExportAction) {
 			ExportAction exportAction = (ExportAction) action;
 			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntry().getPath().getAbsolutePath()
