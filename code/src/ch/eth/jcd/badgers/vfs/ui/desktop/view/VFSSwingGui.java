@@ -84,6 +84,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	 */
 	private boolean searching = false;
 
+	private JMenuItem mntmQueryDiskspace;
+
 	/**
 	 * Launch the application.
 	 */
@@ -161,6 +163,10 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 		mnDisk.add(mntmClose);
+		mnDisk.addSeparator();
+
+		mntmQueryDiskspace = new JMenuItem("Query Diskspace TODO");
+		mnDisk.add(mntmQueryDiskspace);
 
 		mnDisk.addSeparator();
 
@@ -172,6 +178,8 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnActions.setMnemonic('A');
 		menuBar.add(mnActions);
 
+		// actions on the current directory!
+		// create new folder in the current directory!
 		JMenuItem mntmNewFolder = new JMenuItem("New Folder");
 		mntmNewFolder.addActionListener(new ActionListener() {
 			@Override
@@ -185,6 +193,33 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmNewFolder);
 
+		// paste into the current folder
+		mntmPaste = new JMenuItem("Paste");
+		mntmPaste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
+		mntmPaste.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// null means use current folder
+				desktopController.pasteFromClipboardTo(null);
+			}
+		});
+
+		// open import dialog, using current folder
+		JMenuItem mntmImport = new JMenuItem("Import");
+		mntmImport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.openImportDialog(getDesktopFrame());
+			}
+		});
+		mnActions.add(mntmImport);
+
+		mnActions.addSeparator();
+
+		// TODO: allow multiple selection and do all the stuff on the selected entries (except renaming?)
+		// actions on the currently selected entry
+		// renames the currently selected entry
 		JMenuItem mntmRename = new JMenuItem("Rename");
 		mntmRename.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
 		mntmRename.addActionListener(new ActionListener() {
@@ -199,6 +234,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmRename);
 
+		// deletes the currently selected entry
 		JMenuItem mntmDelete = new JMenuItem("Delete");
 		mntmDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
 		mntmDelete.addActionListener(new ActionListener() {
@@ -213,18 +249,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmDelete);
 
-		JMenuItem mntmNewFile = new JMenuItem("TODO: New File");
-		mnActions.add(mntmNewFile);
-
-		JMenuItem mntmImport = new JMenuItem("Import");
-		mntmImport.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				desktopController.openImportDialog(getDesktopFrame());
-			}
-		});
-		mnActions.add(mntmImport);
-
+		// exports the currently selected entry
 		mntmExport = new JMenuItem("Export");
 		mntmExport.addActionListener(new ActionListener() {
 			@Override
@@ -238,13 +263,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmExport);
 
-		mnActions.addSeparator();
-
-		JMenuItem mntmQueryDiskspace = new JMenuItem("Query Diskspace TODO");
-		mnActions.add(mntmQueryDiskspace);
-
-		mnActions.addSeparator();
-
+		// copies the currently selected entry to the clipboard
 		JMenuItem mntmCopy = new JMenuItem("Copy");
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
 		mntmCopy.addActionListener(new ActionListener() {
@@ -258,6 +277,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCopy);
 
+		// cuts the currently selected entries to the clipboard
 		JMenuItem mntmCut = new JMenuItem("Cut");
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
 		mnActions.addActionListener(new ActionListener() {
@@ -270,17 +290,6 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		});
 		mnActions.add(mntmCut);
 
-		mntmPaste = new JMenuItem("Paste");
-		mntmPaste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
-		mntmPaste.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				EntryUiModel entry = (EntryUiModel) tableFolderEntries.getValueAt(tableFolderEntries.getSelectedRow(), 0);
-				desktopController.pasteFromClipboardTo(entry);
-
-			}
-		});
 		mnActions.add(mntmPaste);
 
 		JMenu mnHelp = new JMenu("Help");
@@ -504,11 +513,17 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private void removeKeysFromJTableInputMap(JTable tableFolderEntries2) {
 		KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);
 		KeyStroke deleteKeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+		KeyStroke ctrlC = KeyStroke.getKeyStroke('C', KeyEvent.CTRL_DOWN_MASK);
+		KeyStroke ctrlX = KeyStroke.getKeyStroke('X', KeyEvent.CTRL_DOWN_MASK);
+		KeyStroke ctrlV = KeyStroke.getKeyStroke('V', KeyEvent.CTRL_DOWN_MASK);
 
 		InputMap imap = tableFolderEntries.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		while (imap != null) {
 			imap.remove(f2KeyToRemove);
 			imap.remove(deleteKeyToRemove);
+			imap.remove(ctrlC);
+			imap.remove(ctrlX);
+			imap.remove(ctrlV);
 			imap = imap.getParent();
 		}
 	}
@@ -559,20 +574,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 					desktopController.createNewFolderFromContextMenu(entry);
 				}
 			});
-
 			menu.add(mntmNewFolder);
-			// Todo: implement "New File"
-			JMenuItem mntmNewFile = new JMenuItem("TODO:New File");
-			menu.add(mntmNewFile);
-
-			JMenuItem mntmImport = new JMenuItem("Import");
-			mntmImport.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					desktopController.importFromContextMenu(entry, getDesktopFrame());
-				}
-			});
-			menu.add(mntmImport);
 
 			JMenuItem mntmPaste = new JMenuItem("Paste");
 			// mntmPaste.setAccelerator(KeyStroke.getKeyStroke('V', InputEvent.CTRL_DOWN_MASK));
@@ -586,16 +588,15 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			});
 			menu.add(mntmPaste);
 
-		} else {
-
-			JMenuItem mntmImport = new JMenuItem("Export");
+			JMenuItem mntmImport = new JMenuItem("Import");
 			mntmImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					desktopController.startExport(getDesktopFrame(), entry);
+					desktopController.importFromContextMenu(entry, getDesktopFrame());
 				}
 			});
 			menu.add(mntmImport);
+
 		}
 
 		menu.addSeparator();
@@ -628,7 +629,16 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 			}
 		});
 		menu.add(mntmDelete);
-		menu.addSeparator();
+
+		JMenuItem mntmImport = new JMenuItem("Export");
+		mntmImport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				desktopController.startExport(getDesktopFrame(), entry);
+			}
+		});
+		menu.add(mntmImport);
+
 		JMenuItem mntmCopy = new JMenuItem("Copy");
 		// mntmCopy.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
 		mntmCopy.addActionListener(new ActionListener() {
@@ -685,6 +695,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
+		mntmQueryDiskspace.setEnabled(diskMode);
 
 		contentPane.setVisible(diskMode);
 		contentPane.setEnabled(diskMode);

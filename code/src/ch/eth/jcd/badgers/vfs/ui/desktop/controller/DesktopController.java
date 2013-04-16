@@ -348,6 +348,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 		clipboard = new Pair<ClipboardAction, EntryUiModel>(ClipboardAction.CUT, entry);
 	}
 
+	/**
+	 * pastes clipboard to <code>toFolder</code>. toFolder is allowed to be null and thus the "currentFolder" is taken!
+	 * 
+	 * @param toFolder
+	 */
 	public void pasteFromClipboardTo(EntryUiModel toFolder) {
 
 		if (clipboard == null || (toFolder != null && !toFolder.getEntry().isDirectory())) {
