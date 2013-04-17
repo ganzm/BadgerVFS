@@ -21,8 +21,13 @@ public class SearchParameter {
 		if (!caseSensitive) {
 			str = str.toLowerCase();
 		}
-		str = str.replace("?", "\\w");
-		str = str.replace("*", "\\w*");
+
+		// quotes the search string into \Q....\E
+		// so we don't need to escape all these regex special chars which are
+		// '[', '\\', '^', '$', '.', '|', '?', '*', '+', '(', ')'
+		str = Pattern.quote(str);
+		str = str.replace("?", "\\E\\w\\Q");
+		str = str.replace("*", "\\E\\w*\\Q");
 		str = str + "\\w*";
 
 		searchPattern = Pattern.compile(str);

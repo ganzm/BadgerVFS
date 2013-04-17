@@ -79,4 +79,12 @@ public class SearchParameterTest {
 		assertTrue(sp.matches("strong"));
 		assertFalse(sp.matches("strng"));
 	}
+
+	@Test
+	public void testRegexMetaCharacters() {
+		SearchParameter sp = new SearchParameter();
+		sp.setSearchString("[\\^$.|+()");
+		assertTrue(sp.matches("[\\^$.|+()"));
+
+	}
 }
