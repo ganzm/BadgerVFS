@@ -37,14 +37,8 @@ public class SearchParameter {
 	 * @param fileName
 	 * @return
 	 */
-	public boolean matches(String fileName) {
-		String tmp;
-		if (!caseSensitive) {
-			tmp = fileName.toLowerCase();
-		} else {
-			tmp = fileName;
-		}
-
+	public boolean matches(final String fileName) {
+		final String tmp = caseSensitive ? fileName : fileName.toLowerCase();
 		return searchPattern.matcher(tmp).matches();
 	}
 
@@ -52,7 +46,7 @@ public class SearchParameter {
 		return searchString;
 	}
 
-	public void setSearchString(String searchString) {
+	public void setSearchString(final String searchString) {
 		this.searchString = searchString;
 		createSearchExpression();
 	}
@@ -61,7 +55,7 @@ public class SearchParameter {
 		return caseSensitive;
 	}
 
-	public void setCaseSensitive(boolean caseSensitive) {
+	public void setCaseSensitive(final boolean caseSensitive) {
 		this.caseSensitive = caseSensitive;
 		createSearchExpression();
 	}
@@ -70,7 +64,7 @@ public class SearchParameter {
 		return includeSubFolders;
 	}
 
-	public void setIncludeSubFolders(boolean includeSubFolders) {
+	public void setIncludeSubFolders(final boolean includeSubFolders) {
 		this.includeSubFolders = includeSubFolders;
 	}
 
