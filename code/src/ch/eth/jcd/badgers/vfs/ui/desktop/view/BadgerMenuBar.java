@@ -101,7 +101,12 @@ public class BadgerMenuBar extends JMenuBar {
 
 		mnDisk.addSeparator();
 
-		final JMenuItem mntmExit = new JMenuItem("Exit");
+		final JMenuItem mntmExit = new JMenuItem(new AbstractAction("Exit") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.beforeWindowClosing();
+			}
+		});
 		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
 		mnDisk.add(mntmExit);
 
