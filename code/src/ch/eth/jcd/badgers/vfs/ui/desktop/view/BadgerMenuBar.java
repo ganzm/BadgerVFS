@@ -7,15 +7,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
@@ -226,7 +225,7 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem retVal = new JMenuItem(new AbstractAction("Cut") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().cutToClipboard(parent.getSelectedEntries());
+				parent.getTable().cutToClipboard();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke('X', InputEvent.CTRL_DOWN_MASK));
@@ -238,7 +237,7 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem retVal = new JMenuItem(new AbstractAction("Copy") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().copyToClipboard(parent.getSelectedEntries());
+				parent.getTable().copyToClipboard();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke('C', InputEvent.CTRL_DOWN_MASK));
@@ -250,17 +249,9 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem exportItem = new JMenuItem(new AbstractAction("Export") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				startExport();
+				parent.getTable().startExport();
 			}
 
-			private void startExport() {
-				final List<EntryUiModel> selectedItems = parent.getSelectedEntries();
-				if (selectedItems.isEmpty()) {
-					selectedItems.add(parent.getController().getParentFolderEntry());
-				}
-
-				parent.getController().startExport(parent, selectedItems);
-			}
 		});
 		exportItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
 		return exportItem;
@@ -271,7 +262,7 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem retVal = new JMenuItem(new AbstractAction("Delete") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				startDelete();
+				parent.getTable().startDelete();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -283,43 +274,11 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem retVal = new JMenuItem(new AbstractAction("Rename") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				startRename();
+				parent.getTable().startRename();
 			}
 		});
 		retVal.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
 		return retVal;
-	}
-
-	private void startRename() {
-		try {
-			final int currentRow = parent.getTableFolderEntries().getSelectedRow();
-			if (currentRow < 0) {
-				JOptionPane.showMessageDialog(this, "Selecte File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
-				return;
-			}
-
-			final EntryUiModel entry = (EntryUiModel) parent.getTableFolderEntries().getModel().getValueAt(currentRow, 0);
-			LOGGER.debug("Start renaming " + entry);
-
-			parent.getEntryCellEditor().setAllowEditing(true);
-			parent.getTableFolderEntries().editCellAt(currentRow, 0);
-		} catch (final VFSRuntimeException ex) {
-			SwingUtil.handleException(parent, ex);
-		}
-	}
-
-	private void startDelete() {
-		try {
-			final List<EntryUiModel> selectedEntries = parent.getSelectedEntries();
-			if (selectedEntries.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Select File or Folder", "Badger Message", JOptionPane.INFORMATION_MESSAGE);
-				return;
-
-			}
-			parent.getController().startDelete(selectedEntries);
-		} catch (final VFSRuntimeException ex) {
-			SwingUtil.handleException(parent, ex);
-		}
 	}
 
 	public void doContextMenuOnTable(final MouseEvent e) {
@@ -327,13 +286,18 @@ public class BadgerMenuBar extends JMenuBar {
 			return;
 		}
 		LOGGER.trace(e);
-		final int rowIndex = parent.getTableFolderEntries().rowAtPoint(e.getPoint());
-		// rowIndex = -1 means that the user clicked in grey area where no items are --> we use the parentfolder in this case otherwise we get the item at the
-		// selected row
-		final EntryUiModel entry = rowIndex == -1 ? parent.getController().getParentFolderEntry() : (EntryUiModel) parent.getTableFolderEntries().getModel()
-				.getValueAt(rowIndex, 0);
-		// tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+		final EntryUiModel entry;
+		if (e.getSource() instanceof JTable) {
 
+			final int rowIndex = ((JTable) e.getSource()).rowAtPoint(e.getPoint());
+			// rowIndex = -1 means that the user clicked in grey area where no items are --> we use the parentfolder in this case otherwise we get the item at
+			// the
+			// selected row
+			entry = (EntryUiModel) ((JTable) e.getSource()).getValueAt(rowIndex, 0);
+			// tableFolderEntries.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+		} else {
+			entry = parent.getController().getParentFolderEntry();
+		}
 		LOGGER.debug("Opening popup on entry: " + entry.getFullPath());
 		final JPopupMenu menu = new JPopupMenu();
 		if (entry.isDirectory()) {

@@ -33,8 +33,8 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	private final JTextField textFieldMaxSpace;
 	private final JTextField textFieldFreeSpace;
 	private final JLabel lblStatus;
-	private JProgressBar progressBarDiskSpace;
-	private JTextField textFieldDirectoryBlocks;
+	private final JProgressBar progressBarDiskSpace;
+	private final JTextField textFieldDirectoryBlocks;
 
 	/**
 	 * Create the dialog.
@@ -100,31 +100,31 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 			}
 			{
 				progressBarDiskSpace = new JProgressBar();
-				GridBagConstraints gbc_progressBarDiskSpace = new GridBagConstraints();
-				gbc_progressBarDiskSpace.insets = new Insets(0, 0, 5, 0);
-				gbc_progressBarDiskSpace.fill = GridBagConstraints.BOTH;
-				gbc_progressBarDiskSpace.gridx = 1;
-				gbc_progressBarDiskSpace.gridy = 2;
-				panel.add(progressBarDiskSpace, gbc_progressBarDiskSpace);
+				GridBagConstraints gbcProgressBarDiskSpace = new GridBagConstraints();
+				gbcProgressBarDiskSpace.insets = new Insets(0, 0, 5, 0);
+				gbcProgressBarDiskSpace.fill = GridBagConstraints.BOTH;
+				gbcProgressBarDiskSpace.gridx = 1;
+				gbcProgressBarDiskSpace.gridy = 2;
+				panel.add(progressBarDiskSpace, gbcProgressBarDiskSpace);
 			}
 			{
 				JLabel lblDirectoryBlockUsage = new JLabel("Directory Block usage");
-				GridBagConstraints gbc_lblDirectoryBlockUsage = new GridBagConstraints();
-				gbc_lblDirectoryBlockUsage.anchor = GridBagConstraints.EAST;
-				gbc_lblDirectoryBlockUsage.insets = new Insets(0, 0, 0, 5);
-				gbc_lblDirectoryBlockUsage.gridx = 0;
-				gbc_lblDirectoryBlockUsage.gridy = 3;
-				panel.add(lblDirectoryBlockUsage, gbc_lblDirectoryBlockUsage);
+				GridBagConstraints gbcLblDirectoryBlockUsage = new GridBagConstraints();
+				gbcLblDirectoryBlockUsage.anchor = GridBagConstraints.EAST;
+				gbcLblDirectoryBlockUsage.insets = new Insets(0, 0, 0, 5);
+				gbcLblDirectoryBlockUsage.gridx = 0;
+				gbcLblDirectoryBlockUsage.gridy = 3;
+				panel.add(lblDirectoryBlockUsage, gbcLblDirectoryBlockUsage);
 			}
 			{
 				textFieldDirectoryBlocks = new JTextField();
 				textFieldDirectoryBlocks.setHorizontalAlignment(SwingConstants.RIGHT);
 				textFieldDirectoryBlocks.setEditable(false);
-				GridBagConstraints gbc_textFieldDirectoryBlocks = new GridBagConstraints();
-				gbc_textFieldDirectoryBlocks.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldDirectoryBlocks.gridx = 1;
-				gbc_textFieldDirectoryBlocks.gridy = 3;
-				panel.add(textFieldDirectoryBlocks, gbc_textFieldDirectoryBlocks);
+				GridBagConstraints gbcTextFieldDirectoryBlocks = new GridBagConstraints();
+				gbcTextFieldDirectoryBlocks.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldDirectoryBlocks.gridx = 1;
+				gbcTextFieldDirectoryBlocks.gridy = 3;
+				panel.add(textFieldDirectoryBlocks, gbcTextFieldDirectoryBlocks);
 				textFieldDirectoryBlocks.setColumns(10);
 			}
 		}
@@ -184,7 +184,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		progressBarDiskSpace.setMaximum((int) maxMb);
 		progressBarDiskSpace.setValue(intValue);
 
-		textFieldDirectoryBlocks.setText((du.getMaxDirectoryBlocks() - du.getFreeDirectoryBlocks()) + "/" + du.getMaxDirectoryBlocks());
+		textFieldDirectoryBlocks.setText(du.getMaxDirectoryBlocks() - du.getFreeDirectoryBlocks() + "/" + du.getMaxDirectoryBlocks());
 	}
 
 }
