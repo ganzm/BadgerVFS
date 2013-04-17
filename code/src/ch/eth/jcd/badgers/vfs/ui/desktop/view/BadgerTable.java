@@ -158,7 +158,7 @@ public class BadgerTable extends JScrollPane {
 		}
 	}
 
-	public List<EntryUiModel> getSelectedEntries() {
+	private List<EntryUiModel> getSelectedEntries() {
 		final int[] selectedRowIdexes = tableFolderEntries.getSelectedRows();
 		final List<EntryUiModel> selectedEntries = new ArrayList<EntryUiModel>(selectedRowIdexes.length);
 		for (final int i : selectedRowIdexes) {
@@ -168,14 +168,6 @@ public class BadgerTable extends JScrollPane {
 			}
 		}
 		return selectedEntries;
-	}
-
-	public JTable getTableFolderEntries() {
-		return tableFolderEntries;
-	}
-
-	public EntryCellEditor getEntryCellEditor() {
-		return entryCellEditor;
 	}
 
 	public void startRename() {
