@@ -23,7 +23,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
-public class VFSSwingGui extends JFrame implements BadgerViewBase {
+public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 
 	private static final long serialVersionUID = -8776317677851635247L;
 
@@ -54,7 +54,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final VFSSwingGui frame = new VFSSwingGui();
+				final BadgerMainFrame frame = new BadgerMainFrame();
 				frame.update();
 				frame.setVisible(true);
 			}
@@ -64,7 +64,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	/**
 	 * Create the frame.
 	 */
-	public VFSSwingGui() {
+	public BadgerMainFrame() {
 		setTitle("BadgerFS Client");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {

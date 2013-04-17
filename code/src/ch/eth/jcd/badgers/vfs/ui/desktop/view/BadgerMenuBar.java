@@ -45,9 +45,9 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JButton btnSearch;
 	private final JTextField textFieldFind;
 
-	private final VFSSwingGui parent;
+	private final BadgerMainFrame parent;
 
-	public BadgerMenuBar(final VFSSwingGui parent) {
+	public BadgerMenuBar(final BadgerMainFrame parent) {
 		this.parent = parent;
 		final JMenu mnDisk = new JMenu("Disk");
 		mnDisk.setMnemonic('D');
@@ -81,7 +81,7 @@ public class BadgerMenuBar extends JMenuBar {
 				try {
 					parent.getController().closeDisk(parent);
 					// if we open/create another disk the Browser Panel is shown
-					parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
+					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 				} catch (final VFSException ex) {
 					SwingUtil.handleException(parent, ex);
 				}
@@ -201,7 +201,7 @@ public class BadgerMenuBar extends JMenuBar {
 	protected void startSearch() {
 		parent.getPanelSearch().resetSearch();
 		parent.getPanelSearch().setSearchTextAndContext(textFieldFind.getText(), parent.getController().getCurrentFolderAsString());
-		parent.showCardLayoutPanel(VFSSwingGui.SEARCH_PANEL_NAME);
+		parent.showCardLayoutPanel(BadgerMainFrame.SEARCH_PANEL_NAME);
 	}
 
 	public void adjustActionMenus(final EntryUiModel entry) {

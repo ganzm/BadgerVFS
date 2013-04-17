@@ -36,7 +36,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	private final JTextField textFieldSearchFolder;
 	private final JCheckBox chckbxSearchCaseSensitiv;
 	private final JCheckBox chckbxSearchSubfolders;
-	private final VFSSwingGui parent;
+	private final BadgerMainFrame parent;
 	private final JButton btnStartSearch;
 	private final JButton btnBack;
 	private final JButton btnCancelSearch;
@@ -46,7 +46,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	/**
 	 * Create the panel.
 	 */
-	public SearchPanel(final VFSSwingGui parentGui) {
+	public SearchPanel(final BadgerMainFrame parentGui) {
 		this.parent = parentGui;
 		this.searchController = new SearchController(parentGui.getController(), this);
 		setLayout(new BorderLayout(0, 0));
@@ -134,7 +134,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
-				parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
+				parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 			}
 		});
 		btnBack.setMnemonic('B');
@@ -196,7 +196,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 	protected void openSearchEntryAtRow(final int rowIndex) {
 		searchController.openSearchEntryAtRow(rowIndex);
-		parent.showCardLayoutPanel(VFSSwingGui.BROWSE_PANEL_NAME);
+		parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 	}
 
 	protected void startSearch() {

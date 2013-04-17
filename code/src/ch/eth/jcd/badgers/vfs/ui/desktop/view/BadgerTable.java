@@ -35,9 +35,9 @@ public class BadgerTable extends JScrollPane {
 	private static final Logger LOGGER = Logger.getLogger(BadgerTable.class);
 	private final JTable tableFolderEntries;
 	private final EntryCellEditor entryCellEditor;
-	private final VFSSwingGui parent;
+	private final BadgerMainFrame parent;
 
-	public BadgerTable(final VFSSwingGui parent) {
+	public BadgerTable(final BadgerMainFrame parent) {
 		this.parent = parent;
 		addMouseListener(new MouseAdapter() {
 
