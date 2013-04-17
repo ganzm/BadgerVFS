@@ -9,6 +9,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -74,6 +76,7 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 	private final JTable tableFolderEntries;
 	public static final String SEARCH_PANEL_NAME = "searchpanel";
 	public static final String BROWSE_PANEL_NAME = "browsepanel";
+	public static final String DEFAULT_FIND_FIELD_STRING = "Find";
 	private final SearchPanel panelSearch;
 	private final JButton btnSearch;
 	/**
@@ -226,7 +229,22 @@ public class VFSSwingGui extends JFrame implements BadgerViewBase {
 		mnHelp.add(mntmInfo);
 
 		textFieldFind = new JTextField();
-		textFieldFind.setText("Find");
+		textFieldFind.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				if (DEFAULT_FIND_FIELD_STRING.equals(textFieldFind.getText())) {
+					textFieldFind.setText("");
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if ("".equals(textFieldFind.getText().trim())) {
+					textFieldFind.setText(DEFAULT_FIND_FIELD_STRING);
+				}
+			}
+		});
+		textFieldFind.setText(DEFAULT_FIND_FIELD_STRING);
 		menuBar.add(textFieldFind);
 		textFieldFind.setColumns(10);
 

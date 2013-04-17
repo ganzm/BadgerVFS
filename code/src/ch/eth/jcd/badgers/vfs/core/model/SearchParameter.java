@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.model;
 
+import java.util.regex.Pattern;
+
 public class SearchParameter {
 
 	private String searchString = "";
@@ -7,18 +9,38 @@ public class SearchParameter {
 	private boolean caseSensitive = true;
 
 	private boolean includeSubFolders = true;
+	private Pattern searchPattern;
 
 	public SearchParameter() {
+		createSearchExpression();
+	}
+
+	private void createSearchExpression() {
+		String str = searchString;
+
+		if (!caseSensitive) {
+			str = str.toLowerCase();
+		}
+		str = str.replace("?", "\\w");
+		str = str.replace("*", "\\w*");
+		str = str + "\\w*";
+
+		searchPattern = Pattern.compile(str);
 	}
 
 	/**
-	 * TODO implement me: implement case sensitivity switch, metrics like editing distance, wild cards,
-	 * 
 	 * @param fileName
 	 * @return
 	 */
 	public boolean matches(String fileName) {
-		return fileName.toLowerCase().contains(searchString.toLowerCase());
+		String tmp;
+		if (!caseSensitive) {
+			tmp = fileName.toLowerCase();
+		} else {
+			tmp = fileName;
+		}
+
+		return searchPattern.matcher(tmp).matches();
 	}
 
 	public String getSearchString() {
@@ -27,6 +49,7 @@ public class SearchParameter {
 
 	public void setSearchString(String searchString) {
 		this.searchString = searchString;
+		createSearchExpression();
 	}
 
 	public boolean isCaseSensitive() {
@@ -35,6 +58,7 @@ public class SearchParameter {
 
 	public void setCaseSensitive(boolean caseSensitive) {
 		this.caseSensitive = caseSensitive;
+		createSearchExpression();
 	}
 
 	public boolean isIncludeSubFolders() {

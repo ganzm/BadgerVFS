@@ -120,6 +120,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(lblFolderOnly, gbc_lblFolderOnly);
 
 		chckbxSearchSubfolders = new JCheckBox("");
+		chckbxSearchSubfolders.setSelected(true);
 		final GridBagConstraints gbc_chckbxSearchSubfolders = new GridBagConstraints();
 		gbc_chckbxSearchSubfolders.anchor = GridBagConstraints.WEST;
 		gbc_chckbxSearchSubfolders.gridx = 1;
