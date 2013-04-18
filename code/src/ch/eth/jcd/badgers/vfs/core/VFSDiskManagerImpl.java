@@ -36,6 +36,7 @@ import ch.eth.jcd.badgers.vfs.encryption.CaesarInputStream;
 import ch.eth.jcd.badgers.vfs.encryption.CaesarOutputStream;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
+import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
@@ -106,7 +107,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		}
 	}
 
-	private void createRootFolder() throws IOException {
+	private void createRootFolder() throws IOException, VFSOutOfMemoryException {
 		LOGGER.debug("Creating root folder...");
 
 		DataBlock rootDirectoryDataBlock = dataSectionHandler.allocateNewDataBlock(true);

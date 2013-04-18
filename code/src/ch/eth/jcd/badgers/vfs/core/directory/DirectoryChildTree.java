@@ -9,6 +9,7 @@ import java.util.Stack;
 import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
+import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 /**
@@ -126,9 +127,10 @@ public class DirectoryChildTree {
 	 * 
 	 * 
 	 * @throws IOException
+	 * @throws VFSOutOfMemoryException
 	 */
 	private void bottomUpTreeInsert(Stack<DirectoryBlock> pathToLeave, DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry,
-			DirectoryBlock lastDirectoryBlock, DirectoryBlock directoryBlockToAttach) throws IOException {
+			DirectoryBlock lastDirectoryBlock, DirectoryBlock directoryBlockToAttach) throws IOException, VFSOutOfMemoryException {
 
 		if (pathToLeave.isEmpty()) {
 			insertAtRoot(directorySectionhandler, newEntry, lastDirectoryBlock, directoryBlockToAttach);
@@ -269,7 +271,7 @@ public class DirectoryChildTree {
 	}
 
 	private void insertAtRoot(DirectorySectionHandler directorySectionhandler, DirectoryEntryBlock newEntry, DirectoryBlock rootDirectoryBlock,
-			DirectoryBlock directoryBlockToAttach) throws IOException {
+			DirectoryBlock directoryBlockToAttach) throws IOException, VFSOutOfMemoryException {
 
 		assert rootDirectoryBlock.getLocation() == rootBlockLocation;
 

@@ -18,8 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.util.PathUtil;
 
 public class ImportDialog extends JDialog {
 
@@ -172,16 +172,11 @@ public class ImportDialog extends JDialog {
 	private void startImport() {
 		String sourcePath = textFieldSource.getText();
 		String targetFolder = textFieldTargetFolder.getText().trim();
-		String targetPath;
-		if (VFSPath.FILE_SEPARATOR.equals(targetFolder)) {
-			// import into root folder
-			targetPath = VFSPath.FILE_SEPARATOR + textFieldTargetName.getText();
-		} else {
-			targetPath = targetFolder + VFSPath.FILE_SEPARATOR + textFieldTargetName.getText();
-		}
+		String targetPath = PathUtil.concatPathAndFileName(targetFolder, textFieldTargetName.getText());
 
 		// TODO validate source path
 		ownerController.startImportFromHostFs(sourcePath, targetPath);
 		dispose();
 	}
+
 }

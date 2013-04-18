@@ -10,30 +10,32 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
+import ch.eth.jcd.badgers.vfs.util.Pair;
 
 public class ImportAction extends BadgerAction {
 
 	private static final Logger LOGGER = Logger.getLogger(ImportAction.class);
 
-	private final List<String> hostFsSourcePathes;
-	private final String destinationPath;
+	private final List<Pair<String, String>> host2DestinationPathList;
 
 	public ImportAction(ActionObserver actionObserver, String hostFsSourcePath, String destinationPath) {
 		super(actionObserver);
-		this.destinationPath = destinationPath;
-		this.hostFsSourcePathes = new ArrayList<>();
-		this.hostFsSourcePathes.add(hostFsSourcePath);
+		this.host2DestinationPathList = new ArrayList<>();
+		this.host2DestinationPathList.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 	}
 
-	public ImportAction(DesktopController actionObserver, List<String> hostFsSourcePathes, String destinationPath) {
+	public ImportAction(DesktopController actionObserver, List<Pair<String, String>> host2DestinationPathList) {
 		super(actionObserver);
-		this.hostFsSourcePathes = hostFsSourcePathes;
-		this.destinationPath = destinationPath;
+		this.host2DestinationPathList = host2DestinationPathList;
 	}
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		for (String hostFsSourcePath : hostFsSourcePathes) {
+		for (Pair<String, String> pathPair : host2DestinationPathList) {
+
+			String hostFsSourcePath = pathPair.getFirst();
+			String destinationPath = pathPair.getSecond();
+
 			LOGGER.info("Importing " + hostFsSourcePath);
 			VFSPath path = diskManager.createPath(destinationPath);
 			VFSImporter importer = new VFSImporter();

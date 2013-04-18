@@ -84,7 +84,7 @@ public final class DirectorySectionHandler {
 
 	}
 
-	public DirectoryBlock allocateNewDirectoryBlock() throws IOException {
+	public DirectoryBlock allocateNewDirectoryBlock() throws IOException, VFSOutOfMemoryException {
 		long freePosition = getNextFreeDirectorySectionPosition();
 		DirectoryBlock directoryBlock = new DirectoryBlock(freePosition);
 		persistDirectoryBlock(directoryBlock);
@@ -121,7 +121,7 @@ public final class DirectorySectionHandler {
 		return sectionSize / DirectoryBlock.BLOCK_SIZE;
 	}
 
-	private long getNextFreeDirectorySectionPosition() throws IOException {
+	private long getNextFreeDirectorySectionPosition() throws IOException, VFSOutOfMemoryException {
 
 		// go to start of DataSection
 		virtualDiskFile.seek(sectionOffset);
@@ -144,7 +144,6 @@ public final class DirectorySectionHandler {
 			if (skipedBytes != DirectoryBlock.BLOCK_SIZE - 1) {
 				throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection");
 			}
-
 		}
 
 		throw new VFSOutOfMemoryException("There is no more space left on the DirectorySection - All " + maxNumDirectoryBlocks

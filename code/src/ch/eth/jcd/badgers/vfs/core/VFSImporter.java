@@ -78,6 +78,9 @@ public class VFSImporter {
 			} catch (VFSException ex) {
 				LOGGER.error("internal error while deleting partially created file", ex);
 			}
+
+			// cleanup done, now rethrow the exception
+			throw e;
 		}
 	}
 }

@@ -40,6 +40,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.InfoDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.util.Pair;
+import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class DesktopController extends BadgerController implements ActionObserver {
@@ -311,12 +312,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 			LOGGER.debug("Start Import from " + Arrays.toString(filesToImport.toArray()));
 		}
 
-		List<String> filePathes = new ArrayList<>();
+		List<Pair<String, String>> filePathes = new ArrayList<>();
 		for (File f : filesToImport) {
-			filePathes.add(f.getAbsolutePath());
+
+			String hostFsSourcePath = f.getAbsolutePath();
+			String destinationPath = PathUtil.concatPathAndFileName(currentFolder.getAbsolutePath(), f.getName());
+
+			filePathes.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 		}
 
-		final ImportAction action = new ImportAction(this, filePathes, currentFolder.getAbsolutePath());
+		final ImportAction action = new ImportAction(this, filePathes);
 		WorkerController.getInstance().enqueue(action);
 	}
 

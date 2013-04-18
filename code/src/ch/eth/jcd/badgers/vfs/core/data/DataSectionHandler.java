@@ -100,7 +100,7 @@ public final class DataSectionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public DataBlock allocateNewDataBlock(boolean isDirectory) throws IOException {
+	public DataBlock allocateNewDataBlock(boolean isDirectory) throws IOException, VFSOutOfMemoryException {
 		long freePosition = getNextFreeDataBlockPosition();
 		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
 		dataBlock.persist(virtualDiskFile);
@@ -143,7 +143,7 @@ public final class DataSectionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	private long getNextFreeDataBlockPosition() throws IOException {
+	private long getNextFreeDataBlockPosition() throws IOException, VFSOutOfMemoryException {
 		DataBlockCacheEntry entry;
 
 		entry = cache.getNextFreeOrUnkownDataBlocks();
