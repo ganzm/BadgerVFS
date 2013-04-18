@@ -16,10 +16,18 @@ public class ExportAction extends BadgerAction {
 
 	private final JFrame desktopFrame;
 
-	public ExportAction(ActionObserver actionObserver, List<VFSEntry> entriesToExport, File destination, JFrame desktopFrame) {
+	/**
+	 * 
+	 * @param actionObserver
+	 * @param entriesToExport
+	 * @param destinationFolder
+	 *            folder on the host operating system
+	 * @param desktopFrame
+	 */
+	public ExportAction(ActionObserver actionObserver, List<VFSEntry> entriesToExport, File destinationFolder, JFrame desktopFrame) {
 		super(actionObserver);
 		this.entries = entriesToExport;
-		this.destination = destination;
+		this.destination = destinationFolder;
 		this.desktopFrame = desktopFrame;
 	}
 

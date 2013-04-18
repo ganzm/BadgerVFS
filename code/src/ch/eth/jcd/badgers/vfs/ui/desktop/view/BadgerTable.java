@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
+import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -129,7 +130,10 @@ public class BadgerTable extends JScrollPane {
 				}
 			}
 		});
+		DataFlavor fileListFlavour = DataFlavor.javaFileListFlavor;
 
+		tableFolderEntries.setDragEnabled(true);
+		tableFolderEntries.setTransferHandler(new FileExportTransferHandler(tableFolderEntries, parent.getController()));
 		new DropTarget(this, new FileImportDropTargetListener(parent.getController()));
 		removeKeysFromJTableInputMap(tableFolderEntries);
 	}
