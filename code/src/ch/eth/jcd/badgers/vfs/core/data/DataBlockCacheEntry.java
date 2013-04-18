@@ -56,10 +56,13 @@ public class DataBlockCacheEntry {
 		return new DataBlockCacheEntry(dataBlockLocation, dataBlockLocation, state);
 	}
 
+	public long getNumberOfInvolvedBlocks() {
+		return (lastBlockLocation - firstBlockLocation) / DataBlock.BLOCK_SIZE + 1;
+	}
+
 	@Override
 	public String toString() {
-		return firstBlockLocation + " to " + lastBlockLocation + " - " + +((lastBlockLocation - firstBlockLocation) / DataBlock.BLOCK_SIZE + 1) + " Blocks "
-				+ state;
+		return firstBlockLocation + " to " + lastBlockLocation + " - " + getNumberOfInvolvedBlocks() + " Blocks " + state;
 	}
 
 	public void mergeFromRight(DataBlockCacheEntry toMerge) {

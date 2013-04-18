@@ -58,12 +58,12 @@ public class DataBlockCache {
 
 				if (upper != null) {
 					cache.add(i, upper);
-					if (thisEntry != null) {
-						cache.add(i, thisEntry);
-					}
-					if (lower != null) {
-						cache.add(i, lower);
-					}
+				}
+				if (thisEntry != null) {
+					cache.add(i, thisEntry);
+				}
+				if (lower != null) {
+					cache.add(i, lower);
 				}
 
 				// block marked
