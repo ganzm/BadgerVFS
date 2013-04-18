@@ -149,7 +149,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		return this;
 	}
 
-	void beforeWindowClosing() {
+	public void beforeWindowClosing() {
 		if (!desktopController.isInManagementMode()) {
 			final Object[] options = new Object[] { "Yes", "No" };
 			final int retVal = JOptionPane.showOptionDialog(getDesktopFrame(), "Disk is still opened. Do you want me to close it before we exit?",
