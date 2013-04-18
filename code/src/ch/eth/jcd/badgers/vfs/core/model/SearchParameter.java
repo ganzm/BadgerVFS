@@ -26,10 +26,11 @@ public class SearchParameter {
 		// so we don't need to escape all these regex special chars which are
 		// '[', '\\', '^', '$', '.', '|', '?', '*', '+', '(', ')'
 		str = Pattern.quote(str);
-		str = str.replace("?", "\\E\\w\\Q");
-		str = str.replace("*", "\\E\\w*\\Q");
-		str = str + "\\w*";
+		str = str.replace("?", "\\E[^\\s]\\Q");
+		str = str.replace("*", "\\E[^\\s]*\\Q");
+		str = str + "[^\\s]*";
 
+		// str = "\\w*m\\w*";
 		searchPattern = Pattern.compile(str);
 	}
 

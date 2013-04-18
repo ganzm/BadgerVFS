@@ -87,4 +87,15 @@ public class SearchParameterTest {
 		assertTrue(sp.matches("[\\^$.|+()"));
 
 	}
+
+	@Test
+	public void testFileExtensions() {
+		SearchParameter sp = new SearchParameter();
+		sp.setSearchString("*.m");
+		assertTrue(sp.matches("File.m"));
+
+		sp.setSearchString("*m");
+		assertTrue(sp.matches("File.m"));
+
+	}
 }
