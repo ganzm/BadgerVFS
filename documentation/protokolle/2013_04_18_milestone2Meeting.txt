@@ -1,0 +1,36 @@
+6.2.1 Requirements
+
+alle erledigt
+
+6.2.2 Bonus Points
+2. Advanced search; For example, search with wildcards/regexp, and approximate search based on some metric, e.g. edit distance. (wildcards gehen ja schon!)
+
+edit distance: 
+- gui + SearchParameter
+
+3. Nice-to-have features like operation progress report (e.g. the number of files processed during
+export) or drag-and-drop for manipulative operations (move, copy, import).
+
+- drag - drop von aussen nach innen --> MATTHIAS
+- operation progress report --> wär noch cool zu haben!
+
+Advanced
+1. The browser is implemented for an additional platform.
+2. E cient full-text search (using some sort of indexing).
+
+- crypto support: wäre auch schön, wenn wir das hätten
+
+
+von denen können wir noch entscheiden, was noch implementiert werden soll!
+
+
+jetzt grad noch offene bugs und unschönheiten: MATTHIAS FIXT!
+
+- wozu ist das Suchfeld in der menüleiste? Todo: entweder entfernen (was ich schade fände, weil ich das noch gut dort finde) oder das "Search String" Feld im Suchendialog entfernen
+
+- wenn ich einen Folder mit einigen Bildchen habe  kann ich nach "*jpg" suchen und finde nichts. Wenn ich aber nach "*.jpg" (mit punkt) suche kommen die bilder.
+- ich schaffe es regelmässig, wenn ich nach "*.jpg" suche, dass beim zweiten klick auf "Search" den Button deaktiviere und nichts mehr machen kann, weil weder "Back" noch "Search" wieder aktiv werden --> Disk schliessen und neu öffnen ist da der work-around
+
+- wie wärs wenn wir den button oben rechts "Search" nach "Search..." umbenennen, ich hatte zuerst immer das Gefühl es müsse da schon suchen, wenn ich da draufklicke.
+
+- können wir die Buttons "Back" "Search" und "Cancel" auch in das Form-Feld von oben nehmen. das erspart Mauswege. ich finde es mühsam immer nach dem tippen oben nach unten fahren zu müssen.
