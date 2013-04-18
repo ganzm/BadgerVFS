@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
+import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -28,9 +29,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class BadgerTable extends JScrollPane {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(BadgerTable.class);
 	private final JTable tableFolderEntries;
@@ -132,6 +130,7 @@ public class BadgerTable extends JScrollPane {
 			}
 		});
 
+		new DropTarget(this, new FileImportDropTargetListener(parent.getController()));
 		removeKeysFromJTableInputMap(tableFolderEntries);
 	}
 

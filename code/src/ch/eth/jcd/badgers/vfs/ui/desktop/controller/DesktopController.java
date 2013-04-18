@@ -3,6 +3,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JDialog;
@@ -302,6 +303,20 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void startImportFromHostFs(final String sourcePath, final String targetPath) {
 		final ImportAction action = new ImportAction(this, sourcePath, targetPath);
+		WorkerController.getInstance().enqueue(action);
+	}
+
+	public void startImportFromHostFs(List<File> filesToImport) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Start Import from " + Arrays.toString(filesToImport.toArray()));
+		}
+
+		List<String> filePathes = new ArrayList<>();
+		for (File f : filesToImport) {
+			filePathes.add(f.getAbsolutePath());
+		}
+
+		final ImportAction action = new ImportAction(this, filePathes, currentFolder.getAbsolutePath());
 		WorkerController.getInstance().enqueue(action);
 	}
 
