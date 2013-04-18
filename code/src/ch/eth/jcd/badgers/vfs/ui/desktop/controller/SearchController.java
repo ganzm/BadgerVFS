@@ -56,6 +56,10 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	@Override
 	public void onActionFailed(final BadgerAction action, final VFSException e) {
+		if (action instanceof SearchAction) {
+			currentSearchAction = null;
+		}
+
 		SwingUtil.handleException((Component) getView(), e);
 	}
 
