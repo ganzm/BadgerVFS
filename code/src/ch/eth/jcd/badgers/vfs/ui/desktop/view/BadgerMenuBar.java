@@ -28,9 +28,6 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 @SuppressWarnings("serial")
 public class BadgerMenuBar extends JMenuBar {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(BadgerMenuBar.class);
 
@@ -43,7 +40,11 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmQueryDiskspace;
 	private final JButton btnSearch;
-	private final JTextField textFieldFind;
+	private final JTextField textFieldSearch;
+
+	public JTextField getTextFieldSearch() {
+		return textFieldSearch;
+	}
 
 	private final BadgerMainFrame parent;
 
@@ -160,25 +161,25 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 		mnHelp.add(mntmInfo);
 
-		textFieldFind = new JTextField();
-		textFieldFind.addFocusListener(new FocusAdapter() {
+		textFieldSearch = new JTextField();
+		textFieldSearch.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent arg0) {
-				if (DEFAULT_FIND_FIELD_STRING.equals(textFieldFind.getText())) {
-					textFieldFind.setText("");
+				if (DEFAULT_FIND_FIELD_STRING.equals(textFieldSearch.getText())) {
+					textFieldSearch.setText("");
 				}
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				if ("".equals(textFieldFind.getText().trim())) {
-					textFieldFind.setText(DEFAULT_FIND_FIELD_STRING);
+				if ("".equals(textFieldSearch.getText().trim())) {
+					textFieldSearch.setText(DEFAULT_FIND_FIELD_STRING);
 				}
 			}
 		});
-		textFieldFind.setText(DEFAULT_FIND_FIELD_STRING);
-		add(textFieldFind);
-		textFieldFind.setColumns(10);
+		textFieldSearch.setText(DEFAULT_FIND_FIELD_STRING);
+		add(textFieldSearch);
+		textFieldSearch.setColumns(10);
 
 		btnSearch = new JButton(new AbstractAction("Search") {
 			@Override
@@ -205,7 +206,7 @@ public class BadgerMenuBar extends JMenuBar {
 
 	protected void startSearch() {
 		parent.getPanelSearch().resetSearch();
-		parent.getPanelSearch().setSearchTextAndContext(textFieldFind.getText(), parent.getController().getCurrentFolderAsString());
+		parent.getPanelSearch().setSearchTextAndContext(textFieldSearch.getText(), parent.getController().getCurrentFolderAsString());
 		parent.showCardLayoutPanel(BadgerMainFrame.SEARCH_PANEL_NAME);
 	}
 
@@ -218,9 +219,6 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
-
-		textFieldFind.setEnabled(!searching);
-
 		mntmQueryDiskspace.setEnabled(diskMode);
 		btnSearch.setEnabled(diskMode && !searching);
 	}

@@ -123,7 +123,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		table = new BadgerTable(this);
 
 		panelBrowseMiddle.add(table, BorderLayout.CENTER);
-		panelSearch = new SearchPanel(this);
+		panelSearch = new SearchPanel(this, menuBar.getTextFieldSearch());
 		contentPane.add(panelSearch, SEARCH_PANEL_NAME);
 	}
 
