@@ -16,6 +16,11 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 
+/**
+ * Used for the drag & drop feature which allows you to import files into badger vfs
+ * 
+ * 
+ */
 public class FileImportDropTargetListener implements DropTargetListener {
 
 	private static final Logger LOGGER = Logger.getLogger(FileImportDropTargetListener.class);
@@ -31,7 +36,6 @@ public class FileImportDropTargetListener implements DropTargetListener {
 	@Override
 	public void dropActionChanged(DropTargetDragEvent arg0) {
 		LOGGER.debug("dropActionChanged");
-
 	}
 
 	@Override
