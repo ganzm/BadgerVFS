@@ -1,9 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
@@ -26,26 +23,19 @@ public class WorkerController implements Runnable {
 	private static WorkerController instance = null;
 
 	private final VFSDiskManager diskManager;
+
 	private final WorkLoadIndicator workLoadIndicator;
 
 	/**
 	 * Queue contains unprocesses jobs
 	 */
-	private final ConcurrentLinkedQueue<BadgerAction> actionQueue = new ConcurrentLinkedQueue<>();
-
-	private final Lock lock = new ReentrantLock();
-	private final Condition condition = lock.newCondition();
-
-	/**
-	 * indicates whether the worker is doing anything
-	 */
-	private boolean busy;
+	private final LinkedBlockingQueue<BadgerAction> actionQueue = new LinkedBlockingQueue<>();
 
 	private boolean running = false;
 
 	public WorkerController(final VFSDiskManager diskManager) {
 		this.diskManager = diskManager;
-		this.workLoadIndicator = new WorkLoadIndicator(this);
+		this.workLoadIndicator = new WorkLoadIndicator();
 	}
 
 	public static WorkerController setupWorker(final VFSDiskManager diskManager) {
@@ -78,11 +68,9 @@ public class WorkerController implements Runnable {
 	public void enqueue(final BadgerAction action) {
 		workLoadIndicator.jobEnqueued();
 		try {
-			lock.lock();
-			actionQueue.offer(action);
-			condition.signalAll();
-		} finally {
-			lock.unlock();
+			actionQueue.put(action);
+		} catch (final InterruptedException e) {
+			LOGGER.error("error putting into queue", e);
 		}
 	}
 
@@ -93,33 +81,12 @@ public class WorkerController implements Runnable {
 			running = true;
 			BadgerAction action = null;
 
-			busy = true;
 			while (running) {
-
 				try {
-					lock.lock();
-
-					action = actionQueue.poll();
-					if (action == null) {
-						try {
-							busy = false;
-							// queue is empty there is no work
-							condition.await();
-							busy = true;
-						} catch (final InterruptedException e) {
-							// not too bad - ignore me
-							LOGGER.info("WorkerController was interrupted " + e.getMessage());
-						}
-					}
-				} finally {
-					lock.unlock();
-				}
-				if (action != null) {
-					try {
-						performAction(action);
-					} catch (final Exception ex) {
-						LOGGER.error("Error while performing Action " + action, ex);
-					}
+					action = actionQueue.take();
+					performAction(action);
+				} catch (final Exception ex) {
+					LOGGER.error("Error while performing Action " + action, ex);
 				}
 			}
 		} finally {
@@ -130,14 +97,16 @@ public class WorkerController implements Runnable {
 	private void performAction(final BadgerAction action) {
 		try {
 			LOGGER.info("Perform Action " + action);
-			action.runDiskAction(diskManager);
+			try {
+				action.runDiskAction(diskManager);
+			} finally {
+				workLoadIndicator.actionFinished();
+			}
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
-			workLoadIndicator.actionFinished();
 		} catch (final VFSException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
-			workLoadIndicator.actionFinished();
 		}
 	}
 
@@ -163,24 +132,16 @@ public class WorkerController implements Runnable {
 		}
 	}
 
-	/**
-	 * indicates whether the worker is doing anything
-	 * 
-	 * @return
-	 */
-	public boolean isBusy() {
-		return busy;
-	}
-
 	private void dispose() {
-		try {
-			lock.lock();
-			running = false;
-			// wake me up
+		running = false;
+		BadgerAction noop = new BadgerAction(null) {
+			@Override
+			public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 
-			condition.signalAll();
-		} finally {
-			lock.unlock();
-		}
+			}
+		};
+
+		enqueue(noop);
+		workLoadIndicator.dispose();
 	}
 }

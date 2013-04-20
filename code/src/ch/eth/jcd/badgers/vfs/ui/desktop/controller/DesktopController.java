@@ -241,14 +241,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
-	public boolean isBusy() {
-		final WorkerController workerController = WorkerController.getInstance();
-		if (workerController != null) {
-			return workerController.isBusy();
-		}
-		return false;
-	}
-
 	public EntryTableModel getEntryTableModel() {
 		return entryTableModel;
 	}

@@ -1,39 +1,77 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
+import java.awt.EventQueue;
 import java.util.Timer;
+import java.util.TimerTask;
+
+import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.PleaseWaitDialog;
 
 public class WorkLoadIndicator {
 
-	private WorkerController workerController;
+	private static final Logger LOGGER = Logger.getLogger(WorkLoadIndicator.class);
+
 	private PleaseWaitDialog dialog;
 	private Timer timer;
 
-	public WorkLoadIndicator(WorkerController workerController) {
-		this.workerController = workerController;
-		this.dialog = new PleaseWaitDialog();
+	private int jobPerforming = 0;
 
+	private final Object obj = new Object();
+
+	public WorkLoadIndicator() {
+		this.dialog = new PleaseWaitDialog();
 		this.timer = new Timer();
 	}
 
-	public void jobEnqueued() {
-		//dialog.setVisible(true);
+	public void dispose() {
+		timer.cancel();
 
-		// timer.schedule(new TimerTask() {
-		//
-		// @Override
-		// public void run() {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		// }, 500);
+		synchronized (obj) {
+			jobPerforming--;
+			startSetInvisible();
+		}
+	}
+
+	public void jobEnqueued() {
+		LOGGER.debug("job enqueued");
+		synchronized (obj) {
+			jobPerforming++;
+		}
+		timer.schedule(new WorkLoadTimerTask(), 500);
 	}
 
 	public void actionFinished() {
-		// TODO Auto-generated method stub
+		LOGGER.debug("action finished");
 
-		//dialog.setVisible(false);
+		synchronized (obj) {
+			jobPerforming--;
+			if (dialog.isVisible()) {
+				startSetInvisible();
+			}
+		}
 	}
 
+	private void startSetInvisible() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				dialog.setVisible(false);
+			};
+		});
+	}
+
+	private class WorkLoadTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			synchronized (obj) {
+				if (jobPerforming > 0) {
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							dialog.setVisible(true);
+						}
+					});
+				}
+			}
+		}
+	};
 }
