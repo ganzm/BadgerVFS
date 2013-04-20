@@ -16,6 +16,8 @@ public class ExportAction extends BadgerAction {
 
 	private final JFrame desktopFrame;
 
+	private final VFSExporter exporter = new VFSExporter();
+
 	/**
 	 * 
 	 * @param actionObserver
@@ -33,7 +35,7 @@ public class ExportAction extends BadgerAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		new VFSExporter().exportFileOrFolder(entries, destination);
+		exporter.exportFileOrFolder(entries, destination);
 	}
 
 	public File getDestination() {
@@ -46,6 +48,26 @@ public class ExportAction extends BadgerAction {
 
 	public JFrame getDesktopFrame() {
 		return desktopFrame;
+	}
+
+	@Override
+	public String getActionName() {
+		return "Exporting (" + exporter.getEntriesDone() + "/" + exporter.getTotalEntries() + ") ";
+	}
+
+	@Override
+	public boolean isProgressIndicationSupported() {
+		return true;
+	}
+
+	@Override
+	public int getMaxProgress() {
+		return exporter.getTotalEntries();
+	}
+
+	@Override
+	public int getCurrentProgress() {
+		return exporter.getEntriesDone();
 	}
 
 }

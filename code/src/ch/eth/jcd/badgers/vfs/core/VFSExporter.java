@@ -18,6 +18,9 @@ import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 public class VFSExporter {
 	private static final Logger LOGGER = Logger.getLogger(VFSExporter.class);
 
+	private int totalEntries = 0;
+	private int entriesDone = 0;
+
 	private final class ExportItem {
 		public VFSEntry getFrom() {
 			return from;
@@ -43,17 +46,25 @@ public class VFSExporter {
 	 * @param destination
 	 */
 	public void exportFileOrFolder(List<VFSEntry> entries, File destination) throws VFSException {
+		totalEntries = 1;
+		entriesDone = 0;
+
 		Queue<ExportItem> queue = new LinkedList<ExportItem>();
 
 		for (VFSEntry vfsEntry : entries) {
 			queue.add(new ExportItem(vfsEntry, destination.isDirectory() ? new File(destination, vfsEntry.getPath().getName()) : destination));
+			++totalEntries;
 		}
 
 		while (!queue.isEmpty()) {
 			ExportItem nextItem = queue.remove();
 			if (nextItem.getFrom().isDirectory()) {
 				nextItem.getTo().mkdirs();
-				for (VFSEntry e : nextItem.getFrom().getChildren()) {
+				++entriesDone;
+
+				List<VFSEntry> children = nextItem.getFrom().getChildren();
+				totalEntries += children.size();
+				for (VFSEntry e : children) {
 					queue.add(new ExportItem(e, new File(nextItem.getTo(), e.getPath().getName())));
 				}
 			} else {
@@ -67,7 +78,27 @@ public class VFSExporter {
 					LOGGER.error("ERROR while exporting: source=" + nextItem.getFrom().getPath().toString() + " destination="
 							+ nextItem.getTo().getAbsolutePath());
 				}
+
+				++entriesDone;
 			}
 		}
+	}
+
+	/**
+	 * Progress indicator method
+	 * 
+	 * @return
+	 */
+	public int getTotalEntries() {
+		return totalEntries;
+	}
+
+	/**
+	 * Progress indicator method
+	 * 
+	 * @return
+	 */
+	public int getEntriesDone() {
+		return entriesDone;
 	}
 }
