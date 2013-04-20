@@ -104,13 +104,13 @@ public class WorkerController implements Runnable {
 			}
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
-		} catch (final VFSException e) {
+		} catch (final VFSException | RuntimeException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
 		}
 	}
 
-	private void actionFailed(final BadgerAction action, final VFSException e) {
+	private void actionFailed(final BadgerAction action, final Exception e) {
 		final ActionObserver obs = action.getActionObserver();
 		if (obs != null) {
 			try {

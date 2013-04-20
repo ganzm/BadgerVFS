@@ -182,7 +182,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	@Override
-	public void onActionFailed(final BadgerAction action, final VFSException e) {
+	public void onActionFailed(final BadgerAction action, final Exception e) {
 		SwingUtil.handleException(null, e);
 		updateGUI();
 	}
@@ -408,7 +408,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			}
 
 			@Override
-			public void onActionFailed(final BadgerAction action, final VFSException e) {
+			public void onActionFailed(final BadgerAction action, final Exception e) {
 				SwingUtil.handleException(null, e);
 				updateGUI();
 			}
@@ -429,7 +429,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			}
 
 			@Override
-			public void onActionFailed(final BadgerAction action, final VFSException e) {
+			public void onActionFailed(final BadgerAction action, final Exception e) {
 				SwingUtil.handleException(null, e);
 				updateGUI();
 			}

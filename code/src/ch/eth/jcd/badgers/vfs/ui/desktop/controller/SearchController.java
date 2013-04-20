@@ -7,7 +7,6 @@ import javax.swing.table.TableModel;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
@@ -55,12 +54,13 @@ public class SearchController extends BadgerController implements ActionObserver
 	}
 
 	@Override
-	public void onActionFailed(final BadgerAction action, final VFSException e) {
+	public void onActionFailed(final BadgerAction action, final Exception e) {
 		if (action instanceof SearchAction) {
 			currentSearchAction = null;
 		}
 
 		SwingUtil.handleException((Component) getView(), e);
+		updateGUI();
 	}
 
 	@Override
