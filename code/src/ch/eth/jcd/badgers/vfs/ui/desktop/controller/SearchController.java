@@ -76,7 +76,7 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	public void cancelSearch() {
 		if (currentSearchAction == null) {
-			throw new VFSRuntimeException("Internal Error - you are not supposed to be able to cancel search");
+			return;
 		}
 
 		currentSearchAction.tryCancelSearch();

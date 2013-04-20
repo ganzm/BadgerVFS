@@ -177,6 +177,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		}
 
 		// close the main window
+		LOGGER.info("Disposing MainFrame");
 		dispose();
 	}
 

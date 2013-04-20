@@ -77,4 +77,8 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 		return currentDirectory;
 	}
 
+	@Override
+	public boolean needsToLockGui() {
+		return false;
+	}
 }

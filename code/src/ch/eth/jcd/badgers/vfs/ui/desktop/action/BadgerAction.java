@@ -41,4 +41,11 @@ public abstract class BadgerAction {
 	public int getMaxProgress() {
 		return 0;
 	}
+
+	/**
+	 * returns true if a specific specific action should lock the gui
+	 */
+	public boolean needsToLockGui() {
+		return true;
+	}
 }

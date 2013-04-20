@@ -27,6 +27,8 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 	private JLabel lblHeader;
 	private JProgressBar progressBar;
 
+	private Timer swingTimer = new Timer(500, this);
+
 	/**
 	 * Create the dialog.
 	 */
@@ -79,8 +81,6 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 
 		super.setVisible(b);
 	}
-
-	private Timer swingTimer = new Timer(500, this);
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {

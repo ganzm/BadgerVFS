@@ -186,6 +186,10 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	}
 
 	protected void openSearchEntryAtRow(final int rowIndex) {
+		// cancel search so the WorkerController is not busy anymore searching for files
+		searchController.cancelSearch();
+
+		// we need to load the folder of the SearchResult Entry
 		searchController.openSearchEntryAtRow(rowIndex);
 		parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 	}

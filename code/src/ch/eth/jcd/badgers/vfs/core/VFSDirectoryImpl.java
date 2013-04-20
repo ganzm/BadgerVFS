@@ -23,7 +23,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
  * $Id$
  * 
  * 
- * TODO describe VFSDirectoryImpl
+ * Represents a single directory on the virtual file system
  * 
  */
 public class VFSDirectoryImpl extends VFSEntryImpl {
@@ -219,7 +219,20 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public void findInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException {
+		privateFindInFolder(searchParameter, observer);
+	}
+
+	/**
+	 * @see this{@link #findInFolder(SearchParameter, FindInFolderCallback)}
+	 * @return false if we want to go ahead searching, true if we want to cancel search
+	 */
+	public boolean privateFindInFolder(SearchParameter searchParameter, FindInFolderCallback observer) throws VFSException {
 		LOGGER.debug("Find in Fold " + path.getAbsolutePath());
+
+		if (observer.stopSearch(path)) {
+			LOGGER.debug("API User wanted to stop searching");
+			return true;
+		}
 
 		List<DirectoryEntryBlock> toDeepSearch = new ArrayList<DirectoryEntryBlock>();
 		List<DirectoryEntryBlock> children = childTree.traverseTree(diskManager.getDirectorySectionHandler());
@@ -244,7 +257,12 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		for (DirectoryEntryBlock entry : toDeepSearch) {
 			VFSPath path = this.getChildPath(entry.getFileName());
 			VFSDirectoryImpl directory = (VFSDirectoryImpl) path.getVFSEntry();
-			directory.findInFolder(searchParameter, observer);
+			if (directory.privateFindInFolder(searchParameter, observer)) {
+				// search was canceled, immediately return
+				return true;
+			}
 		}
+
+		return false;
 	}
 }
