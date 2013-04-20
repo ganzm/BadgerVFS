@@ -41,7 +41,7 @@ ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase.java
 ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController.java
 ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController.java
 ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController.java
-\end{verbatim} provide the controller classes of a typicyl MVC design. 
+\end{verbatim} provide the controller classes of a typical MVC design. 
 
 
 \subsubsection {Implemented Bonus Requirements}
@@ -52,13 +52,17 @@ ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController.java
   disk api. This thread has a work queue to which \textit{Actions} are added.
   \item \emph{Advanced search; For example, search with wildcards.} For this the
   API had to be extended slightly.
+  \item \emph{Drag-and-drop for manipulative operations (import).} For that we
+  register a \textit{DropTarget} on the \textit{BadgerTable} that has a
+  \textit{DropTargetListener} which starts the import on the
+  \textit{DesktopController}.
 \end{itemize}
 
 \subsubsection {Not Implemented Bonus Requirements}
 \begin{itemize}
   \item \emph{Nice-to-have features like operation progress report (e.g. the
   number of files processed during export) or drag-and-drop for manipulative
-  operations (move, copy, import).}
+  operations (move, copy).}
   \item \emph{The browser is implemented for an additional platform}
   \item \emph{Efficient full-text search (using some sort of indexing).}
 \end{itemize}
