@@ -30,7 +30,11 @@ public class WorkLoadIndicator {
 
 		synchronized (obj) {
 			jobPerforming--;
-			startSetInvisible();
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					dialog.dispose();
+				};
+			});
 		}
 	}
 
@@ -40,7 +44,11 @@ public class WorkLoadIndicator {
 		synchronized (obj) {
 			jobPerforming++;
 		}
-		timer.schedule(new WorkLoadTimerTask(), 500);
+
+		if (action.needsToLockGui()) {
+			timer.schedule(new WorkLoadTimerTask(), 500);
+		}
+
 	}
 
 	public void actionFinished() {
