@@ -181,7 +181,7 @@ public class BadgerMenuBar extends JMenuBar {
 		add(textFieldSearch);
 		textFieldSearch.setColumns(10);
 
-		btnSearch = new JButton(new AbstractAction("Search") {
+		btnSearch = new JButton(new AbstractAction("Search...") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				startSearch();
