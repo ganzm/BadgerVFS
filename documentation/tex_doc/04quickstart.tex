@@ -77,3 +77,65 @@ following commands can be used in file system mode:
   \item {\textbf{close}} closes the file system mode, from now on management mode
   commands can be executed
 \end{itemize}
+
+
+\subsection{VFS Browser}
+\subsubsection{startup}
+The VFS Browser  can be started as follows:
+
+\begin{verbatim}
+java -jar VFSCore.jar ch.eth.jcd.badgers.vfs.ui.desktop.view.BadgerMainFrame
+\end{verbatim}
+
+or by starting \verb|ch.eth.jcd.badgers.vfs.ui.desktop.view.BadgerMainFrame| in eclipse.
+
+Figures \ref{fig:01_quickstart}, \ref{fig:02_quickstart},
+\ref{fig:03_quickstart}, \ref{fig:04_quickstart}, \ref{fig:05_quickstart} and
+\ref{fig:06_quickstart} give a short overview of opening the browser and
+importing the first folder. From there on the UI is pretty much self explanatory
+of the features it exposes.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/01_quickstart.png}
+\caption{after startup, create a new disk}
+\label{fig:01_quickstart}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/02_quickstart.png}
+\caption{the disk creation wizard openes, one can choose the file, file size,
+encryption and compression algorithms}
+\label{fig:02_quickstart}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/03_quickstart.png}
+\caption{the new disk gets created on the host filesystem and the user can
+start importing files via Actions/Import\ldots}
+\label{fig:03_quickstart}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/04_quickstart.png}
+\caption{\ldots which triggers the import dialog, where the user can choose a
+file or folder\ldots}
+\label{fig:04_quickstart}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/05_quickstart.png}
+\caption{after clicking ``OK'' the progress window appears\ldots}
+\label{fig:05_quickstart}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/06_quickstart.png}
+\caption{\ldots and finally the folder is imported after a couple of time.}
+\label{fig:06_quickstart}
+\end{figure}
