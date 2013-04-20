@@ -29,30 +29,30 @@ public class FileImportDropTargetListener implements DropTargetListener {
 
 	private static final String ACCEPTED_MIME_TYPE = "application/x-java-file-list";
 
-	public FileImportDropTargetListener(DesktopController controller) {
+	public FileImportDropTargetListener(final DesktopController controller) {
 		this.controller = controller;
 	}
 
 	@Override
-	public void dropActionChanged(DropTargetDragEvent arg0) {
+	public void dropActionChanged(final DropTargetDragEvent arg0) {
 		LOGGER.debug("dropActionChanged");
 	}
 
 	@Override
-	public void drop(DropTargetDropEvent event) {
+	public void drop(final DropTargetDropEvent event) {
 		LOGGER.debug("drop");
 		try {
-			DataFlavor[] dataFlavours = event.getCurrentDataFlavors();
-			for (DataFlavor df : dataFlavours) {
+			final DataFlavor[] dataFlavours = event.getCurrentDataFlavors();
+			for (final DataFlavor df : dataFlavours) {
 
 				if (acceptDataFlavour(df)) {
 
 					event.acceptDrop(DnDConstants.ACTION_COPY);
-					Transferable transferable = event.getTransferable();
-					Object transferData = transferable.getTransferData(df);
+					final Transferable transferable = event.getTransferable();
+					final Object transferData = transferable.getTransferData(df);
 
 					@SuppressWarnings("unchecked")
-					List<File> fileList = (List<File>) transferData;
+					final List<File> fileList = (List<File>) transferData;
 
 					controller.startImportFromHostFs(fileList);
 				}
@@ -63,36 +63,31 @@ public class FileImportDropTargetListener implements DropTargetListener {
 	}
 
 	@Override
-	public void dragOver(DropTargetDragEvent event) {
+	public void dragOver(final DropTargetDragEvent event) {
 		LOGGER.debug("dragOver");
 
-		DataFlavor[] dataFlavours = event.getCurrentDataFlavors();
-		for (DataFlavor df : dataFlavours) {
+		final DataFlavor[] dataFlavours = event.getCurrentDataFlavors();
+		for (final DataFlavor df : dataFlavours) {
 			if (acceptDataFlavour(df)) {
 				event.acceptDrag(DnDConstants.ACTION_COPY);
 			}
 		}
 	}
 
-	private boolean acceptDataFlavour(DataFlavor df) {
-		String mimeType = df.getHumanPresentableName();
-		Class<?> representationClass = df.getRepresentationClass();
-		if (ACCEPTED_MIME_TYPE.equals(mimeType)) {
-			if (representationClass == List.class) {
-				return true;
+	private boolean acceptDataFlavour(final DataFlavor df) {
+		final String mimeType = df.getHumanPresentableName();
+		final Class<?> representationClass = df.getRepresentationClass();
 
-			}
-		}
-		return false;
+		return ACCEPTED_MIME_TYPE.equals(mimeType) && representationClass == List.class;
 	}
 
 	@Override
-	public void dragExit(DropTargetEvent arg0) {
+	public void dragExit(final DropTargetEvent arg0) {
 		LOGGER.debug("dragExit");
 	}
 
 	@Override
-	public void dragEnter(DropTargetDragEvent arg0) {
+	public void dragEnter(final DropTargetDragEvent arg0) {
 		LOGGER.debug("dragEnter");
 	}
 }
