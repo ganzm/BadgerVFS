@@ -24,10 +24,10 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 	private final JPanel contentPanel = new JPanel();
 
 	private BadgerAction currentAction;
-	private JLabel lblHeader;
-	private JProgressBar progressBar;
+	private final JLabel lblHeader;
+	private final JProgressBar progressBar;
 
-	private Timer swingTimer = new Timer(500, this);
+	private final Timer swingTimer = new Timer(500, this);
 
 	/**
 	 * Create the dialog.
@@ -40,7 +40,7 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_contentPanel = new GridBagLayout();
+		final GridBagLayout gbl_contentPanel = new GridBagLayout();
 		gbl_contentPanel.columnWidths = new int[] { 314, 0 };
 		gbl_contentPanel.rowHeights = new int[] { 50, 0, 0 };
 		gbl_contentPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
@@ -49,7 +49,7 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 
 		lblHeader = new JLabel("New label");
 		lblHeader.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints gbc_lblHeader = new GridBagConstraints();
+		final GridBagConstraints gbc_lblHeader = new GridBagConstraints();
 		gbc_lblHeader.insets = new Insets(0, 0, 5, 0);
 		gbc_lblHeader.fill = GridBagConstraints.BOTH;
 		gbc_lblHeader.gridx = 0;
@@ -57,19 +57,19 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 		contentPanel.add(lblHeader, gbc_lblHeader);
 
 		progressBar = new JProgressBar();
-		GridBagConstraints gbc_progressBar = new GridBagConstraints();
+		final GridBagConstraints gbc_progressBar = new GridBagConstraints();
 		gbc_progressBar.fill = GridBagConstraints.HORIZONTAL;
 		gbc_progressBar.gridx = 0;
 		gbc_progressBar.gridy = 1;
 		contentPanel.add(progressBar, gbc_progressBar);
 	}
 
-	public void setCurrentAction(BadgerAction action) {
+	public void setCurrentAction(final BadgerAction action) {
 		currentAction = action;
 	}
 
 	@Override
-	public void setVisible(boolean b) {
+	public void setVisible(final boolean b) {
 		if (b) {
 			lblHeader.setText(currentAction.getActionName());
 			progressBar.setVisible(currentAction.isProgressIndicationSupported());
@@ -83,7 +83,7 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformed(final ActionEvent arg0) {
 		lblHeader.setText(currentAction.getActionName());
 
 		progressBar.setMaximum(currentAction.getMaxProgress());
