@@ -17,13 +17,33 @@ partitioned into the packages \textit{model, view and controller}.
 \end{figure}
 
 
-\subsubsection{Decoupling of gui and working threads}
-This section describs the way how the decoupling from gui and working threads
-was implemented. This decoupling mades the gui still responsive event tough some
-long running tasks like importing or search would be running.
+\subsubsection{Decoupling of GUI and working threads}
+This section describes the way how the decoupling from GUI and working threads
+was implemented. This decoupling mades the GUI still responsive even tough some
+long running tasks like import or search would be running. Figure
+\ref{fig:decouple_threads} shows the sequence diagram of the example ``Import'':
+The \textit{DesktopController} which lives in the GUI thread creates a new
+\textit{ImportAction} that is enqueued in the \textit{WorkerController}'s action queue. It is worth to mention, that the
+\textit{WorkerController} is a singleton, that has an \textit{instance} field. The
+\textit{WorkerController} has a thread that works on a blocking queue and every
+time it gets a \textit{BadgerAction} the thread wakes up and performs the action
+on the VFS core API. After the API work is done (in this case the import of
+files), the \textit{WorkerController} calls the corresponding
+\textit{ActionObserver}, which is in most cases the \textit{DesktopController}
+instance, so that the GUI can be updated. This design ensures single threaded
+access on the VFS core API with keeping the GUI responsive.
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/single_threaded_access.eps}
+\caption{example of decoupling import from gui}
+\label{fig:decouple_threads}
+\end{figure}
 
 \subsubsection{Search}
 
 
 \subsubsection{Keyboard and Mouse support}
+
+\paragraph{Keyboard Shortcuts}
+\paragraph{Drag \& Drop}
