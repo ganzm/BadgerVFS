@@ -13,8 +13,8 @@ public class WorkLoadIndicator {
 
 	private static final Logger LOGGER = Logger.getLogger(WorkLoadIndicator.class);
 
-	private PleaseWaitDialog dialog;
-	private Timer timer;
+	private final PleaseWaitDialog dialog;
+	private final Timer timer;
 
 	private int jobPerforming = 0;
 
@@ -31,6 +31,7 @@ public class WorkLoadIndicator {
 		synchronized (obj) {
 			jobPerforming--;
 			EventQueue.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					dialog.dispose();
 				};
@@ -38,7 +39,7 @@ public class WorkLoadIndicator {
 		}
 	}
 
-	public void jobEnqueued(BadgerAction action) {
+	public void jobEnqueued(final BadgerAction action) {
 		LOGGER.debug("job enqueued");
 		dialog.setCurrentAction(action);
 		synchronized (obj) {
@@ -64,6 +65,7 @@ public class WorkLoadIndicator {
 
 	private void startSetInvisible() {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				dialog.setVisible(false);
 			};
@@ -76,6 +78,7 @@ public class WorkLoadIndicator {
 			synchronized (obj) {
 				if (jobPerforming > 0) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							dialog.setVisible(true);
 						}
