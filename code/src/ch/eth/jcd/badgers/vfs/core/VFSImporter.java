@@ -17,6 +17,9 @@ public class VFSImporter {
 
 	private static final Logger LOGGER = Logger.getLogger(VFSImporter.class);
 
+	private int totalEntries = 0;
+	private int entriesDone = 0;
+
 	/**
 	 * 
 	 * @param importFile
@@ -26,6 +29,9 @@ public class VFSImporter {
 	 * @throws VFSException
 	 */
 	public void importFileOrFolder(String pathToImportFile, VFSPath path) throws VFSInvalidPathException, VFSException {
+		totalEntries = 1;
+		entriesDone = 0;
+
 		File importFile = new File(pathToImportFile);
 		if (!importFile.exists()) {
 			throw new VFSInvalidPathException("Path on host file system does not exist" + pathToImportFile);
@@ -52,6 +58,7 @@ public class VFSImporter {
 		VFSEntry newFolder = targetFolderPath.createDirectory();
 
 		File[] children = folderToImport.listFiles();
+		totalEntries += children.length;
 		for (File child : children) {
 			VFSPath childPath = newFolder.getChildPath(child.getName());
 			if (child.isDirectory()) {
@@ -60,6 +67,8 @@ public class VFSImporter {
 				importFile(child, childPath);
 			}
 		}
+
+		++entriesDone;
 	}
 
 	private void importFile(File fileToImport, VFSPath targetFilePath) throws IOException, VFSException {
@@ -70,6 +79,8 @@ public class VFSImporter {
 			FileInputStream fis = new FileInputStream(fileToImport);
 			OutputStream os = newFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE);
 			ChannelUtil.fastStreamCopy(fis, os);
+
+			++entriesDone;
 		} catch (IOException | VFSException e) {
 			try {
 				LOGGER.debug("deleting partially created File at " + targetFilePath.getAbsolutePath());
@@ -81,6 +92,23 @@ public class VFSImporter {
 			// cleanup done, now rethrow the exception
 			throw e;
 		}
+	}
 
+	/**
+	 * Progress indicator method
+	 * 
+	 * @return
+	 */
+	public int getTotalEntries() {
+		return totalEntries;
+	}
+
+	/**
+	 * Progress indicator method
+	 * 
+	 * @return
+	 */
+	public int getEntriesDone() {
+		return entriesDone;
 	}
 }

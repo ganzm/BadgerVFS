@@ -18,6 +18,10 @@ public class ImportAction extends BadgerAction {
 
 	private final List<Pair<String, String>> host2DestinationPathList;
 
+	private String currentHostFsSourcePath = "";
+
+	private VFSImporter importer = new VFSImporter();
+
 	public ImportAction(ActionObserver actionObserver, String hostFsSourcePath, String destinationPath) {
 		super(actionObserver);
 		this.host2DestinationPathList = new ArrayList<>();
@@ -32,14 +36,32 @@ public class ImportAction extends BadgerAction {
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 		for (Pair<String, String> pathPair : host2DestinationPathList) {
-
-			String hostFsSourcePath = pathPair.getFirst();
+			currentHostFsSourcePath = pathPair.getFirst();
 			String destinationPath = pathPair.getSecond();
 
-			LOGGER.info("Importing " + hostFsSourcePath);
+			LOGGER.info("Importing " + currentHostFsSourcePath);
 			VFSPath path = diskManager.createPath(destinationPath);
-			VFSImporter importer = new VFSImporter();
-			importer.importFileOrFolder(hostFsSourcePath, path);
+			importer.importFileOrFolder(currentHostFsSourcePath, path);
 		}
+	}
+
+	@Override
+	public String getActionName() {
+		return "Importing (" + importer.getEntriesDone() + "/" + importer.getTotalEntries() + ") " + currentHostFsSourcePath;
+	}
+
+	@Override
+	public boolean isProgressIndicationSupported() {
+		return true;
+	}
+
+	@Override
+	public int getMaxProgress() {
+		return importer.getTotalEntries();
+	}
+
+	@Override
+	public int getCurrentProgress() {
+		return importer.getEntriesDone();
 	}
 }

@@ -25,4 +25,20 @@ public abstract class BadgerAction {
 	public ActionObserver getActionObserver() {
 		return actionObserver;
 	}
+
+	public String getActionName() {
+		return this.getClass().getSimpleName();
+	}
+
+	public boolean isProgressIndicationSupported() {
+		return false;
+	}
+
+	public int getCurrentProgress() {
+		return 0;
+	}
+
+	public int getMaxProgress() {
+		return 0;
+	}
 }

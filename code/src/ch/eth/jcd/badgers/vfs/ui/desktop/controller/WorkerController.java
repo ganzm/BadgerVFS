@@ -66,7 +66,7 @@ public class WorkerController implements Runnable {
 	}
 
 	public void enqueue(final BadgerAction action) {
-		workLoadIndicator.jobEnqueued();
+		workLoadIndicator.jobEnqueued(action);
 		try {
 			actionQueue.put(action);
 		} catch (final InterruptedException e) {
