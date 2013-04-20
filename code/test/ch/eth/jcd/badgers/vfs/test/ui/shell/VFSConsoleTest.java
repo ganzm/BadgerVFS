@@ -27,7 +27,9 @@ public class VFSConsoleTest {
 	public void testConsoleOperation() throws FileNotFoundException, IOException {
 		String tmpFileContent = "this is the content ASD ÖÄÜöäü";
 		String tmpFileName = "VFSConsoleTestTmpFile.txt";
+		String outFileName = "VFSConsoleTestOutFile.txt";
 		File tmpFile = new File(tmpdir + File.separatorChar + tmpFileName);
+		File outFile = new File(tmpdir + File.separatorChar + outFileName);
 		try (OutputStream out = new FileOutputStream(tmpFile);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
 				BufferedWriter br = new BufferedWriter(writer)) {
@@ -35,12 +37,12 @@ public class VFSConsoleTest {
 		}
 		String testInput = "create " + bfsFile + " 100" + NEW_LINE + "mkdir test" + NEW_LINE + "" + NEW_LINE + "df" + NEW_LINE + "ls" + NEW_LINE + "find tes"
 				+ NEW_LINE + "mkfile test.txt" + NEW_LINE + "import " + tmpFile.getAbsolutePath() + " " + tmpFileName + NEW_LINE + "export " + tmpFileName
-				+ " " + tmpFile.getAbsolutePath() + NEW_LINE + "pwd" + NEW_LINE + "rm test.txt" + NEW_LINE + "cp " + tmpFileName + " test2.txt" + NEW_LINE
+				+ " " + outFile.getAbsolutePath() + NEW_LINE + "pwd" + NEW_LINE + "rm test.txt" + NEW_LINE + "cp " + tmpFileName + " test2.txt" + NEW_LINE
 				+ "mv " + tmpFileName + " test/testli.txt" + NEW_LINE + "cd test" + NEW_LINE + "close" + NEW_LINE + "open " + bfsFile + NEW_LINE + "dispose"
 				+ NEW_LINE + "blub" + NEW_LINE + "exit" + NEW_LINE;
 
 		String testOutput = ">" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">VirtualFileSystem	Size 	Used 	Avail 	Use% 	Mounted on\n"
-				+ "/			97.3M	2K	97.3M	0%	" + bfsFile + "\n" + bfsFile + ">" + "test\n" + bfsFile + ">/test\n" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">"
+				+ "/			73.2M	2K	73.2M	0%	" + bfsFile + "\n" + bfsFile + ">" + "test\n" + bfsFile + ">/test\n" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">"
 				+ bfsFile + ">/\n" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">" + bfsFile + ">" + ">" + bfsFile
 				+ ">>blub is not a valid input\n" + VFSConsole.HELP_MESSAGE + "\n>";
 		// prepare streams
@@ -54,6 +56,9 @@ public class VFSConsoleTest {
 
 		writer.flush();
 		assertEquals(testOutput, outStream.toString());
+		if (outFile.exists()) {
+			outFile.delete();
+		}
 	}
 
 }

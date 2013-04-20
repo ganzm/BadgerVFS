@@ -380,7 +380,7 @@ public abstract class IVFSEntryTest {
 			br.flush();
 		}
 
-		dir1Entry.findInFolder("Find", new FindInFolderCallback() {
+		dir1Entry.findInFolder("*Find*", new FindInFolderCallback() {
 
 			@Override
 			public boolean stopSearch(VFSPath currentDirectory) {

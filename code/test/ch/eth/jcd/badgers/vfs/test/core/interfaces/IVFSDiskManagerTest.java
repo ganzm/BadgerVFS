@@ -137,7 +137,7 @@ public abstract class IVFSDiskManagerTest {
 			br.write("Test2\n");
 		}
 
-		diskManager.find("Find", new FindInFolderCallback() {
+		diskManager.find("*Find*", new FindInFolderCallback() {
 
 			@Override
 			public boolean stopSearch(VFSPath currentDirectory) {

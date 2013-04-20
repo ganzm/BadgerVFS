@@ -7,7 +7,6 @@
 package ch.eth.jcd.badgers.vfs.ui.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,16 +24,15 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
-import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
 
-	private static final String NO_CORRECT_NUMBER_OF_PARAMS = "no correct number of parameters for %s command given: expected %s, got %s";
+	public static final String NO_CORRECT_NUMBER_OF_PARAMS = "no correct number of parameters for %s command given: expected %s, got %s";
 
 	private static final Logger LOGGER = Logger.getLogger(VFSUIController.class);
 
-	private static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
+	public static final String NO_DISK_OPEN_ERROR = "No disk open, please use open or create command first";
 	private static final char[] UNITS = { 'B', 'K', 'M', 'G', 'T', 'P' };
 
 	private final VFSConsole console;
@@ -85,7 +83,7 @@ public class VFSUIController {
 						}
 					}
 					if (childToCD == null) {
-						String warning = String.format("Child: %s not found  in current directory", param[0]);
+						String warning = String.format("Child: %s not found in current directory", param[0]);
 						LOGGER.warn(warning);
 						console.writeLn(warning);
 						return;
@@ -184,7 +182,7 @@ public class VFSUIController {
 			@Override
 			public void execute(String[] param) {
 				LOGGER.debug("create command entered");
-				if (param.length != 2) {
+				if (param == null || param.length != 2) {
 					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
@@ -400,45 +398,6 @@ public class VFSUIController {
 		};
 	}
 
-	/**
-	 * 
-	 * @param importFile
-	 *            e.g. c:\temp\folderToImport
-	 * @param pathOnVfs
-	 *            e.g. /home/imported
-	 * @throws VFSInvalidPathException
-	 */
-	public void importFileOrFolder(String pathToImportFile, String pathOnVfs) throws VFSInvalidPathException {
-
-		File importFile = new File(pathToImportFile);
-		if (!importFile.exists()) {
-			throw new VFSInvalidPathException("Path on host file system does not exist" + pathToImportFile);
-		}
-
-		VFSPath path = null;
-		VFSEntry newFile = null;
-		try {
-			path = currentDirectory.getChildPath(pathOnVfs);
-			newFile = path.createFile();
-
-			FileInputStream fis = new FileInputStream(importFile);
-			OutputStream os = newFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE);
-
-			ChannelUtil.fastStreamCopy(fis, os);
-		} catch (VFSOutOfMemoryException e) {
-			if (newFile != null) {
-				try {
-					LOGGER.debug("deleting partially created File at " + path.getAbsolutePath());
-					newFile.delete();
-				} catch (VFSException ex) {
-					LOGGER.error("internal error while deleting partially created file", ex);
-				}
-			}
-		} catch (IOException | VFSException e) {
-			LOGGER.error("Error while importing file: ", e);
-		}
-	}
-
 	public Command getImportCommand() {
 		return new Command() {
 
@@ -612,7 +571,7 @@ public class VFSUIController {
 				LOGGER.debug("open command entered");
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 1, param == null ? 0 : param.length);
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "open", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -667,7 +626,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "remove", 1, param == null ? 0 : param.length);
+					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "rm", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
