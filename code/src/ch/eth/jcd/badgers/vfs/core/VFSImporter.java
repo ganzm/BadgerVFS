@@ -11,7 +11,6 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
-import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSImporter {
@@ -71,7 +70,7 @@ public class VFSImporter {
 			FileInputStream fis = new FileInputStream(fileToImport);
 			OutputStream os = newFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE);
 			ChannelUtil.fastStreamCopy(fis, os);
-		} catch (VFSOutOfMemoryException e) {
+		} catch (IOException | VFSException e) {
 			try {
 				LOGGER.debug("deleting partially created File at " + targetFilePath.getAbsolutePath());
 				newFile.delete();
@@ -82,5 +81,6 @@ public class VFSImporter {
 			// cleanup done, now rethrow the exception
 			throw e;
 		}
+
 	}
 }
