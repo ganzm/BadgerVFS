@@ -26,6 +26,7 @@ public class WorkerController implements Runnable {
 	private static WorkerController instance = null;
 
 	private final VFSDiskManager diskManager;
+	private final WorkLoadIndicator workLoadIndicator;
 
 	/**
 	 * Queue contains unprocesses jobs
@@ -44,6 +45,7 @@ public class WorkerController implements Runnable {
 
 	public WorkerController(final VFSDiskManager diskManager) {
 		this.diskManager = diskManager;
+		this.workLoadIndicator = new WorkLoadIndicator(this);
 	}
 
 	public static WorkerController setupWorker(final VFSDiskManager diskManager) {
@@ -74,6 +76,7 @@ public class WorkerController implements Runnable {
 	}
 
 	public void enqueue(final BadgerAction action) {
+		workLoadIndicator.jobEnqueued();
 		try {
 			lock.lock();
 			actionQueue.offer(action);
@@ -130,9 +133,11 @@ public class WorkerController implements Runnable {
 			action.runDiskAction(diskManager);
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
+			workLoadIndicator.actionFinished();
 		} catch (final VFSException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
+			workLoadIndicator.actionFinished();
 		}
 	}
 

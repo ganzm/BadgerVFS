@@ -214,7 +214,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
 		} else if (action instanceof ExportAction) {
 			final ExportAction exportAction = (ExportAction) action;
-			JOptionPane.showMessageDialog(exportAction.getDesktopFrame(), "Successfully exported " + exportAction.getEntries() + " to "
+			JOptionPane.showMessageDialog((Component) getView(), "Successfully exported " + exportAction.getEntries() + " to "
 					+ exportAction.getDestination().getAbsolutePath());
 		} else if (action instanceof CopyAction) {
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
