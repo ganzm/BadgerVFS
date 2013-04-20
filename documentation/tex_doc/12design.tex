@@ -40,7 +40,15 @@ access on the VFS core API with keeping the GUI responsive.
 \label{fig:decouple_threads}
 \end{figure}
 
+Even when doing a seach the decoupling works pretty well: The
+\textit{SearchAction} uses the VFS cores \textit{FindInFolderCallback} to update
+the \textit{SearchController} which lives in the GUI thread every time finds an
+entry.
+
 \subsubsection{Search}
+Searching files can be done in a separate Panel: After entering the search
+string one is allowed to switch several flags like ``case sensitive'' or
+``search subfolder'' and one can change the search folder.
 
 
 \subsubsection{Keyboard and Mouse support}
