@@ -10,7 +10,7 @@ public abstract class BadgerAction {
 	 */
 	private final ActionObserver actionObserver;
 
-	public BadgerAction(ActionObserver actionObserver) {
+	public BadgerAction(final ActionObserver actionObserver) {
 		this.actionObserver = actionObserver;
 	}
 

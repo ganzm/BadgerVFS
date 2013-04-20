@@ -20,27 +20,27 @@ public class ImportAction extends BadgerAction {
 
 	private String currentHostFsSourcePath = "";
 
-	private VFSImporter importer = new VFSImporter();
+	private final VFSImporter importer = new VFSImporter();
 
-	public ImportAction(ActionObserver actionObserver, String hostFsSourcePath, String destinationPath) {
+	public ImportAction(final ActionObserver actionObserver, final String hostFsSourcePath, final String destinationPath) {
 		super(actionObserver);
 		this.host2DestinationPathList = new ArrayList<>();
 		this.host2DestinationPathList.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 	}
 
-	public ImportAction(DesktopController actionObserver, List<Pair<String, String>> host2DestinationPathList) {
+	public ImportAction(final DesktopController actionObserver, final List<Pair<String, String>> host2DestinationPathList) {
 		super(actionObserver);
 		this.host2DestinationPathList = host2DestinationPathList;
 	}
 
 	@Override
-	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		for (Pair<String, String> pathPair : host2DestinationPathList) {
+	public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
+		for (final Pair<String, String> pathPair : host2DestinationPathList) {
 			currentHostFsSourcePath = pathPair.getFirst();
-			String destinationPath = pathPair.getSecond();
+			final String destinationPath = pathPair.getSecond();
 
 			LOGGER.info("Importing " + currentHostFsSourcePath);
-			VFSPath path = diskManager.createPath(destinationPath);
+			final VFSPath path = diskManager.createPath(destinationPath);
 			importer.importFileOrFolder(currentHostFsSourcePath, path);
 		}
 	}
