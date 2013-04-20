@@ -38,6 +38,9 @@ public class SearchAction extends BadgerAction implements FindInFolderCallback {
 		final VFSPath searchFolderPath = diskManager.createPath(this.searchFolder);
 		final VFSEntry searchFolder = searchFolderPath.getVFSEntry();
 
+		if (searchFolder == null) {
+			throw new VFSException("Invalid Path " + this.searchFolder);
+		}
 		searchFolder.findInFolder(searchParameter, this);
 	}
 
