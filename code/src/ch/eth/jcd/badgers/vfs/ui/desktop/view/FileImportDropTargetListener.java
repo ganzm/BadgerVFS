@@ -27,7 +27,7 @@ public class FileImportDropTargetListener implements DropTargetListener {
 
 	private final DesktopController controller;
 
-	private static final String acceptedMimeType = "application/x-java-file-list";
+	private static final String ACCEPTED_MIME_TYPE = "application/x-java-file-list";
 
 	public FileImportDropTargetListener(DesktopController controller) {
 		this.controller = controller;
@@ -77,7 +77,7 @@ public class FileImportDropTargetListener implements DropTargetListener {
 	private boolean acceptDataFlavour(DataFlavor df) {
 		String mimeType = df.getHumanPresentableName();
 		Class<?> representationClass = df.getRepresentationClass();
-		if (acceptedMimeType.equals(mimeType)) {
+		if (ACCEPTED_MIME_TYPE.equals(mimeType)) {
 			if (representationClass == List.class) {
 				return true;
 

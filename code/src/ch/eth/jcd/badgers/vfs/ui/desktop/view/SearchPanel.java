@@ -115,11 +115,11 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(chckbxSearchSubfolders, gbc_chckbxSearchSubfolders);
 
 		final JPanel panelButtons = new JPanel();
-		GridBagConstraints gbc_panelButtons = new GridBagConstraints();
-		gbc_panelButtons.anchor = GridBagConstraints.WEST;
-		gbc_panelButtons.gridx = 1;
-		gbc_panelButtons.gridy = 3;
-		panelSearchParameter.add(panelButtons, gbc_panelButtons);
+		GridBagConstraints gbcPanelButtons = new GridBagConstraints();
+		gbcPanelButtons.anchor = GridBagConstraints.WEST;
+		gbcPanelButtons.gridx = 1;
+		gbcPanelButtons.gridy = 3;
+		panelSearchParameter.add(panelButtons, gbcPanelButtons);
 
 		btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener() {
