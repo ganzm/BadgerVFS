@@ -15,7 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
@@ -26,6 +30,7 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 
 	private static final long serialVersionUID = -8776317677851635247L;
+	private static final Logger LOGGER = Logger.getLogger(BadgerMainFrame.class);
 
 	public static final String BROWSE_PANEL_NAME = "browsepanel";
 	public static final String SEARCH_PANEL_NAME = "searchpanel";
@@ -54,6 +59,12 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+					LOGGER.error("Error setting look&feel", e);
+				}
 				final BadgerMainFrame frame = new BadgerMainFrame();
 				frame.update();
 				frame.setVisible(true);
