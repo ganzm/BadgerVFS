@@ -8,6 +8,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -106,6 +107,8 @@ public class MockedVFSEntryImpl implements VFSEntry {
 					childs.add(new MockedVFSEntryImpl(path.toAbsolutePath().toString().substring(pathToRoot.length() + 1), pathToRoot));
 				}
 			}
+		} catch (NotDirectoryException e) {
+			return null;
 		} catch (IOException ex) {
 			throw new VFSException(ex);
 		}

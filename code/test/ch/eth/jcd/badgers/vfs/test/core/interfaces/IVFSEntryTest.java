@@ -281,6 +281,9 @@ public abstract class IVFSEntryTest {
 			LOGGER.info(child);
 		}
 
+		childs = entry.getChildren();
+		assertEquals("Expected childs are null", childs, null);
+
 	}
 
 	@Test
