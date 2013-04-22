@@ -1,10 +1,10 @@
 \subsection{Design}
-This section describes the main aspects of the VFS Browser applicatoin. It shows
+This section describes the main aspects of the VFS Browser application. It shows
 the implementation of the core interfaces and classes.
 
 \subsubsection{GUI classes}\label{sec:guiClasses}
 Figure \ref{fig:gui_classes} gives an overview of the main interfaces and
-classes that were implemented for the gui. The implementation followed the rules
+classes that were implemented for the GUI. The implementation followed the rules
 of a MVC design dividing the aspects of Model View and Control to their
 respective classes. According to the partition of MVC the classes were
 partitioned into the packages \textit{model, view and controller}.
@@ -41,9 +41,9 @@ access on the VFS core API with keeping the GUI responsive.
 \end{figure}
 
 Even when doing a seach the decoupling works pretty well: The
-\textit{SearchAction} uses the VFS cores \textit{FindInFolderCallback} to update
-the \textit{SearchController} which lives in the GUI thread every time finds an
-entry.
+\textit{SearchAction} uses the VFS core's \textit{FindInFolderCallback} to
+update the \textit{SearchController} every time finds an entry. Upon such an
+update, the \textit{SearchController} updates the GUI.
 
 \subsubsection{Search}
 Searching files can be done in a separate Panel: After entering the search
@@ -53,8 +53,8 @@ string one is allowed to switch several flags like ``case sensitive'' or
 
 \subsubsection{Keyboard and Mouse support}
 One can navigate the list of entries by double clicking folders. The parent
-folder can be accessed by double clicking ``..''. On right click on an entry the
-user gets a menu depending on wheter she clicked on an file, folder or the empty
+folder can be accessed by double clicking ``..''. By right clicking on an entry
+the user gets a menu depending on wheter she clicked on an file, folder or the empty
 space. The right click in empty space reveals the same menu entries as the right
 click on the parent folder. The only difference between file and folder menus
 are the ``new folder'', ``paste'' and ``import'' actions, that are not allowed

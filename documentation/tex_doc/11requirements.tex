@@ -56,12 +56,14 @@ ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController.java
   register a \textit{DropTarget} on the \textit{BadgerTable} that has a
   \textit{DropTargetListener} which starts the import on the
   \textit{DesktopController}.
+  \item \emph{Nice-to-have features like operation progress report (e.g. the
+  number of files processed during export)} Is implemented as a small popup
+  window, that kicks in after an action takes more than 500ms.
 \end{itemize}
 
 \subsubsection {Not Implemented Bonus Requirements}
 \begin{itemize}
-  \item \emph{Nice-to-have features like operation progress report (e.g. the
-  number of files processed during export) or drag-and-drop for manipulative
+  \item \emph{Nice-to-have features like drag-and-drop for manipulative
   operations (move, copy).}
   \item \emph{The browser is implemented for an additional platform}
   \item \emph{Efficient full-text search (using some sort of indexing).}
