@@ -89,3 +89,11 @@ implement encryption similar to compression with streams, which allows easy
 configuration via \textit{DiskConfiguration}. These streams are mainly for
 demonstration how encryption should work and shall not be used in high
 security environments :-)
+
+\begin{itemize}
+  \item \emph{Large data: This means, that VFS core can store \& operate amount
+  of data, that can't fit to PC RAM ( typically, more than 4Gb).}
+\end{itemize}
+Having all operations implemented with streams achieves this requirement on the
+fly. Manual tests with 6GB files showed pretty efficient import and export to
+and from virtual disks.
