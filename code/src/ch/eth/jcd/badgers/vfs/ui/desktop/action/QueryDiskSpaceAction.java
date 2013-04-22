@@ -19,4 +19,10 @@ public class QueryDiskSpaceAction extends BadgerAction {
 	public DiskSpaceUsage getDiskSpaceUsage() {
 		return diskSpaceUsage;
 	}
+
+	@Override
+	public boolean needsToLockGui() {
+		return false;
+	}
+
 }
