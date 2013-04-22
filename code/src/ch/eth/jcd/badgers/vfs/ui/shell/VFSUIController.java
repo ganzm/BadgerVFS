@@ -7,14 +7,13 @@
 package ch.eth.jcd.badgers.vfs.ui.shell;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.VFSExporter;
 import ch.eth.jcd.badgers.vfs.core.VFSImporter;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
@@ -22,9 +21,11 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
+import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
-import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class VFSUIController {
 
@@ -182,7 +183,7 @@ public class VFSUIController {
 			@Override
 			public void execute(String[] param) {
 				LOGGER.debug("create command entered");
-				if (param == null || param.length != 2) {
+				if (param == null || (param.length < 2 && param.length > 4)) {
 					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
@@ -195,6 +196,22 @@ public class VFSUIController {
 					config.setHostFilePath(param[0]);
 					long maximumSizeInMb = Long.parseLong(param[1]);
 					config.setMaximumSize(maximumSizeInMb * 1024 * 1024);
+					if (param.length > 2 && param[2] != null) {
+						if (Encryption.NONE.name().equalsIgnoreCase(param[2])) {
+							config.setEncryptionAlgorithm(Encryption.NONE);
+						} else if (Encryption.CAESAR.name().equalsIgnoreCase(param[2])) {
+							config.setEncryptionAlgorithm(Encryption.CAESAR);
+						}
+					}
+					if (param.length > 3 && param[3] != null) {
+						if (Compression.NONE.name().equalsIgnoreCase(param[3])) {
+							config.setCompressionAlgorithm(Compression.NONE);
+						} else if (Compression.LZ77.name().equalsIgnoreCase(param[3])) {
+							config.setCompressionAlgorithm(Compression.LZ77);
+						} else if (Compression.RLE.name().equalsIgnoreCase(param[3])) {
+							config.setCompressionAlgorithm(Compression.RLE);
+						}
+					}
 
 					currentManager = VFSDiskManagerFactory.getInstance().createDiskManager(config);
 					currentDirectory = currentManager.getRoot();
@@ -247,10 +264,11 @@ public class VFSUIController {
 				}
 				try {
 					console.writeLn("VirtualFileSystem\tSize \tUsed \tAvail \tUse% \tMounted on");
+					DiskSpaceUsage dm = currentManager.getDiskSpaceUsage();
 					long freeSpace = currentManager.getFreeSpace();
 					long maxSpace = currentManager.getMaxSpace();
-					console.writeLn(getCurrentVFSPathString() + getFormattedSize(maxSpace) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
-							+ getFormattedSize(freeSpace) + "\t" + (int) (((maxSpace - freeSpace) * 100) / maxSpace) + "%\t"
+					console.writeLn(getCurrentVFSPathString() + getFormattedSize(dm.getMaxData()) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
+							+ getFormattedSize(dm.getFreeData()) + "\t" + (int) (((maxSpace - freeSpace) * 100) / maxSpace) + "%\t"
 							+ currentManager.getDiskConfiguration().getHostFilePath());
 				} catch (VFSException e) {
 					LOGGER.error("Error while listing files", e);
@@ -340,11 +358,11 @@ public class VFSUIController {
 
 						return;
 					}
-					InputStream is = childToExport.getInputStream();
-					OutputStream os = new FileOutputStream(param[1]);
-
-					ChannelUtil.fastStreamCopy(is, os);
-				} catch (VFSException | IOException e) {
+					List<VFSEntry> entries = new LinkedList<>();
+					entries.add(childToExport);
+					VFSExporter exporter = new VFSExporter();
+					exporter.exportFileOrFolder(entries, exportFile);
+				} catch (VFSException e) {
 					LOGGER.error("Error while exporting file: ", e);
 				}
 				LOGGER.debug("export command leaving");

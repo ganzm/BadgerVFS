@@ -3,13 +3,18 @@ package ch.eth.jcd.badgers.vfs.test.ui.shell;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,6 +26,10 @@ import ch.eth.jcd.badgers.vfs.ui.shell.VFSConsole;
 import ch.eth.jcd.badgers.vfs.ui.shell.VFSUIController;
 
 public class VFSUiControllerTest {
+	private static final String CREATE = "create";
+	private static final String DISPOSE = "dispose";
+	private static final String IMPORT = "import";
+	private static final String CLOSE = "close";
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final String TMP_DIR = System.getProperty("java.io.tmpdir");
 	private static final String BFS_FILE = TMP_DIR + File.separatorChar + "VFSUiControllerTest.bfs";
@@ -33,6 +42,11 @@ public class VFSUiControllerTest {
 		UnittestLogger.init();
 		UnitTestUtils.deleteFileIfExist(BFS_FILE);
 		initDisk();
+	}
+
+	@AfterClass
+	public static void afterClass() throws VFSException, IOException {
+		UnitTestUtils.deleteFileIfExist(BFS_FILE);
 	}
 
 	@Before
@@ -64,7 +78,7 @@ public class VFSUiControllerTest {
 
 	@Test
 	public void getCloseCommandTest() throws IOException {
-		noManagerTest("close");
+		noManagerTest(CLOSE);
 		runTest();
 		assertEquals(output, outputStream.toString());
 	}
@@ -84,14 +98,18 @@ public class VFSUiControllerTest {
 
 	@Test
 	public void getCreateCommandTest() throws IOException {
-		noCorrectNumberOfParams("create", 2);
+		noCorrectNumberOfParams(CREATE, 2);
+		closeBfs();
+		input += CREATE + " " + BFS_FILE + " 100" + NEW_LINE;
+		output += ">";
+		openBfs();
 		runTest();
 		assertEquals(output, outputStream.toString());
 	}
 
 	@Test
 	public void getDisposeCommandTest() throws IOException {
-		noManagerTest("dispose");
+		noManagerTest(DISPOSE);
 		runTest();
 		assertEquals(output, outputStream.toString());
 	}
@@ -115,11 +133,16 @@ public class VFSUiControllerTest {
 	public void getExportCommandTest() throws IOException {
 		noManagerTest("export");
 		noCorrectNumberOfParams("export", 2);
+		String exportFilePath = TMP_DIR + File.separatorChar + "getExportCommandTest.txt";
+		File exportFile = new File(exportFilePath);
 		input += "export getExportCommandTest.txt " + BFS_FILE + NEW_LINE;
 		output += BFS_FILE + ">";
-		input += "export getExportCommandTest.txt " + BFS_FILE + ".txt" + NEW_LINE;
+		input += "export getExportCommandTest.txt " + exportFilePath + NEW_LINE;
 		output += "Child: getExportCommandTest.txt not found in current directory, nothing exported" + NEW_LINE + BFS_FILE + ">";
 		runTest();
+		if (exportFile.exists()) {
+			exportFile.delete();
+		}
 		assertEquals(output, outputStream.toString());
 	}
 
@@ -133,9 +156,9 @@ public class VFSUiControllerTest {
 
 	@Test
 	public void getImportCommandTest() throws IOException {
-		noManagerTest("import");
-		noCorrectNumberOfParams("import", 2);
-		input += "import " + BFS_FILE + ".txt getImportCommandTest.txt" + NEW_LINE;
+		noManagerTest(IMPORT);
+		noCorrectNumberOfParams(IMPORT, 2);
+		input += IMPORT + " " + BFS_FILE + ".txt getImportCommandTest.txt" + NEW_LINE;
 		output += "Path on host file system does not exist/tmp/VFSUiControllerTest.bfs.txt" + NEW_LINE + BFS_FILE + ">";
 		runTest();
 		assertEquals(output, outputStream.toString());
@@ -201,6 +224,73 @@ public class VFSUiControllerTest {
 		assertEquals(output, outputStream.toString());
 	}
 
+	@Test
+	public void compressionAndEncryptionTest() throws IOException {
+		String compEncBfsFile = TMP_DIR + File.separatorChar + "CompressionAndEncryptionTest.bfs";
+		String compImportDirPath = TMP_DIR + File.separatorChar + "CompressionAndEncryptionTest";
+		String compExportDirPath = TMP_DIR + File.separatorChar + "CompressionAndEncryptionTestExp";
+		String compImportFilePath = compImportDirPath + File.separatorChar + "CompressionAndEncryptionTestimp.txt";
+		String compExportFilePath = TMP_DIR + File.separatorChar + "CompressionAndEncryptionTestexp.txt";
+		String compExportFileInDirPath = compExportDirPath + File.separatorChar + "CompressionAndEncryptionTestimp.txt";
+		File compImportFile = new File(compImportFilePath);
+		File compImportDir = new File(compImportDirPath);
+		File compExportFile = new File(compExportFilePath);
+		File compExportDir = new File(compExportDirPath);
+		File compExportFileInDir = new File(compExportFileInDirPath);
+		compImportDir.mkdir();
+		try (OutputStream out = new FileOutputStream(compImportFile);
+				OutputStreamWriter writer = new OutputStreamWriter(out);
+				BufferedWriter br = new BufferedWriter(writer)) {
+			br.write("CompressionAndEncryptionTest");
+		}
+		input += CLOSE + NEW_LINE;
+		output += ">";
+		input += CREATE + " " + compEncBfsFile + " 100 CAESAR LZ77" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += DISPOSE + NEW_LINE;
+		output += ">";
+		input += CREATE + " " + compEncBfsFile + " 100 NON LZ" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += DISPOSE + NEW_LINE;
+		output += ">";
+		input += CREATE + " " + compEncBfsFile + " 100 NONE NONE" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += DISPOSE + NEW_LINE;
+		output += ">";
+		input += CREATE + " " + compEncBfsFile + " 100 NONE RLE" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += "import " + compImportFilePath + " test.txt" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += "import " + compImportFilePath + " test.txt" + NEW_LINE;
+		output += "Cant import to /test.txt VFSPath already exists Path to /test.txt" + NEW_LINE + compEncBfsFile + ">";
+		input += "import " + compImportDirPath + " test" + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += "export test.txt " + compExportFilePath + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += "export test " + compExportDirPath + NEW_LINE;
+		output += compEncBfsFile + ">";
+		input += DISPOSE + NEW_LINE;
+		output += ">";
+		output += "No disk open, please use open or create command first" + NEW_LINE;
+		runTest();
+		if (compImportFile.exists()) {
+			compImportFile.delete();
+		}
+		if (compExportFile.exists()) {
+			compExportFile.delete();
+		}
+		if (compImportDir.exists()) {
+			compImportDir.delete();
+		}
+		if (compExportFileInDir.exists()) {
+			compExportFileInDir.delete();
+		}
+		if (compExportDir.exists()) {
+			compExportDir.delete();
+		}
+		assertEquals(output, outputStream.toString());
+	}
+
 	private void createFile(String fileName) {
 		input += "mkfile " + fileName + NEW_LINE;
 		output += BFS_FILE + ">";
@@ -232,7 +322,7 @@ public class VFSUiControllerTest {
 	}
 
 	private void closeBfs() {
-		input += "close" + NEW_LINE;
+		input += CLOSE + NEW_LINE;
 		output += ">";
 	}
 
@@ -248,7 +338,7 @@ public class VFSUiControllerTest {
 	}
 
 	private static void initDisk() throws IOException {
-		String inStr = "create " + BFS_FILE + " 100" + NEW_LINE + "close" + NEW_LINE;
+		String inStr = "create " + BFS_FILE + " 100" + NEW_LINE + CLOSE + NEW_LINE;
 		try (BufferedReader reader = new BufferedReader(new CharArrayReader(inStr.toCharArray()));
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				PrintWriter writer = new PrintWriter(out);) {
