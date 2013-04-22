@@ -8,15 +8,15 @@ public class Initialisation {
 	private static final Logger LOGGER = Logger.getLogger(Initialisation.class);
 
 	public static void initApplication(String[] args) {
-		String log4JConfigurationPath = null;
+		String log4JConfigurationPathFromConsole = null;
 
 		for (int i = 0; i < args.length; i++) {
 			if ("-l".equals(args[i]) && i + 1 < args.length) {
-				log4JConfigurationPath = args[i + 1];
+				log4JConfigurationPathFromConsole = args[i + 1];
 			}
 		}
 
-		log4JConfigurationPath = log4JConfigurationPath == null ? "log4j.xml" : log4JConfigurationPath;
+		String log4JConfigurationPath = log4JConfigurationPathFromConsole == null ? "log4j.xml" : log4JConfigurationPathFromConsole;
 
 		DOMConfigurator.configure(log4JConfigurationPath);
 		LOGGER.info("Log4J initialized with " + log4JConfigurationPath);
