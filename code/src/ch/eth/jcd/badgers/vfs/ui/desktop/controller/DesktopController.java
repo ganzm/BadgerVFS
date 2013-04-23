@@ -31,6 +31,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -38,7 +39,13 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.DiskSpaceDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.InfoDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.LoginDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.LoginDialog.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewRemoteDiskCreationDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.RemoteDiskDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.ServerUrlDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.SyncWithServerDialog;
 import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -73,6 +80,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 		dialog.setVisible(true);
 	}
 
+	public void openCreateNewRemoteDiskDialog(final JFrame desktop) {
+		final NewRemoteDiskCreationDialog dialog = new NewRemoteDiskCreationDialog(desktop);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
 	public void openImportDialog(final JFrame desktop) {
 		final ImportDialog dialog = new ImportDialog(this, currentFolder.getAbsolutePath());
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -87,6 +100,37 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void openInfoDialog(final JFrame desktop) {
 		final InfoDialog dialog = new InfoDialog(desktop);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openLinkDiskDialog(final JFrame desktop) {
+		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, LoginAction.SYNC);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openConnectRemoteDialog(final JFrame desktop) {
+		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, LoginAction.LOGIN);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openLoginDialog(final JFrame desktop, LoginAction loginAction) {
+		final LoginDialog dialog = new LoginDialog(desktop, loginAction);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openSyncToServerDialog(final JFrame desktop) {
+		final SyncWithServerDialog dialog = new SyncWithServerDialog();
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setCurrentAction(new SearchAction(null, null, null));
+		dialog.setVisible(true);
+	}
+
+	public void openRemoteDiskDialog(final JFrame desktop) {
+		final RemoteDiskDialog dialog = new RemoteDiskDialog(desktop);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}

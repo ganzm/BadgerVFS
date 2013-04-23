@@ -36,6 +36,8 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenu mnActions;
 	private final JMenuItem mntmNew;
 	private final JMenuItem mntmOpen;
+	private final JMenuItem mntmConnectRemote;
+	private final JMenuItem mntmLinkDisk;
 	private final JMenuItem mntmClose;
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmQueryDiskspace;
@@ -90,6 +92,26 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 
 		mnDisk.add(mntmClose);
+
+		mnDisk.addSeparator();
+
+		mntmConnectRemote = new JMenuItem(new AbstractAction("Connect remote") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openConnectRemoteDialog(parent);
+			}
+		});
+
+		mnDisk.add(mntmConnectRemote);
+		mntmLinkDisk = new JMenuItem(new AbstractAction("Link disk") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openLinkDiskDialog(parent);
+			}
+		});
+
+		mnDisk.add(mntmLinkDisk);
+
 		mnDisk.addSeparator();
 
 		mntmQueryDiskspace = new JMenuItem(new AbstractAction("Query Diskspace") {
@@ -219,6 +241,8 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
+		mntmConnectRemote.setEnabled(!diskMode);
+		mntmLinkDisk.setEnabled(diskMode);
 		mntmQueryDiskspace.setEnabled(diskMode);
 		btnSearch.setEnabled(diskMode && !searching);
 	}
