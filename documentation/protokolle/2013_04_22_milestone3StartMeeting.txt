@@ -1,0 +1,33 @@
+Requirements
+
+Ideen
+- Synchronisation Server mit debug JMX interface
+
+
+zu dokumentierende features
+- Cancel search
+- regex search
+
+
+Remote Methods
+
+
+Messages (Client zu Server)
+- Connect
+- Create Account (username, password)
+-  Login (username, password)
+- Logout / Disconnect
+
+- queryCurrentDiskVersion() - Abfrage der aktuellen Versionsnummer auf dem Server
+
+- get/query my remote disks
+- 
+
+
+
+Fragen
+- RMI ja/nein
+
+
+Entschiede
+- Passwort kann nicht geändert werden
