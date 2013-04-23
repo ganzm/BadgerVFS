@@ -19,13 +19,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
+import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class SearchPanel extends JPanel implements BadgerViewBase {
 	private static final long serialVersionUID = 6942548578015341003L;
@@ -41,6 +44,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	private final JButton btnCancelSearch;
 	private final JTextField searchTextField;
 	private final SearchController searchController;
+	private JCheckBox chckbxRegexSearch;
+	private JLabel lblRegex;
 
 	/**
 	 * Create the panel.
@@ -58,9 +63,9 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.setBorder(new EmptyBorder(3, 3, 3, 3));
 		add(panelSearchParameter, BorderLayout.NORTH);
 		final GridBagLayout gbl_panelSearchParameter = new GridBagLayout();
-		gbl_panelSearchParameter.columnWidths = new int[] { 0, 0, 0 };
+		gbl_panelSearchParameter.columnWidths = new int[] { 0, 94, 0, 26, 157, 0 };
 		gbl_panelSearchParameter.rowHeights = new int[] { 0, 0, 0, 0, 0 };
-		gbl_panelSearchParameter.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panelSearchParameter.columnWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		gbl_panelSearchParameter.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panelSearchParameter.setLayout(gbl_panelSearchParameter);
 
@@ -75,10 +80,26 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		chckbxSearchCaseSensitiv = new JCheckBox("");
 		final GridBagConstraints gbc_chckbxSearchCaseSensitiv = new GridBagConstraints();
 		gbc_chckbxSearchCaseSensitiv.anchor = GridBagConstraints.WEST;
-		gbc_chckbxSearchCaseSensitiv.insets = new Insets(0, 0, 5, 0);
+		gbc_chckbxSearchCaseSensitiv.insets = new Insets(0, 0, 5, 5);
 		gbc_chckbxSearchCaseSensitiv.gridx = 1;
 		gbc_chckbxSearchCaseSensitiv.gridy = 0;
 		panelSearchParameter.add(chckbxSearchCaseSensitiv, gbc_chckbxSearchCaseSensitiv);
+
+		lblRegex = new JLabel("Regex");
+		GridBagConstraints gbc_lblRegex = new GridBagConstraints();
+		gbc_lblRegex.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRegex.gridx = 2;
+		gbc_lblRegex.gridy = 0;
+		panelSearchParameter.add(lblRegex, gbc_lblRegex);
+
+		chckbxRegexSearch = new JCheckBox("");
+		chckbxRegexSearch.setToolTipText("Enable to use regex search string");
+		chckbxRegexSearch.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_chckbxRegexSearch = new GridBagConstraints();
+		gbc_chckbxRegexSearch.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxRegexSearch.gridx = 3;
+		gbc_chckbxRegexSearch.gridy = 0;
+		panelSearchParameter.add(chckbxRegexSearch, gbc_chckbxRegexSearch);
 
 		final JLabel lblSearchInFolder = new JLabel("Search folder");
 		final GridBagConstraints gbc_lblSearchInFolder = new GridBagConstraints();
@@ -90,7 +111,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 		textFieldSearchFolder = new JTextField();
 		final GridBagConstraints gbc_textFieldSearchFolder = new GridBagConstraints();
-		gbc_textFieldSearchFolder.insets = new Insets(0, 0, 5, 0);
+		gbc_textFieldSearchFolder.gridwidth = 4;
+		gbc_textFieldSearchFolder.insets = new Insets(0, 0, 5, 5);
 		gbc_textFieldSearchFolder.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldSearchFolder.gridx = 1;
 		gbc_textFieldSearchFolder.gridy = 1;
@@ -108,7 +130,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		chckbxSearchSubfolders = new JCheckBox("");
 		chckbxSearchSubfolders.setSelected(true);
 		final GridBagConstraints gbc_chckbxSearchSubfolders = new GridBagConstraints();
-		gbc_chckbxSearchSubfolders.insets = new Insets(0, 0, 5, 0);
+		gbc_chckbxSearchSubfolders.insets = new Insets(0, 0, 5, 5);
 		gbc_chckbxSearchSubfolders.anchor = GridBagConstraints.WEST;
 		gbc_chckbxSearchSubfolders.gridx = 1;
 		gbc_chckbxSearchSubfolders.gridy = 2;
@@ -116,6 +138,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 
 		final JPanel panelButtons = new JPanel();
 		GridBagConstraints gbcPanelButtons = new GridBagConstraints();
+		gbcPanelButtons.gridwidth = 4;
+		gbcPanelButtons.insets = new Insets(0, 0, 0, 5);
 		gbcPanelButtons.anchor = GridBagConstraints.WEST;
 		gbcPanelButtons.gridx = 1;
 		gbcPanelButtons.gridy = 3;
@@ -135,7 +159,11 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnStartSearch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
-				startSearch();
+				try {
+					startSearch();
+				} catch (VFSRuntimeException ex) {
+					SwingUtil.handleException(getThis(), ex);
+				}
 			}
 		});
 		btnStartSearch.setMnemonic('S');
@@ -199,6 +227,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		final String searchFolder = textFieldSearchFolder.getText();
 		searchParameter.setIncludeSubFolders(chckbxSearchSubfolders.isSelected());
 		searchParameter.setCaseSensitive(chckbxSearchCaseSensitiv.isSelected());
+		searchParameter.setRegexSearch(chckbxRegexSearch.isSelected());
 
 		searchController.startSearch(searchParameter, searchFolder);
 	}
@@ -229,4 +258,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		btnBack.setEnabled(!searching);
 	}
 
+	private SearchPanel getThis() {
+		return this;
+	}
 }
