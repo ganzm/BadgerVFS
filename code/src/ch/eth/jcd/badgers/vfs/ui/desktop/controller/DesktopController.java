@@ -56,6 +56,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private Pair<ClipboardAction, List<EntryUiModel>> clipboard;
 
+	private WorkerController workerController = null;
+
 	public DesktopController(final BadgerViewBase desktopView) {
 		super(desktopView);
 	}
@@ -78,7 +80,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openDiskSpaceDialog(final JFrame desktop) {
-		final DiskSpaceDialog dialog = new DiskSpaceDialog(desktop);
+		final DiskSpaceDialog dialog = new DiskSpaceDialog(desktop, this);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -132,8 +134,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
 
-		// create WorkerController
-		WorkerController.setupWorker(diskManager);
+		// create and start WorkerController
+		workerController = new WorkerController(diskManager);
+		workerController.startWorkerController();
 
 		loadRootFolder();
 
@@ -148,7 +151,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
 
-		WorkerController.setupWorker(diskManager);
+		// create and start WorkerController
+		workerController = new WorkerController(diskManager);
+		workerController.startWorkerController();
 
 		loadRootFolder();
 
@@ -157,13 +162,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private void loadRootFolder() {
 		final GetFolderContentAction getFolderContentAction = new GetFolderContentAction(this);
-
-		final WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(getFolderContentAction);
 	}
 
 	public boolean isInManagementMode() {
-		return WorkerController.getInstance() == null;
+		return workerController == null;
 	}
 
 	/**
@@ -177,7 +180,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 			throw new VFSException("Cannot close new Disk - no current disk opened");
 		}
 
-		WorkerController.disposeWorker();
+		workerController.dispose();
+		workerController = null;
 		updateGUI();
 	}
 
@@ -194,7 +198,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		} else if (action instanceof DeleteEntryAction) {
 			// after deletion of multiple items we cannot operate anymore with table indices
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			workerController.enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof OpenFileInFolderAction) {
 			OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
 			VFSPath folderPath = openInFolder.getFolderPath();
@@ -208,7 +212,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		} else if (action instanceof ImportAction) {
 			// reload current folder after import
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			workerController.enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof RenameEntryAction) {
 			final RenameEntryAction renameAction = (RenameEntryAction) action;
 			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
@@ -218,10 +222,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 					+ exportAction.getDestination().getAbsolutePath());
 		} else if (action instanceof CopyAction) {
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			workerController.enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof CutAction) {
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			WorkerController.getInstance().enqueue(reloadCurrentFolderAction);
+			workerController.enqueue(reloadCurrentFolderAction);
 		} else {
 			LOGGER.debug("Action " + action.getClass().getName() + " not handled in " + this.getClass().getName());
 		}
@@ -247,18 +251,17 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void openEntry(final EntryUiModel entry) {
 		final GetFolderContentAction action = new GetFolderContentAction(this, entry);
-		final WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 	}
 
 	public void startDelete(final List<EntryUiModel> entries) {
 		final DeleteEntryAction action = new DeleteEntryAction(this, entries);
-		WorkerController.getInstance().enqueue(action);
+		workerController.enqueue(action);
 	}
 
 	public void startRenameEntry(final EntryUiModel currentEditedValue, final int editedRow, final String newEntryName) {
 		final RenameEntryAction action = new RenameEntryAction(this, currentEditedValue, editedRow, newEntryName);
-		WorkerController.getInstance().enqueue(action);
+		workerController.enqueue(action);
 	}
 
 	private String getUniqueFolderName(final List<EntryUiModel> entries) {
@@ -291,12 +294,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void startCreateNewFolder(final String name) {
 		final CreateFolderAction action = new CreateFolderAction(this, currentFolder, name);
-		WorkerController.getInstance().enqueue(action);
+		workerController.enqueue(action);
 	}
 
 	public void startImportFromHostFs(final String sourcePath, final String targetPath) {
 		final ImportAction action = new ImportAction(this, sourcePath, targetPath);
-		WorkerController.getInstance().enqueue(action);
+		workerController.enqueue(action);
 	}
 
 	public void startImportFromHostFs(List<File> filesToImport) {
@@ -314,7 +317,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		}
 
 		final ImportAction action = new ImportAction(this, filePathes);
-		WorkerController.getInstance().enqueue(action);
+		workerController.enqueue(action);
 	}
 
 	public String getCurrentFolderAsString() {
@@ -344,7 +347,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 					|| JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
 							"The selected file already exists, do you really want do overwrite it?")) {
 				final ExportAction action = new ExportAction(this, vfsEntries, selected, desktopFrame);
-				WorkerController.getInstance().enqueue(action);
+				workerController.enqueue(action);
 
 			}
 		}
@@ -378,7 +381,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			}
 			if (clipboard.getFirst() == ClipboardAction.COPY) {
 				final CopyAction copy = new CopyAction(this, vfsEntries, destinationFolder);
-				WorkerController.getInstance().enqueue(copy);
+				workerController.enqueue(copy);
 			} else {
 				for (final VFSEntry cutSource : vfsEntries) {
 					final String cutSourcePath = cutSource.getPath().getAbsolutePath();
@@ -389,7 +392,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 					}
 				}
 				final CutAction cut = new CutAction(this, vfsEntries, destinationFolder);
-				WorkerController.getInstance().enqueue(cut);
+				workerController.enqueue(cut);
 
 			}
 			clipboard = null;
@@ -414,7 +417,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 			}
 		}, entry);
 
-		final WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 	}
 
@@ -435,7 +437,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 			}
 		}, entry);
 
-		final WorkerController workerController = WorkerController.getInstance();
 		workerController.enqueue(action);
 	}
 
@@ -446,6 +447,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 			LOGGER.error("error getting parentFolder entry", e);
 		}
 		return null;
+	}
+
+	public WorkerController getWorkerController() {
+		return workerController;
 	}
 
 }

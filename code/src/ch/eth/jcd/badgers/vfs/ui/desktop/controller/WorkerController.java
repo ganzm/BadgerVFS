@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 
@@ -16,11 +15,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 public class WorkerController implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(WorkerController.class);
-
-	/**
-	 * singleton instance
-	 */
-	private static WorkerController instance = null;
 
 	private final VFSDiskManager diskManager;
 
@@ -38,26 +32,27 @@ public class WorkerController implements Runnable {
 		this.workLoadIndicator = new WorkLoadIndicator();
 	}
 
-	public static WorkerController setupWorker(final VFSDiskManager diskManager) {
-		if (instance != null) {
-			throw new VFSRuntimeException("WorkerController already instantiated");
-		}
-		instance = new WorkerController(diskManager);
-		instance.startWorkerController();
-
-		return instance;
-	}
-
-	public static void disposeWorker() {
-		if (instance != null) {
-			instance.dispose();
-			instance = null;
-		}
-	}
-
-	public static WorkerController getInstance() {
-		return instance;
-	}
+	//
+	// public static WorkerController setupWorker(final VFSDiskManager diskManager) {
+	// if (instance != null) {
+	// throw new VFSRuntimeException("WorkerController already instantiated");
+	// }
+	// instance = new WorkerController(diskManager);
+	// instance.startWorkerController();
+	//
+	// return instance;
+	// }
+	//
+	// public static void disposeWorker() {
+	// if (instance != null) {
+	// instance.dispose();
+	// instance = null;
+	// }
+	// }
+	//
+	// public static WorkerController getInstance() {
+	// return instance;
+	// }
 
 	public void startWorkerController() {
 		final Thread controllerThread = new Thread(this);
@@ -132,12 +127,12 @@ public class WorkerController implements Runnable {
 		}
 	}
 
-	private void dispose() {
+	public void dispose() {
 		running = false;
 		BadgerAction noop = new BadgerAction(null) {
 			@Override
 			public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-
+				// intentionally does nothing
 			}
 		};
 

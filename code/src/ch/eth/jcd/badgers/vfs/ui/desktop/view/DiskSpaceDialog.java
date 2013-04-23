@@ -22,7 +22,7 @@ import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.QueryDiskSpaceAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 
 public class DiskSpaceDialog extends JDialog implements ActionObserver {
 
@@ -34,12 +34,14 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	private final JLabel lblStatus;
 	private final JProgressBar progressBarDiskSpace;
 	private final JTextField textFieldDirectoryBlocks;
+	private final DesktopController desktopController;
 
 	/**
 	 * Create the dialog.
 	 */
-	public DiskSpaceDialog(JFrame owner) {
+	public DiskSpaceDialog(JFrame owner, DesktopController desktopController) {
 		super(owner, true);
+		this.desktopController = desktopController;
 		setTitle("Disk Space");
 		setBounds(100, 100, 450, 215);
 		getContentPane().setLayout(new BorderLayout());
@@ -156,7 +158,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		lblStatus.setText("Querying...");
 
 		QueryDiskSpaceAction action = new QueryDiskSpaceAction(this);
-		WorkerController.getInstance().enqueue(action);
+		desktopController.getWorkerController().enqueue(action);
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class SearchController extends BadgerController implements ActionObserver
 
 		searchResultTableModel.clear();
 
-		final WorkerController controller = WorkerController.getInstance();
+		final WorkerController controller = parentController.getWorkerController();
 		currentSearchAction = new SearchAction(this, searchParameter, searchFolder);
 		controller.enqueue(currentSearchAction);
 
@@ -89,7 +89,7 @@ public class SearchController extends BadgerController implements ActionObserver
 	public void openSearchEntryAtRow(final int rowIndex) {
 		final EntryUiModel entryModel = (EntryUiModel) searchResultTableModel.getValueAt(rowIndex, 0);
 		final OpenFileInFolderAction action = new OpenFileInFolderAction(parentController, entryModel);
-		WorkerController.getInstance().enqueue(action);
+		parentController.getWorkerController().enqueue(action);
 	}
 
 	public void resetSearchResult() {
