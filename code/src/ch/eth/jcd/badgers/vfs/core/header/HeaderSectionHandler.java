@@ -9,6 +9,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
@@ -108,7 +109,7 @@ public final class HeaderSectionHandler {
 		virtualDiskFile.writeLong(header.directorySectionOffset);
 
 		// DataSectionOffset | double (8 byte)
-		header.dataSectionOffset = header.directorySectionOffset + DirectorySectionHandler.DEFAULT_DIRECTORYSECTION_SIZE;
+		header.dataSectionOffset = header.directorySectionOffset + estimateDirectorySectionSize(config.getMaximumSize());
 		virtualDiskFile.writeLong(header.dataSectionOffset);
 
 		virtualDiskFile.seek(header.directorySectionOffset);
@@ -116,6 +117,21 @@ public final class HeaderSectionHandler {
 		LOGGER.debug("init Header Section DONE");
 		return header;
 
+	}
+
+	/**
+	 * scale directory section with maximum disk size
+	 * 
+	 * TODO this method may be improved.
+	 * 
+	 * @param maxDiskSize
+	 * @return
+	 */
+	private static long estimateDirectorySectionSize(long maxDiskSize) {
+
+		long estimated = maxDiskSize / 1024 / 1024 * 100;
+		estimated = DirectoryBlock.BLOCK_SIZE * estimated;
+		return Math.max(estimated, DirectorySectionHandler.DEFAULT_DIRECTORYSECTION_SIZE);
 	}
 
 	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config) throws IOException {
