@@ -1,10 +1,11 @@
 package ch.eth.jcd.badgers.vfs.util;
 
+import java.util.Arrays;
+
 public class SecurityUtil {
 
 	/**
-	 * TODO anyone Apply crypto hash to a string and create a bytearray with a
-	 * specific lenght
+	 * TODO anyone Apply crypto hash to a string and create a bytearray with a specific lenght
 	 * 
 	 * (truncate or add zeroes)
 	 * 
@@ -13,8 +14,6 @@ public class SecurityUtil {
 	 * @return
 	 */
 	public static byte[] hashString(String string, int targetLenght) {
-		// TODO Auto-generated method stub
-		return "TODO".getBytes();
+		return Arrays.copyOf("TODO".getBytes(), targetLenght);
 	}
-
 }
