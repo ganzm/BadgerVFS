@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.rmi.streaming.RemoteInputStream;
+import ch.eth.jcd.badgers.vfs.remote.model.RemoteInputStream;
 
 public interface AdministrationRemoteInterface extends Remote {
 
