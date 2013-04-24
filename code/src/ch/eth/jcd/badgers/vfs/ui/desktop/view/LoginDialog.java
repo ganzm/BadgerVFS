@@ -17,6 +17,9 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
+
 public class LoginDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
@@ -24,15 +27,14 @@ public class LoginDialog extends JDialog {
 	private JPasswordField passwordField;
 	private final BadgerMainFrame parent;
 
-	public static enum LoginAction {
-		SYNC, LOGIN;
-	}
+	private final RemoteSynchronisationWizardContext wizardContext;
 
 	/**
 	 * Create the dialog.
 	 */
-	public LoginDialog(JFrame owner, LoginAction loginAction) {
+	public LoginDialog(JFrame owner, RemoteSynchronisationWizardContext wizardContext) {
 		super(owner, true);
+		this.wizardContext = wizardContext;
 		parent = (BadgerMainFrame) owner;
 		setTitle("Remote Login");
 		setBounds(100, 100, 450, 120);
@@ -91,61 +93,82 @@ public class LoginDialog extends JDialog {
 				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 				getContentPane().add(buttonPane, BorderLayout.SOUTH);
 				{
-					if (loginAction == LoginAction.SYNC) {
-						JButton syncButton = new JButton("Sync");
-						syncButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								dispose();
-								parent.getController().openSyncToServerDialog(parent);
-							}
-						});
-						syncButton.setMnemonic('c');
-						syncButton.setActionCommand("Create");
-						buttonPane.add(syncButton);
-						getRootPane().setDefaultButton(syncButton);
-					} else if (loginAction == LoginAction.LOGIN) {
-						JButton loginButton = new JButton("Login");
-						loginButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								dispose();
-								parent.getController().openRemoteDiskDialog(parent);
-							}
-						});
-						loginButton.setMnemonic('l');
-						loginButton.setActionCommand("Login");
-						buttonPane.add(loginButton);
-						getRootPane().setDefaultButton(loginButton);
 
-						JButton createButton = new JButton("Create");
-						createButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								dispose();
-								parent.getController().openRemoteDiskDialog(parent);
-							}
-						});
-						createButton.setMnemonic('c');
-						createButton.setActionCommand("Create");
-						buttonPane.add(createButton);
-						getRootPane().setDefaultButton(createButton);
+					JButton syncButton = new JButton("Sync");
+					syncButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dispose();
+							parent.getController().startSyncToServer(getThis().wizardContext);
+						}
+
+					});
+					syncButton.setMnemonic('c');
+					syncButton.setActionCommand("Create");
+					buttonPane.add(syncButton);
+					getRootPane().setDefaultButton(syncButton);
+
+					JButton loginButton = new JButton("Login");
+					loginButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dispose();
+							parent.getController().openRemoteDiskDialog(parent);
+						}
+					});
+					loginButton.setMnemonic('l');
+					loginButton.setActionCommand("Login");
+					buttonPane.add(loginButton);
+					getRootPane().setDefaultButton(loginButton);
+
+					JButton createButton = new JButton("Create");
+					createButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dispose();
+							parent.getController().openRemoteDiskDialog(parent);
+						}
+					});
+					createButton.setMnemonic('c');
+					createButton.setActionCommand("Create");
+					buttonPane.add(createButton);
+					getRootPane().setDefaultButton(createButton);
+
+					JButton closeButton = new JButton("Close");
+					closeButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dispose();
+						}
+					});
+					closeButton.setMnemonic('c');
+					closeButton.setActionCommand("Close");
+					buttonPane.add(closeButton);
+					getRootPane().setDefaultButton(closeButton);
+
+					if (wizardContext.getLoginActionEnum() == LoginActionEnum.SYNC) {
+						syncButton.setVisible(true);
+						loginButton.setVisible(false);
+						createButton.setVisible(false);
+						closeButton.setVisible(false);
+
+					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.LOGIN) {
+						syncButton.setVisible(false);
+						loginButton.setVisible(true);
+						createButton.setVisible(true);
+						closeButton.setVisible(false);
 					} else {
-						JButton closeButton = new JButton("Close");
-						closeButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								dispose();
-							}
-						});
-						closeButton.setMnemonic('c');
-						closeButton.setActionCommand("Close");
-						buttonPane.add(closeButton);
-						getRootPane().setDefaultButton(closeButton);
+						syncButton.setVisible(false);
+						loginButton.setVisible(false);
+						createButton.setVisible(false);
+						closeButton.setVisible(true);
 					}
 				}
 			}
 		}
+	}
 
+	private LoginDialog getThis() {
+		return this;
 	}
 }

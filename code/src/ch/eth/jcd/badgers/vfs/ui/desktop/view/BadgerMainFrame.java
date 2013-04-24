@@ -55,7 +55,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	 * Launch the application.
 	 */
 	public static void main(final String[] args) {
-		Initialisation.initApplication(args);
+		Initialisation.initLog4J(args);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {

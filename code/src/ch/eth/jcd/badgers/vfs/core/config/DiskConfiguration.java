@@ -20,6 +20,8 @@ public class DiskConfiguration {
 
 	private Compression compressionAlgorithm = Compression.LZ77;
 
+	private String linkedHostName;
+
 	/**
 	 * the maximum size in bytes of the file we store our data on the host file system <br>
 	 * values <=0 indicate that there is no limit <br>
@@ -65,6 +67,14 @@ public class DiskConfiguration {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getLinkedHostName() {
+		return linkedHostName;
+	}
+
+	public void setLinkedHostName(String linkedHostName) {
+		this.linkedHostName = linkedHostName;
 	}
 
 	@Override

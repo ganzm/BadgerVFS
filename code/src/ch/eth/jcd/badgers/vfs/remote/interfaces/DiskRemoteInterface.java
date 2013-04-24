@@ -44,16 +44,6 @@ public interface DiskRemoteInterface extends Remote {
 	Journal pushVersion(long lastSeenServerVersion, Journal clientJournal) throws RemoteException;
 
 	/**
-	 * Invalidates this RemoteInterface
-	 * 
-	 * 
-	 * Closes the connection to the client
-	 * 
-	 * @throws RemoteException
-	 */
-	void close() throws RemoteException;
-
-	/**
 	 * Deleted the currently managed disk on the server.
 	 * 
 	 * 

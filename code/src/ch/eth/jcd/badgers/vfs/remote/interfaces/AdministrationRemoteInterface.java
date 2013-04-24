@@ -3,7 +3,9 @@ package ch.eth.jcd.badgers.vfs.remote.interfaces;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.UUID;
 
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.model.RemoteInputStream;
 
@@ -35,6 +37,6 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	DiskRemoteInterface useLinkedDisk(LinkedDisk linkedDisk) throws RemoteException;
+	DiskRemoteInterface useLinkedDisk(UUID diskId) throws RemoteException, VFSException;
 
 }

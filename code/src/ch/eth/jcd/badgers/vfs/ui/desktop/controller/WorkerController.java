@@ -30,7 +30,7 @@ public abstract class WorkerController implements Runnable {
 
 	public void startWorkerController() {
 		final Thread controllerThread = new Thread(this);
-		controllerThread.setName("WorkerController");
+		controllerThread.setName(this.getClass().getSimpleName());
 		controllerThread.start();
 	}
 

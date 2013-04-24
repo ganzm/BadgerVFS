@@ -19,15 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
-
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 
 public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBase {
 
-	private static final Logger LOGGER = Logger.getLogger(NewDiskCreationDialog.class);
 	private static final String DEFAULT_FILE_NAME = "disk.bfs";
 
 	private static final long serialVersionUID = -2652867330270571476L;

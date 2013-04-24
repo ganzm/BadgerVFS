@@ -7,6 +7,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public interface LoginRemoteInterface extends Remote {
 
+	static final String LOGIN_INTERFACE_KEY = "Login Interface";
+
 	/**
 	 * try to login with specific credentials
 	 * 
@@ -33,5 +35,13 @@ public interface LoginRemoteInterface extends Remote {
 	 *             if username already exists
 	 */
 	AdministrationRemoteInterface registerUser(String username, String password) throws RemoteException, VFSException;
+
+	/**
+	 * terminates the connection to the sync server
+	 * 
+	 * @throws RemoteException
+	 * @throws VFSException
+	 */
+	void logout(AdministrationRemoteInterface remoteInterface) throws RemoteException, VFSException;
 
 }

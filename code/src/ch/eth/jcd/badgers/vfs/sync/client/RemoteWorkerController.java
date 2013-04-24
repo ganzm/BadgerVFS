@@ -14,6 +14,10 @@ public class RemoteWorkerController extends WorkerController {
 	public RemoteWorkerController() {
 	}
 
+	public void enqueue(RemoteAction action) {
+		super.enqueue(action);
+	}
+
 	@Override
 	protected void performAction(AbstractBadgerAction abstractAction) {
 		RemoteAction action = (RemoteAction) abstractAction;

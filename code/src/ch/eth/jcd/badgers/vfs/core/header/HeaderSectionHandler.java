@@ -34,7 +34,6 @@ public final class HeaderSectionHandler {
 	private static String defaultInfoString = "Badger VFS 2013 V1.0";
 	private static String defaultVersionString = "0.1";
 	private static String defaultUserName = "user";
-	private static String defaultLinkedHostName = "";
 
 	private String infoString;
 
@@ -119,8 +118,12 @@ public final class HeaderSectionHandler {
 		virtualDiskFile.write(header.salt);
 
 		// write linkedHostName
-		header.linkedHostName = defaultLinkedHostName;
-		virtualDiskFile.write(Arrays.copyOf(header.linkedHostName.getBytes(cs), LINKEDHOSTNAME_FIELD_LENGTH));
+		header.linkedHostName = config.getLinkedHostName();
+		if (header.linkedHostName == null) {
+			virtualDiskFile.skipBytes(LINKEDHOSTNAME_FIELD_LENGTH);
+		} else {
+			virtualDiskFile.write(Arrays.copyOf(header.linkedHostName.getBytes(cs), LINKEDHOSTNAME_FIELD_LENGTH));
+		}
 
 		header.directorySectionOffset = virtualDiskFile.getFilePointer();
 
@@ -141,21 +144,6 @@ public final class HeaderSectionHandler {
 		LOGGER.debug("init Header Section DONE");
 		return header;
 
-	}
-
-	/**
-	 * scale directory section with maximum disk size
-	 * 
-	 * TODO this method may be improved.
-	 * 
-	 * @param maxDiskSize
-	 * @return
-	 */
-	private static long estimateDirectorySectionSize(long maxDiskSize) {
-
-		long estimated = maxDiskSize / 1024 / 1024 * 100;
-		estimated = DirectoryBlock.BLOCK_SIZE * estimated;
-		return Math.max(estimated, DirectorySectionHandler.DEFAULT_DIRECTORYSECTION_SIZE);
 	}
 
 	public static HeaderSectionHandler createExisting(RandomAccessFile virtualDiskFile, DiskConfiguration config) throws IOException {
@@ -236,6 +224,7 @@ public final class HeaderSectionHandler {
 		byte[] linkedHostNameBytes = new byte[LINKEDHOSTNAME_FIELD_LENGTH];
 		virtualDiskFile.read(linkedHostNameBytes);
 		header.linkedHostName = new String(linkedHostNameBytes, cs).trim();
+		config.setLinkedHostName(header.linkedHostName);
 		LOGGER.debug("Linked Host: " + header.linkedHostName);
 
 		LOGGER.debug("read Header Section DONE");
@@ -248,6 +237,21 @@ public final class HeaderSectionHandler {
 
 	public long getDataSectionOffset() {
 		return dataSectionOffset;
+	}
+
+	/**
+	 * scale directory section with maximum disk size
+	 * 
+	 * TODO this method may be improved.
+	 * 
+	 * @param maxDiskSize
+	 * @return
+	 */
+	private static long estimateDirectorySectionSize(long maxDiskSize) {
+
+		long estimated = maxDiskSize / 1024 / 1024 * 100;
+		estimated = DirectoryBlock.BLOCK_SIZE * estimated;
+		return Math.max(estimated, DirectorySectionHandler.DEFAULT_DIRECTORYSECTION_SIZE);
 	}
 
 	public void close() {

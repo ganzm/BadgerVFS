@@ -20,6 +20,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.sync.client.OfflineRemoteManager;
+import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CopyAction;
@@ -31,21 +33,20 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.DiskSpaceDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.InfoDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.LoginDialog;
-import ch.eth.jcd.badgers.vfs.ui.desktop.view.LoginDialog.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.NewRemoteDiskCreationDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.RemoteDiskDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ServerUrlDialog;
-import ch.eth.jcd.badgers.vfs.ui.desktop.view.SyncWithServerDialog;
 import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -64,6 +65,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 	private Pair<ClipboardAction, List<EntryUiModel>> clipboard;
 
 	private DiskWorkerController workerController = null;
+
+	/**
+	 * is null when there is no disk opened or if disk is not linked
+	 */
+	private RemoteManager remoteManager = null;
 
 	public DesktopController(final BadgerViewBase desktopView) {
 		super(desktopView);
@@ -105,28 +111,27 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openLinkDiskDialog(final JFrame desktop) {
-		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, LoginAction.SYNC);
+		RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
+		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
 	public void openConnectRemoteDialog(final JFrame desktop) {
-		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, LoginAction.LOGIN);
+		RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
+		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openLoginDialog(final JFrame desktop, LoginAction loginAction) {
-		final LoginDialog dialog = new LoginDialog(desktop, loginAction);
+	public void openLoginDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizardContext) {
+		final LoginDialog dialog = new LoginDialog(desktop, wizardContext);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openSyncToServerDialog(final JFrame desktop) {
-		final SyncWithServerDialog dialog = new SyncWithServerDialog();
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setCurrentAction(new SearchAction(null, null, null));
-		dialog.setVisible(true);
+	public void startSyncToServer(RemoteSynchronisationWizardContext wizardContext) {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	public void openRemoteDiskDialog(final JFrame desktop) {
@@ -178,6 +183,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
 
+		remoteManager = initRemoteManager(config);
+
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
 		workerController.startWorkerController();
@@ -187,6 +194,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
+	private RemoteManager initRemoteManager(DiskConfiguration config) {
+		String hostLink = config.getLinkedHostName();
+		if (hostLink == null || "".equals(hostLink)) {
+			LOGGER.debug("Disk not linked");
+			return new OfflineRemoteManager();
+		}
+
+		return new RemoteManager(hostLink);
+	}
+
 	public void createDisk(final DiskConfiguration config) throws VFSException {
 		if (!isInManagementMode()) {
 			throw new VFSException("Cannot create new Disk - close current disk first");
@@ -194,6 +211,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
+
+		remoteManager = initRemoteManager(config);
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
