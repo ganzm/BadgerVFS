@@ -24,7 +24,7 @@ import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;

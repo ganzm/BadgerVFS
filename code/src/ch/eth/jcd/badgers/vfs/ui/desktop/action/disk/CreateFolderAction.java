@@ -1,11 +1,12 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
-public class CreateFolderAction extends BadgerAction {
+public class CreateFolderAction extends DiskAction {
 
 	private final VFSPath parentFolderPath;
 	private final String name;

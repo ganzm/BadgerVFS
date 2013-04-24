@@ -6,53 +6,27 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
 
 /**
  * This class handles access to the VFSDiskManager
  */
-public class WorkerController implements Runnable {
+public abstract class WorkerController implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(WorkerController.class);
-
-	private final VFSDiskManager diskManager;
-
-	private final WorkLoadIndicator workLoadIndicator;
 
 	/**
 	 * Queue contains unprocesses jobs
 	 */
-	private final LinkedBlockingQueue<BadgerAction> actionQueue = new LinkedBlockingQueue<>();
+	private final LinkedBlockingQueue<AbstractBadgerAction> actionQueue = new LinkedBlockingQueue<>();
 
 	private boolean running = false;
 
-	public WorkerController(final VFSDiskManager diskManager) {
-		this.diskManager = diskManager;
-		this.workLoadIndicator = new WorkLoadIndicator();
-	}
+	public WorkerController() {
 
-	//
-	// public static WorkerController setupWorker(final VFSDiskManager diskManager) {
-	// if (instance != null) {
-	// throw new VFSRuntimeException("WorkerController already instantiated");
-	// }
-	// instance = new WorkerController(diskManager);
-	// instance.startWorkerController();
-	//
-	// return instance;
-	// }
-	//
-	// public static void disposeWorker() {
-	// if (instance != null) {
-	// instance.dispose();
-	// instance = null;
-	// }
-	// }
-	//
-	// public static WorkerController getInstance() {
-	// return instance;
-	// }
+	}
 
 	public void startWorkerController() {
 		final Thread controllerThread = new Thread(this);
@@ -60,8 +34,7 @@ public class WorkerController implements Runnable {
 		controllerThread.start();
 	}
 
-	public void enqueue(final BadgerAction action) {
-		workLoadIndicator.jobEnqueued(action);
+	protected void enqueue(final AbstractBadgerAction action) {
 		try {
 			actionQueue.put(action);
 		} catch (final InterruptedException e) {
@@ -74,7 +47,7 @@ public class WorkerController implements Runnable {
 		try {
 			LOGGER.debug("Starting WorkerController Thread");
 			running = true;
-			BadgerAction action = null;
+			AbstractBadgerAction action = null;
 
 			while (running) {
 				try {
@@ -89,23 +62,9 @@ public class WorkerController implements Runnable {
 		}
 	}
 
-	private void performAction(final BadgerAction action) {
-		try {
-			LOGGER.info("Perform Action " + action);
-			try {
-				action.runDiskAction(diskManager);
-			} finally {
-				workLoadIndicator.actionFinished();
-			}
-			LOGGER.info("Finished Action " + action);
-			actionFinished(action);
-		} catch (final VFSException | RuntimeException e) {
-			LOGGER.error("", e);
-			actionFailed(action, e);
-		}
-	}
+	protected abstract void performAction(final AbstractBadgerAction action);
 
-	private void actionFailed(final BadgerAction action, final Exception e) {
+	protected void actionFailed(final AbstractBadgerAction action, final Exception e) {
 		final ActionObserver obs = action.getActionObserver();
 		if (obs != null) {
 			try {
@@ -116,7 +75,7 @@ public class WorkerController implements Runnable {
 		}
 	}
 
-	private void actionFinished(final BadgerAction action) {
+	protected void actionFinished(final AbstractBadgerAction action) {
 		final ActionObserver obs = action.getActionObserver();
 		if (obs != null) {
 			try {
@@ -129,7 +88,7 @@ public class WorkerController implements Runnable {
 
 	public void dispose() {
 		running = false;
-		BadgerAction noop = new BadgerAction(null) {
+		DiskAction noop = new DiskAction(null) {
 			@Override
 			public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 				// intentionally does nothing
@@ -137,6 +96,6 @@ public class WorkerController implements Runnable {
 		};
 
 		enqueue(noop);
-		workLoadIndicator.dispose();
+
 	}
 }

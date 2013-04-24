@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +11,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.SearchController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 
-public class SearchAction extends BadgerAction implements FindInFolderCallback {
+public class SearchAction extends DiskAction implements FindInFolderCallback {
 
 	private static final Logger LOGGER = Logger.getLogger(SearchAction.class);
 

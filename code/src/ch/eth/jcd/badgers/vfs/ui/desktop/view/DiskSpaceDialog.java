@@ -19,9 +19,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.QueryDiskSpaceAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.QueryDiskSpaceAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 
 public class DiskSpaceDialog extends JDialog implements ActionObserver {
@@ -162,12 +162,12 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	}
 
 	@Override
-	public void onActionFailed(BadgerAction action, Exception e) {
+	public void onActionFailed(AbstractBadgerAction action, Exception e) {
 		lblStatus.setText("Failed " + e.getMessage());
 	}
 
 	@Override
-	public void onActionFinished(BadgerAction action) {
+	public void onActionFinished(AbstractBadgerAction action) {
 		QueryDiskSpaceAction queryAction = (QueryDiskSpaceAction) action;
 
 		DiskSpaceUsage du = queryAction.getDiskSpaceUsage();

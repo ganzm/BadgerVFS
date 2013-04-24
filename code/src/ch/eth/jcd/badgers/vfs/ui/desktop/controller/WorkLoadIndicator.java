@@ -6,7 +6,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.PleaseWaitDialog;
 
 public class WorkLoadIndicator {
@@ -35,7 +35,7 @@ public class WorkLoadIndicator {
 		});
 	}
 
-	public void jobEnqueued(final BadgerAction action) {
+	public void jobEnqueued(final DiskAction action) {
 		LOGGER.debug("job enqueued");
 		dialog.setCurrentAction(action);
 

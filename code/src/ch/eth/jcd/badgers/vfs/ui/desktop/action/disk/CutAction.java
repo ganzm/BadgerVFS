@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import java.util.List;
 
@@ -6,8 +6,9 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
-public class CutAction extends BadgerAction {
+public class CutAction extends DiskAction {
 
 	private final List<VFSEntry> source;
 	private final VFSEntry destinationFolder;

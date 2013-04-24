@@ -20,18 +20,18 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.CopyAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.CreateFolderAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.CutAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.DeleteEntryAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ExportAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.GetFolderContentAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ImportAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.OpenFileInFolderAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.RenameEntryAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CopyAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CreateFolderAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CutAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DeleteEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ExportAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -63,7 +63,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private Pair<ClipboardAction, List<EntryUiModel>> clipboard;
 
-	private WorkerController workerController = null;
+	private DiskWorkerController workerController = null;
 
 	public DesktopController(final BadgerViewBase desktopView) {
 		super(desktopView);
@@ -179,7 +179,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
 
 		// create and start WorkerController
-		workerController = new WorkerController(diskManager);
+		workerController = new DiskWorkerController(diskManager);
 		workerController.startWorkerController();
 
 		loadRootFolder();
@@ -196,7 +196,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
 
 		// create and start WorkerController
-		workerController = new WorkerController(diskManager);
+		workerController = new DiskWorkerController(diskManager);
 		workerController.startWorkerController();
 
 		loadRootFolder();
@@ -230,13 +230,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	@Override
-	public void onActionFailed(final BadgerAction action, final Exception e) {
+	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 		SwingUtil.handleException(null, e);
 		updateGUI();
 	}
 
 	@Override
-	public void onActionFinished(final BadgerAction action) {
+	public void onActionFinished(final AbstractBadgerAction action) {
 		if (action instanceof GetFolderContentAction) {
 			getFolderContentActionFinished((GetFolderContentAction) action);
 		} else if (action instanceof DeleteEntryAction) {
@@ -449,13 +449,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final GetFolderContentAction action = new GetFolderContentAction(new ActionObserver() {
 
 			@Override
-			public void onActionFinished(final BadgerAction action) {
+			public void onActionFinished(final AbstractBadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
 				startCreateNewFolder();
 			}
 
 			@Override
-			public void onActionFailed(final BadgerAction action, final Exception e) {
+			public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 				SwingUtil.handleException(null, e);
 				updateGUI();
 			}
@@ -469,13 +469,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final GetFolderContentAction action = new GetFolderContentAction(new ActionObserver() {
 
 			@Override
-			public void onActionFinished(final BadgerAction action) {
+			public void onActionFinished(final AbstractBadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
 				openImportDialog(parent);
 			}
 
 			@Override
-			public void onActionFailed(final BadgerAction action, final Exception e) {
+			public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 				SwingUtil.handleException(null, e);
 				updateGUI();
 			}
@@ -493,7 +493,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		return null;
 	}
 
-	public WorkerController getWorkerController() {
+	public DiskWorkerController getWorkerController() {
 		return workerController;
 	}
 

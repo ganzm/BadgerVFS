@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.OpenFileInFolderAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.SearchAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -54,7 +54,7 @@ public class SearchController extends BadgerController implements ActionObserver
 	}
 
 	@Override
-	public void onActionFailed(final BadgerAction action, final Exception e) {
+	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 		if (action instanceof SearchAction) {
 			currentSearchAction = null;
 		}
@@ -64,7 +64,7 @@ public class SearchController extends BadgerController implements ActionObserver
 	}
 
 	@Override
-	public void onActionFinished(final BadgerAction action) {
+	public void onActionFinished(final AbstractBadgerAction action) {
 		if (action instanceof SearchAction) {
 			LOGGER.debug("Search finished " + action);
 			currentSearchAction = null;

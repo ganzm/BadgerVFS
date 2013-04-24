@@ -1,10 +1,11 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 
-public class RenameEntryAction extends BadgerAction {
+public class RenameEntryAction extends DiskAction {
 
 	private final EntryUiModel entryModel;
 	private final int editedRow;

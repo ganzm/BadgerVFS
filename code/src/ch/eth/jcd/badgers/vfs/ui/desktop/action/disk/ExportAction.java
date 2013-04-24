@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import java.io.File;
 import java.util.List;
@@ -9,8 +9,9 @@ import ch.eth.jcd.badgers.vfs.core.VFSExporter;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
-public class ExportAction extends BadgerAction {
+public class ExportAction extends DiskAction {
 	private final List<VFSEntry> entries;
 	private final File destination;
 

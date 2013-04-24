@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
 
 public class SyncWithServerDialog extends JDialog implements ActionListener {
 
@@ -22,7 +22,7 @@ public class SyncWithServerDialog extends JDialog implements ActionListener {
 
 	private final JPanel contentPanel = new JPanel();
 
-	private BadgerAction currentAction;
+	private DiskAction currentAction;
 	private final JLabel lblHeader;
 
 	private final Timer swingTimer = new Timer(500, this);
@@ -56,7 +56,7 @@ public class SyncWithServerDialog extends JDialog implements ActionListener {
 
 	}
 
-	public void setCurrentAction(final BadgerAction action) {
+	public void setCurrentAction(final DiskAction action) {
 		currentAction = action;
 	}
 

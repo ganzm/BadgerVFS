@@ -15,7 +15,7 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.BadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
 
 public class PleaseWaitDialog extends JDialog implements ActionListener {
 
@@ -23,7 +23,7 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 
 	private final JPanel contentPanel = new JPanel();
 
-	private BadgerAction currentAction;
+	private DiskAction currentAction;
 	private final JLabel lblHeader;
 	private final JProgressBar progressBar;
 
@@ -64,7 +64,7 @@ public class PleaseWaitDialog extends JDialog implements ActionListener {
 		contentPanel.add(progressBar, gbc_progressBar);
 	}
 
-	public void setCurrentAction(final BadgerAction action) {
+	public void setCurrentAction(final DiskAction action) {
 		currentAction = action;
 	}
 

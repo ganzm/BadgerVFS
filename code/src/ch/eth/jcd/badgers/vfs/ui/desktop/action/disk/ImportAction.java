@@ -1,4 +1,4 @@
-package ch.eth.jcd.badgers.vfs.ui.desktop.action;
+package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,11 @@ import ch.eth.jcd.badgers.vfs.core.VFSImporter;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.util.Pair;
 
-public class ImportAction extends BadgerAction {
+public class ImportAction extends DiskAction {
 
 	private static final Logger LOGGER = Logger.getLogger(ImportAction.class);
 

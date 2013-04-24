@@ -39,7 +39,7 @@ public interface DiskRemoteInterface extends Remote {
 	 * 
 	 * @param clientJournal
 	 * @throws RemoteException
-	 * @return
+	 * @return slightly modified journal which was created from the server
 	 */
 	Journal pushVersion(long lastSeenServerVersion, Journal clientJournal) throws RemoteException;
 
