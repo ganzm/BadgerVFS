@@ -44,10 +44,11 @@ public class RemoteDiskDialog extends JDialog {
 					{
 						table = new JTable();
 						table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Filename", "Size", "Encrypted", "Compression" }) {
-							Class[] columnTypes = new Class[] { String.class, String.class, String.class, Object.class };
+							private static final long serialVersionUID = 1L;
+							Class<?>[] columnTypes = new Class[] { String.class, String.class, String.class, Object.class };
 
 							@Override
-							public Class getColumnClass(int columnIndex) {
+							public Class<?> getColumnClass(int columnIndex) {
 								return columnTypes[columnIndex];
 							}
 						});
