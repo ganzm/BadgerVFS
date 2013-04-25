@@ -22,10 +22,6 @@ public class DiskWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
-	public void enqueueBlocking(final DiskAction action) {
-
-	}
-
 	@Override
 	protected void performAction(final AbstractBadgerAction abstractAction) {
 		final DiskAction action = (DiskAction) abstractAction;
