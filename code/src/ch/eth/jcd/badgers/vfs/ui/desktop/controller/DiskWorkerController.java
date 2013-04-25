@@ -17,14 +17,18 @@ public class DiskWorkerController extends WorkerController {
 		this.workLoadIndicator = new WorkLoadIndicator();
 	}
 
-	public void enqueue(DiskAction action) {
+	public void enqueue(final DiskAction action) {
 		workLoadIndicator.jobEnqueued(action);
 		super.enqueue(action);
 	}
 
+	public void enqueueBlocking(final DiskAction action) {
+
+	}
+
 	@Override
 	protected void performAction(final AbstractBadgerAction abstractAction) {
-		DiskAction action = (DiskAction) abstractAction;
+		final DiskAction action = (DiskAction) abstractAction;
 		try {
 			LOGGER.info("Perform Action " + action);
 			try {
@@ -45,4 +49,5 @@ public class DiskWorkerController extends WorkerController {
 		super.dispose();
 		workLoadIndicator.dispose();
 	}
+
 }

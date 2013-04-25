@@ -88,9 +88,9 @@ public abstract class WorkerController implements Runnable {
 
 	public void dispose() {
 		running = false;
-		DiskAction noop = new DiskAction(null) {
+		final DiskAction noop = new DiskAction(null) {
 			@Override
-			public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
+			public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
 				// intentionally does nothing
 			}
 		};

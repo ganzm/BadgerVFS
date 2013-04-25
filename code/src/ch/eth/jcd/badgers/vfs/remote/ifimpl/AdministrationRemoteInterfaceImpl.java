@@ -12,43 +12,44 @@ import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.model.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 
 public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteInterface {
 
 	private final ClientLink clientLink;
 
-	public AdministrationRemoteInterfaceImpl(ClientLink clientLink) {
+	public AdministrationRemoteInterfaceImpl(final ClientLink clientLink) {
 		this.clientLink = clientLink;
 	}
 
 	@Override
 	public List<LinkedDisk> listDisks() throws RemoteException {
-		UserAccount account = clientLink.getUserAccount();
+		final UserAccount account = clientLink.getUserAccount();
 		return account.getLinkedDisks();
 	}
 
 	@Override
-	public DiskRemoteInterface linkNewDisk(LinkedDisk linkedDisk, RemoteInputStream diskFileContent) throws RemoteException {
+	public DiskRemoteInterface linkNewDisk(final LinkedDisk linkedDisk, final RemoteInputStream diskFileContent) throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public DiskRemoteInterface useLinkedDisk(UUID diskId) throws RemoteException, VFSException {
+	public DiskRemoteInterface useLinkedDisk(final UUID diskId) throws RemoteException, VFSException {
 
-		LinkedDisk disk = clientLink.getUserAccount().getLinkedDiskById(diskId);
+		final DiskWorkerController diskWorkerController = clientLink.getUserAccount().getDiskControllerForDiskWithId(diskId);
 
-		if (disk == null) {
-			throw new VFSException("Disk Id " + disk + " not known for " + clientLink.getUserAccount().getUsername());
+		if (diskWorkerController == null) {
+			throw new VFSException("Disk Id " + diskId + " not known for " + clientLink.getUserAccount().getUsername());
 		}
 
-		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(clientLink, disk);
+		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;
 	}
 
-	public void closeDisk(DiskRemoteInterface diskRemoteInterface) throws RemoteException, VFSException {
+	public void closeDisk(final DiskRemoteInterface diskRemoteInterface) throws RemoteException, VFSException {
 		((DiskRemoteInterfaceImpl) diskRemoteInterface).close();
 		UnicastRemoteObject.unexportObject(diskRemoteInterface, true);
 	}
