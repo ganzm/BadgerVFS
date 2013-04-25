@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class RemoteDiskDialog extends JDialog {
@@ -35,6 +36,7 @@ public class RemoteDiskDialog extends JDialog {
 		{
 			{
 				JPanel panel = new JPanel();
+				panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 				getContentPane().add(panel, BorderLayout.CENTER);
 				panel.setLayout(new BorderLayout(0, 0));
 				{

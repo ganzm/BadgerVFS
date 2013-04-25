@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
@@ -33,11 +34,11 @@ public class ServerUrlDialog extends JDialog {
 		this.wizardContext = wizardContext;
 		parent = (BadgerMainFrame) owner;
 		setTitle("Remote Server");
-		setBounds(100, 100, 450, 120);
+		setBounds(100, 100, 450, 80);
 		getContentPane().setLayout(new BorderLayout());
 		{
 			JPanel panel = new JPanel();
-			panel.setBorder(new EmptyBorder(2, 2, 2, 2));
+			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			getContentPane().add(panel, BorderLayout.CENTER);
 			GridBagLayout gblPanel = new GridBagLayout();
 			gblPanel.columnWidths = new int[] { 0, 0, 0 };
@@ -56,6 +57,7 @@ public class ServerUrlDialog extends JDialog {
 			}
 			{
 				textFieldRemoteServerUrl = new JTextField("localhost");
+				textFieldRemoteServerUrl.setHorizontalAlignment(SwingConstants.LEADING);
 				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;

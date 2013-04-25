@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
@@ -41,6 +42,8 @@ public class LoginDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		{
 			JPanel panel = new JPanel();
+			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
 			getContentPane().add(panel, BorderLayout.CENTER);
 			GridBagLayout gblPanel = new GridBagLayout();
 			gblPanel.columnWidths = new int[] { 0, 0, 0 };
@@ -59,7 +62,7 @@ public class LoginDialog extends JDialog {
 			}
 			{
 				textFieldUsername = new JTextField();
-				textFieldUsername.setHorizontalAlignment(SwingConstants.RIGHT);
+				textFieldUsername.setHorizontalAlignment(SwingConstants.LEADING);
 				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
@@ -79,7 +82,7 @@ public class LoginDialog extends JDialog {
 			}
 			{
 				passwordField = new JPasswordField();
-				passwordField.setHorizontalAlignment(SwingConstants.RIGHT);
+				passwordField.setHorizontalAlignment(SwingConstants.LEADING);
 				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
