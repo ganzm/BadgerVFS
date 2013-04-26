@@ -119,29 +119,31 @@ public class LoginDialog extends JDialog {
 					loginButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), passwordField.getText(), new ActionObserver() {
 
-								@Override
-								public void onActionFinished(final AbstractBadgerAction action) {
-									// i believe this is ugly, is there a way to set the adminInterface in a nicer manner
-									// I tend to think that this ActionObserver should not be set, but the RemoteManager must be the ActionObserver for
-									// this action, how can we dispose this login dialog from RemoteManager??
-									wizardContext.getRemoteManager().setAdminInterface(((LoginAction) action).getAdminInterface());
+							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
+									new ActionObserver() {
 
-									SwingUtilities.invokeLater(new Runnable() {
 										@Override
-										public void run() {
-											dispose();
-											controller.openRemoteDiskDialog(wizardContext);
+										public void onActionFinished(final AbstractBadgerAction action) {
+											// i believe this is ugly, is there a way to set the adminInterface in a nicer manner
+											// I tend to think that this ActionObserver should not be set, but the RemoteManager must be the ActionObserver for
+											// this action, how can we dispose this login dialog from RemoteManager??
+											wizardContext.getRemoteManager().setAdminInterface(((LoginAction) action).getAdminInterface());
+
+											SwingUtilities.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													dispose();
+													controller.openRemoteDiskDialog(wizardContext);
+												}
+											});
+										}
+
+										@Override
+										public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
+											SwingUtil.handleException(getThis(), e);
 										}
 									});
-								}
-
-								@Override
-								public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-									SwingUtil.handleException(getThis(), e);
-								}
-							});
 
 						}
 					});

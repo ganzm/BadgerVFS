@@ -8,9 +8,11 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CreateNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -69,6 +71,15 @@ public class RemoteManager implements ActionObserver {
 		}
 		final RegisterUserAction createLoginAction = new RegisterUserAction(observer, loginInterface, username, password);
 		remoteWorkerController.enqueue(createLoginAction);
+		return true;
+	}
+
+	public boolean startCreateNewDisk(final LinkedDisk prototype, final ActionObserver actionObserver) {
+		if (status != ConnectionStatus.CONNECTED) {
+			return false;
+		}
+		final CreateNewDiskAction newDiskAction = new CreateNewDiskAction(actionObserver, adminInterface, prototype);
+		remoteWorkerController.enqueue(newDiskAction);
 		return true;
 	}
 
