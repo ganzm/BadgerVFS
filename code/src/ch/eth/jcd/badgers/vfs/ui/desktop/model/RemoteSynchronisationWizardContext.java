@@ -1,11 +1,15 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.model;
 
+import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
+
 public class RemoteSynchronisationWizardContext {
 	public static enum LoginActionEnum {
 		SYNC, LOGIN;
 	}
 
 	private LoginActionEnum loginActionEnum;
+	private RemoteManager remoteManager;
+
 	private String remoteHostName;
 	private String username;
 	private String password;
@@ -16,6 +20,14 @@ public class RemoteSynchronisationWizardContext {
 
 	public String getRemoteHostName() {
 		return remoteHostName;
+	}
+
+	public RemoteManager getRemoteManager() {
+		return remoteManager;
+	}
+
+	public void setRemoteManager(RemoteManager remoteManager) {
+		this.remoteManager = remoteManager;
 	}
 
 	public void setRemoteHostName(String remoteHostName) {

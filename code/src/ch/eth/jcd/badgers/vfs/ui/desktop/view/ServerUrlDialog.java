@@ -17,10 +17,17 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
+import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class ServerUrlDialog extends JDialog {
 
+	private static final Logger LOGGER = Logger.getLogger(ServerUrlDialog.class);
 	private static final long serialVersionUID = 6008623672955958103L;
 	private JTextField textFieldRemoteServerUrl;
 	private final BadgerMainFrame parent;
@@ -29,7 +36,7 @@ public class ServerUrlDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public ServerUrlDialog(JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
+	public ServerUrlDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
 		super(owner, true);
 		this.wizardContext = wizardContext;
 		parent = (BadgerMainFrame) owner;
@@ -37,18 +44,18 @@ public class ServerUrlDialog extends JDialog {
 		setBounds(100, 100, 450, 80);
 		getContentPane().setLayout(new BorderLayout());
 		{
-			JPanel panel = new JPanel();
+			final JPanel panel = new JPanel();
 			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			getContentPane().add(panel, BorderLayout.CENTER);
-			GridBagLayout gblPanel = new GridBagLayout();
+			final GridBagLayout gblPanel = new GridBagLayout();
 			gblPanel.columnWidths = new int[] { 0, 0, 0 };
 			gblPanel.rowHeights = new int[] { 0, 0, 0 };
 			gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 			gblPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
 			panel.setLayout(gblPanel);
 			{
-				JLabel lblRemoteServerUrl = new JLabel("Remote Server Hostname: ");
-				GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+				final JLabel lblRemoteServerUrl = new JLabel("Remote Server Hostname: ");
+				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
 				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
 				gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
 				gbcLblMaximumSpace.gridx = 0;
@@ -58,7 +65,7 @@ public class ServerUrlDialog extends JDialog {
 			{
 				textFieldRemoteServerUrl = new JTextField("localhost");
 				textFieldRemoteServerUrl.setHorizontalAlignment(SwingConstants.LEADING);
-				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldMaxSpace.gridx = 1;
@@ -67,16 +74,34 @@ public class ServerUrlDialog extends JDialog {
 				textFieldRemoteServerUrl.setColumns(10);
 			}
 			{
-				JPanel buttonPane = new JPanel();
+				final JPanel buttonPane = new JPanel();
 				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 				getContentPane().add(buttonPane, BorderLayout.SOUTH);
 				{
-					JButton nextButton = new JButton("Next");
+					final JButton nextButton = new JButton("Next");
 					nextButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							dispose();
-							parent.getController().openLoginDialog(parent, wizardContext);
+						public void actionPerformed(final ActionEvent arg0) {
+							wizardContext.setRemoteHostName(textFieldRemoteServerUrl.getText());
+							final RemoteManager remoteManager = new RemoteManager(wizardContext.getRemoteHostName());
+							remoteManager.addConnectionStateListener(new ConnectionStateListener() {
+
+								@Override
+								public void connectionStateChanged(final ConnectionStatus status) {
+									if (ConnectionStatus.CONNECTED == status) {
+										wizardContext.setRemoteManager(remoteManager);
+										dispose();
+										parent.getController().openLoginDialog(parent, wizardContext);
+										LOGGER.debug("ConnectionStatus.CONNECTED");
+									}
+									if (ConnectionStatus.DISCONNECTED == status) {
+										// TODO implement correct disconnect.
+										SwingUtil.showWarning(getThis(), "Cannot connect to the Server");
+										LOGGER.debug("Cannot connect to the Server");
+									}
+								}
+							});
+							remoteManager.start();
 						}
 					});
 					nextButton.setMnemonic('n');
@@ -87,5 +112,9 @@ public class ServerUrlDialog extends JDialog {
 			}
 		}
 
+	}
+
+	private ServerUrlDialog getThis() {
+		return this;
 	}
 }

@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.config;
 
+import java.io.Serializable;
+
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 
@@ -7,7 +9,9 @@ import ch.eth.jcd.badgers.vfs.core.model.Encryption;
  * DiskConfiguration used to open/create a VirtualDisk
  * 
  */
-public class DiskConfiguration {
+public class DiskConfiguration implements Serializable {
+
+	private static final long serialVersionUID = -146786101445454171L;
 
 	/**
 	 * Path where the virtual disk file is located on the host file system
@@ -49,23 +53,23 @@ public class DiskConfiguration {
 		return password;
 	}
 
-	public void setCompressionAlgorithm(Compression compressionAlgorithm) {
+	public void setCompressionAlgorithm(final Compression compressionAlgorithm) {
 		this.compressionAlgorithm = compressionAlgorithm;
 	}
 
-	public void setEncryptionAlgorithm(Encryption encryptionAlgorithm) {
+	public void setEncryptionAlgorithm(final Encryption encryptionAlgorithm) {
 		this.encryptionAlgorithm = encryptionAlgorithm;
 	}
 
-	public void setHostFilePath(String hostFilePath) {
+	public void setHostFilePath(final String hostFilePath) {
 		this.hostFilePath = hostFilePath;
 	}
 
-	public void setMaximumSize(long maximumSize) {
+	public void setMaximumSize(final long maximumSize) {
 		this.maximumSize = maximumSize;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -73,7 +77,7 @@ public class DiskConfiguration {
 		return linkedHostName;
 	}
 
-	public void setLinkedHostName(String linkedHostName) {
+	public void setLinkedHostName(final String linkedHostName) {
 		this.linkedHostName = linkedHostName;
 	}
 

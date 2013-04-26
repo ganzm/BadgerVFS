@@ -22,8 +22,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 
 	private ConnectionStatus status;
 
-	private String username = "user";
-	private String password = "password";
+	private final String username = "user";
+	private final String password = "password";
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
@@ -41,21 +41,23 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	}
 
 	@Test
-	public void testLogin() {
+	public void testLogin() throws InterruptedException {
 		clientRemoteManager.addConnectionStateListener(this);
 
-		long startTime = System.currentTimeMillis();
-		long timeout = 5000;
+		final long startTime = System.currentTimeMillis();
+		final long timeout = 5000;
 		while (status != ConnectionStatus.CONNECTED && System.currentTimeMillis() - startTime < timeout) {
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 			}
 		}
 
 		Assert.assertEquals(ConnectionStatus.CONNECTED, status);
 
 		clientRemoteManager.startLogin(username, password);
+
+		Thread.sleep(2000);
 
 	}
 
@@ -75,8 +77,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 		syncServer.start();
 	}
 
-	private static ServerConfiguration createServerConfiguration() {
-		ServerConfiguration config = new ServerConfiguration();
+	private static ServerConfiguration createServerConfiguration() throws VFSException {
+		final ServerConfiguration config = new ServerConfiguration("");
 		return config;
 	}
 
@@ -85,7 +87,7 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	}
 
 	@Override
-	public void connectionStateChanged(ConnectionStatus status) {
+	public void connectionStateChanged(final ConnectionStatus status) {
 		this.status = status;
 	}
 }

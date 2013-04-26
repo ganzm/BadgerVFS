@@ -10,8 +10,8 @@ public class SynchronisationServer {
 
 	private final ServerRemoteInterfaceManager ifManager;
 
-	public SynchronisationServer(ServerConfiguration config) {
-		ifManager = new ServerRemoteInterfaceManager();
+	public SynchronisationServer(final ServerConfiguration config) {
+		ifManager = new ServerRemoteInterfaceManager(config);
 	}
 
 	public void start() throws VFSException {
@@ -28,11 +28,11 @@ public class SynchronisationServer {
 	 * @param args
 	 * @throws VFSException
 	 */
-	public static void main(String[] args) throws VFSException {
+	public static void main(final String[] args) throws VFSException {
 		Initialisation.initLog4J(args);
 
-		ServerConfiguration config = Initialisation.parseServerConfiguration(args);
-		SynchronisationServer server = new SynchronisationServer(config);
+		final ServerConfiguration config = Initialisation.parseServerConfiguration(args);
+		final SynchronisationServer server = new SynchronisationServer(config);
 
 		server.start();
 	}

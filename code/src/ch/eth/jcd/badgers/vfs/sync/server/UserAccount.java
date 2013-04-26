@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,9 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 
-public class UserAccount {
+public class UserAccount implements Serializable {
+
+	private static final long serialVersionUID = 1058529120906749114L;
 	private final String username;
 	private final String password;
 

@@ -39,4 +39,14 @@ public interface AdministrationRemoteInterface extends Remote {
 	 */
 	DiskRemoteInterface useLinkedDisk(UUID diskId) throws RemoteException, VFSException;
 
+	/**
+	 * This method is called from the client whenever on the server-side a new disk shall be created.
+	 * 
+	 * @param linkedDiskPrototype
+	 * @return
+	 * @throws RemoteException
+	 * @throws VFSException
+	 */
+	void createNewDisk(LinkedDisk linkedDiskPrototype) throws RemoteException, VFSException;
+
 }

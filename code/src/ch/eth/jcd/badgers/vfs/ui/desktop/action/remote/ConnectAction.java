@@ -16,7 +16,7 @@ public class ConnectAction extends RemoteAction {
 
 	private LoginRemoteInterface loginInterface;
 
-	public ConnectAction(String remoteHost, ActionObserver actionObserver) {
+	public ConnectAction(final String remoteHost, final ActionObserver actionObserver) {
 		super(actionObserver);
 		this.remoteHost = remoteHost;
 	}

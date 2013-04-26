@@ -111,14 +111,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openLinkDiskDialog(final JFrame desktop) {
-		RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
+		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
 		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
 	public void openConnectRemoteDialog(final JFrame desktop) {
-		RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
+		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
 		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
@@ -130,7 +130,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		dialog.setVisible(true);
 	}
 
-	public void startSyncToServer(RemoteSynchronisationWizardContext wizardContext) {
+	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {
 		throw new UnsupportedOperationException("TODO");
 	}
 
@@ -194,8 +194,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
-	private RemoteManager initRemoteManager(DiskConfiguration config) {
-		String hostLink = config.getLinkedHostName();
+	private RemoteManager initRemoteManager(final DiskConfiguration config) {
+		final String hostLink = config.getLinkedHostName();
 		if (hostLink == null || "".equals(hostLink)) {
 			LOGGER.debug("Disk not linked");
 			return new OfflineRemoteManager();
@@ -263,10 +263,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
 			workerController.enqueue(reloadCurrentFolderAction);
 		} else if (action instanceof OpenFileInFolderAction) {
-			OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
-			VFSPath folderPath = openInFolder.getFolderPath();
-			List<EntryUiModel> entries = openInFolder.getEntries();
-			ParentFolderEntryUiModel parentFolderEntryModel = openInFolder.getParentFolderEntryUiModel();
+			final OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
+			final VFSPath folderPath = openInFolder.getFolderPath();
+			final List<EntryUiModel> entries = openInFolder.getEntries();
+			final ParentFolderEntryUiModel parentFolderEntryModel = openInFolder.getParentFolderEntryUiModel();
 			setCurrentFolder(folderPath, parentFolderEntryModel, entries);
 		} else if (action instanceof CreateFolderAction) {
 			final CreateFolderAction createAction = (CreateFolderAction) action;
@@ -365,16 +365,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 		workerController.enqueue(action);
 	}
 
-	public void startImportFromHostFs(List<File> filesToImport) {
+	public void startImportFromHostFs(final List<File> filesToImport) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Start Import from " + Arrays.toString(filesToImport.toArray()));
 		}
 
-		List<Pair<String, String>> filePathes = new ArrayList<>();
-		for (File f : filesToImport) {
+		final List<Pair<String, String>> filePathes = new ArrayList<>();
+		for (final File f : filesToImport) {
 
-			String hostFsSourcePath = f.getAbsolutePath();
-			String destinationPath = PathUtil.concatPathAndFileName(currentFolder.getAbsolutePath(), f.getName());
+			final String hostFsSourcePath = f.getAbsolutePath();
+			final String destinationPath = PathUtil.concatPathAndFileName(currentFolder.getAbsolutePath(), f.getName());
 
 			filePathes.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 		}

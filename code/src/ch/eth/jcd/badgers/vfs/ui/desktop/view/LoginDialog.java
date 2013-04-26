@@ -33,7 +33,7 @@ public class LoginDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public LoginDialog(JFrame owner, RemoteSynchronisationWizardContext wizardContext) {
+	public LoginDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
 		super(owner, true);
 		this.wizardContext = wizardContext;
 		parent = (BadgerMainFrame) owner;
@@ -41,19 +41,19 @@ public class LoginDialog extends JDialog {
 		setBounds(100, 100, 450, 120);
 		getContentPane().setLayout(new BorderLayout());
 		{
-			JPanel panel = new JPanel();
+			final JPanel panel = new JPanel();
 			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 			getContentPane().add(panel, BorderLayout.CENTER);
-			GridBagLayout gblPanel = new GridBagLayout();
+			final GridBagLayout gblPanel = new GridBagLayout();
 			gblPanel.columnWidths = new int[] { 0, 0, 0 };
 			gblPanel.rowHeights = new int[] { 0, 0, 0 };
 			gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 			gblPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
 			panel.setLayout(gblPanel);
 			{
-				JLabel lblUsername = new JLabel("Username: ");
-				GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+				final JLabel lblUsername = new JLabel("Username: ");
+				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
 				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
 				gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
 				gbcLblMaximumSpace.gridx = 0;
@@ -63,7 +63,7 @@ public class LoginDialog extends JDialog {
 			{
 				textFieldUsername = new JTextField();
 				textFieldUsername.setHorizontalAlignment(SwingConstants.LEADING);
-				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldMaxSpace.gridx = 1;
@@ -72,8 +72,8 @@ public class LoginDialog extends JDialog {
 				textFieldUsername.setColumns(10);
 			}
 			{
-				JLabel lblPassword = new JLabel("Password: ");
-				GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+				final JLabel lblPassword = new JLabel("Password: ");
+				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
 				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
 				gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
 				gbcLblMaximumSpace.gridx = 0;
@@ -83,7 +83,7 @@ public class LoginDialog extends JDialog {
 			{
 				passwordField = new JPasswordField();
 				passwordField.setHorizontalAlignment(SwingConstants.LEADING);
-				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldMaxSpace.gridx = 1;
@@ -92,30 +92,30 @@ public class LoginDialog extends JDialog {
 				passwordField.setColumns(10);
 			}
 			{
-				JPanel buttonPane = new JPanel();
+				final JPanel buttonPane = new JPanel();
 				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 				getContentPane().add(buttonPane, BorderLayout.SOUTH);
 				{
 
-					JButton syncButton = new JButton("Sync");
+					final JButton syncButton = new JButton("Sync");
 					syncButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
+						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
 							parent.getController().startSyncToServer(getThis().wizardContext);
 						}
-
 					});
 					syncButton.setMnemonic('c');
 					syncButton.setActionCommand("Create");
 					buttonPane.add(syncButton);
 					getRootPane().setDefaultButton(syncButton);
 
-					JButton loginButton = new JButton("Login");
+					final JButton loginButton = new JButton("Login");
 					loginButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
+						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
+							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), passwordField.getText());
 							parent.getController().openRemoteDiskDialog(parent);
 						}
 					});
@@ -124,10 +124,10 @@ public class LoginDialog extends JDialog {
 					buttonPane.add(loginButton);
 					getRootPane().setDefaultButton(loginButton);
 
-					JButton createButton = new JButton("Create");
+					final JButton createButton = new JButton("Create");
 					createButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
+						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
 							parent.getController().openRemoteDiskDialog(parent);
 						}
@@ -137,10 +137,10 @@ public class LoginDialog extends JDialog {
 					buttonPane.add(createButton);
 					getRootPane().setDefaultButton(createButton);
 
-					JButton closeButton = new JButton("Close");
+					final JButton closeButton = new JButton("Close");
 					closeButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
+						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
 						}
 					});

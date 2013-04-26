@@ -14,10 +14,15 @@ import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
 
 public class ServerRemoteInterfaceManager {
 	private static final Logger LOGGER = Logger.getLogger(ServerRemoteInterfaceManager.class);
+	private final ServerConfiguration config;
+
+	public ServerRemoteInterfaceManager(final ServerConfiguration config) {
+		this.config = config;
+	}
 
 	public void setup() throws VFSException {
 		try {
-			final LoginRemoteInterfaceImpl obj = new LoginRemoteInterfaceImpl();
+			final LoginRemoteInterfaceImpl obj = new LoginRemoteInterfaceImpl(config);
 			final LoginRemoteInterface stub = (LoginRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 			// Bind the remote object's stub in the registry.

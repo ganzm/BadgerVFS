@@ -53,4 +53,10 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		((DiskRemoteInterfaceImpl) diskRemoteInterface).close();
 		UnicastRemoteObject.unexportObject(diskRemoteInterface, true);
 	}
+
+	@Override
+	public void createNewDisk(final LinkedDisk linkedDiskPrototype) throws RemoteException, VFSException {
+		// TODO Auto-generated method stub
+
+	}
 }
