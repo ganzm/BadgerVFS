@@ -29,8 +29,8 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class LoginDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
-	private JTextField textFieldUsername;
-	private JPasswordField passwordField;
+	private final JTextField textFieldUsername;
+	private final JPasswordField passwordField;
 	private final DesktopController controller;
 
 	private final RemoteSynchronisationWizardContext wizardContext;
