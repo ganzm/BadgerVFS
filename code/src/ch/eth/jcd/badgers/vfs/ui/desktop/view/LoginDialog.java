@@ -21,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
@@ -160,6 +161,8 @@ public class LoginDialog extends JDialog {
 
 								@Override
 								public void onActionFinished(final AbstractBadgerAction action) {
+
+									wizardContext.getRemoteManager().setAdminInterface(((RegisterUserAction) action).getAdminInterface());
 
 									SwingUtilities.invokeLater(new Runnable() {
 										@Override

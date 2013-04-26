@@ -16,13 +16,19 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
+import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBase {
 
@@ -31,7 +37,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 	private static final long serialVersionUID = -2652867330270571476L;
 
 	private final JPanel contentPanel = new JPanel();
-	private final JTextField txtPath;
+	private final JTextField txtFilename;
 	private final JTextField txtMaximumSize;
 
 	private final JComboBox<Encryption> cboEncryption;
@@ -65,14 +71,14 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 			contentPanel.add(lblFilename, gbc_lblPath);
 		}
 		{
-			txtPath = new JTextField();
+			txtFilename = new JTextField();
 			final GridBagConstraints gbc_txtPath = new GridBagConstraints();
 			gbc_txtPath.insets = new Insets(0, 0, 5, 5);
 			gbc_txtPath.fill = GridBagConstraints.HORIZONTAL;
 			gbc_txtPath.gridx = 1;
 			gbc_txtPath.gridy = 0;
-			contentPanel.add(txtPath, gbc_txtPath);
-			txtPath.setColumns(10);
+			contentPanel.add(txtFilename, gbc_txtPath);
+			txtFilename.setColumns(10);
 		}
 		{
 			final JLabel lblMaximumSize = new JLabel("Maximum Size (mb)");
@@ -140,10 +146,39 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 				final JButton btnOk = new JButton("OK");
 				btnOk.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(final ActionEvent e) {
-						// createDisk();
-						dispose();
-						controller.openRemoteDiskDialog(wizardContext);
+					public void actionPerformed(final ActionEvent arg0) {
+
+						final DiskConfiguration config = new DiskConfiguration();
+						config.setMaximumSize(1024 * 1024 * Long.parseLong(txtMaximumSize.getText()));
+
+						final Compression compression = (Compression) cboCompression.getSelectedItem();
+						final Encryption encryption = (Encryption) cboEncryption.getSelectedItem();
+
+						config.setCompressionAlgorithm(compression);
+						config.setEncryptionAlgorithm(encryption);
+
+						wizardContext.getRemoteManager().startCreateNewDisk(new LinkedDisk(txtFilename.getText(), config), new ActionObserver() {
+
+							@Override
+							public void onActionFinished(final AbstractBadgerAction action) {
+								// i believe this is ugly, is there a way to set the adminInterface in a nicer manner
+								// I tend to think that this ActionObserver should not be set, but the RemoteManager must be the ActionObserver for
+								// this action, how can we dispose this login dialog from RemoteManager??
+								SwingUtilities.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										dispose();
+										controller.openRemoteDiskDialog(wizardContext);
+									}
+								});
+							}
+
+							@Override
+							public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
+								SwingUtil.handleException(getThis(), e);
+							}
+						});
+
 					}
 				});
 				btnOk.setMnemonic('o');
@@ -170,7 +205,11 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 	}
 
 	private void init() {
-		txtPath.setText(DEFAULT_FILE_NAME);
+		txtFilename.setText(DEFAULT_FILE_NAME);
+	}
+
+	private NewRemoteDiskCreationDialog getThis() {
+		return this;
 	}
 
 	protected Component getComponent() {
@@ -180,4 +219,5 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 	@Override
 	public void update() {
 	}
+
 }

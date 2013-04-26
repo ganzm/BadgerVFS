@@ -139,4 +139,8 @@ public class RemoteManager implements ActionObserver {
 		this.adminInterface = adminInterface2;
 	}
 
+	public AdministrationRemoteInterface getAdminInterface() {
+		return adminInterface;
+	}
+
 }

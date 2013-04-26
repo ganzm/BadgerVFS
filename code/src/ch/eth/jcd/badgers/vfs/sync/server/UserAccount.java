@@ -40,6 +40,10 @@ public class UserAccount implements Serializable {
 		return linkedDisks;
 	}
 
+	public void addLinkedDisk(final LinkedDisk linkedDisk) {
+		linkedDisks.add(linkedDisk);
+	}
+
 	public LinkedDisk getLinkedDiskById(final UUID diskId) {
 		for (final LinkedDisk disk : linkedDisks) {
 			if (disk.getId().equals(diskId)) {

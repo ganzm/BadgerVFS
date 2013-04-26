@@ -24,7 +24,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 		final UserAccount userAccount = config.getUserAccount(username, password);
 		final ClientLink clientLink = new ClientLink(userAccount);
 
-		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink);
+		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, config);
 		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;
@@ -37,7 +37,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 		config.setUserAccount(userAccount);
 		final ClientLink clientLink = new ClientLink(userAccount);
 
-		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink);
+		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, config);
 		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;
