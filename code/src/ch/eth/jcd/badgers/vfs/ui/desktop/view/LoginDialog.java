@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
@@ -121,8 +122,15 @@ public class LoginDialog extends JDialog {
 
 								@Override
 								public void onActionFinished(final AbstractBadgerAction action) {
-									dispose();
-									parent.getController().openRemoteDiskDialog(parent, getThis().wizardContext);
+
+									SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											dispose();
+											parent.getController().openRemoteDiskDialog(parent, wizardContext);
+
+										}
+									});
 								}
 
 								@Override

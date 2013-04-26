@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -90,9 +91,22 @@ public class ServerUrlDialog extends JDialog {
 								public void connectionStateChanged(final ConnectionStatus status) {
 									if (ConnectionStatus.CONNECTED == status) {
 										wizardContext.setRemoteManager(remoteManager);
-										dispose();
-										parent.getController().openLoginDialog(parent, wizardContext);
-										LOGGER.debug("Connected to Server");
+										// onActionFinished wird vom WorkerController Thread aufgerufen
+										// wenn "dispse()" und "openLoginDialog" auch im "WorkerControllerThread" ausgeführt werden
+										// bleibt alles andere im WorkerController Thread stehen, bis der neu geöffnete "openRemoteDiskDialog" geschlossen wird
+										// deswegen muss dieser code im swing-thread gestartet werden, mit "Swingutilities.invokeLater"
+										// rop: ich habe es auch gleich im LoginDialog so eingebaut
+										SwingUtilities.invokeLater(new Runnable() {
+
+											@Override
+											public void run() {
+												dispose();
+												parent.getController().openLoginDialog(parent, wizardContext);
+												LOGGER.debug("Connected to Server");
+
+											}
+										});
+
 									}
 									if (ConnectionStatus.DISCONNECTED == status) {
 										// TODO implement correct disconnect.
