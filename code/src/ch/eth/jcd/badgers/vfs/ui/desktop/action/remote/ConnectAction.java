@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action.remote;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -29,7 +31,7 @@ public class ConnectAction extends RemoteAction {
 			LOGGER.debug("Get RMI Login Interface from " + remoteHost);
 			loginInterface = (LoginRemoteInterface) registry.lookup(LoginRemoteInterface.LOGIN_INTERFACE_KEY);
 			LOGGER.debug("Connected to " + remoteHost);
-		} catch (final Exception e) {
+		} catch (final RemoteException | NotBoundException e) {
 			throw new VFSException(e);
 		}
 	}
