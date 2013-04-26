@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -21,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -30,17 +30,17 @@ public class LoginDialog extends JDialog {
 	private static final long serialVersionUID = 6008623672955958103L;
 	private JTextField textFieldUsername;
 	private JPasswordField passwordField;
-	private final BadgerMainFrame parent;
+	private final DesktopController controller;
 
 	private final RemoteSynchronisationWizardContext wizardContext;
 
 	/**
 	 * Create the dialog.
 	 */
-	public LoginDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
-		super(owner, true);
+	public LoginDialog(final DesktopController owner, final RemoteSynchronisationWizardContext wizardContext) {
+		super((BadgerMainFrame) owner.getView(), true);
 		this.wizardContext = wizardContext;
-		parent = (BadgerMainFrame) owner;
+		controller = owner;
 		setTitle("Remote Login");
 		setBounds(100, 100, 450, 120);
 		getContentPane().setLayout(new BorderLayout());
@@ -106,7 +106,7 @@ public class LoginDialog extends JDialog {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
-							parent.getController().startSyncToServer(getThis().wizardContext);
+							controller.startSyncToServer(getThis().wizardContext);
 						}
 					});
 					syncButton.setMnemonic('c');
@@ -127,7 +127,7 @@ public class LoginDialog extends JDialog {
 										@Override
 										public void run() {
 											dispose();
-											parent.getController().openRemoteDiskDialog(parent, wizardContext);
+											controller.openRemoteDiskDialog(wizardContext);
 
 										}
 									});
@@ -159,7 +159,7 @@ public class LoginDialog extends JDialog {
 										@Override
 										public void run() {
 											dispose();
-											parent.getController().openRemoteDiskDialog(parent, wizardContext);
+											controller.openRemoteDiskDialog(wizardContext);
 
 										}
 									});

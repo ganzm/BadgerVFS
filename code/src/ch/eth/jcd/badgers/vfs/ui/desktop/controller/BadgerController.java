@@ -15,7 +15,7 @@ public abstract class BadgerController {
 		badgerView.update();
 	}
 
-	protected BadgerViewBase getView() {
+	public BadgerViewBase getView() {
 		return badgerView;
 	}
 }

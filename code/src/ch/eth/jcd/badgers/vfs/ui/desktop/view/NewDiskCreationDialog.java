@@ -3,7 +3,6 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -50,8 +49,8 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 	/**
 	 * Create the dialog.
 	 */
-	public NewDiskCreationDialog(final Frame owner, final DesktopController ownerController) {
-		super(owner, "Create new virtual disk", true);
+	public NewDiskCreationDialog(final DesktopController ownerController) {
+		super((BadgerMainFrame) ownerController.getView(), "Create new virtual disk", true);
 		this.ownerController = ownerController;
 
 		setBounds(100, 100, 727, 213);

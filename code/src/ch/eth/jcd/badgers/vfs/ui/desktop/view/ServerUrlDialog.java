@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,6 +22,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
@@ -31,16 +31,16 @@ public class ServerUrlDialog extends JDialog {
 	private static final Logger LOGGER = Logger.getLogger(ServerUrlDialog.class);
 	private static final long serialVersionUID = 6008623672955958103L;
 	private JTextField textFieldRemoteServerUrl;
-	private final BadgerMainFrame parent;
+	private final DesktopController controller;
 	private final RemoteSynchronisationWizardContext wizardContext;
 
 	/**
 	 * Create the dialog.
 	 */
-	public ServerUrlDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
-		super(owner, true);
+	public ServerUrlDialog(final DesktopController desktopController, final RemoteSynchronisationWizardContext wizardContext) {
+		super((BadgerMainFrame) desktopController.getView(), true);
 		this.wizardContext = wizardContext;
-		parent = (BadgerMainFrame) owner;
+		controller = desktopController;
 		setTitle("Remote Server");
 		setBounds(100, 100, 450, 80);
 		getContentPane().setLayout(new BorderLayout());
@@ -101,7 +101,7 @@ public class ServerUrlDialog extends JDialog {
 											@Override
 											public void run() {
 												dispose();
-												parent.getController().openLoginDialog(parent, wizardContext);
+												controller.openLoginDialog(wizardContext);
 												LOGGER.debug("Connected to Server");
 
 											}

@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,21 +16,22 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 
 public class RemoteDiskDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
-	private final BadgerMainFrame parent;
+	private final DesktopController controller;
 	private JTable table;
 	private JButton btnCreateNewDisk;
 
 	/**
 	 * Create the dialog.
 	 */
-	public RemoteDiskDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
-		super(owner, true);
-		parent = (BadgerMainFrame) owner;
+	public RemoteDiskDialog(final DesktopController desktopController, final RemoteSynchronisationWizardContext wizardContext) {
+		super((BadgerMainFrame) desktopController.getView(), true);
+		controller = desktopController;
 		setTitle("My Remote Disks");
 		setBounds(100, 100, 650, 400);
 		getContentPane().setLayout(new BorderLayout());
@@ -72,7 +72,7 @@ public class RemoteDiskDialog extends JDialog {
 							@Override
 							public void actionPerformed(final ActionEvent arg0) {
 								dispose();
-								parent.getController().openCreateNewRemoteDiskDialog(parent, wizardContext);
+								controller.openCreateNewRemoteDiskDialog(wizardContext);
 							}
 						});
 						btnCreateNewDisk.setMnemonic('n');

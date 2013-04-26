@@ -80,52 +80,52 @@ public class DesktopController extends BadgerController implements ActionObserve
 	 * 
 	 * @param desktop
 	 */
-	public void openCreateNewDiskDialog(final JFrame desktop) {
-		final NewDiskCreationDialog dialog = new NewDiskCreationDialog(desktop, this);
+	public void openCreateNewDiskDialog() {
+		final NewDiskCreationDialog dialog = new NewDiskCreationDialog(this);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openCreateNewRemoteDiskDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizard) {
-		final NewRemoteDiskCreationDialog dialog = new NewRemoteDiskCreationDialog(desktop, wizard);
+	public void openCreateNewRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {
+		final NewRemoteDiskCreationDialog dialog = new NewRemoteDiskCreationDialog(this, wizard);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openImportDialog(final JFrame desktop) {
+	public void openImportDialog() {
 		final ImportDialog dialog = new ImportDialog(this, currentFolder.getAbsolutePath());
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openDiskSpaceDialog(final JFrame desktop) {
-		final DiskSpaceDialog dialog = new DiskSpaceDialog(desktop, this);
+	public void openDiskSpaceDialog() {
+		final DiskSpaceDialog dialog = new DiskSpaceDialog(this);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openInfoDialog(final JFrame desktop) {
-		final InfoDialog dialog = new InfoDialog(desktop);
+	public void openInfoDialog() {
+		final InfoDialog dialog = new InfoDialog(this);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openLinkDiskDialog(final JFrame desktop) {
+	public void openLinkDiskDialog() {
 		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
-		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openConnectRemoteDialog(final JFrame desktop) {
+	public void openConnectRemoteDialog() {
 		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
-		final ServerUrlDialog dialog = new ServerUrlDialog(desktop, ctx);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, ctx);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
-	public void openLoginDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizardContext) {
-		final LoginDialog dialog = new LoginDialog(desktop, wizardContext);
+	public void openLoginDialog(final RemoteSynchronisationWizardContext wizardContext) {
+		final LoginDialog dialog = new LoginDialog(this, wizardContext);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -134,8 +134,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		throw new UnsupportedOperationException("TODO");
 	}
 
-	public void openRemoteDiskDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizard) {
-		final RemoteDiskDialog dialog = new RemoteDiskDialog(desktop, wizard);
+	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {
+		final RemoteDiskDialog dialog = new RemoteDiskDialog(this, wizard);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -490,7 +490,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
-				openImportDialog(parent);
+				openImportDialog();
 			}
 
 			@Override

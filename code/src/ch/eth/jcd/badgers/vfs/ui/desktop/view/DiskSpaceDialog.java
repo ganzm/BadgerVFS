@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -39,8 +38,8 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	/**
 	 * Create the dialog.
 	 */
-	public DiskSpaceDialog(JFrame owner, DesktopController desktopController) {
-		super(owner, true);
+	public DiskSpaceDialog(final DesktopController desktopController) {
+		super((BadgerMainFrame) desktopController.getView(), true);
 		this.desktopController = desktopController;
 		setTitle("Disk Space");
 		setBounds(100, 100, 450, 215);
@@ -49,17 +48,17 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
-			JPanel panel = new JPanel();
+			final JPanel panel = new JPanel();
 			contentPanel.add(panel);
-			GridBagLayout gblPanel = new GridBagLayout();
+			final GridBagLayout gblPanel = new GridBagLayout();
 			gblPanel.columnWidths = new int[] { 0, 0, 0 };
 			gblPanel.rowHeights = new int[] { 0, 0, 0, 0, 0 };
 			gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 			gblPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 			panel.setLayout(gblPanel);
 			{
-				JLabel lblMaximumSpace = new JLabel("Maximum Space");
-				GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+				final JLabel lblMaximumSpace = new JLabel("Maximum Space");
+				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
 				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
 				gbcLblMaximumSpace.insets = new Insets(0, 0, 5, 5);
 				gbcLblMaximumSpace.gridx = 0;
@@ -70,7 +69,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 				textFieldMaxSpace = new JTextField();
 				textFieldMaxSpace.setHorizontalAlignment(SwingConstants.RIGHT);
 				textFieldMaxSpace.setEditable(false);
-				GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
 				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 5, 0);
 				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldMaxSpace.gridx = 1;
@@ -79,8 +78,8 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 				textFieldMaxSpace.setColumns(10);
 			}
 			{
-				JLabel lblFreeSpace = new JLabel("Free Space");
-				GridBagConstraints gbcLblFreeSpace = new GridBagConstraints();
+				final JLabel lblFreeSpace = new JLabel("Free Space");
+				final GridBagConstraints gbcLblFreeSpace = new GridBagConstraints();
 				gbcLblFreeSpace.anchor = GridBagConstraints.EAST;
 				gbcLblFreeSpace.insets = new Insets(0, 0, 5, 5);
 				gbcLblFreeSpace.gridx = 0;
@@ -91,7 +90,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 				textFieldFreeSpace = new JTextField();
 				textFieldFreeSpace.setHorizontalAlignment(SwingConstants.RIGHT);
 				textFieldFreeSpace.setEditable(false);
-				GridBagConstraints gbcTextFieldFreeSpace = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldFreeSpace = new GridBagConstraints();
 				gbcTextFieldFreeSpace.insets = new Insets(0, 0, 5, 0);
 				gbcTextFieldFreeSpace.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldFreeSpace.gridx = 1;
@@ -101,7 +100,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 			}
 			{
 				progressBarDiskSpace = new JProgressBar();
-				GridBagConstraints gbcProgressBarDiskSpace = new GridBagConstraints();
+				final GridBagConstraints gbcProgressBarDiskSpace = new GridBagConstraints();
 				gbcProgressBarDiskSpace.insets = new Insets(0, 0, 5, 0);
 				gbcProgressBarDiskSpace.fill = GridBagConstraints.BOTH;
 				gbcProgressBarDiskSpace.gridx = 1;
@@ -109,8 +108,8 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 				panel.add(progressBarDiskSpace, gbcProgressBarDiskSpace);
 			}
 			{
-				JLabel lblDirectoryBlockUsage = new JLabel("Directory Block usage");
-				GridBagConstraints gbcLblDirectoryBlockUsage = new GridBagConstraints();
+				final JLabel lblDirectoryBlockUsage = new JLabel("Directory Block usage");
+				final GridBagConstraints gbcLblDirectoryBlockUsage = new GridBagConstraints();
 				gbcLblDirectoryBlockUsage.anchor = GridBagConstraints.EAST;
 				gbcLblDirectoryBlockUsage.insets = new Insets(0, 0, 0, 5);
 				gbcLblDirectoryBlockUsage.gridx = 0;
@@ -121,7 +120,7 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 				textFieldDirectoryBlocks = new JTextField();
 				textFieldDirectoryBlocks.setHorizontalAlignment(SwingConstants.RIGHT);
 				textFieldDirectoryBlocks.setEditable(false);
-				GridBagConstraints gbcTextFieldDirectoryBlocks = new GridBagConstraints();
+				final GridBagConstraints gbcTextFieldDirectoryBlocks = new GridBagConstraints();
 				gbcTextFieldDirectoryBlocks.fill = GridBagConstraints.HORIZONTAL;
 				gbcTextFieldDirectoryBlocks.gridx = 1;
 				gbcTextFieldDirectoryBlocks.gridy = 3;
@@ -134,14 +133,14 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 			contentPanel.add(lblStatus, BorderLayout.SOUTH);
 		}
 		{
-			JPanel buttonPane = new JPanel();
+			final JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				final JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent arg0) {
+					public void actionPerformed(final ActionEvent arg0) {
 						dispose();
 					}
 				});
@@ -157,29 +156,29 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	private void startDiskSpaceQuery() {
 		lblStatus.setText("Querying...");
 
-		QueryDiskSpaceAction action = new QueryDiskSpaceAction(this);
+		final QueryDiskSpaceAction action = new QueryDiskSpaceAction(this);
 		desktopController.getWorkerController().enqueue(action);
 	}
 
 	@Override
-	public void onActionFailed(AbstractBadgerAction action, Exception e) {
+	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 		lblStatus.setText("Failed " + e.getMessage());
 	}
 
 	@Override
-	public void onActionFinished(AbstractBadgerAction action) {
-		QueryDiskSpaceAction queryAction = (QueryDiskSpaceAction) action;
+	public void onActionFinished(final AbstractBadgerAction action) {
+		final QueryDiskSpaceAction queryAction = (QueryDiskSpaceAction) action;
 
-		DiskSpaceUsage du = queryAction.getDiskSpaceUsage();
+		final DiskSpaceUsage du = queryAction.getDiskSpaceUsage();
 
 		lblStatus.setText("");
 		textFieldFreeSpace.setText(du.getFreeData() + " bytes");
 		textFieldMaxSpace.setText(du.getMaxData() + " bytes");
 
-		long maxMb = du.getMaxData() / 1024 / 1024;
-		long freeMb = du.getFreeData() / 1024 / 1024;
+		final long maxMb = du.getMaxData() / 1024 / 1024;
+		final long freeMb = du.getFreeData() / 1024 / 1024;
 		// progress bar does not like values below 1;
-		int intValue = (int) (maxMb - freeMb);
+		final int intValue = (int) (maxMb - freeMb);
 
 		progressBarDiskSpace.setStringPainted(true);
 		progressBarDiskSpace.setMaximum((int) maxMb);

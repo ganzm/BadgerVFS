@@ -59,7 +59,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmNew = new JMenuItem(new AbstractAction("New") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openCreateNewDiskDialog(parent);
+				parent.getController().openCreateNewDiskDialog();
 			}
 		});
 
@@ -98,7 +98,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmConnectRemote = new JMenuItem(new AbstractAction("Connect remote") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openConnectRemoteDialog(parent);
+				parent.getController().openConnectRemoteDialog();
 			}
 		});
 
@@ -106,7 +106,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmLinkDisk = new JMenuItem(new AbstractAction("Link disk") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openLinkDiskDialog(parent);
+				parent.getController().openLinkDiskDialog();
 			}
 		});
 
@@ -117,7 +117,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmQueryDiskspace = new JMenuItem(new AbstractAction("Query Diskspace") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openDiskSpaceDialog(parent);
+				parent.getController().openDiskSpaceDialog();
 			}
 		});
 		mnDisk.add(mntmQueryDiskspace);
@@ -159,7 +159,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mnActions.add(new JMenuItem(new AbstractAction("Import") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openImportDialog(parent);
+				parent.getController().openImportDialog();
 			}
 		}));
 
@@ -178,7 +178,7 @@ public class BadgerMenuBar extends JMenuBar {
 		final JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openInfoDialog(parent);
+				parent.getController().openInfoDialog();
 			}
 		});
 		mnHelp.add(mntmInfo);

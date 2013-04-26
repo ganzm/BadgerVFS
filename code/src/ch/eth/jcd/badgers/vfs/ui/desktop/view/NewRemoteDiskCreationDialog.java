@@ -3,7 +3,6 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 
 public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBase {
@@ -36,14 +36,14 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 
 	private final JComboBox<Encryption> cboEncryption;
 	private final JComboBox<Compression> cboCompression;
-	private final BadgerMainFrame parent;
+	private final DesktopController controller;
 
 	/**
 	 * Create the dialog.
 	 */
-	public NewRemoteDiskCreationDialog(final Frame owner, final RemoteSynchronisationWizardContext wizardContext) {
-		super(owner, "Create new remote virtual disk", true);
-		parent = (BadgerMainFrame) owner;
+	public NewRemoteDiskCreationDialog(final DesktopController desktopController, final RemoteSynchronisationWizardContext wizardContext) {
+		super((BadgerMainFrame) desktopController.getView(), "Create new remote virtual disk", true);
+		controller = desktopController;
 
 		setBounds(100, 100, 727, 213);
 		getContentPane().setLayout(new BorderLayout());
@@ -143,7 +143,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 					public void actionPerformed(final ActionEvent e) {
 						// createDisk();
 						dispose();
-						parent.getController().openRemoteDiskDialog(parent, wizardContext);
+						controller.openRemoteDiskDialog(wizardContext);
 					}
 				});
 				btnOk.setMnemonic('o');
@@ -157,7 +157,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 					@Override
 					public void actionPerformed(final ActionEvent arg0) {
 						dispose();
-						parent.getController().openRemoteDiskDialog(parent, wizardContext);
+						controller.openRemoteDiskDialog(wizardContext);
 					}
 				});
 				btnCancel.setMnemonic('c');
