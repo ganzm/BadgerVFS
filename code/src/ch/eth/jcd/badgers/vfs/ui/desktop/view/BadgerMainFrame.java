@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -61,9 +61,14 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 			public void run() {
 
 				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-					LOGGER.error("Error setting look&feel", e);
+					for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+						if ("Nimbus".equals(info.getName())) {
+							UIManager.setLookAndFeel(info.getClassName());
+							break;
+						}
+					}
+				} catch (final Exception e) {
+					// If Nimbus is not available, you can set the GUI to another look and feel.
 				}
 				final BadgerMainFrame frame = new BadgerMainFrame();
 				frame.update();
