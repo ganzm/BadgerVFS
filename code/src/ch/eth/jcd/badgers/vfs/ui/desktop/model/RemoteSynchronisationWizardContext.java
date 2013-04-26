@@ -14,7 +14,7 @@ public class RemoteSynchronisationWizardContext {
 	private String username;
 	private String password;
 
-	public RemoteSynchronisationWizardContext(LoginActionEnum loginActionEnum) {
+	public RemoteSynchronisationWizardContext(final LoginActionEnum loginActionEnum) {
 		this.loginActionEnum = loginActionEnum;
 	}
 
@@ -26,11 +26,11 @@ public class RemoteSynchronisationWizardContext {
 		return remoteManager;
 	}
 
-	public void setRemoteManager(RemoteManager remoteManager) {
+	public void setRemoteManager(final RemoteManager remoteManager) {
 		this.remoteManager = remoteManager;
 	}
 
-	public void setRemoteHostName(String remoteHostName) {
+	public void setRemoteHostName(final String remoteHostName) {
 		this.remoteHostName = remoteHostName;
 	}
 
@@ -38,7 +38,7 @@ public class RemoteSynchronisationWizardContext {
 		return username;
 	}
 
-	public void setUsername(String username) {
+	public void setUsername(final String username) {
 		this.username = username;
 	}
 
@@ -46,7 +46,7 @@ public class RemoteSynchronisationWizardContext {
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		this.password = password;
 	}
 
@@ -54,7 +54,7 @@ public class RemoteSynchronisationWizardContext {
 		return loginActionEnum;
 	}
 
-	public void setLoginActionEnum(LoginActionEnum loginActionEnum) {
+	public void setLoginActionEnum(final LoginActionEnum loginActionEnum) {
 		this.loginActionEnum = loginActionEnum;
 	}
 }

@@ -6,12 +6,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
+import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 /**
@@ -27,6 +28,7 @@ public class RemoteManager implements ActionObserver {
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
 	private LoginRemoteInterface loginInterface;
+	private AdministrationRemoteInterface adminInterface;
 
 	private final List<ConnectionStateListener> connectionStateListeners = new ArrayList<>();
 
@@ -120,6 +122,10 @@ public class RemoteManager implements ActionObserver {
 
 	public void addConnectionStateListener(final ConnectionStateListener connectionStateListener) {
 		connectionStateListeners.add(connectionStateListener);
+	}
+
+	public void setAdminInterface(final AdministrationRemoteInterface adminInterface2) {
+		this.adminInterface = adminInterface2;
 	}
 
 }
