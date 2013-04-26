@@ -150,8 +150,27 @@ public class LoginDialog extends JDialog {
 					createButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-							dispose();
-							parent.getController().openRemoteDiskDialog(parent, wizardContext);
+							wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), passwordField.getText(), new ActionObserver() {
+
+								@Override
+								public void onActionFinished(final AbstractBadgerAction action) {
+
+									SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											dispose();
+											parent.getController().openRemoteDiskDialog(parent, wizardContext);
+
+										}
+									});
+								}
+
+								@Override
+								public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
+									SwingUtil.handleException(getThis(), e);
+								}
+							});
+
 						}
 					});
 					createButton.setMnemonic('c');
