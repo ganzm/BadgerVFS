@@ -53,7 +53,7 @@ public class UserAccount implements Serializable {
 		final LinkedDisk disk = getLinkedDiskById(diskId);
 		if (disk != null) {
 			DiskWorkerController retVal = activeDiskControllers.get(diskId);
-			if (retVal == null) {
+			if (retVal == null || !retVal.isRunning()) {
 				final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 				final VFSDiskManager diskManager = factory.createDiskManager(disk.getDiskConfig());
 				retVal = new DiskWorkerController(diskManager);

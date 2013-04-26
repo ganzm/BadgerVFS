@@ -44,8 +44,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	private final JButton btnCancelSearch;
 	private final JTextField searchTextField;
 	private final SearchController searchController;
-	private JCheckBox chckbxRegexSearch;
-	private JLabel lblRegex;
+	private final JCheckBox chckbxRegexSearch;
 
 	/**
 	 * Create the panel.
@@ -53,7 +52,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	 * @param searchTextField
 	 *            GUI design decision, pass around reference to the search TextField located in BadgerMenuBar
 	 */
-	public SearchPanel(final BadgerMainFrame parentGui, JTextField searchTextField) {
+	public SearchPanel(final BadgerMainFrame parentGui, final JTextField searchTextField) {
 		this.parent = parentGui;
 		this.searchTextField = searchTextField;
 		this.searchController = new SearchController(parentGui.getController(), this);
@@ -85,8 +84,8 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		gbc_chckbxSearchCaseSensitiv.gridy = 0;
 		panelSearchParameter.add(chckbxSearchCaseSensitiv, gbc_chckbxSearchCaseSensitiv);
 
-		lblRegex = new JLabel("Regex");
-		GridBagConstraints gbc_lblRegex = new GridBagConstraints();
+		final JLabel lblRegex = new JLabel("Regex");
+		final GridBagConstraints gbc_lblRegex = new GridBagConstraints();
 		gbc_lblRegex.insets = new Insets(0, 0, 5, 5);
 		gbc_lblRegex.gridx = 2;
 		gbc_lblRegex.gridy = 0;
@@ -95,7 +94,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		chckbxRegexSearch = new JCheckBox("");
 		chckbxRegexSearch.setToolTipText("Enable to use regex search string");
 		chckbxRegexSearch.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_chckbxRegexSearch = new GridBagConstraints();
+		final GridBagConstraints gbc_chckbxRegexSearch = new GridBagConstraints();
 		gbc_chckbxRegexSearch.insets = new Insets(0, 0, 5, 5);
 		gbc_chckbxRegexSearch.gridx = 3;
 		gbc_chckbxRegexSearch.gridy = 0;
@@ -137,7 +136,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 		panelSearchParameter.add(chckbxSearchSubfolders, gbc_chckbxSearchSubfolders);
 
 		final JPanel panelButtons = new JPanel();
-		GridBagConstraints gbcPanelButtons = new GridBagConstraints();
+		final GridBagConstraints gbcPanelButtons = new GridBagConstraints();
 		gbcPanelButtons.gridwidth = 4;
 		gbcPanelButtons.insets = new Insets(0, 0, 0, 5);
 		gbcPanelButtons.anchor = GridBagConstraints.WEST;
@@ -161,7 +160,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 			public void actionPerformed(final ActionEvent arg0) {
 				try {
 					startSearch();
-				} catch (VFSRuntimeException ex) {
+				} catch (final VFSRuntimeException ex) {
 					SwingUtil.handleException(getThis(), ex);
 				}
 			}

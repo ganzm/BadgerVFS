@@ -24,8 +24,8 @@ public abstract class WorkerController implements Runnable {
 
 	private boolean running = false;
 
-	public WorkerController() {
-
+	public boolean isRunning() {
+		return running;
 	}
 
 	public void startWorkerController() {

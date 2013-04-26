@@ -67,12 +67,10 @@ public class ServerConfiguration {
 	}
 
 	public UserAccount getUserAccount(final String username, final String password) throws VFSException {
+
 		for (final UserAccount user : userAccounts) {
-			if (username == user.getUsername()) {
-				if (password.equals(user.getPassword())) {
-					return user;
-				}
-				break;
+			if (username.equals(user.getUsername()) && password.equals(user.getPassword())) {
+				return user;
 			}
 		}
 		throw new VFSException("invalid username or password");

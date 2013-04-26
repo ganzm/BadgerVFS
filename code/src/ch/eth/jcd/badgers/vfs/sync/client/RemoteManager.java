@@ -10,6 +10,7 @@ import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
@@ -57,6 +58,15 @@ public class RemoteManager implements ActionObserver {
 		}
 		final LoginAction loginAction = new LoginAction(observer, loginInterface, username, password);
 		remoteWorkerController.enqueue(loginAction);
+		return true;
+	}
+
+	public boolean registerUser(final String username, final String password, final ActionObserver observer) {
+		if (status != ConnectionStatus.CONNECTED) {
+			return false;
+		}
+		final RegisterUserAction createLoginAction = new RegisterUserAction(observer, loginInterface, username, password);
+		remoteWorkerController.enqueue(createLoginAction);
 		return true;
 	}
 
