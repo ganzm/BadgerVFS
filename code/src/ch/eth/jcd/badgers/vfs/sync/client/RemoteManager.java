@@ -11,6 +11,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 /**
  * Client side class which encapsulates all remote access and disk linking operations
@@ -26,9 +27,9 @@ public class RemoteManager implements ActionObserver {
 
 	private LoginRemoteInterface loginInterface;
 
-	private List<ConnectionStateListener> connectionStateListeners = new ArrayList<>();
+	private final List<ConnectionStateListener> connectionStateListeners = new ArrayList<>();
 
-	public RemoteManager(String hostLink) {
+	public RemoteManager(final String hostLink) {
 		this.hostLink = hostLink;
 		this.remoteWorkerController = new RemoteWorkerController();
 	}
@@ -46,11 +47,15 @@ public class RemoteManager implements ActionObserver {
 		remoteWorkerController.enqueue(new ConnectAction(hostLink, this));
 	}
 
-	public boolean startLogin(String username, String password) {
+	public boolean startLogin(final String username, final String password) {
+		return startLogin(username, password, this);
+	}
+
+	public boolean startLogin(final String username, final String password, final ActionObserver observer) {
 		if (status != ConnectionStatus.CONNECTED) {
 			return false;
 		}
-		LoginAction loginAction = new LoginAction(this, loginInterface, username, password);
+		final LoginAction loginAction = new LoginAction(observer, loginInterface, username, password);
 		remoteWorkerController.enqueue(loginAction);
 		return true;
 	}
@@ -64,32 +69,38 @@ public class RemoteManager implements ActionObserver {
 	}
 
 	@Override
-	public void onActionFailed(AbstractBadgerAction action, Exception e) {
+	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 		if (action instanceof ConnectAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
+		} else {
+			SwingUtil.handleException(null, e);
 		}
 	}
 
 	@Override
-	public void onActionFinished(AbstractBadgerAction action) {
+	public void onActionFinished(final AbstractBadgerAction action) {
 		if (action instanceof ConnectAction) {
-			setStatus(ConnectionStatus.CONNECTED);
-
-			ConnectAction loginAction = (ConnectAction) action;
+			final ConnectAction loginAction = (ConnectAction) action;
 			loginInterface = loginAction.getLoginInterface();
+
+			setStatus(ConnectionStatus.CONNECTED);
+		}
+		if (action instanceof LoginAction) {
+			final LoginAction loginAction = (LoginAction) action;
+
 		}
 	}
 
-	private void setStatus(ConnectionStatus status) {
+	private void setStatus(final ConnectionStatus status) {
 		if (this.status != status) {
 			LOGGER.info("Switch ConnectionStatus To " + status + " was  " + this.status);
 			this.status = status;
 
 			// notify listeners
-			for (ConnectionStateListener csl : connectionStateListeners) {
+			for (final ConnectionStateListener csl : connectionStateListeners) {
 				try {
 					csl.connectionStateChanged(status);
-				} catch (RuntimeException ex) {
+				} catch (final RuntimeException ex) {
 					LOGGER.error("", ex);
 				}
 			}
@@ -97,7 +108,8 @@ public class RemoteManager implements ActionObserver {
 		}
 	}
 
-	public void addConnectionStateListener(ConnectionStateListener connectionStateListener) {
+	public void addConnectionStateListener(final ConnectionStateListener connectionStateListener) {
 		connectionStateListeners.add(connectionStateListener);
 	}
+
 }

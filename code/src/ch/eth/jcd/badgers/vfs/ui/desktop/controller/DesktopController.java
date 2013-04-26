@@ -86,8 +86,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		dialog.setVisible(true);
 	}
 
-	public void openCreateNewRemoteDiskDialog(final JFrame desktop) {
-		final NewRemoteDiskCreationDialog dialog = new NewRemoteDiskCreationDialog(desktop);
+	public void openCreateNewRemoteDiskDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizard) {
+		final NewRemoteDiskCreationDialog dialog = new NewRemoteDiskCreationDialog(desktop, wizard);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -134,8 +134,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 		throw new UnsupportedOperationException("TODO");
 	}
 
-	public void openRemoteDiskDialog(final JFrame desktop) {
-		final RemoteDiskDialog dialog = new RemoteDiskDialog(desktop);
+	public void openRemoteDiskDialog(final JFrame desktop, final RemoteSynchronisationWizardContext wizard) {
+		final RemoteDiskDialog dialog = new RemoteDiskDialog(desktop, wizard);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}

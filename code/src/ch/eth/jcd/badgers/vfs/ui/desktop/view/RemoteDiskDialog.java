@@ -17,6 +17,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+
 public class RemoteDiskDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
@@ -27,7 +29,7 @@ public class RemoteDiskDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public RemoteDiskDialog(JFrame owner) {
+	public RemoteDiskDialog(final JFrame owner, final RemoteSynchronisationWizardContext wizardContext) {
 		super(owner, true);
 		parent = (BadgerMainFrame) owner;
 		setTitle("My Remote Disks");
@@ -35,12 +37,12 @@ public class RemoteDiskDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		{
 			{
-				JPanel panel = new JPanel();
+				final JPanel panel = new JPanel();
 				panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 				getContentPane().add(panel, BorderLayout.CENTER);
 				panel.setLayout(new BorderLayout(0, 0));
 				{
-					Box verticalBox = Box.createVerticalBox();
+					final Box verticalBox = Box.createVerticalBox();
 					panel.add(verticalBox);
 					// add(new JScrollPane(scrTbl));
 					{
@@ -50,7 +52,7 @@ public class RemoteDiskDialog extends JDialog {
 							Class<?>[] columnTypes = new Class[] { String.class, String.class, String.class, Object.class };
 
 							@Override
-							public Class<?> getColumnClass(int columnIndex) {
+							public Class<?> getColumnClass(final int columnIndex) {
 								return columnTypes[columnIndex];
 							}
 						});
@@ -59,18 +61,18 @@ public class RemoteDiskDialog extends JDialog {
 						table.getColumnModel().getColumn(2).setPreferredWidth(50);
 						table.getColumnModel().getColumn(3).setPreferredWidth(50);
 					}
-					JScrollPane scrollPane = new JScrollPane(table);
+					final JScrollPane scrollPane = new JScrollPane(table);
 					verticalBox.add(scrollPane);
 					scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-					Dimension d = table.getPreferredSize();
+					final Dimension d = table.getPreferredSize();
 					scrollPane.setPreferredSize(new Dimension(d.width, table.getRowHeight() * 3));
 					{
 						btnCreateNewDisk = new JButton("Create new disk");
 						btnCreateNewDisk.addActionListener(new ActionListener() {
 							@Override
-							public void actionPerformed(ActionEvent arg0) {
+							public void actionPerformed(final ActionEvent arg0) {
 								dispose();
-								parent.getController().openCreateNewRemoteDiskDialog(parent);
+								parent.getController().openCreateNewRemoteDiskDialog(parent, wizardContext);
 							}
 						});
 						btnCreateNewDisk.setMnemonic('n');
@@ -80,7 +82,7 @@ public class RemoteDiskDialog extends JDialog {
 				}
 			}
 			{
-				JPanel buttonPane = new JPanel();
+				final JPanel buttonPane = new JPanel();
 				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 				getContentPane().add(buttonPane, BorderLayout.SOUTH);
 				{
@@ -97,10 +99,10 @@ public class RemoteDiskDialog extends JDialog {
 						buttonPane.add(btnCancel);
 					}
 
-					JButton openButton = new JButton("Open");
+					final JButton openButton = new JButton("Open");
 					openButton.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent arg0) {
+						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
 						}
 					});

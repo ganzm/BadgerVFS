@@ -92,7 +92,7 @@ public class ServerUrlDialog extends JDialog {
 										wizardContext.setRemoteManager(remoteManager);
 										dispose();
 										parent.getController().openLoginDialog(parent, wizardContext);
-										LOGGER.debug("ConnectionStatus.CONNECTED");
+										LOGGER.debug("Connected to Server");
 									}
 									if (ConnectionStatus.DISCONNECTED == status) {
 										// TODO implement correct disconnect.

@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 
 public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBase {
 
@@ -40,7 +41,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 	/**
 	 * Create the dialog.
 	 */
-	public NewRemoteDiskCreationDialog(final Frame owner) {
+	public NewRemoteDiskCreationDialog(final Frame owner, final RemoteSynchronisationWizardContext wizardContext) {
 		super(owner, "Create new remote virtual disk", true);
 		parent = (BadgerMainFrame) owner;
 
@@ -142,7 +143,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 					public void actionPerformed(final ActionEvent e) {
 						// createDisk();
 						dispose();
-						parent.getController().openRemoteDiskDialog(parent);
+						parent.getController().openRemoteDiskDialog(parent, wizardContext);
 					}
 				});
 				btnOk.setMnemonic('o');
@@ -156,7 +157,7 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 					@Override
 					public void actionPerformed(final ActionEvent arg0) {
 						dispose();
-						parent.getController().openRemoteDiskDialog(parent);
+						parent.getController().openRemoteDiskDialog(parent, wizardContext);
 					}
 				});
 				btnCancel.setMnemonic('c');

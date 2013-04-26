@@ -18,8 +18,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class LoginDialog extends JDialog {
 
@@ -114,9 +117,20 @@ public class LoginDialog extends JDialog {
 					loginButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-							dispose();
-							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), passwordField.getText());
-							parent.getController().openRemoteDiskDialog(parent);
+							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), passwordField.getText(), new ActionObserver() {
+
+								@Override
+								public void onActionFinished(final AbstractBadgerAction action) {
+									dispose();
+									parent.getController().openRemoteDiskDialog(parent, getThis().wizardContext);
+								}
+
+								@Override
+								public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
+									SwingUtil.handleException(getThis(), e);
+								}
+							});
+
 						}
 					});
 					loginButton.setMnemonic('l');
@@ -129,7 +143,7 @@ public class LoginDialog extends JDialog {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
 							dispose();
-							parent.getController().openRemoteDiskDialog(parent);
+							parent.getController().openRemoteDiskDialog(parent, wizardContext);
 						}
 					});
 					createButton.setMnemonic('c');
