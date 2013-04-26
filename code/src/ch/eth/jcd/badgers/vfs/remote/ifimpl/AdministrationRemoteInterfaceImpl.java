@@ -9,7 +9,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.model.RemoteInputStream;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;

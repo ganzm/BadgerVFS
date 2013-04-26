@@ -7,7 +7,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public interface LoginRemoteInterface extends Remote {
 
-	static final String LOGIN_INTERFACE_KEY = "Login Interface";
+	final String LOGIN_INTERFACE_KEY = "Login Interface";
 
 	/**
 	 * try to login with specific credentials

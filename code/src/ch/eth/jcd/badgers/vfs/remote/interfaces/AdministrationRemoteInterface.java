@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.model.RemoteInputStream;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 
 public interface AdministrationRemoteInterface extends Remote {
 
