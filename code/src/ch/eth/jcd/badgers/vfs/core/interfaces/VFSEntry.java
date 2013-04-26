@@ -52,6 +52,7 @@ public interface VFSEntry {
 	/**
 	 * in case you want to write stuff to this entry
 	 * 
+	 * @see VFSEntry#WRITE_MODE_OVERRIDE
 	 * @param writeMode
 	 *            TODO
 	 * @return

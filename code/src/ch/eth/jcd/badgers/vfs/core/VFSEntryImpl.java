@@ -12,6 +12,11 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateDirectoryItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateFileItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.DeleteEntryItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.MoveToItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.RenameEntryItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
@@ -56,9 +61,12 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
 
+			diskManager.addJournalEntry(new CreateDirectoryItem(vfsPath));
+
 			return entry;
 		} catch (IOException ex) {
 
+			// try to revert changes performed on the file system
 			if (dataBlock != null) {
 				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
 			}
@@ -80,6 +88,8 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
 
 			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
+
+			diskManager.addJournalEntry(new CreateFileItem(vfsPath));
 
 			return entry;
 		} catch (IOException ex) {
@@ -156,7 +166,9 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			throw new VFSException("Copy failed - file already exist " + newLocation.getAbsolutePath());
 		}
 
-		LOGGER.info("Move Entry " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+		String oldPath = path.getAbsolutePath();
+		String newPath = newLocation.getAbsolutePath();
+		LOGGER.info("Move Entry " + oldPath + " to " + newPath);
 
 		VFSDirectoryImpl oldParentDirectory = getParentProtected();
 
@@ -179,23 +191,28 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 		// assign new path
 		this.path = (VFSPathImpl) newLocation;
+
+		diskManager.addJournalEntry(new MoveToItem(oldPath, newPath));
 	}
 
 	@Override
 	public void renameTo(String newName) throws VFSException {
 		try {
-			LOGGER.info("Rename " + getPath().getAbsolutePath() + " to " + newName);
+			String oldPath = getPath().getAbsolutePath();
+			LOGGER.info("Rename " + oldPath + " to " + newName);
 			String oldName = getPath().getName();
 			VFSDirectoryImpl parent = getParentProtected();
-			
+
 			// validation
 			DirectoryEntryBlock childDirBlock = parent.getChildDirectoryEntryBlockByName(newName);
 			if (childDirBlock != null) {
 				throw new VFSDuplicatedEntryException("Rename " + getPath().getAbsolutePath() + " to " + newName + " failed because name is already taken");
 			}
-			
+
 			parent.renameDirectoryEntryBlock(oldName, newName);
 			this.path = this.path.renameTo(newName);
+
+			diskManager.addJournalEntry(new RenameEntryItem(oldPath, newName));
 		} catch (IOException ex) {
 			throw new VFSException(ex);
 		}
@@ -211,6 +228,8 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			}
 
 			parentDirectory.deleteChild(this);
+
+			diskManager.addJournalEntry(new DeleteEntryItem(this));
 		} catch (IOException e) {
 			throw new VFSException(e);
 		}

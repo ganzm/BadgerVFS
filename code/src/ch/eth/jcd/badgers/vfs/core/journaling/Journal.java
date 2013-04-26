@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
-import ch.eth.jcd.badgers.vfs.core.journaling.entries.JournalEntry;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class Journal {
 
@@ -22,21 +23,24 @@ public class Journal {
 	 */
 	private int clientVersion;
 
-	private List<JournalEntry> journalEntries = new ArrayList<>();
+	private List<JournalItem> journalEntries = new ArrayList<>();
 
-	public Journal() {
-
+	public Journal(List<JournalItem> uncommitedJournalEntries) {
+		// copy entries
+		journalEntries.addAll(uncommitedJournalEntries);
 	}
 
-	public void addJournalEntry(JournalEntry entry) {
+	public void addJournalEntry(JournalItem entry) {
 		journalEntries.add(entry);
 	}
 
-	public void replay(VFSDiskManager diskManager) {
-
+	public void replay(VFSDiskManager diskManager) throws VFSException {
+		for (JournalItem entry : journalEntries) {
+			entry.replay(diskManager);
+		}
 	}
 
-	public List<JournalEntry> getJournalEntries() {
+	public List<JournalItem> getJournalEntries() {
 		return journalEntries;
 	}
 }

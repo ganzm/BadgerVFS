@@ -1,6 +1,8 @@
 package ch.eth.jcd.badgers.vfs.test.core.journaling;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -70,7 +72,6 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 		// compare content of the file systems
 		assertEntriesEqual(diskManager.getRoot(), secondDiskManager.getRoot());
-
 	}
 
 	private void assertEntriesEqual(VFSEntry expected, VFSEntry actual) throws VFSException {
@@ -89,6 +90,41 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 				assertEntriesEqual(exptedChild, actualChild);
 			}
+		} else {
+			// compare files
+			assertFileContentEquals(expected, actual);
 		}
+	}
+
+	/**
+	 * Do not use this for big files
+	 * 
+	 * @param expected
+	 * @param actual
+	 */
+	private void assertFileContentEquals(VFSEntry expected, VFSEntry actual) {
+		try {
+			byte[] exptecedContent = fileToBytes(expected);
+			byte[] actualContent = fileToBytes(actual);
+
+			Assert.assertArrayEquals("Files at " + expected.getPath().getAbsolutePath() + " differ", exptecedContent, actualContent);
+		} catch (IOException | VFSException e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	private byte[] fileToBytes(VFSEntry entry) throws IOException, VFSException {
+		byte[] buffer = new byte[512];
+		int numBytes;
+
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+		try (InputStream in = entry.getInputStream()) {
+
+			while ((numBytes = in.read(buffer, 0, buffer.length)) != -1) {
+				bOut.write(buffer, 0, numBytes);
+			}
+		}
+
+		return bOut.toByteArray();
 	}
 }

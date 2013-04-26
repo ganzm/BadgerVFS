@@ -11,6 +11,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.ModifyFileItem;
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
@@ -60,8 +61,9 @@ public class VFSFileImpl extends VFSEntryImpl {
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
 		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
-		return diskManager.wrapOutputStream(outputStream);
 
+		diskManager.addJournalEntry(new ModifyFileItem(this));
+		return diskManager.wrapOutputStream(outputStream);
 	}
 
 	@Override

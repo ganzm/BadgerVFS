@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -30,6 +32,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
@@ -65,6 +68,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	private DirectorySectionHandler directorySectionHandler;
 
 	private DataSectionHandler dataSectionHandler;
+
+	private List<JournalItem> uncommitedJournalEntries = new ArrayList<>();
 
 	/**
 	 * Private constructor
@@ -353,7 +358,13 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	public Journal closeAndGetCurrentJournal() throws VFSException {
-		throw new UnsupportedOperationException();
+		Journal j = new Journal(uncommitedJournalEntries);
+		uncommitedJournalEntries.clear();
+		return j;
+	}
+
+	public void addJournalEntry(JournalItem journalEntry) {
+		uncommitedJournalEntries.add(journalEntry);
 	}
 
 }
