@@ -11,10 +11,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
-import ch.eth.jcd.badgers.vfs.remote.model.Journal;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
@@ -138,8 +138,7 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
 	@Override
 	public void unlink() throws RemoteException {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException("TODO");
 	}
 
 }

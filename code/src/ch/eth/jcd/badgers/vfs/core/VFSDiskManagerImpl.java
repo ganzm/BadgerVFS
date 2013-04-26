@@ -29,6 +29,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
@@ -349,6 +350,10 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	@Override
 	public void find(String fileName, FindInFolderCallback observer) throws VFSException {
 		getRoot().findInFolder(fileName, observer);
+	}
+
+	public Journal closeAndGetCurrentJournal() throws VFSException {
+		throw new UnsupportedOperationException();
 	}
 
 }

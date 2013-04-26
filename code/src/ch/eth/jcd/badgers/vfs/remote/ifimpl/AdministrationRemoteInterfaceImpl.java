@@ -36,8 +36,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 	@Override
 	public DiskRemoteInterface linkNewDisk(final LinkedDisk linkedDisk, final RemoteInputStream diskFileContent) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override
@@ -68,5 +67,9 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		factory.createDiskManager(diskConfig);
 		clientLink.getUserAccount().addLinkedDisk(linkedDiskPrototype);
 		config.persist();
+	}
+
+	public ClientLink getClientLink() {
+		return clientLink;
 	}
 }

@@ -32,14 +32,12 @@ public class ServerUrlDialog extends JDialog {
 	private static final long serialVersionUID = 6008623672955958103L;
 	private JTextField textFieldRemoteServerUrl;
 	private final DesktopController controller;
-	private final RemoteSynchronisationWizardContext wizardContext;
 
 	/**
 	 * Create the dialog.
 	 */
 	public ServerUrlDialog(final DesktopController desktopController, final RemoteSynchronisationWizardContext wizardContext) {
 		super((BadgerMainFrame) desktopController.getView(), true);
-		this.wizardContext = wizardContext;
 		controller = desktopController;
 		setTitle("Remote Server");
 		setBounds(100, 100, 450, 80);

@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
@@ -79,5 +80,15 @@ public interface VFSDiskManager {
 	 * @param observer
 	 */
 	void find(String fileName, FindInFolderCallback observer) throws VFSException;
+
+	/**
+	 * puts all operations performed since the last call of this operation into a Journal file
+	 * 
+	 * closes the current journal which is returned
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
+	Journal closeAndGetCurrentJournal() throws VFSException;
 
 }

@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
-import ch.eth.jcd.badgers.vfs.remote.model.Journal;
 
 /**
  * 

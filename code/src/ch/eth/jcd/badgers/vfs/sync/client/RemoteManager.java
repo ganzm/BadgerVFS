@@ -107,8 +107,7 @@ public class RemoteManager implements ActionObserver {
 			loginInterface = loginAction.getLoginInterface();
 
 			setStatus(ConnectionStatus.CONNECTED);
-		}
-		if (action instanceof LoginAction) {
+		} else if (action instanceof LoginAction) {
 			final LoginAction loginAction = (LoginAction) action;
 
 		}

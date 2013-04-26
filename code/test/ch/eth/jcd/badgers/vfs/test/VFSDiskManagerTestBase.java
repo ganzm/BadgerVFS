@@ -21,8 +21,7 @@ public class VFSDiskManagerTestBase {
 	public static void beforeClass() throws VFSException {
 		UnittestLogger.init();
 
-		// diskManager = setupMock();
-		diskManager = setupDefault();
+		diskManager = setupDefault("test.tmp");
 	}
 
 	@Before
@@ -61,12 +60,12 @@ public class VFSDiskManagerTestBase {
 
 	}
 
-	protected static VFSDiskManager setupDefault() throws VFSException {
+	protected static VFSDiskManager setupDefault(String name) throws VFSException {
 
 		String tempDir = System.getProperty("java.io.tmpdir");
 
 		// Delete if this file already exists
-		String fileName = tempDir + File.separatorChar + "test.tmp";
+		String fileName = tempDir + File.separatorChar + name;
 		if (new File(fileName).exists()) {
 			new File(fileName).delete();
 		}
