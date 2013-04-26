@@ -5,8 +5,7 @@ import java.util.regex.PatternSyntaxException;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
-public class SearchParameter {
-
+public final class SearchParameter {
 	private String searchString = "";
 
 	private boolean caseSensitive = true;
@@ -45,7 +44,7 @@ public class SearchParameter {
 
 			// str = "\\w*m\\w*";
 			searchPattern = Pattern.compile(str);
-		} catch (PatternSyntaxException ex) {
+		} catch (final PatternSyntaxException ex) {
 			throw new VFSRuntimeException("Invalid RegexPattern " + searchString, ex);
 		}
 	}
