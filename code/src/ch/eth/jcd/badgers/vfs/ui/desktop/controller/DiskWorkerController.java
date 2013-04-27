@@ -46,4 +46,12 @@ public class DiskWorkerController extends WorkerController {
 		workLoadIndicator.dispose();
 	}
 
+	@Override
+	protected void workerControllerDisposed() {
+		try {
+			diskManager.close();
+		} catch (VFSException e) {
+			LOGGER.error("Error while closing DiskManager " + diskManager, e);
+		}
+	}
 }

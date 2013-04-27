@@ -59,7 +59,11 @@ public abstract class WorkerController implements Runnable {
 			}
 		} finally {
 			LOGGER.debug("Shutdown WorkerController Thread");
+			workerControllerDisposed();
 		}
+	}
+
+	protected void workerControllerDisposed() {
 	}
 
 	protected abstract void performAction(final AbstractBadgerAction action);
