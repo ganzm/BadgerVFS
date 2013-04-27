@@ -44,7 +44,7 @@ public class LoginDialog extends JDialog {
 		this.wizardContext = wizardContext;
 		controller = owner;
 		setTitle("Remote Login");
-		setBounds(100, 100, 450, 120);
+		setBounds(100, 100, 450, 149);
 		getContentPane().setLayout(new BorderLayout());
 		{
 			final JPanel panel = new JPanel();

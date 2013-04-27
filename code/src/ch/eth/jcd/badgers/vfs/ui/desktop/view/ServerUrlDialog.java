@@ -40,7 +40,7 @@ public class ServerUrlDialog extends JDialog {
 		super((BadgerMainFrame) desktopController.getView(), true);
 		controller = desktopController;
 		setTitle("Remote Server");
-		setBounds(100, 100, 450, 80);
+		setBounds(100, 100, 450, 111);
 		getContentPane().setLayout(new BorderLayout());
 		{
 			final JPanel panel = new JPanel();
