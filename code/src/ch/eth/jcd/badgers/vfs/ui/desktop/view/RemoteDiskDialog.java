@@ -15,19 +15,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDiskTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class RemoteDiskDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
 	private static final Logger LOGGER = Logger.getLogger(RemoteDiskDialog.class);
 	private final DesktopController controller;
+	private LinkedDiskTableModel linkedDiskTableModel;
 	private JTable table;
 	private JButton btnCreateNewDisk;
 
@@ -56,10 +57,12 @@ public class RemoteDiskDialog extends JDialog {
 						table = new JTable();
 						final Object[][] disks;
 						try {
-							table.setModel(new LinkedDiskTableModel(wizardContext.getRemoteManager().getAdminInterface().listDisks()));
+							linkedDiskTableModel = new LinkedDiskTableModel(wizardContext.getRemoteManager().getAdminInterface().listDisks());
+							table.setModel(linkedDiskTableModel);
 						} catch (final RemoteException e) {
-							LOGGER.warn(e);
-							table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Filename", "Size", "Encrypted", "Compression" }));
+							LOGGER.error(e);
+							SwingUtil.handleException(getThis(), e);
+							dispose();
 						}
 						table.getColumnModel().getColumn(0).setPreferredWidth(125);
 						table.getColumnModel().getColumn(1).setPreferredWidth(50);
@@ -108,7 +111,15 @@ public class RemoteDiskDialog extends JDialog {
 					openButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-							dispose();
+							final int selectedRow = table.getSelectedRow();
+							if (selectedRow == -1) {
+								SwingUtil.handleError(getThis(), "No disk selected");
+							} else {
+								wizardContext.setSelectedDiskToLink(linkedDiskTableModel.getEntries().get(selectedRow));
+								dispose();
+								controller.openGetRemoteLinkedDiskDialog(wizardContext);
+
+							}
 						}
 					});
 					openButton.setMnemonic('o');
@@ -119,5 +130,9 @@ public class RemoteDiskDialog extends JDialog {
 			}
 		}
 
+	}
+
+	private RemoteDiskDialog getThis() {
+		return this;
 	}
 }

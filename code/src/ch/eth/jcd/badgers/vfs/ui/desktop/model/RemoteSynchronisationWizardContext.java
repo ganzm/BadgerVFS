@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.model;
 
+import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 
 public class RemoteSynchronisationWizardContext {
@@ -9,6 +10,7 @@ public class RemoteSynchronisationWizardContext {
 
 	private LoginActionEnum loginActionEnum;
 	private RemoteManager remoteManager;
+	private LinkedDisk selectedDiskToLink;
 
 	private String remoteHostName;
 	private String username;
@@ -56,5 +58,13 @@ public class RemoteSynchronisationWizardContext {
 
 	public void setLoginActionEnum(final LoginActionEnum loginActionEnum) {
 		this.loginActionEnum = loginActionEnum;
+	}
+
+	public LinkedDisk getSelectedDiskToLink() {
+		return selectedDiskToLink;
+	}
+
+	public void setSelectedDiskToLink(final LinkedDisk selectedDiskToLink) {
+		this.selectedDiskToLink = selectedDiskToLink;
 	}
 }

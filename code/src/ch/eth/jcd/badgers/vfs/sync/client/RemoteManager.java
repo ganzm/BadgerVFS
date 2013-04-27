@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.sync.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -13,6 +14,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CreateNewDiskAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.GetRemoteLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
@@ -80,6 +82,15 @@ public class RemoteManager implements ActionObserver {
 		}
 		final CreateNewDiskAction newDiskAction = new CreateNewDiskAction(actionObserver, adminInterface, prototype);
 		remoteWorkerController.enqueue(newDiskAction);
+		return true;
+	}
+
+	public boolean startGetRemoteLinkedDisk(final String localDiskPath, final UUID diskId, final ActionObserver actionObserver) {
+		if (status != ConnectionStatus.CONNECTED) {
+			return false;
+		}
+		final GetRemoteLinkedDiskAction getRemoteDiskAction = new GetRemoteLinkedDiskAction(actionObserver, adminInterface, localDiskPath, diskId);
+		remoteWorkerController.enqueue(getRemoteDiskAction);
 		return true;
 	}
 

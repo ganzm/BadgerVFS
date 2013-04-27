@@ -40,6 +40,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.DiskSpaceDialog;
+import ch.eth.jcd.badgers.vfs.ui.desktop.view.GetRemoteLinkedDiskDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.ImportDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.InfoDialog;
 import ch.eth.jcd.badgers.vfs.ui.desktop.view.LoginDialog;
@@ -128,6 +129,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final LoginDialog dialog = new LoginDialog(this, wizardContext);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
+	}
+
+	public void openGetRemoteLinkedDiskDialog(final RemoteSynchronisationWizardContext wizardContext) {
+		final GetRemoteLinkedDiskDialog dialog = new GetRemoteLinkedDiskDialog(this, wizardContext);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+	}
+
+	public void openLocalDiskFromRemoteDisk(final String path) throws VFSException {
+		openDisk(path);
 	}
 
 	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {

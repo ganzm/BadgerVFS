@@ -8,6 +8,7 @@ import java.util.UUID;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 
 public interface AdministrationRemoteInterface extends Remote {
 
@@ -48,5 +49,15 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @throws VFSException
 	 */
 	void createNewDisk(LinkedDisk linkedDiskPrototype) throws RemoteException, VFSException;
+
+	/**
+	 * This method is called from the client whenever on the server-side a disk shall be fetched.
+	 * 
+	 * @param linkedDiskPrototype
+	 * @return
+	 * @throws RemoteException
+	 * @throws VFSException
+	 */
+	void getLinkedDisk(UUID diskId, RemoteOutputStream remoteDiskFileContent) throws RemoteException, VFSException;
 
 }
