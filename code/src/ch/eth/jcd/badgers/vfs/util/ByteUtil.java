@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.util;
 
+import java.nio.ByteBuffer;
+
 public class ByteUtil {
 
 	/**
@@ -16,4 +18,14 @@ public class ByteUtil {
 		return sb.toString();
 	}
 
+	public static byte[] longToBytes(long l) {
+		return ByteBuffer.allocate(8).putLong(l).array();
+	}
+
+	public static long bytesToLong(byte[] bytes) {
+		assert bytes.length == 8;
+
+		ByteBuffer buf = ByteBuffer.wrap(bytes);
+		return buf.getLong();
+	}
 }

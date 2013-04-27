@@ -61,7 +61,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
 
-			diskManager.addJournalEntry(new CreateDirectoryItem(vfsPath));
+			diskManager.addJournalItem(new CreateDirectoryItem(vfsPath));
 
 			return entry;
 		} catch (IOException ex) {
@@ -89,7 +89,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
 
-			diskManager.addJournalEntry(new CreateFileItem(vfsPath));
+			diskManager.addJournalItem(new CreateFileItem(vfsPath));
 
 			return entry;
 		} catch (IOException ex) {
@@ -192,7 +192,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		// assign new path
 		this.path = (VFSPathImpl) newLocation;
 
-		diskManager.addJournalEntry(new MoveToItem(oldPath, newPath));
+		diskManager.addJournalItem(new MoveToItem(oldPath, newPath));
 	}
 
 	@Override
@@ -212,7 +212,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			parent.renameDirectoryEntryBlock(oldName, newName);
 			this.path = this.path.renameTo(newName);
 
-			diskManager.addJournalEntry(new RenameEntryItem(oldPath, newName));
+			diskManager.addJournalItem(new RenameEntryItem(oldPath, newName));
 		} catch (IOException ex) {
 			throw new VFSException(ex);
 		}
@@ -229,7 +229,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 			parentDirectory.deleteChild(this);
 
-			diskManager.addJournalEntry(new DeleteEntryItem(this));
+			diskManager.addJournalItem(new DeleteEntryItem(this));
 		} catch (IOException e) {
 			throw new VFSException(e);
 		}
@@ -281,6 +281,26 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		long next = firstDataBlock.getNextDataBlock();
 		diskManager.getDataSectionHandler().freeDataBlock(firstDataBlock);
 
+		freeSubsequentDataBlocks(next);
+	}
+
+	/**
+	 * sets user data to 0 for this Entry
+	 * 
+	 * @throws VFSException
+	 * @throws IOException
+	 */
+	protected void truncateDataBlocks() throws VFSException, IOException {
+		long next = firstDataBlock.getNextDataBlock();
+
+		firstDataBlock.setDataLength(0);
+		firstDataBlock.setNextDataBlock(0);
+		diskManager.getDataSectionHandler().persistDataBlock(firstDataBlock);
+
+		freeSubsequentDataBlocks(next);
+	}
+
+	private void freeSubsequentDataBlocks(long next) throws VFSException, IOException {
 		while (next != 0) {
 			DataBlock tmp = diskManager.getDataSectionHandler().loadDataBlock(next);
 			next = tmp.getNextDataBlock();

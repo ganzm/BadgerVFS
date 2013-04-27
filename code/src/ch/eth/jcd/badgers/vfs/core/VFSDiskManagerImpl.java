@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -32,6 +30,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSDisabledJournaling;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
@@ -69,7 +69,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private DataSectionHandler dataSectionHandler;
 
-	private List<JournalItem> uncommitedJournalEntries = new ArrayList<>();
+	private VFSJournaling journaling;
 
 	/**
 	 * Private constructor
@@ -177,6 +177,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 			mgr.virtualDiskFile = randomAccessFile;
 
 			mgr.openRootFolder();
+			mgr.initJournaling();
 
 			return mgr;
 
@@ -185,10 +186,21 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		}
 	}
 
+	private void initJournaling() {
+		if (config.isHostNameLinked()) {
+			this.journaling = new VFSJournaling(this);
+
+		} else {
+			this.journaling = new VFSDisabledJournaling();
+		}
+	}
+
 	@Override
 	public void close() throws VFSException {
 
 		try {
+			journaling.closeJournal();
+
 			headerSectionHandler.close();
 			directorySectionHandler.close();
 			dataSectionHandler.close();
@@ -357,14 +369,13 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		getRoot().findInFolder(fileName, observer);
 	}
 
+	@Override
 	public Journal closeAndGetCurrentJournal() throws VFSException {
-		Journal j = new Journal(uncommitedJournalEntries);
-		uncommitedJournalEntries.clear();
-		return j;
+		return journaling.closeAndGetCurrentJournal();
 	}
 
-	public void addJournalEntry(JournalItem journalEntry) {
-		uncommitedJournalEntries.add(journalEntry);
+	public void addJournalItem(JournalItem journalEntry) {
+		journaling.addJournalItem(journalEntry);
 	}
 
 }

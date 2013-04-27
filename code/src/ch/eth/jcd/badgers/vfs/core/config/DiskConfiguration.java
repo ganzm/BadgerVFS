@@ -77,6 +77,10 @@ public class DiskConfiguration implements Serializable {
 		return linkedHostName;
 	}
 
+	public boolean isHostNameLinked() {
+		return linkedHostName != null && "".equals(linkedHostName) == false;
+	}
+
 	public void setLinkedHostName(final String linkedHostName) {
 		this.linkedHostName = linkedHostName;
 	}

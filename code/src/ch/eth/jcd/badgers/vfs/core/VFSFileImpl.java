@@ -60,9 +60,17 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
-		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 
-		diskManager.addJournalEntry(new ModifyFileItem(this));
+		// if (writeMode == WRITE_MODE_OVERRIDE) {
+		try {
+			truncateDataBlocks();
+		} catch (IOException e) {
+			throw new VFSException("Error while truncating file", e);
+		}
+		// }
+
+		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
+		diskManager.addJournalItem(new ModifyFileItem(this));
 		return diskManager.wrapOutputStream(outputStream);
 	}
 

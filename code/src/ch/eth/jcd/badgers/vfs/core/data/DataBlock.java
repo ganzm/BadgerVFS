@@ -80,6 +80,10 @@ public class DataBlock {
 		dataLength += increment;
 	}
 
+	public void setDataLength(int dataLength) {
+		this.dataLength = dataLength;
+	}
+
 	public Date getCreationDate() {
 		return creationDate;
 	}
