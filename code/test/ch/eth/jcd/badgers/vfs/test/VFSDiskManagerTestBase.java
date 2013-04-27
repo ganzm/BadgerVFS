@@ -21,7 +21,7 @@ public class VFSDiskManagerTestBase {
 	public static void beforeClass() throws VFSException {
 		UnittestLogger.init();
 
-		diskManager = setupDefault("test.tmp");
+		diskManager = setupDefault("test.tmp", null);
 	}
 
 	@Before
@@ -60,7 +60,7 @@ public class VFSDiskManagerTestBase {
 
 	}
 
-	protected static VFSDiskManager setupDefault(String name) throws VFSException {
+	public static VFSDiskManager setupDefault(String name, String linkedHostName) throws VFSException {
 
 		String tempDir = System.getProperty("java.io.tmpdir");
 
@@ -71,12 +71,13 @@ public class VFSDiskManagerTestBase {
 		}
 		DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(fileName);
+		config.setLinkedHostName(linkedHostName);
 
 		return VFSDiskManagerImpl.create(config);
 
 	}
 
-	protected void teardownDefault() throws VFSException {
+	public void teardownDefault() throws VFSException {
 		diskManager.dispose();
 	}
 

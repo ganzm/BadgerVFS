@@ -26,7 +26,10 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 	@Before
 	public void before() throws VFSException {
-		secondDiskManager = setupDefault("test2.tmp");
+		diskManager.dispose();
+		diskManager = setupDefault("test.tmp", "localhost");
+
+		secondDiskManager = setupDefault("test2.tmp", "localhost");
 	}
 
 	@After

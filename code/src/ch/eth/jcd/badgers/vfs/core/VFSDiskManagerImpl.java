@@ -105,6 +105,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 			mgr.dataSectionHandler = DataSectionHandler.createNew(mgr.virtualDiskFile, config, dataSectionOffset);
 
 			mgr.createRootFolder();
+			mgr.initJournaling();
 
 			return mgr;
 
