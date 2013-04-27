@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -16,18 +17,24 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.log4j.Logger;
+
+import ch.eth.jcd.badgers.vfs.remote.model.LinkedDiskTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 
 public class RemoteDiskDialog extends JDialog {
 
 	private static final long serialVersionUID = 6008623672955958103L;
+	private static final Logger LOGGER = Logger.getLogger(RemoteDiskDialog.class);
 	private final DesktopController controller;
 	private JTable table;
 	private JButton btnCreateNewDisk;
 
 	/**
 	 * Create the dialog.
+	 * 
+	 * @throws RemoteException
 	 */
 	public RemoteDiskDialog(final DesktopController desktopController, final RemoteSynchronisationWizardContext wizardContext) {
 		super((BadgerMainFrame) desktopController.getView(), true);
@@ -47,15 +54,13 @@ public class RemoteDiskDialog extends JDialog {
 					// add(new JScrollPane(scrTbl));
 					{
 						table = new JTable();
-						table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Filename", "Size", "Encrypted", "Compression" }) {
-							private static final long serialVersionUID = 1L;
-							Class<?>[] columnTypes = new Class[] { String.class, String.class, String.class, Object.class };
-
-							@Override
-							public Class<?> getColumnClass(final int columnIndex) {
-								return columnTypes[columnIndex];
-							}
-						});
+						final Object[][] disks;
+						try {
+							table.setModel(new LinkedDiskTableModel(wizardContext.getRemoteManager().getAdminInterface().listDisks()));
+						} catch (final RemoteException e) {
+							LOGGER.warn(e);
+							table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Filename", "Size", "Encrypted", "Compression" }));
+						}
 						table.getColumnModel().getColumn(0).setPreferredWidth(125);
 						table.getColumnModel().getColumn(1).setPreferredWidth(50);
 						table.getColumnModel().getColumn(2).setPreferredWidth(50);
