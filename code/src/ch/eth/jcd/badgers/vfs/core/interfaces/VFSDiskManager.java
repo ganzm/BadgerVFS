@@ -91,4 +91,12 @@ public interface VFSDiskManager {
 	 */
 	Journal closeAndGetCurrentJournal() throws VFSException;
 
+	/**
+	 * 
+	 * @param hostName
+	 * @throws VFSException
+	 *             is thrown if this disk is already linked
+	 * @return
+	 */
+	Journal linkDisk(String hostName) throws VFSException;
 }

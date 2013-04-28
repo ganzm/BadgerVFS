@@ -57,6 +57,12 @@ public class ServerConfiguration {
 		}
 	}
 
+	/**
+	 * add UserAccount to current configuration
+	 * 
+	 * @param userAccount
+	 * @throws VFSException
+	 */
 	public void setUserAccount(final UserAccount userAccount) throws VFSException {
 		if (!accountExists(userAccount.getUsername())) {
 			userAccounts.add(userAccount);
@@ -78,7 +84,7 @@ public class ServerConfiguration {
 		throw new VFSException("invalid username or password");
 	}
 
-	private boolean accountExists(final String username) {
+	public boolean accountExists(final String username) {
 		for (final UserAccount user : userAccounts) {
 			if (user.getUsername().equalsIgnoreCase(username)) {
 				return true;

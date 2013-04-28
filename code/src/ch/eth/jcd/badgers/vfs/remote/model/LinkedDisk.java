@@ -6,6 +6,7 @@ import java.util.UUID;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 
 public class LinkedDisk implements Serializable {
+	private static final long serialVersionUID = -8251903872394461493L;
 	private final UUID uuid;
 	private final String displayName;
 	private DiskConfiguration diskConfig = new DiskConfiguration();
@@ -31,5 +32,9 @@ public class LinkedDisk implements Serializable {
 
 	public DiskConfiguration getDiskConfig() {
 		return diskConfig;
+	}
+
+	public void setDiskConfiguration(DiskConfiguration diskConfig) {
+		this.diskConfig = diskConfig;
 	}
 }

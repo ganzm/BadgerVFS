@@ -151,4 +151,11 @@ public class VFSJournaling {
 			journalingEnabled = true;
 		}
 	}
+
+	public void replayInitialJournal(Journal journal) {
+
+		for (JournalItem item : journal.getJournalEntries()) {
+			// TODO
+		}
+	}
 }

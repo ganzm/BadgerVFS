@@ -3,10 +3,14 @@ package ch.eth.jcd.badgers.vfs.core.journaling;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 
 public class Journal implements Serializable {
 
@@ -27,6 +31,9 @@ public class Journal implements Serializable {
 	private long clientVersion;
 
 	private List<JournalItem> journalEntries = new ArrayList<>();
+
+	private Map<UUID, RemoteInputStream> entriesToUpload;
+	private Map<UUID, RemoteOutputStream> entriesToDownload;
 
 	public Journal(List<JournalItem> uncommitedJournalEntries) {
 		// copy entries

@@ -151,4 +151,8 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 		throw new UnsupportedOperationException("TODO");
 	}
 
+	@Override
+	public Journal linkDisk(String hostName) throws VFSException {
+		throw new UnsupportedOperationException("TODO");
+	}
 }

@@ -5,15 +5,15 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
 
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 
 public interface AdministrationRemoteInterface extends Remote {
 
 	/**
-	 * Returns all Disk currently managed by the server for the user which is currently loged in
+	 * Returns all Disk currently managed by the server for the user which is currently logged in
 	 * 
 	 * @return
 	 */
@@ -29,7 +29,7 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	DiskRemoteInterface linkNewDisk(LinkedDisk linkedDisk, RemoteInputStream diskFileContent) throws RemoteException;
+	DiskRemoteInterface linkNewDisk(LinkedDisk linkedDisk, Journal journal) throws RemoteException, VFSException;
 
 	/**
 	 * This method is called from the client whenever a linked disk was opened or when the client wants to use and copy an existing disk located on the server

@@ -14,6 +14,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryBlock;
 import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 import ch.eth.jcd.badgers.vfs.util.SecurityUtil;
 
@@ -60,6 +61,8 @@ public final class HeaderSectionHandler {
 	private long directorySectionOffset;
 
 	private long dataSectionOffset;
+
+	private long linkedHostNamePosition;
 
 	private HeaderSectionHandler() {
 	}
@@ -118,9 +121,10 @@ public final class HeaderSectionHandler {
 		virtualDiskFile.write(header.salt);
 
 		// write linkedHostName
+		header.linkedHostNamePosition = virtualDiskFile.getFilePointer();
 		header.linkedHostName = config.getLinkedHostName();
 		if (header.linkedHostName == null) {
-			virtualDiskFile.skipBytes(LINKEDHOSTNAME_FIELD_LENGTH);
+			virtualDiskFile.write(Arrays.copyOf(new byte[0], LINKEDHOSTNAME_FIELD_LENGTH));
 		} else {
 			virtualDiskFile.write(Arrays.copyOf(header.linkedHostName.getBytes(cs), LINKEDHOSTNAME_FIELD_LENGTH));
 		}
@@ -221,6 +225,7 @@ public final class HeaderSectionHandler {
 		LOGGER.debug("Salt: " + saltString);
 
 		// read linkedHostName
+		header.linkedHostNamePosition = virtualDiskFile.getFilePointer();
 		byte[] linkedHostNameBytes = new byte[LINKEDHOSTNAME_FIELD_LENGTH];
 		virtualDiskFile.read(linkedHostNameBytes);
 		header.linkedHostName = new String(linkedHostNameBytes, cs).trim();
@@ -258,4 +263,20 @@ public final class HeaderSectionHandler {
 
 	}
 
+	public void setLinkedHostName(RandomAccessFile virtualDiskFile, String hostName) throws VFSException {
+		if (linkedHostName != null) {
+			throw new VFSException("Disk is already linked to [" + hostName + "]");
+		}
+
+		try {
+			this.linkedHostName = hostName;
+
+			virtualDiskFile.seek(linkedHostNamePosition);
+			virtualDiskFile.write(Arrays.copyOf(hostName.getBytes(cs), LINKEDHOSTNAME_FIELD_LENGTH));
+
+			LOGGER.info("Disk now linked to " + hostName);
+		} catch (IOException e) {
+			throw new VFSException("", e);
+		}
+	}
 }

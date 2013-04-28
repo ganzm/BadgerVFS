@@ -11,13 +11,17 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
+import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImplFactory;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
@@ -43,8 +47,33 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	}
 
 	@Override
-	public DiskRemoteInterface linkNewDisk(final LinkedDisk linkedDisk, final RemoteInputStream diskFileContent) throws RemoteException {
-		throw new UnsupportedOperationException("TODO");
+	public DiskRemoteInterface linkNewDisk(final LinkedDisk linkedDisk, final Journal journal) throws RemoteException, VFSException {
+		UserAccount userAccout = this.clientLink.getUserAccount();
+
+		File bfsFolder = config.getBfsFileFolder();
+		String bfsFilePath = bfsFolder.getAbsolutePath() + File.separator + linkedDisk.getId() + ".bfs";
+
+		// create server side DiskConfiguration
+		DiskConfiguration diskConfiguration = new DiskConfiguration();
+		diskConfiguration.setCompressionAlgorithm(Compression.NONE);
+		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
+		diskConfiguration.setHostFilePath(bfsFilePath);
+		diskConfiguration.setMaximumSize(-1);
+
+		// override diskConfiguration
+		linkedDisk.setDiskConfiguration(diskConfiguration);
+		userAccout.addLinkedDisk(linkedDisk);
+
+		// Create Disk and DiskManager
+		VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
+		VFSDiskManagerImpl diskManager = (VFSDiskManagerImpl) factory.createDiskManager(diskConfiguration);
+
+		diskManager.replayInitialJournal(journal);
+
+		DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager);
+		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
+		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+		return stub;
 	}
 
 	@Override

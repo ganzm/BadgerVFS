@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -32,6 +34,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSDisabledJournaling;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateDirectoryItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateFileItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
@@ -379,4 +383,38 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		journaling.addJournalItem(journalEntry);
 	}
 
+	public Journal linkDisk(String hostName) throws VFSException {
+		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
+		List<JournalItem> journalItems = new ArrayList<>();
+		for (VFSEntry entry : getRoot().getChildren()) {
+			if (entry.isDirectory()) {
+
+				addDirectoryToJournal(journalItems, entry);
+			} else {
+				journalItems.add(new CreateFileItem(entry));
+			}
+		}
+		Journal j = new Journal(journalItems);
+		return j;
+	}
+
+	private void addDirectoryToJournal(List<JournalItem> journalItems, VFSEntry entry) throws VFSException {
+		journalItems.add(new CreateDirectoryItem(entry));
+		for (VFSEntry childEntry : entry.getChildren()) {
+			if (childEntry.isDirectory()) {
+				addDirectoryToJournal(journalItems, childEntry);
+			} else {
+				journalItems.add(new CreateFileItem(childEntry));
+			}
+		}
+	}
+
+	/**
+	 * This method is called on the synchronization server whenever a client publishes his disk
+	 * 
+	 * @param journal
+	 */
+	public void replayInitialJournal(Journal journal) {
+		journaling.replayInitialJournal(journal);
+	}
 }
