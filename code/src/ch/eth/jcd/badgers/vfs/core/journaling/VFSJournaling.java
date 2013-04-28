@@ -110,7 +110,7 @@ public class VFSJournaling {
 		if (journalingEnabled) {
 			uncommitedJournalEntries.add(journalEntry);
 		} else {
-			LOGGER.debug("Journaling disabled drop " + journalEntry);
+			LOGGER.debug("Journaling disabled -  drop " + journalEntry);
 		}
 	}
 

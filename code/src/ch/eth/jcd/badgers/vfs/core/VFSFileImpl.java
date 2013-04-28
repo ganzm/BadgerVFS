@@ -101,6 +101,7 @@ public class VFSFileImpl extends VFSEntryImpl {
 				out.write(buffer, 0, numBytes);
 			}
 
+			diskManager.addJournalItem(new ModifyFileItem(newFile));
 		} catch (IOException ex) {
 			throw new VFSException("Error while copying data from " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath(), ex);
 		} finally {

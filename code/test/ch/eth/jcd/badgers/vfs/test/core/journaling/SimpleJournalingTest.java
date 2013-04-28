@@ -64,7 +64,6 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 		LOGGER.info("Rename other file");
 		otherFile.renameTo("test.txt");
-
 		otherFile.copyTo(subDir2.getChildPath("test.txt"));
 		otherFile.moveTo(root.getChildPath("renamed.txt"));
 
