@@ -155,4 +155,8 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	public Journal linkDisk(String hostName) throws VFSException {
 		throw new UnsupportedOperationException("TODO");
 	}
+
+	@Override
+	public void pauseJournaling(boolean pause) {
+	}
 }

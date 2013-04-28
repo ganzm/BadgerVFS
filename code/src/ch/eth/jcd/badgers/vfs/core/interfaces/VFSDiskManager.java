@@ -99,4 +99,6 @@ public interface VFSDiskManager {
 	 * @return
 	 */
 	Journal linkDisk(String hostName) throws VFSException;
+
+	void pauseJournaling(boolean pause);
 }

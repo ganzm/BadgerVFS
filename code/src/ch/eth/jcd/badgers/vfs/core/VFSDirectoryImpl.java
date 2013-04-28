@@ -172,7 +172,7 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
-		throw new VFSException("getInputStream() does not work on directories");
+		throw new VFSException("getOutputStream() does not work on directories");
 	}
 
 	@Override

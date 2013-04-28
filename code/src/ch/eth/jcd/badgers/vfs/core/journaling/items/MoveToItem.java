@@ -8,6 +8,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class MoveToItem extends JournalItem {
 
+	private static final long serialVersionUID = 788902060408180786L;
+
 	protected static final Logger LOGGER = Logger.getLogger(MoveToItem.class);
 
 	private final String oldPathString;
@@ -19,7 +21,7 @@ public class MoveToItem extends JournalItem {
 	}
 
 	@Override
-	public void replay(VFSDiskManager diskManager) throws VFSException {
+	public void doReplay(VFSDiskManager diskManager) throws VFSException {
 		LOGGER.debug("Journal - Move Entry " + oldPathString + " to " + newPathString);
 		VFSPath path = diskManager.createPath(oldPathString);
 		VFSPath newPath = diskManager.createPath(newPathString);

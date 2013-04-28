@@ -8,6 +8,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class RenameEntryItem extends JournalItem {
 
+	private static final long serialVersionUID = 4354596804041585526L;
+
 	protected static final Logger LOGGER = Logger.getLogger(RenameEntryItem.class);
 
 	private final String oldPath;
@@ -19,7 +21,7 @@ public class RenameEntryItem extends JournalItem {
 	}
 
 	@Override
-	public void replay(VFSDiskManager diskManager) throws VFSException {
+	public void doReplay(VFSDiskManager diskManager) throws VFSException {
 		LOGGER.debug("Journal - Rename " + oldPath + " to " + newName);
 		VFSPath path = diskManager.createPath(oldPath);
 		path.getVFSEntry().renameTo(newName);

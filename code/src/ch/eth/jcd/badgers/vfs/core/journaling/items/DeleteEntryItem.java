@@ -9,6 +9,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class DeleteEntryItem extends JournalItem {
 
+	private static final long serialVersionUID = 8152410141037332312L;
+
 	protected static final Logger LOGGER = Logger.getLogger(DeleteEntryItem.class);
 
 	private final String absolutePath;
@@ -18,7 +20,7 @@ public class DeleteEntryItem extends JournalItem {
 	}
 
 	@Override
-	public void replay(VFSDiskManager diskManager) throws VFSException {
+	public void doReplay(VFSDiskManager diskManager) throws VFSException {
 		LOGGER.debug("Journal - Delete Entry " + absolutePath);
 		VFSPath path = diskManager.createPath(absolutePath);
 		path.getVFSEntry().delete();

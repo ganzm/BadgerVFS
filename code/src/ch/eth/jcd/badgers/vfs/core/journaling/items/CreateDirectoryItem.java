@@ -25,7 +25,7 @@ public class CreateDirectoryItem extends JournalItem {
 	}
 
 	@Override
-	public void replay(VFSDiskManager diskManager) throws VFSException {
+	public void doReplay(VFSDiskManager diskManager) throws VFSException {
 		LOGGER.debug("Journal - Create Directory " + absolutePath);
 		VFSPath path = diskManager.createPath(absolutePath);
 		path.createDirectory();

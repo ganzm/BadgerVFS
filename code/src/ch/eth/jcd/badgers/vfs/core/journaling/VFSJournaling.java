@@ -12,10 +12,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
+import ch.eth.jcd.badgers.vfs.core.VFSFileImpl;
 import ch.eth.jcd.badgers.vfs.core.VFSPathImpl;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateDirectoryItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateFileItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.ModifyFileItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 
@@ -32,7 +36,7 @@ public class VFSJournaling {
 	/**
 	 * Flag disables journaling temporary
 	 * 
-	 * we dont need journaling while writing journal information to the disk
+	 * we don't need journaling while writing journal information to the disk
 	 */
 	private boolean journalingEnabled = true;
 
@@ -47,13 +51,10 @@ public class VFSJournaling {
 	}
 
 	public void closeJournal() throws VFSException {
-
 		VFSEntry journalsFolder = getJournalsFolder();
 
 		// determine name of the journal file
-
 		List<VFSEntry> journals = journalsFolder.getChildren();
-
 		long journalNumber = 1 + journals.size() + getLastSeenServerVersion();
 
 		writeJournal(journalsFolder, journalNumber, uncommitedJournalEntries);
@@ -152,10 +153,26 @@ public class VFSJournaling {
 		}
 	}
 
-	public void replayInitialJournal(Journal journal) {
+	public Journal createJournal(VFSEntry root) throws VFSException {
+		List<JournalItem> journalItems = new ArrayList<>();
+		addDirectoryToJournal(journalItems, root);
+		Journal j = new Journal(journalItems);
+		return j;
+	}
 
-		for (JournalItem item : journal.getJournalEntries()) {
-			// TODO
+	private void addDirectoryToJournal(List<JournalItem> journalItems, VFSEntry entry) throws VFSException {
+		for (VFSEntry childEntry : entry.getChildren()) {
+			if (childEntry.isDirectory()) {
+				journalItems.add(new CreateDirectoryItem(childEntry));
+				addDirectoryToJournal(journalItems, childEntry);
+			} else {
+				journalItems.add(new CreateFileItem(childEntry));
+				journalItems.add(new ModifyFileItem((VFSFileImpl) childEntry));
+			}
 		}
+	}
+
+	public void pauseJournaling(boolean pause) {
+		journalingEnabled = !pause;
 	}
 }

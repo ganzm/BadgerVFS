@@ -17,7 +17,7 @@ public class Journal implements Serializable {
 	private static final long serialVersionUID = -4125853629235672102L;
 
 	/**
-	 * This is the Version last seen on the synchronisation server
+	 * This is the Version last seen on the synchronization server
 	 * 
 	 * up to this version there are no differences from the local to the server side version
 	 * 
@@ -25,7 +25,7 @@ public class Journal implements Serializable {
 	private long serverVersion;
 
 	/**
-	 * Ignore this field if you are running code on the synchronisation server
+	 * Ignore this field if you are running code on the synchronization server
 	 * 
 	 */
 	private long clientVersion;

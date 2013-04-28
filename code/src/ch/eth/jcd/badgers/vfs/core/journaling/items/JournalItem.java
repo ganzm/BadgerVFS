@@ -9,5 +9,15 @@ public abstract class JournalItem implements Serializable {
 
 	private static final long serialVersionUID = 6217683568058825388L;
 
-	public abstract void replay(VFSDiskManager diskManager) throws VFSException;
+	public void replay(VFSDiskManager diskManager) throws VFSException {
+		// actions performed on the disk should not be added to the journal for oviousreasons
+		diskManager.pauseJournaling(true);
+		try {
+			doReplay(diskManager);
+		} finally {
+			diskManager.pauseJournaling(false);
+		}
+	}
+
+	public abstract void doReplay(VFSDiskManager diskManager) throws VFSException;
 }

@@ -18,13 +18,12 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 /**
  * $Id$
  * 
- * 
- * TODO describe VFSFileImpl
+ * This class represents a single file located on the virtual file system
  * 
  */
 public class VFSFileImpl extends VFSEntryImpl {
 
-	private static final Logger LOGGER = Logger.getLogger(VFSDiskManagerImpl.class);
+	private static final Logger LOGGER = Logger.getLogger(VFSFileImpl.class);
 
 	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
 		super(diskManager, path, firstDataBlock);

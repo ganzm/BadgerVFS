@@ -76,7 +76,7 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 		VFSPath libPath = root.getChildPath("lib");
 
 		VFSEntry homeDir = homePath.createDirectory();
-		VFSEntry libDir = libPath.createDirectory();
+		libPath.createDirectory();
 
 		VFSPath filePath1 = homeDir.getChildPath("anyFile1.bin");
 		VFSEntry fileEntry1 = filePath1.createFile();
