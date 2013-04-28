@@ -1,5 +1,8 @@
 package ch.eth.jcd.badgers.vfs.test.sync;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -22,8 +25,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 
 	private ConnectionStatus status;
 
-	private final String username = "user";
-	private final String password = "password";
+	private final String username = "asdf";
+	private final String password = "asdf";
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
@@ -42,22 +45,22 @@ public class SimpleLoginTest implements ConnectionStateListener {
 
 	@Test
 	public void testLogin() throws InterruptedException {
-		clientRemoteManager.addConnectionStateListener(this);
+		final CountDownLatch lock = new CountDownLatch(1);
 
-		final long startTime = System.currentTimeMillis();
-		final long timeout = 5000;
-		while (status != ConnectionStatus.CONNECTED && System.currentTimeMillis() - startTime < timeout) {
-			try {
-				Thread.sleep(100);
-			} catch (final InterruptedException e) {
+		final ConnectionStatus[] statusResult = new ConnectionStatus[1];
+		clientRemoteManager.startLogin(username, password, new ConnectionStateListener() {
+
+			@Override
+			public void connectionStateChanged(final ConnectionStatus status) {
+
+				statusResult[0] = status;
+				lock.countDown();
+
 			}
-		}
+		});
+		lock.await(5000, TimeUnit.MILLISECONDS);
 
-		Assert.assertEquals(ConnectionStatus.CONNECTED, status);
-
-		clientRemoteManager.startLogin(username, password);
-
-		Thread.sleep(2000);
+		Assert.assertEquals(ConnectionStatus.LOGGED_IN, statusResult[0]);
 
 	}
 

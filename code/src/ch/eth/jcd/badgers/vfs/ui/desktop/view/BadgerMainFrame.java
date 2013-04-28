@@ -172,7 +172,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 					"Close Disk?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if (retVal == JOptionPane.YES_OPTION) {
 				try {
-					desktopController.closeDisk(getDesktopFrame());
+					desktopController.closeAndLogout();
 				} catch (final VFSException e) {
 					SwingUtil.handleException(getDesktopFrame(), e);
 				}

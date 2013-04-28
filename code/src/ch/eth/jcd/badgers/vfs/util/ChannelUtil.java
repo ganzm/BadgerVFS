@@ -24,7 +24,7 @@ public final class ChannelUtil {
 	 * @param output
 	 * @throws IOException
 	 */
-	public static void fastStreamCopy(InputStream input, OutputStream output) throws IOException {
+	public static void fastStreamCopy(final InputStream input, final OutputStream output) throws IOException {
 
 		// get an channel from the stream
 		final ReadableByteChannel inputChannel = Channels.newChannel(input);
@@ -34,6 +34,8 @@ public final class ChannelUtil {
 		// closing the channels
 		inputChannel.close();
 		outputChannel.close();
+		input.close();
+		output.close();
 	}
 
 	/**

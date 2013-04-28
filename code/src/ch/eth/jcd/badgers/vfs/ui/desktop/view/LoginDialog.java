@@ -18,14 +18,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
-import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class LoginDialog extends JDialog {
 
@@ -120,32 +117,26 @@ public class LoginDialog extends JDialog {
 					loginButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-
-							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
-									new ActionObserver() {
+							wizardContext.setUsername(textFieldUsername.getText());
+							wizardContext.setPassword(new String(passwordField.getPassword()));
+							wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(),
+									new ConnectionStateListener() {
+										private ConnectionStateListener getConnectionStateListener() {
+											return this;
+										}
 
 										@Override
-										public void onActionFinished(final AbstractBadgerAction action) {
-											// i believe this is ugly, is there a way to set the adminInterface in a nicer manner
-											// I tend to think that this ActionObserver should not be set, but the RemoteManager must be the ActionObserver for
-											// this action, how can we dispose this login dialog from RemoteManager??
-											wizardContext.getRemoteManager().setAdminInterface(((LoginAction) action).getAdminInterface());
-
+										public void connectionStateChanged(final ConnectionStatus status) {
 											SwingUtilities.invokeLater(new Runnable() {
 												@Override
 												public void run() {
+													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 													dispose();
 													controller.openRemoteDiskDialog(wizardContext);
 												}
 											});
 										}
-
-										@Override
-										public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-											SwingUtil.handleException(getThis(), e);
-										}
 									});
-
 						}
 					});
 					loginButton.setMnemonic('l');
@@ -158,27 +149,26 @@ public class LoginDialog extends JDialog {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
 							wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
-									new ActionObserver() {
+									new ConnectionStateListener() {
+
+										private ConnectionStateListener getConnectionStateListener() {
+											return this;
+										}
 
 										@Override
-										public void onActionFinished(final AbstractBadgerAction action) {
-
-											wizardContext.getRemoteManager().setAdminInterface(((RegisterUserAction) action).getAdminInterface());
-
+										public void connectionStateChanged(final ConnectionStatus status) {
 											SwingUtilities.invokeLater(new Runnable() {
 												@Override
 												public void run() {
+													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 													dispose();
 													controller.openRemoteDiskDialog(wizardContext);
 
 												}
 											});
+
 										}
 
-										@Override
-										public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-											SwingUtil.handleException(getThis(), e);
-										}
 									});
 
 						}

@@ -82,7 +82,7 @@ public class BadgerMenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
-					parent.getController().closeDisk(parent);
+					parent.getController().closeDisk();
 					// if we open/create another disk the Browser Panel is shown
 					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 				} catch (final VFSException ex) {

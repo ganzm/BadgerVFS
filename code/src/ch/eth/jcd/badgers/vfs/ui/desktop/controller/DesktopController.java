@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
@@ -20,6 +21,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.OfflineRemoteManager;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
@@ -72,6 +75,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	 */
 	private RemoteManager remoteManager = null;
 
+	private RemoteSynchronisationWizardContext wizardContext;
+
 	public DesktopController(final BadgerViewBase desktopView) {
 		super(desktopView);
 	}
@@ -112,15 +117,15 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openLinkDiskDialog() {
-		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
-		final ServerUrlDialog dialog = new ServerUrlDialog(this, ctx);
+		wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, wizardContext);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
 	public void openConnectRemoteDialog() {
-		final RemoteSynchronisationWizardContext ctx = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
-		final ServerUrlDialog dialog = new ServerUrlDialog(this, ctx);
+		wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, wizardContext);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -139,6 +144,29 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void openLocalDiskFromRemoteDisk(final String path) throws VFSException {
 		openDisk(path);
+		if (remoteManager == null || wizardContext == null) {
+			// TODO IMPLEMENT LOGIN, WHEN OPENING a disk
+			LOGGER.info("Needs some implementation, when we open a disk locally, that has a link to a host!");
+		}
+		remoteManager.startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
+			}
+
+			@Override
+			public void connectionStateChanged(final ConnectionStatus status) {
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						remoteManager.removeConnectionStateListener(getConnectionStateListener());
+						remoteManager.startUseLinkedDisk(wizardContext.getSelectedDiskToLink());
+
+					}
+				});
+			}
+		});
+
 	}
 
 	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {
@@ -191,10 +219,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(path);
 
+		remoteManager = initRemoteManager(config);
+		remoteManager.start();
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
-
-		remoteManager = initRemoteManager(config);
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
@@ -224,6 +252,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
 
 		remoteManager = initRemoteManager(config);
+		remoteManager.start();
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
@@ -249,13 +278,17 @@ public class DesktopController extends BadgerController implements ActionObserve
 	 * @param desktopFrame
 	 * @throws VFSException
 	 */
-	public void closeDisk(final JFrame desktopFrame) throws VFSException {
+	public void closeDisk() throws VFSException {
 		if (isInManagementMode()) {
 			throw new VFSException("Cannot close new Disk - no current disk opened");
 		}
 
 		workerController.dispose();
 		workerController = null;
+		if (remoteManager != null) {
+			remoteManager.startCloseDisk();
+			remoteManager = null;
+		}
 		updateGUI();
 	}
 
@@ -525,6 +558,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public DiskWorkerController getWorkerController() {
 		return workerController;
+	}
+
+	public void closeAndLogout() throws VFSException {
+		closeDisk();
+		if (remoteManager != null) {
+			remoteManager.logout();
+		}
+
 	}
 
 }

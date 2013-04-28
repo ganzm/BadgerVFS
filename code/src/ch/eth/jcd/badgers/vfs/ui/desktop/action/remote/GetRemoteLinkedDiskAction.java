@@ -10,21 +10,20 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStreamServer;
+import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
 public class GetRemoteLinkedDiskAction extends RemoteAction {
 	private final String localDiskPath;
 	private final UUID diskId;
-	private final AdministrationRemoteInterface adminInterface;
+	private final RemoteManager remoteManager;
 	private static final Logger LOGGER = Logger.getLogger(GetRemoteLinkedDiskAction.class);
 
-	public GetRemoteLinkedDiskAction(final ActionObserver actionObserver, final AdministrationRemoteInterface adminInterface, final String localDiskPath,
-			final UUID diskId) {
+	public GetRemoteLinkedDiskAction(final ActionObserver actionObserver, final RemoteManager remoteManager, final String localDiskPath, final UUID diskId) {
 		super(actionObserver);
-		this.adminInterface = adminInterface;
+		this.remoteManager = remoteManager;
 		this.localDiskPath = localDiskPath;
 		this.diskId = diskId;
 	}
@@ -36,7 +35,7 @@ public class GetRemoteLinkedDiskAction extends RemoteAction {
 		try {
 			localDisk = new File(localDiskPath);
 			ros = RemoteOutputStreamServer.wrap(new FileOutputStream(localDisk));
-			adminInterface.getLinkedDisk(diskId, ros);
+			remoteManager.getAdminInterface().getLinkedDisk(diskId, ros);
 		} catch (final RemoteException | FileNotFoundException e) {
 			LOGGER.error(e);
 			throw new VFSException(e);

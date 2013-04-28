@@ -64,6 +64,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 	public void closeDisk(final DiskRemoteInterface diskRemoteInterface) throws RemoteException, VFSException {
 		((DiskRemoteInterfaceImpl) diskRemoteInterface).close();
+		LOGGER.info("closing disk for user Username: " + clientLink.getUserAccount().getUsername());
+
 		UnicastRemoteObject.unexportObject(diskRemoteInterface, true);
 	}
 
@@ -97,18 +99,13 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		try {
 			is = new FileInputStream(diskToFetch);
 			ChannelUtil.fastStreamCopy(is, remoteDiskFileContent);
-			remoteDiskFileContent.flush();
 		} catch (final IOException e) {
 			LOGGER.error("ERROR while fetching disk with UUID: " + diskId + " from Server", e);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (final IOException e) {
-					LOGGER.trace(e);
-				}
-			}
 		}
+	}
 
+	@Override
+	public void closeLinkedDisk(final DiskRemoteInterface diskInterface) throws RemoteException, VFSException {
+		closeDisk(diskInterface);
 	}
 }

@@ -22,6 +22,10 @@ public class DiskWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
+	public VFSDiskManager getDiskManager() {
+		return diskManager;
+	}
+
 	@Override
 	protected void performAction(final AbstractBadgerAction abstractAction) {
 		final DiskAction action = (DiskAction) abstractAction;
@@ -50,7 +54,7 @@ public class DiskWorkerController extends WorkerController {
 	protected void workerControllerDisposed() {
 		try {
 			diskManager.close();
-		} catch (VFSException e) {
+		} catch (final VFSException e) {
 			LOGGER.error("Error while closing DiskManager " + diskManager, e);
 		}
 	}

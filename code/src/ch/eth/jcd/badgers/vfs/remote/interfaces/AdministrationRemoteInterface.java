@@ -60,4 +60,14 @@ public interface AdministrationRemoteInterface extends Remote {
 	 */
 	void getLinkedDisk(UUID diskId, RemoteOutputStream remoteDiskFileContent) throws RemoteException, VFSException;
 
+	/**
+	 * The client must tell the server when he closes a currently opened disk. This is done via this method
+	 * 
+	 * @param diskInterface
+	 * @param diskId
+	 * @throws RemoteException
+	 * @throws VFSException
+	 */
+	void closeLinkedDisk(DiskRemoteInterface diskInterface) throws RemoteException, VFSException;
+
 }
