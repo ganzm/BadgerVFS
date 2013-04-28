@@ -77,7 +77,7 @@ public class RemoteManager implements ActionObserver {
 			return false;
 		}
 		connectionStateListeners.add(connectionStateListener);
-		final RegisterUserAction createLoginAction = new RegisterUserAction(this, this, username, password);
+		final RegisterUserAction createLoginAction = new RegisterUserAction(this, username, password);
 		remoteWorkerController.enqueue(createLoginAction);
 		return true;
 	}
@@ -138,6 +138,7 @@ public class RemoteManager implements ActionObserver {
 
 		else if (action instanceof UseLinkedDiskAction) {
 			currentLinkedDiskRemoteInterface = ((UseLinkedDiskAction) action).getResult();
+			this.setStatus(ConnectionStatus.DISK_MODE);
 		} else if (action instanceof LogoutAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
 		}
@@ -170,7 +171,7 @@ public class RemoteManager implements ActionObserver {
 
 	public boolean startCloseDisk() {
 		LOGGER.trace("Start closing Linked disk");
-		if (status != ConnectionStatus.LOGGED_IN) {
+		if (status != ConnectionStatus.DISK_MODE) {
 			LOGGER.trace("Cannot close linked disk, when remoteManager is not logged in");
 			return false;
 		}
@@ -193,7 +194,7 @@ public class RemoteManager implements ActionObserver {
 	}
 
 	public boolean logout() {
-		if (status != ConnectionStatus.CONNECTED || status != ConnectionStatus.LOGGED_IN) {
+		if (status != ConnectionStatus.CONNECTED || status != ConnectionStatus.LOGGED_IN || status != ConnectionStatus.DISK_MODE) {
 			return false;
 		}
 		final LogoutAction action = new LogoutAction(this, this);

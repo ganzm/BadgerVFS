@@ -161,9 +161,6 @@ public class NewRemoteDiskCreationDialog extends JDialog implements BadgerViewBa
 
 							@Override
 							public void onActionFinished(final AbstractBadgerAction action) {
-								// i believe this is ugly, is there a way to set the adminInterface in a nicer manner
-								// I tend to think that this ActionObserver should not be set, but the RemoteManager must be the ActionObserver for
-								// this action, how can we dispose this login dialog from RemoteManager??
 								SwingUtilities.invokeLater(new Runnable() {
 									@Override
 									public void run() {

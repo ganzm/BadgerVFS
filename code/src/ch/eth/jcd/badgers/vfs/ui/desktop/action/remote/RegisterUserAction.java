@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
 public class RegisterUserAction extends RemoteAction {
 
@@ -14,8 +13,8 @@ public class RegisterUserAction extends RemoteAction {
 	private final String password;
 	private AdministrationRemoteInterface adminInterface;
 
-	public RegisterUserAction(final ActionObserver observer, final RemoteManager remoteManager, final String username, final String password) {
-		super(observer);
+	public RegisterUserAction(final RemoteManager remoteManager, final String username, final String password) {
+		super(remoteManager);
 		this.remoteManager = remoteManager;
 		this.username = username;
 		this.password = password;
