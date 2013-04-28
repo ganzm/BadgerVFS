@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
@@ -17,11 +18,11 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CloseLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CreateNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.GetRemoteLinkedDiskAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LinkNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LogoutAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.UseLinkedDiskAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 /**
@@ -34,9 +35,8 @@ public class RemoteManager implements ActionObserver {
 
 	private final RemoteWorkerController remoteWorkerController;
 	private final String hostLink;
-	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
-	private RemoteSynchronisationWizardContext wizardContext;
+	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
 	private LoginRemoteInterface loginInterface;
 	private AdministrationRemoteInterface adminInterface;
@@ -97,6 +97,15 @@ public class RemoteManager implements ActionObserver {
 		}
 		final GetRemoteLinkedDiskAction getRemoteDiskAction = new GetRemoteLinkedDiskAction(actionObserver, this, localDiskPath, diskId);
 		remoteWorkerController.enqueue(getRemoteDiskAction);
+		return true;
+	}
+
+	public boolean startLinkNewDisk(final DiskConfiguration diskConfig, final ActionObserver actionObserver) {
+		if (status != ConnectionStatus.LOGGED_IN) {
+			return false;
+		}
+		final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(actionObserver, adminInterface, diskConfig);
+		remoteWorkerController.enqueue(linkNewDiskAction);
 		return true;
 	}
 
@@ -169,6 +178,10 @@ public class RemoteManager implements ActionObserver {
 		return adminInterface;
 	}
 
+	public String getHostLink() {
+		return hostLink;
+	}
+
 	public boolean startCloseDisk() {
 		LOGGER.trace("Start closing Linked disk");
 		if (status != ConnectionStatus.DISK_MODE) {
@@ -214,5 +227,4 @@ public class RemoteManager implements ActionObserver {
 	public void removeConnectionStateListener(final ConnectionStateListener connectionStateListener) {
 		connectionStateListeners.remove(connectionStateListener);
 	}
-
 }

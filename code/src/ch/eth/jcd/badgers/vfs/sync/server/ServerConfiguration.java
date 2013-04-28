@@ -8,10 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 
 public class ServerConfiguration {
 
@@ -49,7 +51,7 @@ public class ServerConfiguration {
 		}
 	}
 
-	public void persist() throws VFSException {
+	public synchronized void persist() throws VFSException {
 		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(bfsServerConfigFile));) {
 			out.writeObject(userAccounts);
 		} catch (final IOException e) {
@@ -88,6 +90,17 @@ public class ServerConfiguration {
 		for (final UserAccount user : userAccounts) {
 			if (user.getUsername().equalsIgnoreCase(username)) {
 				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean diskWithIdExists(final UUID diskId) {
+		for (final UserAccount user : userAccounts) {
+			for (final LinkedDisk disk : user.getLinkedDisks()) {
+				if (disk.getId().equals(diskId)) {
+					return true;
+				}
 			}
 		}
 		return false;

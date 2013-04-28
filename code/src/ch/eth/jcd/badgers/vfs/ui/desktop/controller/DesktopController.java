@@ -34,6 +34,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.LinkCurrentDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
@@ -170,7 +171,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {
-		throw new UnsupportedOperationException("TODO");
+		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(this, wizardContext.getRemoteManager());
+		workerController.enqueue(action);
 	}
 
 	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {

@@ -8,6 +8,7 @@ import java.util.UUID;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
+import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 
 public interface AdministrationRemoteInterface extends Remote {
@@ -29,6 +30,8 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
+	DiskRemoteInterface linkNewDisk2(LinkedDisk linkedDisk, RemoteInputStream diskFileContent) throws RemoteException, VFSException;
+
 	DiskRemoteInterface linkNewDisk(LinkedDisk linkedDisk, Journal journal) throws RemoteException, VFSException;
 
 	/**

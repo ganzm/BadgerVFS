@@ -3,7 +3,6 @@ package ch.eth.jcd.badgers.vfs.remote.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class RemoteInputStreamServer implements Readable {
@@ -44,6 +43,6 @@ public class RemoteInputStreamServer implements Readable {
 
 	public static RemoteInputStream wrap(final InputStream in) throws RemoteException {
 
-		return new RemoteInputStream((Readable) UnicastRemoteObject.exportObject(new RemoteInputStreamServer(in), Registry.REGISTRY_PORT));
+		return new RemoteInputStream((Readable) UnicastRemoteObject.exportObject(new RemoteInputStreamServer(in), 0));
 	}
 }

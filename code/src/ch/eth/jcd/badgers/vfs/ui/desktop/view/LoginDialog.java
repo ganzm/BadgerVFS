@@ -104,8 +104,24 @@ public class LoginDialog extends JDialog {
 					syncButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
-							dispose();
-							controller.startSyncToServer(getThis().wizardContext);
+							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
+									new ConnectionStateListener() {
+										private ConnectionStateListener getConnectionStateListener() {
+											return this;
+										}
+
+										@Override
+										public void connectionStateChanged(final ConnectionStatus status) {
+											SwingUtilities.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+													dispose();
+													controller.startSyncToServer(getThis().wizardContext);
+												}
+											});
+										}
+									});
 						}
 					});
 					syncButton.setMnemonic('c');

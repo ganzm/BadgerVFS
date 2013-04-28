@@ -34,8 +34,8 @@ public final class ChannelUtil {
 		// closing the channels
 		inputChannel.close();
 		outputChannel.close();
-		input.close();
-		output.close();
+		// input.close();
+		// output.close();
 	}
 
 	/**
