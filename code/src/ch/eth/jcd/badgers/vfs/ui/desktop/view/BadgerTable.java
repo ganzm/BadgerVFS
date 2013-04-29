@@ -35,6 +35,13 @@ public class BadgerTable extends JScrollPane {
 	private final EntryCellEditor entryCellEditor;
 	private final BadgerMainFrame parent;
 
+	/**
+	 * we don't need this constructor but WindowBuilder likes it :)
+	 */
+	protected BadgerTable() {
+		this(new BadgerMainFrame());
+	}
+
 	public BadgerTable(final BadgerMainFrame parent) {
 		this.parent = parent;
 		addMouseListener(new MouseAdapter() {
@@ -138,7 +145,7 @@ public class BadgerTable extends JScrollPane {
 	/**
 	 * copied from http://stackoverflow.com/questions/2019371/swing-setting-a-function-key-f2-as-an-accelerator
 	 * 
-	 * @param tableFolderEntries2
+	 * @param table
 	 */
 	private static void removeKeysFromJTableInputMap(final JTable table) {
 		final KeyStroke f2KeyToRemove = KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0);

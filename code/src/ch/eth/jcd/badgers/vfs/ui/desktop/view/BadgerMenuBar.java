@@ -44,11 +44,14 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JButton btnSearch;
 	private final JTextField textFieldSearch;
 
-	public JTextField getTextFieldSearch() {
-		return textFieldSearch;
-	}
-
 	private final BadgerMainFrame parent;
+
+	/**
+	 * we don't need this constructor but WindowBuilder likes it :)
+	 */
+	protected BadgerMenuBar() {
+		this(null);
+	}
 
 	public BadgerMenuBar(final BadgerMainFrame parent) {
 		this.parent = parent;
@@ -211,6 +214,10 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 
 		add(btnSearch);
+	}
+
+	public JTextField getTextFieldSearch() {
+		return textFieldSearch;
 	}
 
 	private JMenuItem getPasteMenuItem(final EntryUiModel entry) {

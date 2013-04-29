@@ -47,6 +47,13 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	private final JCheckBox chckbxRegexSearch;
 
 	/**
+	 * we don't need this constructor but WindowBuilder likes it :)
+	 */
+	protected SearchPanel() {
+		this(null, new JTextField());
+	}
+
+	/**
 	 * Create the panel.
 	 * 
 	 * @param searchTextField
