@@ -21,7 +21,6 @@ public class SynchronisationServer {
 
 	public void stop() throws VFSException {
 		LOGGER.info("Stop Server");
-
 	}
 
 	/**

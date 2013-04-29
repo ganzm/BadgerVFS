@@ -137,7 +137,7 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 	public void testSimpleSync() throws RemoteException, VFSException {
 		LOGGER.info("Start login");
 
-		WaitUntilConnected();
+		waitUntilConnected();
 
 		boolean result = clientRemoteManager.startLogin(username, password, this);
 		Assert.assertTrue(result);
@@ -165,7 +165,7 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 		DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
 	}
 
-	private void WaitUntilConnected() {
+	private void waitUntilConnected() {
 		final long startTime = System.currentTimeMillis();
 		final long timeout = 5000;
 		while (status != ConnectionStatus.CONNECTED && System.currentTimeMillis() - startTime < timeout) {

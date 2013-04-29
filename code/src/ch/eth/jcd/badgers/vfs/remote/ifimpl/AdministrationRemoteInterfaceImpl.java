@@ -87,6 +87,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		// override diskConfiguration
 		linkedDisk.setDiskConfiguration(diskConfiguration);
 		userAccout.addLinkedDisk(linkedDisk);
+		config.persist();
 
 		// Create Disk and DiskManager
 		final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();

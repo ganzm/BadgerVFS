@@ -1,6 +1,6 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
-public abstract class BadgerController {
+public class BadgerController {
 
 	/**
 	 * Reference to the view component

@@ -68,6 +68,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 						}
 					}
 				} catch (final Exception e) {
+					LOGGER.debug(e);
 					// If Nimbus is not available, you can set the GUI to another look and feel.
 				}
 				final BadgerMainFrame frame = new BadgerMainFrame();

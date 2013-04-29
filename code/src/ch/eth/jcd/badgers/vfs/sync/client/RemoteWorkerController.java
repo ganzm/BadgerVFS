@@ -10,9 +10,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkerController;
 public class RemoteWorkerController extends WorkerController {
 	private static final Logger LOGGER = Logger.getLogger(RemoteWorkerController.class);
 
-	public RemoteWorkerController() {
-	}
-
 	public void enqueue(final RemoteAction action) {
 		super.enqueue(action);
 	}

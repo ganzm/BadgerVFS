@@ -21,7 +21,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
@@ -36,7 +35,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog {
 
 	private static final long serialVersionUID = -2652867330270571476L;
 
-	private final DesktopController ownerController;
+	private final DesktopController controller;
 
 	private final JPanel contentPanel = new JPanel();
 	private final JTextField txtPath;
@@ -46,7 +45,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog {
 	 */
 	public GetRemoteLinkedDiskDialog(final DesktopController ownerController, final RemoteSynchronisationWizardContext wizardContext) {
 		super((BadgerMainFrame) ownerController.getView(), "Set filepath for remote disk", true);
-		this.ownerController = ownerController;
+		this.controller = ownerController;
 
 		setBounds(100, 100, 400, 213);
 		getContentPane().setLayout(new BorderLayout());
@@ -128,7 +127,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog {
 											public void run() {
 												dispose();
 												try {
-													ownerController.openLocalDiskFromRemoteDisk(txtPath.getText());
+													controller.openLocalDiskFromRemoteDisk(txtPath.getText());
 												} catch (final VFSException e) {
 													SwingUtil.handleException(getThis(), e);
 												}
@@ -169,20 +168,6 @@ public class GetRemoteLinkedDiskDialog extends JDialog {
 	private void init() {
 		final String home = System.getProperty("user.home");
 		txtPath.setText(home + File.separator + DEFAULT_FILE_NAME);
-	}
-
-	private void createDisk() {
-		try {
-			LOGGER.info("Create Disk");
-
-			final DiskConfiguration config = new DiskConfiguration();
-
-			config.setHostFilePath(txtPath.getText());
-
-			ownerController.createDisk(config);
-		} catch (final VFSException e) {
-			SwingUtil.handleException(this, e);
-		}
 	}
 
 	protected Component getComponent() {
