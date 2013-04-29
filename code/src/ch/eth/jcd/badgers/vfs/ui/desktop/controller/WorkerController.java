@@ -42,6 +42,13 @@ public abstract class WorkerController implements Runnable {
 		}
 	}
 
+	protected void enqueueBlocking(final AbstractBadgerAction action) throws InterruptedException {
+		synchronized (action) {
+			enqueue(action);
+			action.wait();
+		}
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -55,6 +62,10 @@ public abstract class WorkerController implements Runnable {
 					performAction(action);
 				} catch (final Exception ex) {
 					LOGGER.error("Error while performing Action " + action, ex);
+				} finally {
+					synchronized (action) {
+						action.notifyAll();
+					}
 				}
 			}
 		} finally {

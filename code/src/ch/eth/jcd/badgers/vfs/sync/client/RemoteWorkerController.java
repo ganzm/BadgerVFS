@@ -14,6 +14,10 @@ public class RemoteWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
+	public void enqueueBlocking(final RemoteAction action) throws InterruptedException {
+		super.enqueueBlocking(action);
+	}
+
 	@Override
 	protected void performAction(final AbstractBadgerAction abstractAction) {
 		final RemoteAction action = (RemoteAction) abstractAction;
