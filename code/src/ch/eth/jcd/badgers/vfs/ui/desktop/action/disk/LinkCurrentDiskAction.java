@@ -12,6 +12,7 @@ public class LinkCurrentDiskAction extends DiskAction {
 	private final ActionObserver actionObserver;
 
 	private final RemoteManager manager;
+	private DiskConfiguration diskConfig;
 
 	public LinkCurrentDiskAction(final ActionObserver actionObserver, final RemoteManager manager) {
 		super(actionObserver);
@@ -23,8 +24,13 @@ public class LinkCurrentDiskAction extends DiskAction {
 	public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
 		String hostLink = manager.getHostLink();
 		Journal journal = diskManager.linkDisk(hostLink);
-		DiskConfiguration diskConfig = diskManager.getDiskConfiguration();
+		diskConfig = diskManager.getDiskConfiguration();
 
 		manager.linkNewDisk(diskConfig, journal, actionObserver);
 	}
+
+	public DiskConfiguration getDiskConfiguration() {
+		return diskConfig;
+	}
+
 }

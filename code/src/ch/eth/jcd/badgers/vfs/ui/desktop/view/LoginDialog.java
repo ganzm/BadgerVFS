@@ -18,6 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
@@ -25,6 +27,8 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContex
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
 
 public class LoginDialog extends JDialog {
+
+	private static final Logger LOGGER = Logger.getLogger(LoginDialog.class);
 
 	private static final long serialVersionUID = 6008623672955958103L;
 	private final JTextField textFieldUsername;
@@ -112,6 +116,7 @@ public class LoginDialog extends JDialog {
 
 										@Override
 										public void connectionStateChanged(final ConnectionStatus status) {
+											LOGGER.debug("Connection state changed to " + status);
 											SwingUtilities.invokeLater(new Runnable() {
 												@Override
 												public void run() {

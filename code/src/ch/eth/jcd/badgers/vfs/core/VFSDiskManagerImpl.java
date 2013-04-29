@@ -386,6 +386,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 */
 	public Journal linkDisk(String hostName) throws VFSException {
 		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
+		config.setLinkedHostName(hostName);
 		return journaling.createJournal(getRoot());
 	}
 

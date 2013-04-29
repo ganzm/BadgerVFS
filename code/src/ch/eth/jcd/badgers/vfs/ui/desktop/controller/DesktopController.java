@@ -221,10 +221,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		config.setHostFilePath(path);
 
 		remoteManager = initRemoteManager(config);
-		if (remoteManager != null) {
-			remoteManager.addConnectionStateListener(this);
-			remoteManager.start();
-		}
+
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
 
@@ -244,7 +241,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 			return null;
 		}
 
-		return new RemoteManager(hostLink);
+		RemoteManager mgr = new RemoteManager(hostLink);
+		mgr.addConnectionStateListener(this);
+		mgr.start();
+		return mgr;
 	}
 
 	public void createDisk(final DiskConfiguration config) throws VFSException {
@@ -256,10 +256,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
 
 		remoteManager = initRemoteManager(config);
-		if (remoteManager != null) {
-			remoteManager.addConnectionStateListener(this);
-			remoteManager.start();
-		}
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
@@ -341,6 +337,11 @@ public class DesktopController extends BadgerController implements ActionObserve
 		} else if (action instanceof CutAction) {
 			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
 			workerController.enqueue(reloadCurrentFolderAction);
+
+		} else if (action instanceof LinkCurrentDiskAction) {
+			final LinkCurrentDiskAction linkCurrentDiskAction = (LinkCurrentDiskAction) action;
+			remoteManager = initRemoteManager(linkCurrentDiskAction.getDiskConfiguration());
+			updateGUI();
 		} else {
 			LOGGER.debug("Action " + action.getClass().getName() + " not handled in " + this.getClass().getName());
 		}
