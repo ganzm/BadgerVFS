@@ -6,13 +6,15 @@ import java.io.Serializable;
 
 public class RemoteInputStream extends InputStream implements Serializable {
 
+	private static final int BUFFER_SIZE = 1024;
+
 	private static final long serialVersionUID = 1L;
 
 	private final Readable source;
 	private byte buffer[];
 	private int pos;
 	private int exp;
-	private final static int MAX_EXP = 6; // max fetch size = 2^MAX_EXP (64 KB)
+	private final static int MAX_EXP = 12; // max fetch size = 2^MAX_EXP (4 MB)
 
 	RemoteInputStream(final Readable source) {
 		this.source = source;
@@ -25,7 +27,7 @@ public class RemoteInputStream extends InputStream implements Serializable {
 			return -1;
 		}
 		if (buffer == null || pos > buffer.length - 1) {
-			buffer = source.read(1024 * (exp > MAX_EXP ? 1 << MAX_EXP : 1 << exp++)); // max 64 KB fetch
+			buffer = source.read(BUFFER_SIZE * (exp > MAX_EXP ? 1 << MAX_EXP : 1 << exp++));
 			pos = 0;
 			if (buffer.length == 0) {
 				pos = -2;

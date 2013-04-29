@@ -6,14 +6,16 @@ import java.io.Serializable;
 
 public class RemoteOutputStream extends OutputStream implements Serializable {
 
+	private static final int BUFFER_SIZE = 1024;
+
 	private static final long serialVersionUID = 1L;
 
 	private final Writeable target;
 
-	private byte buffer[] = new byte[1024];
+	private byte buffer[] = new byte[BUFFER_SIZE];
 	private int pos = -1;
 	private int exp;
-	private final static int MAX_EXP = 6; // 2^MAX_EXP (64 KB) = buffer size
+	private final static int MAX_EXP = 12; // 2^MAX_EXP (4 MB) = buffer size
 
 	RemoteOutputStream(final Writeable target) {
 		this.target = target;
@@ -27,7 +29,7 @@ public class RemoteOutputStream extends OutputStream implements Serializable {
 			target.write(buffer);
 			pos = -1;
 			if (exp <= MAX_EXP) {
-				buffer = new byte[1024 * (1 << exp++)];
+				buffer = new byte[BUFFER_SIZE * (1 << exp++)];
 			}
 		}
 	}
