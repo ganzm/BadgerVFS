@@ -3,6 +3,7 @@ package ch.eth.jcd.badgers.vfs.test.sync;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Random;
@@ -42,10 +43,10 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 	private ServerConfiguration serverConfig;
 	private SynchronisationServer syncServer;
 	private RemoteManager clientRemoteManager;
-	private String hostLink = "localhost";
+	private final String hostLink = "localhost";
 	private VFSDiskManagerImpl diskManager;
-	private final String username = "user";
-	private final String password = "password";
+	private final String username = new BigInteger(130, new Random()).toString(32);
+	private final String password = "asdf";
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {

@@ -84,11 +84,11 @@ public class RemoteManager implements ActionObserver {
 		return true;
 	}
 
-	public boolean startCreateNewDisk(final LinkedDisk prototype, final ActionObserver actionObserver) {
+	public boolean startCreateNewDisk(final String diskname, final ActionObserver actionObserver) {
 		if (status != ConnectionStatus.LOGGED_IN) {
 			return false;
 		}
-		final CreateNewDiskAction newDiskAction = new CreateNewDiskAction(actionObserver, this, prototype);
+		final CreateNewDiskAction newDiskAction = new CreateNewDiskAction(actionObserver, this, diskname);
 		remoteWorkerController.enqueue(newDiskAction);
 		return true;
 	}

@@ -45,6 +45,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 		ServerConfiguration config = ifManager.getConfig();
 		final UserAccount userAccount = new UserAccount(username, password);
 		config.setUserAccount(userAccount);
+		config.persist();
 		final ClientLink clientLink = new ClientLink(userAccount);
 
 		ifManager.addActiveClientLink(clientLink);

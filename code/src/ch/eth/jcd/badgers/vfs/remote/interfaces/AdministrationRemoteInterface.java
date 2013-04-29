@@ -48,7 +48,7 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @throws RemoteException
 	 * @throws VFSException
 	 */
-	void createNewDisk(LinkedDisk linkedDiskPrototype) throws RemoteException, VFSException;
+	void createNewDisk(String diskname) throws RemoteException, VFSException;
 
 	/**
 	 * This method is called from the client whenever on the server-side a disk shall be fetched.

@@ -51,14 +51,11 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	public DiskRemoteInterface linkNewDisk(final LinkedDisk linkedDisk, final Journal journal) throws RemoteException, VFSException {
 		final UserAccount userAccout = this.clientLink.getUserAccount();
 
-		final File bfsFolder = config.getBfsFileFolder();
-		final String bfsFilePath = bfsFolder.getAbsolutePath() + File.separator + linkedDisk.getId() + ".bfs";
-
 		// create server side DiskConfiguration
 		final DiskConfiguration diskConfiguration = new DiskConfiguration();
 		diskConfiguration.setCompressionAlgorithm(Compression.NONE);
 		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
-		diskConfiguration.setHostFilePath(bfsFilePath);
+		diskConfiguration.setHostFilePath(createDiskPathFromUUID(linkedDisk.getId()));
 		diskConfiguration.setMaximumSize(-1);
 
 		// override diskConfiguration
@@ -108,12 +105,18 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	}
 
 	@Override
-	public void createNewDisk(final LinkedDisk linkedDiskPrototype) throws RemoteException, VFSException {
-		final DiskConfiguration diskConfig = linkedDiskPrototype.getDiskConfig();
-		diskConfig.setHostFilePath(createDiskPathFromUUID(linkedDiskPrototype.getId()));
+	public void createNewDisk(final String diskname) throws RemoteException, VFSException {
+		final DiskConfiguration diskConfiguration = new DiskConfiguration();
+		diskConfiguration.setCompressionAlgorithm(Compression.NONE);
+		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
+		diskConfiguration.setMaximumSize(-1);
+
+		LinkedDisk linkedDisk = new LinkedDisk(diskname, diskConfiguration);
+		diskConfiguration.setHostFilePath(createDiskPathFromUUID(linkedDisk.getId()));
+
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
-		factory.createDiskManager(diskConfig);
-		clientLink.getUserAccount().addLinkedDisk(linkedDiskPrototype);
+		factory.createDiskManager(diskConfiguration);
+		clientLink.getUserAccount().addLinkedDisk(linkedDisk);
 		config.persist();
 	}
 

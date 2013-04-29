@@ -68,7 +68,6 @@ public class ServerConfiguration {
 	public void setUserAccount(final UserAccount userAccount) throws VFSException {
 		if (!accountExists(userAccount.getUsername())) {
 			userAccounts.add(userAccount);
-			persist();
 			return;
 		}
 		throw new VFSException("Username already exists");

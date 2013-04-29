@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.test.sync;
 
+import java.math.BigInteger;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +26,7 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	private static RemoteManager clientRemoteManager;
 	private static String hostLink = "localhost";
 
-	private static final String username = "asdf";
+	private static final String username = new BigInteger(130, new Random()).toString(32);
 	private static final String password = "asdf";
 
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
