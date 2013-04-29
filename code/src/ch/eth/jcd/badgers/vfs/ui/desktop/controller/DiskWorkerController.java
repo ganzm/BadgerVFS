@@ -22,6 +22,13 @@ public class DiskWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
+	public void enqueueBlocking(final DiskAction action) throws InterruptedException {
+		synchronized (action) {
+			enqueue(action);
+			action.wait();
+		}
+	}
+
 	public VFSDiskManager getDiskManager() {
 		return diskManager;
 	}
@@ -41,6 +48,10 @@ public class DiskWorkerController extends WorkerController {
 		} catch (final VFSException | RuntimeException e) {
 			LOGGER.error("", e);
 			actionFailed(action, e);
+		} finally {
+			synchronized (abstractAction) {
+				abstractAction.notifyAll();
+			}
 		}
 	}
 
