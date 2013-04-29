@@ -18,7 +18,7 @@ import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 public class ServerConfiguration {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerConfiguration.class);
-	private static final String DEFAULT_SERVER_FOLDER = System.getProperty("java.io.tmpdir") + File.separatorChar + "BadgersServerConfig";
+	public static final String DEFAULT_SERVER_FOLDER = System.getProperty("java.io.tmpdir") + File.separatorChar + "BadgersServerConfig";
 	private List<UserAccount> userAccounts;
 	private final File bfsFileFolder;
 	private final File bfsServerConfigFile;
