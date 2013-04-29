@@ -23,7 +23,6 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
-import ch.eth.jcd.badgers.vfs.sync.client.OfflineRemoteManager;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
@@ -56,7 +55,7 @@ import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
-public class DesktopController extends BadgerController implements ActionObserver {
+public class DesktopController extends BadgerController implements ActionObserver, ConnectionStateListener {
 	public enum ClipboardAction {
 		COPY, CUT
 	}
@@ -222,7 +221,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		config.setHostFilePath(path);
 
 		remoteManager = initRemoteManager(config);
-		remoteManager.start();
+		if (remoteManager != null) {
+			remoteManager.addConnectionStateListener(this);
+			remoteManager.start();
+		}
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
 
@@ -237,9 +239,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	private RemoteManager initRemoteManager(final DiskConfiguration config) {
 		final String hostLink = config.getLinkedHostName();
-		if (hostLink == null || "".equals(hostLink)) {
+		if (hostLink == null || hostLink.isEmpty()) {
 			LOGGER.debug("Disk not linked");
-			return new OfflineRemoteManager();
+			return null;
 		}
 
 		return new RemoteManager(hostLink);
@@ -254,7 +256,10 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final VFSDiskManager diskManager = factory.createDiskManager(config);
 
 		remoteManager = initRemoteManager(config);
-		remoteManager.start();
+		if (remoteManager != null) {
+			remoteManager.addConnectionStateListener(this);
+			remoteManager.start();
+		}
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
@@ -288,6 +293,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 		workerController.dispose();
 		workerController = null;
 		if (remoteManager != null) {
+			remoteManager.removeConnectionStateListener(this);
 			remoteManager.startCloseDisk();
 			remoteManager = null;
 		}
@@ -568,6 +574,19 @@ public class DesktopController extends BadgerController implements ActionObserve
 			remoteManager.logout();
 		}
 
+	}
+
+	public String getStatusText() {
+		if (remoteManager != null) {
+			return remoteManager.getConnectionStatus() + " " + remoteManager.getHostLink();
+		}
+
+		return null;
+	}
+
+	@Override
+	public void connectionStateChanged(ConnectionStatus status) {
+		updateGUI();
 	}
 
 }

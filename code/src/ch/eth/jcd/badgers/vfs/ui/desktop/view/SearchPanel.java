@@ -50,7 +50,7 @@ public class SearchPanel extends JPanel implements BadgerViewBase {
 	 * we don't need this constructor but WindowBuilder likes it :)
 	 */
 	protected SearchPanel() {
-		this(null, new JTextField());
+		this(new BadgerMainFrame(), new JTextField());
 	}
 
 	/**

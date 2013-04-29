@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.ui.desktop.view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -10,13 +11,16 @@ import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
@@ -50,6 +54,9 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	private final BadgerMenuBar menuBar;
 
 	private final BadgerTable table;
+	private JPanel panelCenter;
+	private JPanel panelStatusBar;
+	private JLabel lblStatusbar;
 
 	/**
 	 * Launch the application.
@@ -99,11 +106,24 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
 
-		contentPane.setLayout(new CardLayout());
+		panelStatusBar = new JPanel();
+		panelStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		panelStatusBar.setPreferredSize(new Dimension(getWidth(), 16));
+		panelStatusBar.setLayout(new BoxLayout(panelStatusBar, BoxLayout.X_AXIS));
+		contentPane.add(panelStatusBar, BorderLayout.SOUTH);
+
+		lblStatusbar = new JLabel("");
+		lblStatusbar.setHorizontalAlignment(SwingConstants.LEFT);
+		panelStatusBar.add(lblStatusbar);
+
+		panelCenter = new JPanel();
+		contentPane.add(panelCenter);
+		panelCenter.setLayout(new CardLayout());
 
 		final JPanel panelBrowsing = new JPanel();
-		contentPane.add(panelBrowsing, BROWSE_PANEL_NAME);
+		panelCenter.add(panelBrowsing, BROWSE_PANEL_NAME);
 		panelBrowsing.setLayout(new BorderLayout(0, 0));
 
 		final JPanel panelPathLocator = new JPanel();
@@ -141,12 +161,12 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 
 		panelBrowseMiddle.add(table, BorderLayout.CENTER);
 		panelSearch = new SearchPanel(this, menuBar.getTextFieldSearch());
-		contentPane.add(panelSearch, SEARCH_PANEL_NAME);
+		panelCenter.add(panelSearch, SEARCH_PANEL_NAME);
 	}
 
 	public void showCardLayoutPanel(final String panelName) {
-		final CardLayout cl = (CardLayout) (contentPane.getLayout());
-		cl.show(contentPane, panelName);
+		final CardLayout cl = (CardLayout) (panelCenter.getLayout());
+		cl.show(panelCenter, panelName);
 
 		searching = SEARCH_PANEL_NAME.equals(panelName);
 
@@ -197,6 +217,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		contentPane.setEnabled(diskMode);
 
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
+		this.lblStatusbar.setText(desktopController.getStatusText());
 	}
 
 	public DesktopController getController() {
@@ -215,5 +236,4 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	public BadgerTable getTable() {
 		return table;
 	}
-
 }
