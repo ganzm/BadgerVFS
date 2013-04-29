@@ -2,17 +2,10 @@ package ch.eth.jcd.badgers.vfs.sync.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImplFactory;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 
 public class UserAccount implements Serializable {
 
@@ -21,11 +14,15 @@ public class UserAccount implements Serializable {
 	private final String password;
 
 	private final List<LinkedDisk> linkedDisks = new ArrayList<>();
-	private final Map<UUID, DiskWorkerController> activeDiskControllers = new HashMap<UUID, DiskWorkerController>();
 
 	public UserAccount(final String username, final String password) {
 		this.username = username;
 		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		return "UserAccount " + username;
 	}
 
 	public String getUsername() {
@@ -49,21 +46,6 @@ public class UserAccount implements Serializable {
 			if (disk.getId().equals(diskId)) {
 				return disk;
 			}
-		}
-		return null;
-	}
-
-	public DiskWorkerController getDiskControllerForDiskWithId(final UUID diskId) throws VFSException {
-		final LinkedDisk disk = getLinkedDiskById(diskId);
-		if (disk != null) {
-			DiskWorkerController retVal = activeDiskControllers.get(diskId);
-			if (retVal == null || !retVal.isRunning()) {
-				final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
-				final VFSDiskManager diskManager = factory.openDiskManager(disk.getDiskConfig());
-				retVal = new DiskWorkerController(diskManager);
-				activeDiskControllers.put(diskId, retVal);
-			}
-			return retVal;
 		}
 		return null;
 	}

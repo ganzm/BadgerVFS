@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
@@ -100,13 +102,26 @@ public class RemoteManager implements ActionObserver {
 		return true;
 	}
 
-	public boolean startLinkNewDisk(final DiskConfiguration diskConfig, final ActionObserver actionObserver) {
-		if (status != ConnectionStatus.LOGGED_IN) {
-			return false;
+	/**
+	 * blocking call links a classic mode disk to a remote SynchronizationServer
+	 * 
+	 * @param diskConfig
+	 * @param actionObserver
+	 * @return
+	 * @throws VFSException
+	 */
+	public boolean linkNewDisk(final DiskConfiguration diskConfig, final Journal journal, final ActionObserver actionObserver) throws VFSException {
+		try {
+			if (status != ConnectionStatus.LOGGED_IN) {
+				return false;
+			}
+
+			final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(actionObserver, adminInterface, diskConfig, journal);
+			remoteWorkerController.enqueueBlocking(linkNewDiskAction);
+			return true;
+		} catch (InterruptedException e) {
+			throw new VFSException(e);
 		}
-		final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(actionObserver, adminInterface, diskConfig);
-		remoteWorkerController.enqueue(linkNewDiskAction);
-		return true;
 	}
 
 	public ConnectionStatus getConnectionStatus() {
@@ -122,6 +137,7 @@ public class RemoteManager implements ActionObserver {
 		if (action instanceof ConnectAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
 		} else {
+			// TODO remove GUI Code
 			SwingUtil.handleException(null, e);
 		}
 	}

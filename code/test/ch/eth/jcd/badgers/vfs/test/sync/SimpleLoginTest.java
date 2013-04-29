@@ -77,7 +77,6 @@ public class SimpleLoginTest implements ConnectionStateListener {
 		clientRemoteManager = new RemoteManager(hostLink);
 		clientRemoteManager.addConnectionStateListener(this);
 		clientRemoteManager.start();
-
 	}
 
 	private static void tearDownClient() {

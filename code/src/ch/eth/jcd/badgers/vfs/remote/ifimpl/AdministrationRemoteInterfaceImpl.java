@@ -2,7 +2,6 @@ package ch.eth.jcd.badgers.vfs.remote.ifimpl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -15,6 +14,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImplFactory;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
@@ -23,7 +23,6 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStream;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
@@ -46,28 +45,6 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	public List<LinkedDisk> listDisks() throws RemoteException {
 		final UserAccount account = clientLink.getUserAccount();
 		return account.getLinkedDisks();
-	}
-
-	@Override
-	public DiskRemoteInterface linkNewDisk2(final LinkedDisk linkedDisk, final RemoteInputStream diskFileContent) throws RemoteException, VFSException {
-		if (config.diskWithIdExists(linkedDisk.getId())) {
-			final String errorMsg = "disk with UUID: " + linkedDisk.getId() + " already exists on Server, cannot be created, delete it first.";
-			LOGGER.error(errorMsg);
-			throw new VFSException(errorMsg);
-		}
-		linkedDisk.getDiskConfig().setHostFilePath(createDiskPathFromUUID(linkedDisk.getId()));
-		final File tempFile = new File(linkedDisk.getDiskConfig().getHostFilePath());
-		FileOutputStream fos = null;
-		try {
-			fos = new FileOutputStream(tempFile);
-			ChannelUtil.fastStreamCopy(diskFileContent, fos);
-		} catch (final IOException e) {
-			LOGGER.error("ERROR while uploading disk with UUID: " + linkedDisk.getId() + " to Server", e);
-			throw new VFSException("ERROR while uploading disk with UUID: " + linkedDisk.getId() + " to Server", e);
-		}
-		clientLink.getUserAccount().addLinkedDisk(linkedDisk);
-		config.persist();
-		return fetchDiskWorkerControllerFromIdAndSetRmiObject(linkedDisk.getId());
 	}
 
 	@Override
@@ -104,17 +81,20 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	@Override
 	public DiskRemoteInterface useLinkedDisk(final UUID diskId) throws RemoteException, VFSException {
 
-		return fetchDiskWorkerControllerFromIdAndSetRmiObject(diskId);
-	}
+		UserAccount account = clientLink.getUserAccount();
+		LinkedDisk linkedDisk = account.getLinkedDiskById(diskId);
 
-	private DiskRemoteInterface fetchDiskWorkerControllerFromIdAndSetRmiObject(final UUID diskId) throws VFSException, RemoteException {
-		final DiskWorkerController diskWorkerController = clientLink.getUserAccount().getDiskControllerForDiskWithId(diskId);
+		DiskConfiguration diskConfig = linkedDisk.getDiskConfig();
 
-		if (diskWorkerController == null) {
-			throw new VFSException("Disk Id " + diskId + " not known for " + clientLink.getUserAccount().getUsername());
-		}
+		final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 
-		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
+		VFSDiskManager diskManager = factory.createDiskManager(diskConfig);
+
+		clientLink.setDiskManager(diskManager);
+
+		final DiskWorkerController workerController = new DiskWorkerController(diskManager);
+
+		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(workerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;
@@ -181,5 +161,4 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	public void closeLinkedDisk(final DiskRemoteInterface diskInterface) throws RemoteException, VFSException {
 		closeDisk(diskInterface);
 	}
-
 }
