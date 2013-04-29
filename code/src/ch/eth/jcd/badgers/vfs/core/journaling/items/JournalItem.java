@@ -10,7 +10,7 @@ public abstract class JournalItem implements Serializable {
 	private static final long serialVersionUID = 6217683568058825388L;
 
 	public void replay(VFSDiskManager diskManager) throws VFSException {
-		// actions performed on the disk should not be added to the journal for oviousreasons
+		// actions performed on the disk should not be added to the journal for obvious reasons
 		diskManager.pauseJournaling(true);
 		try {
 			doReplay(diskManager);
@@ -20,4 +20,8 @@ public abstract class JournalItem implements Serializable {
 	}
 
 	public abstract void doReplay(VFSDiskManager diskManager) throws VFSException;
+
+	public void prepareForRmiServerUpload() throws VFSException {
+		// does nothing by default
+	}
 }

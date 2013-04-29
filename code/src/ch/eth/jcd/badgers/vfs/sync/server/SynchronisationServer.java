@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -21,6 +23,11 @@ public class SynchronisationServer {
 
 	public void stop() throws VFSException {
 		LOGGER.info("Stop Server");
+		ifManager.dispose();
+	}
+
+	public List<ClientLink> getActiveClientLinks() {
+		return ifManager.getActiveClientLinks();
 	}
 
 	/**

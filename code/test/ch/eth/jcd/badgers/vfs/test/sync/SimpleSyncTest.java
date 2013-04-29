@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
+import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
@@ -66,11 +68,11 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 		DiskConfiguration clientConfig = createConfig();
 		diskManager = VFSDiskManagerImpl.create(clientConfig);
 
-		fillSomeJunk(diskManager);
+		fillDiskWithStuff(diskManager);
 
 	}
 
-	private void fillSomeJunk(VFSDiskManagerImpl diskManager) throws VFSException {
+	private void fillDiskWithStuff(VFSDiskManagerImpl diskManager) throws VFSException {
 		VFSEntry root = diskManager.getRoot();
 		VFSPath homePath = root.getChildPath("home");
 		VFSPath libPath = root.getChildPath("lib");
@@ -155,14 +157,22 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 
 		Assert.assertNotNull(adminRI);
 
-		LOGGER.info("We are now loged in");
+		LOGGER.info("We are now logged in");
 
 		String displayName = "TestName";
 		DiskConfiguration diskConfig = new DiskConfiguration();
 		LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 
 		Journal journal = diskManager.linkDisk(hostLink);
+
+		journal.prepareForRmiServerUpload();
+
 		DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
+
+		List<ClientLink> links = syncServer.getActiveClientLinks();
+		Assert.assertEquals(1, links.size());
+
+		ClientLink clientLink = links.get(0);
 	}
 
 	private void waitUntilConnected() {

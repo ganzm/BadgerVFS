@@ -53,4 +53,10 @@ public class Journal implements Serializable {
 	public List<JournalItem> getJournalEntries() {
 		return journalEntries;
 	}
+
+	public void prepareForRmiServerUpload() throws VFSException {
+		for (JournalItem entry : journalEntries) {
+			entry.prepareForRmiServerUpload();
+		}
+	}
 }

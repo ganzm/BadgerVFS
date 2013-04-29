@@ -30,6 +30,7 @@ public class ModifyFileItem extends JournalItem {
 		this.inputStream = vfsFileImpl.getInputStream();
 	}
 
+	@Override
 	public void prepareForRmiServerUpload() throws VFSException {
 		try {
 			this.inputStream = RemoteInputStreamServer.wrap(inputStream);
