@@ -1,21 +1,35 @@
 package ch.eth.jcd.badgers.vfs.core.journaling;
 
+import java.util.List;
+
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
-public class VFSDisabledJournaling extends VFSJournaling {
+public class VFSDisabledJournaling implements VFSJournaling {
 
 	public VFSDisabledJournaling() {
-		super(null);
 	}
 
 	@Override
 	public void addJournalItem(JournalItem journalEntry) {
-		// ignore this call since journaling is disabled
 	}
 
 	@Override
 	public void closeJournal() throws VFSException {
-		// ignore this call since journaling is disabled
+	}
+
+	@Override
+	public List<Journal> getPendingJournals() throws VFSException {
+		return null;
+	}
+
+	@Override
+	public Journal createJournal(VFSEntry root) throws VFSException {
+		return null;
+	}
+
+	@Override
+	public void pauseJournaling(boolean pause) {
 	}
 }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -32,6 +33,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSDisabledJournaling;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournalingImpl;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
@@ -189,7 +191,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	private void initJournaling() {
 		if (config.isHostNameLinked()) {
-			this.journaling = new VFSJournaling(this);
+			this.journaling = new VFSJournalingImpl(this);
 
 		} else {
 			this.journaling = new VFSDisabledJournaling();
@@ -371,12 +373,16 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public Journal closeAndGetCurrentJournal() throws VFSException {
-		return journaling.closeAndGetCurrentJournal();
+	public void closeCurrentJournal() throws VFSException {
+		journaling.closeJournal();
 	}
 
 	public void addJournalItem(JournalItem journalEntry) {
 		journaling.addJournalItem(journalEntry);
+	}
+
+	public List<Journal> getPendingJournals() throws VFSException {
+		return journaling.getPendingJournals();
 	}
 
 	/**

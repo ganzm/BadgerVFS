@@ -21,7 +21,15 @@ public abstract class JournalItem implements Serializable {
 
 	public abstract void doReplay(VFSDiskManager diskManager) throws VFSException;
 
-	public void prepareForRmiServerUpload() throws VFSException {
+	public void beforeRmiTransport() throws VFSException {
+		// does nothing by default
+	}
+
+	public void beforeSerializeToDisk() throws VFSException {
+		// does nothing by default
+	}
+
+	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
 		// does nothing by default
 	}
 }

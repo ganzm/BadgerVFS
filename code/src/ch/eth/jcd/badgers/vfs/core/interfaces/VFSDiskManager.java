@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
+import java.util.List;
+
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
@@ -82,14 +84,20 @@ public interface VFSDiskManager {
 	void find(String fileName, FindInFolderCallback observer) throws VFSException;
 
 	/**
-	 * puts all operations performed since the last call of this operation into a Journal file
-	 * 
-	 * closes the current journal which is returned
+	 * puts all operations performed since the last call of this operation into a Journal file and persists it on the disk
 	 * 
 	 * @return
 	 * @throws VFSException
 	 */
-	Journal closeAndGetCurrentJournal() throws VFSException;
+	void closeCurrentJournal() throws VFSException;
+
+	/**
+	 * Returns all journals which have not yet been transfered to the synchronization server (because we were offline some time)
+	 * 
+	 * @return sorted list of journals, the first element of the list is the oldest journal
+	 * @throws VFSException
+	 */
+	List<Journal> getPendingJournals() throws VFSException;
 
 	/**
 	 * 
@@ -100,5 +108,10 @@ public interface VFSDiskManager {
 	 */
 	Journal linkDisk(String hostName) throws VFSException;
 
+	/**
+	 * we need journaling to be temporary disabled while replaying journals
+	 * 
+	 * @param pause
+	 */
 	void pauseJournaling(boolean pause);
 }

@@ -64,6 +64,16 @@ public final class HeaderSectionHandler {
 
 	private long linkedHostNamePosition;
 
+	/**
+	 * Start position in the file where we write linkedHostVersion
+	 */
+	private long linkedHostVersionPosition;
+
+	/**
+	 * Version number we have last seen on the synchronization server
+	 */
+	private long linkedHostVersion = -1;
+
 	private HeaderSectionHandler() {
 	}
 
@@ -129,6 +139,12 @@ public final class HeaderSectionHandler {
 			virtualDiskFile.write(Arrays.copyOf(header.linkedHostName.getBytes(cs), LINKEDHOSTNAME_FIELD_LENGTH));
 		}
 
+		// write Version number seen from linked synchronization server
+		header.linkedHostVersionPosition = virtualDiskFile.getFilePointer();
+		virtualDiskFile.writeLong(header.linkedHostVersion);
+
+		// we are done writing header data
+		// get current location
 		header.directorySectionOffset = virtualDiskFile.getFilePointer();
 
 		// now we are at the end of the directory section, remember this position
@@ -232,6 +248,10 @@ public final class HeaderSectionHandler {
 		config.setLinkedHostName(header.linkedHostName);
 		LOGGER.debug("Linked Host: " + header.linkedHostName);
 
+		// read Version number from linked host name
+		header.linkedHostVersionPosition = virtualDiskFile.getFilePointer();
+		header.linkedHostVersion = virtualDiskFile.readLong();
+
 		LOGGER.debug("read Header Section DONE");
 		return header;
 	}
@@ -278,5 +298,19 @@ public final class HeaderSectionHandler {
 		} catch (IOException e) {
 			throw new VFSException("", e);
 		}
+	}
+
+	public void setlinkedHostVersion(RandomAccessFile virtualDiskFile, long serverVersion) throws VFSException {
+		this.linkedHostVersion = serverVersion;
+		try {
+			virtualDiskFile.seek(linkedHostVersionPosition);
+			virtualDiskFile.writeLong(serverVersion);
+		} catch (IOException e) {
+			throw new VFSException("", e);
+		}
+	}
+
+	public long getLinkedHostVersion() {
+		return linkedHostVersion;
 	}
 }

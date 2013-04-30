@@ -31,12 +31,23 @@ public class ModifyFileItem extends JournalItem {
 	}
 
 	@Override
-	public void prepareForRmiServerUpload() throws VFSException {
+	public void beforeRmiTransport() throws VFSException {
 		try {
 			this.inputStream = RemoteInputStreamServer.wrap(inputStream);
 		} catch (RemoteException ex) {
 			throw new VFSException(ex);
 		}
+	}
+
+	@Override
+	public void beforeSerializeToDisk() throws VFSException {
+		inputStream = null;
+	}
+
+	@Override
+	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
+		VFSPath path = diskManager.createPath(absolutePath);
+		this.inputStream = path.getVFSEntry().getInputStream();
 	}
 
 	@Override

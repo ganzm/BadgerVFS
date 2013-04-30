@@ -70,6 +70,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		diskManager.replayInitialJournal(journal);
 
 		final DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager);
+		clientLink.setDiskWorkerController(diskWorkerController);
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 		return stub;
@@ -87,9 +88,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		VFSDiskManager diskManager = factory.createDiskManager(diskConfig);
 
-		clientLink.setDiskManager(diskManager);
-
 		final DiskWorkerController workerController = new DiskWorkerController(diskManager);
+		clientLink.setDiskWorkerController(workerController);
 
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(workerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);

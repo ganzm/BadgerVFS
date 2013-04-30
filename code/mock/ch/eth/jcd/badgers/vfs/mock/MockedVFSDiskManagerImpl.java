@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -147,7 +148,7 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public Journal closeAndGetCurrentJournal() throws VFSException {
+	public void closeCurrentJournal() throws VFSException {
 		throw new UnsupportedOperationException("TODO");
 	}
 
@@ -158,5 +159,10 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void pauseJournaling(boolean pause) {
+	}
+
+	@Override
+	public List<Journal> getPendingJournals() throws VFSException {
+		throw new UnsupportedOperationException("TODO");
 	}
 }

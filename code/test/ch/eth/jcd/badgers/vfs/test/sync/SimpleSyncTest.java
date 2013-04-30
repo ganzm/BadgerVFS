@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Random;
 
@@ -16,6 +15,7 @@ import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
@@ -30,12 +30,10 @@ import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
+import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
-public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
-
+public class SimpleSyncTest implements ConnectionStateListener {
 	private static final Logger LOGGER = Logger.getLogger(SimpleSyncTest.class);
 
 	private ConnectionStatus status;
@@ -44,7 +42,7 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 	private SynchronisationServer syncServer;
 	private RemoteManager clientRemoteManager;
 	private final String hostLink = "localhost";
-	private VFSDiskManagerImpl diskManager;
+	private VFSDiskManagerImpl clientDiskManager;
 	private final String username = new BigInteger(130, new Random()).toString(32);
 	private final String password = "asdf";
 
@@ -67,9 +65,9 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 
 		LOGGER.info("Create new disk");
 		DiskConfiguration clientConfig = createConfig();
-		diskManager = VFSDiskManagerImpl.create(clientConfig);
+		clientDiskManager = VFSDiskManagerImpl.create(clientConfig);
 
-		fillDiskWithStuff(diskManager);
+		fillDiskWithStuff(clientDiskManager);
 
 	}
 
@@ -137,7 +135,7 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 	}
 
 	@Test
-	public void testSimpleSync() throws RemoteException, VFSException {
+	public void testSimpleSync() throws VFSException, IOException {
 		LOGGER.info("Start login");
 
 		waitUntilConnected();
@@ -164,16 +162,47 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 		DiskConfiguration diskConfig = new DiskConfiguration();
 		LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 
-		Journal journal = diskManager.linkDisk(hostLink);
-
-		journal.prepareForRmiServerUpload();
-
+		Journal journal = clientDiskManager.linkDisk(hostLink);
+		journal.beforeRmiTransport();
 		DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
+
+		LOGGER.info("Disk is now linked");
 
 		List<ClientLink> links = syncServer.getActiveClientLinks();
 		Assert.assertEquals(1, links.size());
-
 		ClientLink clientLink = links.get(0);
+
+		VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
+
+		// compare content of the file systems
+		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
+
+		LOGGER.info("Do local change");
+		VFSPath otherDirectoryPath = clientDiskManager.getRoot().getChildPath("FileWithVersion1Stuff");
+		VFSEntry otherDirectory = otherDirectoryPath.createDirectory();
+		VFSPath otherFilePath = otherDirectory.getChildPath("test.txt");
+		VFSEntry otherFile = otherFilePath.createFile();
+		try (OutputStream out = otherFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write("Hello World".getBytes());
+		}
+
+		clientDiskManager.closeCurrentJournal();
+
+		LOGGER.info("Do some more local change");
+		VFSPath otherDirectoryPath2 = clientDiskManager.getRoot().getChildPath("FileWithVersion2Stuff");
+		otherDirectoryPath2.createDirectory();
+
+		clientDiskManager.closeCurrentJournal();
+
+		List<Journal> pendingJournals = clientDiskManager.getPendingJournals();
+		Assert.assertEquals("expected 2 pending journals", 2, pendingJournals.size());
+
+		for (Journal toUpload : pendingJournals) {
+			diskRemoteInterface.pushVersion(toUpload.getServerVersion(), toUpload);
+		}
+
+		LOGGER.info("Unlink Disk");
+		diskRemoteInterface.unlink();
 	}
 
 	private void waitUntilConnected() {
@@ -185,15 +214,6 @@ public class SimpleSyncTest implements ActionObserver, ConnectionStateListener {
 			} catch (final InterruptedException e) {
 			}
 		}
-	}
-
-	@Override
-	public void onActionFailed(AbstractBadgerAction action, Exception e) {
-	}
-
-	@Override
-	public void onActionFinished(AbstractBadgerAction action) {
-
 	}
 
 	@Override
