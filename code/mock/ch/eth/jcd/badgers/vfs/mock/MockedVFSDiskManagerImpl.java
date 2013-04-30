@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -163,6 +164,11 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public List<Journal> getPendingJournals() throws VFSException {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public UUID getDiskId() {
 		throw new UnsupportedOperationException("TODO");
 	}
 }

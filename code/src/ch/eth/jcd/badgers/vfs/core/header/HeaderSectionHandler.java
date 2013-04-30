@@ -284,7 +284,7 @@ public final class HeaderSectionHandler {
 	}
 
 	public void setLinkedHostName(RandomAccessFile virtualDiskFile, String hostName) throws VFSException {
-		if (linkedHostName != null) {
+		if (linkedHostName != null && !linkedHostName.isEmpty()) {
 			throw new VFSException("Disk is already linked to [" + hostName + "]");
 		}
 
@@ -312,5 +312,9 @@ public final class HeaderSectionHandler {
 
 	public long getLinkedHostVersion() {
 		return linkedHostVersion;
+	}
+
+	public UUID getUuid() {
+		return uuid;
 	}
 }

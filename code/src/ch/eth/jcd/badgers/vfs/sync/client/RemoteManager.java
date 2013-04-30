@@ -13,7 +13,6 @@ import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
-import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CloseLinkedDiskAction;
@@ -211,13 +210,13 @@ public class RemoteManager implements ActionObserver {
 
 	}
 
-	public boolean startUseLinkedDisk(final LinkedDisk linkedDisk) {
+	public boolean startUseLinkedDisk(final UUID diskId) {
 		LOGGER.trace("Start using linked disk");
 		if (status != ConnectionStatus.LOGGED_IN) {
 			LOGGER.trace("cannot Start using linked disk, when not logged in");
 			return false;
 		}
-		final UseLinkedDiskAction useLinkedDiskAction = new UseLinkedDiskAction(this, this, linkedDisk);
+		final UseLinkedDiskAction useLinkedDiskAction = new UseLinkedDiskAction(this, this, diskId);
 		remoteWorkerController.enqueue(useLinkedDiskAction);
 		return true;
 	}

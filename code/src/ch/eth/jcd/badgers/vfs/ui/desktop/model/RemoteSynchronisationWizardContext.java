@@ -5,12 +5,14 @@ import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 
 public class RemoteSynchronisationWizardContext {
 	public static enum LoginActionEnum {
-		SYNC, LOGIN;
+		SYNC, LOGINREMOTE, CONNECT;
 	}
 
 	private LoginActionEnum loginActionEnum;
 	private RemoteManager remoteManager;
 	private LinkedDisk selectedDiskToLink;
+
+	private String localFilePath;
 
 	private String remoteHostName;
 	private String username;
@@ -66,5 +68,13 @@ public class RemoteSynchronisationWizardContext {
 
 	public void setSelectedDiskToLink(final LinkedDisk selectedDiskToLink) {
 		this.selectedDiskToLink = selectedDiskToLink;
+	}
+
+	public String getLocalFilePath() {
+		return localFilePath;
+	}
+
+	public void setLocalFilePath(String localFilePath) {
+		this.localFilePath = localFilePath;
 	}
 }

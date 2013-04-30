@@ -20,11 +20,13 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext.LoginActionEnum;
+import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class LoginDialog extends JDialog {
 
@@ -129,12 +131,12 @@ public class LoginDialog extends JDialog {
 									});
 						}
 					});
-					loginAndSyncButton.setMnemonic('c');
-					loginAndSyncButton.setActionCommand("Create");
+					loginAndSyncButton.setMnemonic('l');
+					loginAndSyncButton.setActionCommand("LoginSync");
 					buttonPane.add(loginAndSyncButton);
 					getRootPane().setDefaultButton(loginAndSyncButton);
 
-					final JButton createAndSyncButton = new JButton("Create & Sync");
+					final JButton createAndSyncButton = new JButton("Register & Sync");
 					createAndSyncButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
@@ -158,10 +160,47 @@ public class LoginDialog extends JDialog {
 									});
 						}
 					});
-					createAndSyncButton.setMnemonic('c');
-					createAndSyncButton.setActionCommand("Create");
-					buttonPane.add(loginAndSyncButton);
-					getRootPane().setDefaultButton(loginAndSyncButton);
+					createAndSyncButton.setMnemonic('r');
+					createAndSyncButton.setActionCommand("RegisterSync");
+					buttonPane.add(createAndSyncButton);
+
+					final JButton connectButton = new JButton("Connect");
+					connectButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent arg0) {
+							wizardContext.setUsername(textFieldUsername.getText());
+							wizardContext.setPassword(new String(passwordField.getPassword()));
+							wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(),
+									new ConnectionStateListener() {
+										private ConnectionStateListener getConnectionStateListener() {
+											return this;
+										}
+
+										@Override
+										public void connectionStateChanged(final ConnectionStatus status) {
+											SwingUtilities.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													dispose();
+													try {
+														wizardContext.getRemoteManager().logout();
+														// TODO Warten auf fertiges Logout. Blocking.
+														wizardContext.getRemoteManager().dispose();
+														controller.openLinkedDisk(wizardContext.getLocalFilePath(), wizardContext.getUsername(),
+																wizardContext.getPassword());
+													} catch (final VFSException e) {
+														SwingUtil.handleException(getThis(), e);
+													}
+												}
+											});
+										}
+									});
+						}
+					});
+					connectButton.setMnemonic('c');
+					connectButton.setActionCommand("Connect");
+					buttonPane.add(connectButton);
+					getRootPane().setDefaultButton(connectButton);
 
 					final JButton loginButton = new JButton("Login");
 					loginButton.addActionListener(new ActionListener() {
@@ -194,7 +233,7 @@ public class LoginDialog extends JDialog {
 					buttonPane.add(loginButton);
 					getRootPane().setDefaultButton(loginButton);
 
-					final JButton createButton = new JButton("Create");
+					final JButton createButton = new JButton("Register");
 					createButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent arg0) {
@@ -224,7 +263,7 @@ public class LoginDialog extends JDialog {
 						}
 					});
 					createButton.setMnemonic('c');
-					createButton.setActionCommand("Create");
+					createButton.setActionCommand("Register");
 					buttonPane.add(createButton);
 					getRootPane().setDefaultButton(createButton);
 
@@ -244,19 +283,31 @@ public class LoginDialog extends JDialog {
 						loginAndSyncButton.setVisible(true);
 						createAndSyncButton.setVisible(true);
 						loginButton.setVisible(false);
+						connectButton.setVisible(false);
 						createButton.setVisible(false);
 						closeButton.setVisible(false);
 
-					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.LOGIN) {
+					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.LOGINREMOTE) {
 						loginAndSyncButton.setVisible(false);
 						createAndSyncButton.setVisible(false);
 						loginButton.setVisible(true);
+						connectButton.setVisible(false);
 						createButton.setVisible(true);
 						closeButton.setVisible(false);
+
+					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.CONNECT) {
+						loginAndSyncButton.setVisible(false);
+						createAndSyncButton.setVisible(false);
+						loginButton.setVisible(false);
+						connectButton.setVisible(true);
+						createButton.setVisible(false);
+						closeButton.setVisible(false);
+
 					} else {
 						loginAndSyncButton.setVisible(false);
 						createAndSyncButton.setVisible(false);
 						loginButton.setVisible(false);
+						connectButton.setVisible(false);
 						createButton.setVisible(false);
 						closeButton.setVisible(true);
 					}

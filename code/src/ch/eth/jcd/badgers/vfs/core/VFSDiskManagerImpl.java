@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -248,6 +249,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		}
 	}
 
+	@Override
 	public DiskSpaceUsage getDiskSpaceUsage() throws VFSException {
 		try {
 			DiskSpaceUsage du = new DiskSpaceUsage();
@@ -381,6 +383,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		journaling.addJournalItem(journalEntry);
 	}
 
+	@Override
 	public List<Journal> getPendingJournals() throws VFSException {
 		return journaling.getPendingJournals();
 	}
@@ -390,6 +393,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 * 
 	 * @return current changes made to this disk are stored in the journal and returned
 	 */
+	@Override
 	public Journal linkDisk(String hostName) throws VFSException {
 		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
 		config.setLinkedHostName(hostName);
@@ -408,7 +412,13 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		}
 	}
 
+	@Override
 	public void pauseJournaling(boolean pause) {
 		journaling.pauseJournaling(pause);
+	}
+
+	@Override
+	public UUID getDiskId() {
+		return headerSectionHandler.getUuid();
 	}
 }

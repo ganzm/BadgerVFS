@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
 import java.util.List;
+import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
@@ -114,4 +115,11 @@ public interface VFSDiskManager {
 	 * @param pause
 	 */
 	void pauseJournaling(boolean pause);
+
+	/**
+	 * Returns the currents disks UUID
+	 * 
+	 * @return uuid of the disk
+	 */
+	UUID getDiskId();
 }

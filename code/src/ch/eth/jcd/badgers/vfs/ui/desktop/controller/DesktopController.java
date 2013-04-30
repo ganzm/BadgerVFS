@@ -75,8 +75,6 @@ public class DesktopController extends BadgerController implements ActionObserve
 	 */
 	private RemoteManager remoteManager = null;
 
-	private RemoteSynchronisationWizardContext wizardContext;
-
 	public DesktopController(final BadgerViewBase desktopView) {
 		super(desktopView);
 	}
@@ -117,15 +115,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openLinkDiskDialog() {
-		wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC);
-		final ServerUrlDialog dialog = new ServerUrlDialog(this, wizardContext);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, new RemoteSynchronisationWizardContext(LoginActionEnum.SYNC));
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
 	public void openConnectRemoteDialog() {
-		wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.LOGIN);
-		final ServerUrlDialog dialog = new ServerUrlDialog(this, wizardContext);
+		final ServerUrlDialog dialog = new ServerUrlDialog(this, new RemoteSynchronisationWizardContext(LoginActionEnum.LOGINREMOTE));
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
@@ -142,13 +138,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 		dialog.setVisible(true);
 	}
 
-	public void openLocalDiskFromRemoteDisk(final String path) throws VFSException {
-		openDisk(path);
-		if (remoteManager == null || wizardContext == null) {
-			// TODO IMPLEMENT LOGIN, WHEN OPENING a disk
-			LOGGER.info("Needs some implementation, when we open a disk locally, that has a link to a host!");
+	public void openLinkedDisk(final String path, final String username, final String password) throws VFSException {
+		VFSDiskManager diskManager = initDisk(path);
+		openDisk(diskManager);
+		if (remoteManager == null) {
+			// disk not linked so return
+			return;
 		}
-		remoteManager.startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+		remoteManager.startLogin(username, password, new ConnectionStateListener() {
 			private ConnectionStateListener getConnectionStateListener() {
 				return this;
 			}
@@ -160,7 +157,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 					@Override
 					public void run() {
 						remoteManager.removeConnectionStateListener(getConnectionStateListener());
-						remoteManager.startUseLinkedDisk(wizardContext.getSelectedDiskToLink());
+						remoteManager.startUseLinkedDisk(workerController.getDiskManager().getDiskId());
 
 					}
 				});
@@ -200,17 +197,25 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final File selectedFile = fileChooser.getSelectedFile();
-			openDisk(selectedFile.getAbsolutePath());
+			VFSDiskManager diskManager = initDisk(selectedFile.getAbsolutePath());
+			if (remoteManager == null) {
+				openDisk(diskManager);
+			} else {
+				diskManager.close();
+				RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
+				wizardContext.setRemoteManager(remoteManager);
+				wizardContext.setLocalFilePath(diskManager.getDiskConfiguration().getHostFilePath());
+				openLoginDialog(wizardContext);
+			}
 		}
 	}
 
 	/**
-	 * Actualy open a disk You acknowledged the Disk / Open FileChooser Dialog
+	 * Initialize the disk for opening.
 	 * 
 	 * @param path
-	 * @throws VFSException
 	 */
-	private void openDisk(final String path) throws VFSException {
+	private VFSDiskManager initDisk(final String path) throws VFSException {
 		if (!isInManagementMode()) {
 			throw new VFSException("Cannot open Disk on " + path + " - close current disk first");
 		}
@@ -220,10 +225,21 @@ public class DesktopController extends BadgerController implements ActionObserve
 		final DiskConfiguration config = new DiskConfiguration();
 		config.setHostFilePath(path);
 
-		remoteManager = initRemoteManager(config);
-
 		final VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 		final VFSDiskManager diskManager = factory.openDiskManager(config);
+
+		remoteManager = initRemoteManager(config);
+
+		return diskManager;
+	}
+
+	/**
+	 * Actualy open a disk You acknowledged the Disk / Open FileChooser Dialog
+	 * 
+	 * @param path
+	 * @throws VFSException
+	 */
+	private void openDisk(final VFSDiskManager diskManager) throws VFSException {
 
 		// create and start WorkerController
 		workerController = new DiskWorkerController(diskManager);
