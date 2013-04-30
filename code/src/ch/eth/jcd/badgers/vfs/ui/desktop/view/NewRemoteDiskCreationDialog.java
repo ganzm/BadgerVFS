@@ -17,9 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
-
-import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
@@ -28,7 +25,6 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class NewRemoteDiskCreationDialog extends JDialog {
 
-	private static final Logger LOGGER = Logger.getLogger(NewRemoteDiskCreationDialog.class);
 	private static final String DEFAULT_FILE_NAME = "disk.bfs";
 
 	private static final long serialVersionUID = -2652867330270571476L;
@@ -103,7 +99,6 @@ public class NewRemoteDiskCreationDialog extends JDialog {
 								SwingUtil.handleException(getThis(), e);
 							}
 						});
-
 
 					}
 				});
