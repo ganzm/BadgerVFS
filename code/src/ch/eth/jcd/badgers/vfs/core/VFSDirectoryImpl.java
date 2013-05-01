@@ -160,7 +160,13 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 		// remove this from parent directory tree structure
 		childTree.remove(diskManager.getDirectorySectionHandler(), fileName);
-		entry.deleteDataBlocks();
+
+		if (entry.firstDataBlock.getLinkCount() <= 1) {
+			entry.deleteDataBlocks();
+		} else {
+			entry.firstDataBlock.decLinkCount();
+			diskManager.getDataSectionHandler().persistDataBlock(entry.firstDataBlock);
+		}
 
 		LOGGER.info("Deleting DONE " + filePath);
 	}

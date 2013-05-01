@@ -80,11 +80,20 @@ public class VFSFileImpl extends VFSEntryImpl {
 		}
 
 		LOGGER.info("Copy file " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+		if (firstDataBlock.getLinkCount() < DataBlock.MAX_LINK_COUNT) {
+			shallowCopy(newLocation);
+		} else {
+			deepCopy(newLocation);
+		}
+	}
+
+	private void deepCopy(VFSPath newLocation) throws VFSException {
 		OutputStream out = null;
 		InputStream in = null;
 
 		try {
 
+			// copy as usual
 			VFSFileImpl newFile = (VFSFileImpl) newLocation.createFile();
 
 			// since we do an file system internal copy we bypass the getOutputStream/getInputStream method to avoid compression/decompression
@@ -119,6 +128,19 @@ public class VFSFileImpl extends VFSEntryImpl {
 					LOGGER.error("", e);
 				}
 			}
+		}
+	}
+
+	private void shallowCopy(VFSPath newLocation) throws VFSException {
+		try {
+			LOGGER.debug("Do shallow copy operation from " + getPath().getAbsolutePath() + " to " + newLocation.getAbsolutePath());
+			firstDataBlock.incLinkCount();
+			diskManager.getDataSectionHandler().persistDataBlock(firstDataBlock);
+			VFSFileImpl newFile = VFSEntryImpl.createNewFile(diskManager, (VFSPathImpl) newLocation, firstDataBlock);
+
+			diskManager.addJournalItem(new ModifyFileItem(newFile));
+		} catch (IOException e) {
+			throw new VFSException(e);
 		}
 	}
 

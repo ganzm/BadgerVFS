@@ -19,6 +19,11 @@ public class DataBlock {
 	public static final int BLOCK_SIZE = 1024;
 
 	/**
+	 * Constrain number of DirectoryEntries pointing to the same file content to avoid overflow
+	 */
+	public static final short MAX_LINK_COUNT = 126;
+
+	/**
 	 * StartPosition of this DataBlock
 	 * 
 	 * 
@@ -177,5 +182,22 @@ public class DataBlock {
 		} else {
 			return 13;
 		}
+	}
+
+	/**
+	 * number of DirectoryEntries pointing to this DataBlock
+	 * 
+	 * @return
+	 */
+	public short getLinkCount() {
+		return linkCount;
+	}
+
+	public void incLinkCount() {
+		this.linkCount++;
+	}
+
+	public void decLinkCount() {
+		this.linkCount--;
 	}
 }

@@ -79,16 +79,34 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		}
 	}
 
-	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
-		DataBlock dataBlock = null;
+	/**
+	 * Creates a new File by using a predefined DataBlock as first block of the file
+	 * 
+	 * @param diskManager
+	 * @param vfsPath
+	 * @param dataBlock
+	 * @return
+	 * @throws VFSException
+	 * @throws IOException
+	 */
+	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, DataBlock dataBlock) throws VFSException, IOException {
 		try {
-			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
 			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
 
 			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
 
 			diskManager.addJournalItem(new CreateFileItem(vfsPath));
 			return entry;
+		} catch (IOException ex) {
+			throw ex;
+		}
+	}
+
+	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
+		DataBlock dataBlock = null;
+		try {
+			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
+			return createNewFile(diskManager, vfsPath, dataBlock);
 		} catch (IOException ex) {
 
 			if (dataBlock != null) {
