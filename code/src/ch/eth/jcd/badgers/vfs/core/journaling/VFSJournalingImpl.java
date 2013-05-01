@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -25,16 +26,29 @@ import ch.eth.jcd.badgers.vfs.core.journaling.items.ModifyFileItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 
+/**
+ * $ID$
+ * 
+ * In order to synchronize data via SynchronisationServer the file system writes serializable journal files
+ * 
+ * 
+ */
 public class VFSJournalingImpl implements VFSJournaling {
 
 	private static final Logger LOGGER = Logger.getLogger(VFSJournaling.class);
 
-	private static final String HIDDEN_FOLDER_NAME = ".hidden";
+	public static final String HIDDEN_FOLDER_NAME = ".hidden";
+
+	private static final String JOURNALS_FOLDER_NAME = "journals";
+
+	private static final String JOURNAL_NAME = "journal.bin";
 
 	/**
 	 * Journal entries which not yet have been persisted
 	 */
-	private List<JournalItem> uncommitedJournalEntries = new ArrayList<>();
+	private List<JournalItem> uncommitedJournalEntries = null;
+
+	private VFSEntry currentJournalFolder;
 
 	private final VFSDiskManagerImpl diskManager;
 
@@ -50,14 +64,13 @@ public class VFSJournalingImpl implements VFSJournaling {
 	}
 
 	public void closeJournal() throws VFSException {
-		VFSEntry journalsFolder = getJournalsFolder();
+		if (uncommitedJournalEntries == null) {
+			// nothing to do
+			return;
+		}
 
-		// determine name of the journal file
-		List<VFSEntry> journals = journalsFolder.getChildren();
-		long journalNumber = 1 + journals.size() + getLastSeenServerVersion();
-
-		writeJournal(journalsFolder, journalNumber, uncommitedJournalEntries);
-		uncommitedJournalEntries.clear();
+		writeJournal(currentJournalFolder, uncommitedJournalEntries);
+		uncommitedJournalEntries = null;
 	}
 
 	public List<Journal> getPendingJournals() throws VFSException {
@@ -65,8 +78,17 @@ public class VFSJournalingImpl implements VFSJournaling {
 		VFSEntry journalsFolder = getJournalsFolder();
 
 		List<VFSEntry> journalEntries = journalsFolder.getChildren();
-		for (VFSEntry journalEntry : journalEntries) {
-			Journal journal = deserializeJournalEntry(journalEntry);
+		for (VFSEntry journalFolders : journalEntries) {
+			assert journalsFolder.isDirectory();
+
+			VFSPath journalFilePath = journalFolders.getChildPath(JOURNAL_NAME);
+			if (!journalFilePath.exists()) {
+				continue;
+			}
+
+			VFSEntry journalFile = journalFilePath.getVFSEntry();
+
+			Journal journal = deserializeJournalEntry(journalFile);
 			journals.add(journal);
 		}
 		return journals;
@@ -84,12 +106,12 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
-	private void writeJournal(VFSEntry journalsFolder, long journalNumber, List<JournalItem> uncommitedJournalEntries) throws VFSException {
+	private void writeJournal(VFSEntry journalsFolder, List<JournalItem> uncommitedJournalEntries) throws VFSException {
+
+		boolean journalingEnabledBackupFlag = journalingEnabled;
 		journalingEnabled = false;
 		try {
-			NumberFormat decimalFormat = new DecimalFormat("000000000000000");
-
-			VFSPath journalPath = journalsFolder.getChildPath(decimalFormat.format(journalNumber));
+			VFSPath journalPath = journalsFolder.getChildPath(JOURNAL_NAME);
 			VFSEntry journalFile = journalPath.createFile();
 
 			Journal toPersist = new Journal(uncommitedJournalEntries);
@@ -102,11 +124,12 @@ public class VFSJournalingImpl implements VFSJournaling {
 				throw new VFSException(e);
 			}
 		} finally {
-			journalingEnabled = true;
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
 	}
 
 	private VFSEntry getJournalsFolder() throws VFSException {
+		boolean journalingEnabledBackupFlag = journalingEnabled;
 		journalingEnabled = false;
 		try {
 
@@ -118,7 +141,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 				hiddenEntry = hiddenPath.getVFSEntry();
 			}
 
-			VFSPath journalsPath = hiddenEntry.getChildPath("journals");
+			VFSPath journalsPath = hiddenEntry.getChildPath(JOURNALS_FOLDER_NAME);
 
 			if (journalsPath.exists()) {
 				return journalsPath.getVFSEntry();
@@ -126,20 +149,60 @@ public class VFSJournalingImpl implements VFSJournaling {
 				return journalsPath.createDirectory();
 			}
 		} finally {
-			journalingEnabled = true;
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
 	}
 
-	public void addJournalItem(JournalItem journalEntry) {
+	public void addJournalItem(JournalItem journalEntry) throws VFSException {
 		if (journalingEnabled) {
+			if (uncommitedJournalEntries == null) {
+
+				boolean journalingEnabledBackupFlag = journalingEnabled;
+				journalingEnabled = false;
+				try {
+					openNewJournal();
+				} finally {
+					journalingEnabled = journalingEnabledBackupFlag;
+				}
+			}
 			uncommitedJournalEntries.add(journalEntry);
+			journalEntry.onJournalAdd(this);
 		} else {
-			LOGGER.debug("Journaling disabled -  drop " + journalEntry);
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace("Journaling disabled -  drop " + journalEntry);
+			}
 		}
+	}
+
+	private void openNewJournal() throws VFSException {
+
+		VFSEntry journalsFolder = getJournalsFolder();
+
+		List<VFSEntry> journals = journalsFolder.getChildren();
+
+		long newJournalNumber = 0;
+		if (journals.size() == 0) {
+			newJournalNumber = 1 + getLastSeenServerVersion();
+		}
+
+		else {
+			String journalName = journals.get(journals.size() - 1).getPath().getName();
+			newJournalNumber = 1 + Long.parseLong(journalName);
+		}
+
+		NumberFormat decimalFormat = new DecimalFormat("000000000000000");
+		String newJournalName = decimalFormat.format(newJournalNumber);
+
+		VFSPath newJournalPath = journalsFolder.getChildPath(newJournalName);
+
+		LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
+		currentJournalFolder = newJournalPath.createDirectory();
+		uncommitedJournalEntries = new ArrayList<JournalItem>();
 	}
 
 	private long getLastSeenServerVersion() throws VFSException {
 
+		boolean journalingEnabledBackupFlag = journalingEnabled;
 		journalingEnabled = false;
 		try {
 
@@ -173,25 +236,37 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 			return serverVersion;
 		} finally {
-			journalingEnabled = true;
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
 	}
 
-	public Journal createJournal(VFSEntry root) throws VFSException {
-		List<JournalItem> journalItems = new ArrayList<>();
-		addDirectoryToJournal(journalItems, root);
-		Journal j = new Journal(journalItems);
+	/**
+	 * scans the whole disk and creates a journals which when replayed creates exactly the same content
+	 * 
+	 * @param root
+	 * @return
+	 * @throws VFSException
+	 */
+	public Journal journalizeDisk(VFSEntry root) throws VFSException {
+
+		if (uncommitedJournalEntries != null) {
+			throw new VFSException("Disallowed action - use this method only for unlinked/unjournalized disks");
+		}
+		openNewJournal();
+
+		addDirectoryToJournal(root);
+		Journal j = new Journal(uncommitedJournalEntries);
 		return j;
 	}
 
-	private void addDirectoryToJournal(List<JournalItem> journalItems, VFSEntry entry) throws VFSException {
+	private void addDirectoryToJournal(VFSEntry entry) throws VFSException {
 		for (VFSEntry childEntry : entry.getChildren()) {
 			if (childEntry.isDirectory()) {
-				journalItems.add(new CreateDirectoryItem(childEntry));
-				addDirectoryToJournal(journalItems, childEntry);
+				addJournalItem(new CreateDirectoryItem(childEntry));
+				addDirectoryToJournal(childEntry);
 			} else {
-				journalItems.add(new CreateFileItem(childEntry));
-				journalItems.add(new ModifyFileItem((VFSFileImpl) childEntry));
+				addJournalItem(new CreateFileItem(childEntry));
+				addJournalItem(new ModifyFileItem((VFSFileImpl) childEntry));
 			}
 		}
 	}
@@ -200,4 +275,21 @@ public class VFSJournalingImpl implements VFSJournaling {
 		journalingEnabled = !pause;
 	}
 
+	@Override
+	public VFSPath copyFileToJournal(String absolutePath) throws VFSException {
+		boolean journalingEnabledBackupFlag = journalingEnabled;
+		journalingEnabled = false;
+		try {
+			String fileName = "file-" + UUID.randomUUID();
+			VFSPath targetPath = currentJournalFolder.getChildPath(fileName);
+
+			VFSPath path = diskManager.createPath(absolutePath);
+			VFSEntry entry = path.getVFSEntry();
+			entry.copyTo(targetPath);
+
+			return targetPath;
+		} finally {
+			journalingEnabled = journalingEnabledBackupFlag;
+		}
+	}
 }

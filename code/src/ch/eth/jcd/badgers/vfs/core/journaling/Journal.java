@@ -41,9 +41,15 @@ public class Journal implements Serializable {
 		return journalEntries;
 	}
 
-	public void beforeRmiTransport() throws VFSException {
+	public void beforeLocalTransport(VFSDiskManager diskManager) throws VFSException {
 		for (JournalItem entry : journalEntries) {
-			entry.beforeRmiTransport();
+			entry.beforeLocalTransport(diskManager);
+		}
+	}
+
+	public void beforeRmiTransport(VFSDiskManager diskManager) throws VFSException {
+		for (JournalItem entry : journalEntries) {
+			entry.beforeRmiTransport(diskManager);
 		}
 	}
 

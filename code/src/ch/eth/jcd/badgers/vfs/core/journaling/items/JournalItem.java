@@ -3,6 +3,7 @@ package ch.eth.jcd.badgers.vfs.core.journaling.items;
 import java.io.Serializable;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public abstract class JournalItem implements Serializable {
@@ -21,8 +22,16 @@ public abstract class JournalItem implements Serializable {
 
 	public abstract void doReplay(VFSDiskManager diskManager) throws VFSException;
 
-	public void beforeRmiTransport() throws VFSException {
+	public void onJournalAdd(VFSJournaling journaling) throws VFSException {
 		// does nothing by default
+	}
+
+	public void beforeRmiTransport(VFSDiskManager diskManager) throws VFSException {
+		// does nothing by default
+	}
+
+	public void beforeLocalTransport(VFSDiskManager diskManager) throws VFSException {
+
 	}
 
 	public void beforeSerializeToDisk() throws VFSException {
@@ -32,4 +41,5 @@ public abstract class JournalItem implements Serializable {
 	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
 		// does nothing by default
 	}
+
 }

@@ -163,7 +163,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 
 		Journal journal = clientDiskManager.linkDisk(hostLink);
-		journal.beforeRmiTransport();
+		journal.beforeRmiTransport(clientDiskManager);
 		DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
 
 		LOGGER.info("Disk is now linked");

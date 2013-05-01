@@ -3,6 +3,7 @@ package ch.eth.jcd.badgers.vfs.core.journaling;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
@@ -25,11 +26,16 @@ public class VFSDisabledJournaling implements VFSJournaling {
 	}
 
 	@Override
-	public Journal createJournal(VFSEntry root) throws VFSException {
+	public Journal journalizeDisk(VFSEntry root) throws VFSException {
 		return null;
 	}
 
 	@Override
 	public void pauseJournaling(boolean pause) {
+	}
+
+	@Override
+	public VFSPath copyFileToJournal(String absolutePath) throws VFSException {
+		return null;
 	}
 }

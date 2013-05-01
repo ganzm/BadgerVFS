@@ -15,6 +15,7 @@ import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournalingImpl;
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidLocationExceptionException;
@@ -52,11 +53,18 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	@Override
 	public List<VFSEntry> getChildren() throws VFSException {
+		boolean isRoot = isRootDir();
+
 		try {
 			List<VFSEntry> result = new ArrayList<>();
 			List<DirectoryEntryBlock> directoryEntryList = childTree.traverseTree(diskManager.getDirectorySectionHandler());
 
 			for (DirectoryEntryBlock block : directoryEntryList) {
+				if (isRoot && VFSJournalingImpl.HIDDEN_FOLDER_NAME.equals(block.getFileName())) {
+					// skip hidden folder in root directory
+					continue;
+				}
+
 				result.add(createFromDirectoryEntryBlock(block));
 			}
 
@@ -65,7 +73,10 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		} catch (IOException e) {
 			throw new VFSException(e);
 		}
+	}
 
+	private boolean isRootDir() {
+		return diskManager.getRoot() == this;
 	}
 
 	@Override

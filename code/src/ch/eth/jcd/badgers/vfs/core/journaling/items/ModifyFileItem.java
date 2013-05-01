@@ -12,31 +12,71 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStreamServer;
 
+/**
+ * $ID$
+ * 
+ * 
+ * This JournalItem remembers when the content of a file has changed. Whenever this happens the file is (shallow) copied to a hidden section of the disk.
+ * 
+ * 
+ * Why do we need this? Renaming files causes some trouble with the Journal. Since a journals needs to be serializable we are only allowed to save strings.
+ * 
+ * To avoid such problem we copy each file modification to a hidden section near the corresponding journal
+ * 
+ */
 public class ModifyFileItem extends JournalItem {
 
 	private static final long serialVersionUID = -1463585225400507478L;
 
 	protected static final Logger LOGGER = Logger.getLogger(ModifyFileItem.class);
 
-	private final String absolutePath;
+	/**
+	 * Path where our data should be stored but may be touched/deleted/renamed by the user
+	 */
+	private final String absoluteFilePath;
+
+	/**
+	 * Path where our data are stored and where the user can not touch/rename/delete them
+	 * 
+	 * @param vfsFileImpl
+	 * @throws VFSException
+	 */
+	private String journalPathString;
 
 	private InputStream inputStream;
 
 	public ModifyFileItem(VFSFileImpl vfsFileImpl) throws VFSException {
-		this.absolutePath = vfsFileImpl.getPath().getAbsolutePath();
-		this.inputStream = vfsFileImpl.getInputStream();
+		this.absoluteFilePath = vfsFileImpl.getPath().getAbsolutePath();
 	}
 
 	@Override
-	public void beforeRmiTransport() throws VFSException {
+	public void onJournalAdd(VFSJournaling journaling) throws VFSException {
+		VFSPath journalPath = journaling.copyFileToJournal(absoluteFilePath);
+		journalPathString = journalPath.getAbsolutePath();
+
+	}
+
+	@Override
+	public void beforeRmiTransport(VFSDiskManager diskManager) throws VFSException {
 		try {
-			this.inputStream = RemoteInputStreamServer.wrap(inputStream);
+			VFSPath journalPath = diskManager.createPath(journalPathString);
+			VFSEntry journalEntry = journalPath.getVFSEntry();
+			this.inputStream = RemoteInputStreamServer.wrap(journalEntry.getInputStream());
 		} catch (RemoteException ex) {
 			throw new VFSException(ex);
+
 		}
+	}
+
+	@Override
+	public void beforeLocalTransport(VFSDiskManager diskManager) throws VFSException {
+		VFSPath journalPath = diskManager.createPath(journalPathString);
+		VFSEntry journalEntry = journalPath.getVFSEntry();
+		this.inputStream = journalEntry.getInputStream();
 	}
 
 	@Override
@@ -46,14 +86,12 @@ public class ModifyFileItem extends JournalItem {
 
 	@Override
 	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
-		VFSPath path = diskManager.createPath(absolutePath);
-		this.inputStream = path.getVFSEntry().getInputStream();
 	}
 
 	@Override
 	public void doReplay(VFSDiskManager diskManager) throws VFSException {
-		LOGGER.debug("Journal - Modify File " + absolutePath);
-		VFSPath filePath = diskManager.createPath(absolutePath);
+		LOGGER.debug("Journal - Modify File " + absoluteFilePath);
+		VFSPath filePath = diskManager.createPath(absoluteFilePath);
 		VFSEntry file = filePath.getVFSEntry();
 
 		// copy file

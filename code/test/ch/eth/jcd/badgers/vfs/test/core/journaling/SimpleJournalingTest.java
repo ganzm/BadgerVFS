@@ -73,6 +73,8 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 		Journal journal = journals.get(0);
 
+		journal.beforeLocalTransport(diskManager);
+
 		journal.replay(secondDiskManager);
 
 		// compare content of the file systems

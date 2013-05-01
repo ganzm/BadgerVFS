@@ -379,7 +379,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		journaling.closeJournal();
 	}
 
-	public void addJournalItem(JournalItem journalEntry) {
+	public void addJournalItem(JournalItem journalEntry) throws VFSException {
 		journaling.addJournalItem(journalEntry);
 	}
 
@@ -397,7 +397,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	public Journal linkDisk(String hostName) throws VFSException {
 		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
 		config.setLinkedHostName(hostName);
-		return journaling.createJournal(getRoot());
+		initJournaling();
+		return journaling.journalizeDisk(getRoot());
 	}
 
 	/**
