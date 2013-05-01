@@ -94,7 +94,7 @@ public class VFSFileImpl extends VFSEntryImpl {
 			// get input stream of this file
 			in = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 
-			byte[] buffer = new byte[DataBlock.USERDATA_SIZE];
+			byte[] buffer = new byte[DataBlock.BLOCK_SIZE];
 
 			int numBytes;
 			while ((numBytes = in.read(buffer)) >= 0) {

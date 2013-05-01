@@ -10,7 +10,6 @@ import java.util.Date;
  * $Id$
  * 
  * DataBlocks are located in the DataSection of the file system. All DataBlocks have constant size {@link DataBlock#BLOCK_SIZE}
- * 
  */
 public class DataBlock {
 
@@ -19,16 +18,13 @@ public class DataBlock {
 	 */
 	public static final int BLOCK_SIZE = 1024;
 
-	public static final int HEADER_SIZE = 21;
-
-	public static final int USERDATA_SIZE = BLOCK_SIZE - HEADER_SIZE;
-
 	/**
+	 * StartPosition of this DataBlock
+	 * 
+	 * 
 	 * Position (offset in bytes) in our file where this DataBlock is located
 	 */
 	private final long location;
-
-	private final boolean isDirectory;
 
 	/**
 	 * Yes, this is a linked list
@@ -38,11 +34,24 @@ public class DataBlock {
 	private Date creationDate;
 
 	/**
+	 * Number of UserData stored in this DataBlock
 	 */
 	private int dataLength = 0;
 
-	public DataBlock(long location, boolean isDirectory) {
-		this.isDirectory = isDirectory;
+	/**
+	 * If set to true this is the first DataBlock of a File or a Directory
+	 * 
+	 * If true we have DirectoryBlocks pointing on us
+	 */
+	private boolean isEntryHeaderBlock;
+
+	/**
+	 * counter from 0 to 127 which indicates how many DirectoryBlocks point on this specific DataBlock
+	 */
+	private short linkCount = 1;
+
+	public DataBlock(long location, boolean isEntryHeaderBlock) {
+		this.isEntryHeaderBlock = isEntryHeaderBlock;
 		this.location = location;
 		this.creationDate = new Date();
 	}
@@ -57,12 +66,12 @@ public class DataBlock {
 	}
 
 	/**
-	 * Location in our Virtual Disk File where the first user data bytes fo this DataBlock is located
+	 * Location in our Virtual Disk File where the first user data bytes of this DataBlock is located
 	 * 
 	 * @return
 	 */
 	public long getUserDataLocation() {
-		return location + HEADER_SIZE;
+		return location + getHeaderSize();
 	}
 
 	/**
@@ -97,11 +106,11 @@ public class DataBlock {
 	}
 
 	private byte[] serializeHeader() {
-		ByteBuffer buf = ByteBuffer.allocate(HEADER_SIZE);
+		ByteBuffer buf = ByteBuffer.allocate(getHeaderSize());
 
 		// BlockHeader
 		int header = 1;
-		if (isDirectory) {
+		if (isEntryHeaderBlock) {
 			header = header | 2;
 		}
 		buf.put((byte) header);
@@ -109,8 +118,14 @@ public class DataBlock {
 		// Next DataBlock
 		buf.putLong(nextDataBlock);
 
-		// Creation Date
-		buf.putLong(creationDate.getTime());
+		if (isEntryHeaderBlock) {
+
+			// Creation Date
+			buf.putLong(creationDate.getTime());
+
+			// LinkCount
+			buf.putShort(linkCount);
+		}
 
 		// Data Length
 		buf.putInt(dataLength);
@@ -120,23 +135,31 @@ public class DataBlock {
 
 	public static DataBlock deserialize(long location, byte[] dataBlockBuffer) {
 		ByteBuffer buf = ByteBuffer.wrap(dataBlockBuffer);
+		Date creationDate = null;
+		short linkCount = -1;
 
 		// BlockHeader
 		int headerByte = buf.get();
 
-		boolean isDirectory = (headerByte & 2) != 0;
+		boolean isEntryHeaderBlock = (headerByte & 2) != 0;
 
 		// Next DataBlock
 		long nextBlockLocation = buf.getLong();
 
-		// Creation Date
-		Date creationDate = new Date(buf.getLong());
+		if (isEntryHeaderBlock) {
+			// Creation Date
+			creationDate = new Date(buf.getLong());
+
+			// LinkCount
+			linkCount = buf.getShort();
+		}
 
 		// Data Length
 		int dataLength = buf.getInt();
 
-		DataBlock dataBlock = new DataBlock(location, isDirectory);
+		DataBlock dataBlock = new DataBlock(location, isEntryHeaderBlock);
 		dataBlock.creationDate = creationDate;
+		dataBlock.linkCount = linkCount;
 		dataBlock.nextDataBlock = nextBlockLocation;
 		dataBlock.dataLength = dataLength;
 
@@ -148,4 +171,11 @@ public class DataBlock {
 		virtualDiskFile.write(serializeHeader());
 	}
 
+	private int getHeaderSize() {
+		if (isEntryHeaderBlock) {
+			return 23;
+		} else {
+			return 13;
+		}
+	}
 }

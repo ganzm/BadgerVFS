@@ -215,10 +215,10 @@ Block layout \\
 \\  \hline
 BlockHeader & 1 byte &
 \\
-\hspace{0.2cm} 0) Header-Bit (LSB) & &  If set to 1 this is the first DataBlock
-of a file.
+\hspace{0.2cm} 0) Block Header-Bit (LSB) & &  If set to 1 this DataBlock is in use and contains real data.
 \\
-\hspace{0.2cm} 1) not used & &
+\hspace{0.2cm} 1) Entry Header-Bit & &  If set to 1 this is the first DataBlock
+of a file or folder.
 \\
 \hspace{0.2cm} 2) not used & &
 \\
@@ -238,8 +238,13 @@ Points to the start address of the next DataBlock (linked list).
 0 if this is the last DataBlock of a certain file or folder.
 \\  \hline
 CreationDate & 8 byte & UTC time when this file was created
-\newline \textit{This field only exists if Header-Bit is set to 1}
+\newline \textit{This field only exists if File Header-Bit is set to 1}
 \\  \hline
+
+LinkCount & 2 byte & counter from 0 to 127 which indicates how many DirectoryBlocks point on this specific DataBlock.
+\newline \textit{This field only exists if File Header-Bit is set to 1}
+\\  \hline
+
 
 DataLength & 4 byte &
 Indicates the number of data saved on this DataBlock.

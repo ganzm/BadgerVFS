@@ -82,7 +82,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {
 		DataBlock dataBlock = null;
 		try {
-			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(false);
+			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
 			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
 
 			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);

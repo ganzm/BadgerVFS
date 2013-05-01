@@ -58,7 +58,7 @@ public class ModifyFileItem extends JournalItem {
 
 		// copy file
 		try (OutputStream out = file.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
-			byte[] buffer = new byte[DataBlock.USERDATA_SIZE];
+			byte[] buffer = new byte[DataBlock.BLOCK_SIZE];
 			int numBytes;
 			while ((numBytes = inputStream.read(buffer)) > 0) {
 				out.write(buffer, 0, numBytes);

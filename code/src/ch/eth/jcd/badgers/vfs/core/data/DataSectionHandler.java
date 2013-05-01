@@ -95,14 +95,15 @@ public final class DataSectionHandler {
 	/**
 	 * Memory Allocation on the DataSection
 	 * 
-	 * @param isDirectory
+	 * @param isEntryHeaderBlock
+	 *            If set to true this is the first DataBlock of a File or a Directory
 	 * 
 	 * @return
 	 * @throws IOException
 	 */
-	public DataBlock allocateNewDataBlock(boolean isDirectory) throws IOException, VFSOutOfMemoryException {
+	public DataBlock allocateNewDataBlock(boolean isEntryHeaderBlock) throws IOException, VFSOutOfMemoryException {
 		long freePosition = getNextFreeDataBlockPosition();
-		DataBlock dataBlock = new DataBlock(freePosition, isDirectory);
+		DataBlock dataBlock = new DataBlock(freePosition, isEntryHeaderBlock);
 		dataBlock.persist(virtualDiskFile);
 		// update cache
 		cache.markOccupied(freePosition);
