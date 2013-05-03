@@ -7,31 +7,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.GetVersionDeltaAction;
 
 public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	private static final Logger LOGGER = Logger.getLogger(DiskRemoteInterfaceImpl.class);
-
-	private static final ActionObserver DUMMY_OBSERVER = new ActionObserver() {
-
-		@Override
-		public void onActionFinished(final AbstractBadgerAction action) {
-
-		}
-
-		@Override
-		public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-
-		}
-	};
-
 	private final BlockingQueue<DiskRemoteResult> clientRequests = new LinkedBlockingQueue<DiskRemoteResult>();
 	private final DiskWorkerController diskWorkerController;
 
@@ -57,19 +43,18 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	@Override
 	public List<Journal> getVersionDelta(final long lastSeenServerVersion, final long clientVersion) throws RemoteException {
 		try {
-			final GetVersionDeltaAction deltaAction = new GetVersionDeltaAction(lastSeenServerVersion, clientVersion, DUMMY_OBSERVER);
+			final GetVersionDeltaAction deltaAction = new GetVersionDeltaAction(lastSeenServerVersion, clientVersion, null);
 			diskWorkerController.enqueueBlocking(deltaAction);
 			return deltaAction.getResult();
 		} catch (final InterruptedException e) {
 			throw new RemoteException("error getting version Delta", e);
 		}
-
 	}
 
 	@Override
-	public Journal pushVersion(final long lastSeenServerVersion, final Journal clientJournal) throws RemoteException {
+	public PushVersionResult pushVersion(ClientVersion clientVersion) throws RemoteException {
 		try {
-			final PushVersionAction pushVersionAction = new PushVersionAction(lastSeenServerVersion, clientJournal, DUMMY_OBSERVER);
+			final SyncServerPushVersionAction pushVersionAction = new SyncServerPushVersionAction(clientVersion);
 			diskWorkerController.enqueueBlocking(pushVersionAction);
 			return pushVersionAction.getResult();
 		} catch (final InterruptedException e) {
@@ -83,8 +68,6 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
 	@Override
 	public void unlink() throws RemoteException {
-
-		throw new UnsupportedOperationException("TODO");
+		LOGGER.info("unlink() - TODO");
 	}
-
 }

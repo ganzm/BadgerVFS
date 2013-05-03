@@ -47,8 +47,9 @@ public interface AdministrationRemoteInterface extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 * @throws VFSException
+	 * @return UUID of the freshly created disk
 	 */
-	void createNewDisk(String diskname) throws RemoteException, VFSException;
+	UUID createNewDisk(String diskname) throws RemoteException, VFSException;
 
 	/**
 	 * This method is called from the client whenever on the server-side a disk shall be fetched.

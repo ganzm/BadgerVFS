@@ -300,6 +300,13 @@ public final class HeaderSectionHandler {
 		}
 	}
 
+	/**
+	 * Version number we have last seen on the synchronization server
+	 * 
+	 * @param virtualDiskFile
+	 * @param serverVersion
+	 * @throws VFSException
+	 */
 	public void setlinkedHostVersion(RandomAccessFile virtualDiskFile, long serverVersion) throws VFSException {
 		this.linkedHostVersion = serverVersion;
 		try {
@@ -310,6 +317,11 @@ public final class HeaderSectionHandler {
 		}
 	}
 
+	/**
+	 * Version number we have last seen on the synchronization server
+	 * 
+	 * @return
+	 */
 	public long getLinkedHostVersion() {
 		return linkedHostVersion;
 	}

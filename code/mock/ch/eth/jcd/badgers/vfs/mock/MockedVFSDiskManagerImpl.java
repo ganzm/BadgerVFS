@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -18,7 +17,10 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSDisabledJournaling;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
@@ -159,16 +161,27 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public void pauseJournaling(boolean pause) {
-	}
-
-	@Override
-	public List<Journal> getPendingJournals() throws VFSException {
+	public ClientVersion getPendingVersion() throws VFSException {
 		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override
 	public UUID getDiskId() {
 		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public long getServerVersion() {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public void persistServerJournal(Journal journal) {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public VFSJournaling getJournaling() {
+		return new VFSDisabledJournaling();
 	}
 }

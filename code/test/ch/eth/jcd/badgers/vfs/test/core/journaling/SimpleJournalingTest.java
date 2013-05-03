@@ -13,6 +13,7 @@ import org.junit.Test;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.test.VFSDiskManagerTestBase;
 import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
@@ -68,7 +69,8 @@ public class SimpleJournalingTest extends VFSDiskManagerTestBase {
 
 		LOGGER.info("Try to replay Journal on the second Disk");
 		diskManager.closeCurrentJournal();
-		List<Journal> journals = diskManager.getPendingJournals();
+		ClientVersion version = diskManager.getPendingVersion();
+		List<Journal> journals = version.getJournals();
 		Assert.assertEquals(1, journals.size());
 
 		Journal journal = journals.get(0);

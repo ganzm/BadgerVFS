@@ -37,7 +37,7 @@ public class ModifyFileItem extends JournalItem {
 	/**
 	 * Path where our data should be stored but may be touched/deleted/renamed by the user
 	 */
-	private final String absoluteFilePath;
+	private String absoluteFilePath;
 
 	/**
 	 * Path where our data are stored and where the user can not touch/rename/delete them
@@ -57,7 +57,6 @@ public class ModifyFileItem extends JournalItem {
 	public void onJournalAdd(VFSJournaling journaling) throws VFSException {
 		VFSPath journalPath = journaling.copyFileToJournal(absoluteFilePath);
 		journalPathString = journalPath.getAbsolutePath();
-
 	}
 
 	@Override
@@ -68,7 +67,6 @@ public class ModifyFileItem extends JournalItem {
 			this.inputStream = RemoteInputStreamServer.wrap(journalEntry.getInputStream());
 		} catch (RemoteException ex) {
 			throw new VFSException(ex);
-
 		}
 	}
 
@@ -100,6 +98,17 @@ public class ModifyFileItem extends JournalItem {
 			int numBytes;
 			while ((numBytes = inputStream.read(buffer)) > 0) {
 				out.write(buffer, 0, numBytes);
+			}
+
+			out.flush();
+
+			// copy procedure finished
+
+			boolean replayOnSyncServer = diskManager.getDiskConfiguration().isSyncServerMode();
+			if (replayOnSyncServer) {
+				VFSJournaling journaling = diskManager.getJournaling();
+				VFSPath fileInJournalPath = journaling.copyFileToJournal(absoluteFilePath);
+				this.absoluteFilePath = fileInJournalPath.getAbsolutePath();
 			}
 		} catch (IOException e) {
 			throw new VFSException(e);

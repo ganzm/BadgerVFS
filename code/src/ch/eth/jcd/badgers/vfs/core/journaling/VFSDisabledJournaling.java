@@ -38,4 +38,17 @@ public class VFSDisabledJournaling implements VFSJournaling {
 	public VFSPath copyFileToJournal(String absolutePath) throws VFSException {
 		return null;
 	}
+
+	@Override
+	public void persistServerJournal(Journal journal) {
+
+	}
+
+	@Override
+	public void openNewJournal() throws VFSException {
+	}
+
+	@Override
+	public void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException {
+	}
 }

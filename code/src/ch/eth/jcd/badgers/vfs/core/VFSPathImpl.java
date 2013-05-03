@@ -63,7 +63,7 @@ public class VFSPathImpl implements VFSPath {
 	@Override
 	public VFSEntry createDirectory() throws VFSException {
 		if (exists()) {
-			throw new VFSException("Can't create Directory from " + pathString + " already exists");
+			throw new VFSException("Can't create Directory from " + pathString + " - directory already exists");
 		}
 
 		try {

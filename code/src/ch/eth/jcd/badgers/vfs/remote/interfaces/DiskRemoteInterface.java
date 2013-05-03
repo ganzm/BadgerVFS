@@ -5,7 +5,9 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
+import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 
 /**
  * 
@@ -37,11 +39,11 @@ public interface DiskRemoteInterface extends Remote {
 	/**
 	 * pushes locally made changes to the server. The client needs to be ready to revert his changes because an other client may have made conflicting changes
 	 * 
-	 * @param clientJournal
+	 * @param clientVersion
 	 * @throws RemoteException
-	 * @return slightly modified journal which was created from the server
+	 * @return
 	 */
-	Journal pushVersion(long lastSeenServerVersion, Journal clientJournal) throws RemoteException;
+	PushVersionResult pushVersion(ClientVersion clientVersion) throws RemoteException;
 
 	/**
 	 * Deleted the currently managed disk on the server. Any other client which currently uses this this is disconnected

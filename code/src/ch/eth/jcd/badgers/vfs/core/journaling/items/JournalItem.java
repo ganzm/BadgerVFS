@@ -12,11 +12,11 @@ public abstract class JournalItem implements Serializable {
 
 	public void replay(VFSDiskManager diskManager) throws VFSException {
 		// actions performed on the disk should not be added to the journal for obvious reasons
-		diskManager.pauseJournaling(true);
+		diskManager.getJournaling().pauseJournaling(true);
 		try {
 			doReplay(diskManager);
 		} finally {
-			diskManager.pauseJournaling(false);
+			diskManager.getJournaling().pauseJournaling(false);
 		}
 	}
 
@@ -41,5 +41,4 @@ public abstract class JournalItem implements Serializable {
 	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
 		// does nothing by default
 	}
-
 }

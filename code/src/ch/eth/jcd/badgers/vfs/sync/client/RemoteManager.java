@@ -67,7 +67,10 @@ public class RemoteManager implements ActionObserver {
 		if (status != ConnectionStatus.CONNECTED) {
 			return false;
 		}
-		connectionStateListeners.add(connectionStateListener);
+
+		if (connectionStateListener != null) {
+			connectionStateListeners.add(connectionStateListener);
+		}
 		final LoginAction loginAction = new LoginAction(this, this, username, password);
 		remoteWorkerController.enqueue(loginAction);
 		return true;

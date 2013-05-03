@@ -24,7 +24,6 @@ import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateFileItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.ModifyFileItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.util.ByteUtil;
 
 /**
  * $ID$
@@ -63,6 +62,9 @@ public class VFSJournalingImpl implements VFSJournaling {
 		this.diskManager = diskManager;
 	}
 
+	/**
+	 * Persist the current journal
+	 */
 	public void closeJournal() throws VFSException {
 		if (uncommitedJournalEntries == null) {
 			// nothing to do
@@ -174,7 +176,11 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
-	private void openNewJournal() throws VFSException {
+	public void openNewJournal() throws VFSException {
+		openNewJournal(new ArrayList<JournalItem>(0));
+	}
+
+	public void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException {
 
 		VFSEntry journalsFolder = getJournalsFolder();
 
@@ -182,7 +188,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 		long newJournalNumber = 0;
 		if (journals.size() == 0) {
-			newJournalNumber = 1 + getLastSeenServerVersion();
+			newJournalNumber = 1 + diskManager.getServerVersion();
 		}
 
 		else {
@@ -197,47 +203,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 		LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
 		currentJournalFolder = newJournalPath.createDirectory();
-		uncommitedJournalEntries = new ArrayList<JournalItem>();
-	}
-
-	private long getLastSeenServerVersion() throws VFSException {
-
-		boolean journalingEnabledBackupFlag = journalingEnabled;
-		journalingEnabled = false;
-		try {
-
-			long serverVersion = 0;
-			VFSPath syncedVersion = diskManager.getRoot().getChildPath(HIDDEN_FOLDER_NAME + VFSPath.FILE_SEPARATOR + "syncedversion.txt");
-			VFSEntry syncedVersionFile;
-			if (!syncedVersion.exists()) {
-				syncedVersionFile = syncedVersion.createFile();
-
-				try (OutputStream out = syncedVersionFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
-					out.write(ByteUtil.longToBytes(serverVersion));
-				} catch (IOException e) {
-					throw new VFSException("", e);
-				}
-
-			} else {
-				syncedVersionFile = syncedVersion.getVFSEntry();
-
-				try (InputStream in = syncedVersionFile.getInputStream()) {
-					byte[] longByteBuffer = new byte[8];
-
-					if (8 != in.read(longByteBuffer)) {
-						throw new VFSException("Could not read VersionNumber");
-					}
-
-					serverVersion = ByteUtil.bytesToLong(longByteBuffer);
-				} catch (IOException e) {
-					throw new VFSException("", e);
-				}
-			}
-
-			return serverVersion;
-		} finally {
-			journalingEnabled = journalingEnabledBackupFlag;
-		}
+		uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
 	}
 
 	/**
@@ -256,6 +222,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 		addDirectoryToJournal(root);
 		Journal j = new Journal(uncommitedJournalEntries);
+		uncommitedJournalEntries = null;
 		return j;
 	}
 
@@ -291,5 +258,11 @@ public class VFSJournalingImpl implements VFSJournaling {
 		} finally {
 			journalingEnabled = journalingEnabledBackupFlag;
 		}
+	}
+
+	@Override
+	public void persistServerJournal(Journal journal) throws VFSException {
+		uncommitedJournalEntries.addAll(journal.getJournalEntries());
+		closeJournal();
 	}
 }

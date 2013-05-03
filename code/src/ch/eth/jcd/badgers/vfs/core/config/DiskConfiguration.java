@@ -27,6 +27,11 @@ public class DiskConfiguration implements Serializable {
 	private String linkedHostName;
 
 	/**
+	 * If set to true this is a VirtualDisk located on the SynchronisationServer
+	 */
+	private boolean syncServerMode = false;
+
+	/**
 	 * the maximum size in bytes of the file we store our data on the host file system <br>
 	 * values <=0 indicate that there is no limit <br>
 	 * 
@@ -91,4 +96,11 @@ public class DiskConfiguration implements Serializable {
 				+ " HostFilePath=" + hostFilePath;
 	}
 
+	public boolean isSyncServerMode() {
+		return syncServerMode;
+	}
+
+	public void setSyncServerMode(boolean syncServerMode) {
+		this.syncServerMode = syncServerMode;
+	}
 }

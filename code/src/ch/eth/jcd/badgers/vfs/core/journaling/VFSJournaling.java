@@ -11,6 +11,9 @@ public interface VFSJournaling {
 
 	void addJournalItem(JournalItem journalEntry) throws VFSException;
 
+	/**
+	 * Persist the current journal
+	 */
 	void closeJournal() throws VFSException;
 
 	List<Journal> getPendingJournals() throws VFSException;
@@ -27,4 +30,10 @@ public interface VFSJournaling {
 	void pauseJournaling(boolean pause);
 
 	VFSPath copyFileToJournal(String absolutePath) throws VFSException;
+
+	void persistServerJournal(Journal journal) throws VFSException;
+
+	void openNewJournal() throws VFSException;
+
+	void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException;
 }

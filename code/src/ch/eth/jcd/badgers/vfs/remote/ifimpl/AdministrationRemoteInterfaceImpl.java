@@ -64,6 +64,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		config.persist();
 
 		// Create Disk and DiskManager
+		diskConfiguration.setSyncServerMode(true);
+
 		final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 		final VFSDiskManagerImpl diskManager = (VFSDiskManagerImpl) factory.createDiskManager(diskConfiguration);
 
@@ -73,12 +75,12 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		clientLink.setDiskWorkerController(diskWorkerController);
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+
 		return stub;
 	}
 
 	@Override
 	public DiskRemoteInterface useLinkedDisk(final UUID diskId) throws RemoteException, VFSException {
-
 		UserAccount account = clientLink.getUserAccount();
 		LinkedDisk linkedDisk = account.getLinkedDiskById(diskId);
 
@@ -105,7 +107,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	}
 
 	@Override
-	public void createNewDisk(final String diskname) throws RemoteException, VFSException {
+	public UUID createNewDisk(final String diskname) throws RemoteException, VFSException {
 		final DiskConfiguration diskConfiguration = new DiskConfiguration();
 		diskConfiguration.setCompressionAlgorithm(Compression.NONE);
 		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
@@ -118,6 +120,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		factory.createDiskManager(diskConfiguration);
 		clientLink.getUserAccount().addLinkedDisk(linkedDisk);
 		config.persist();
+
+		return linkedDisk.getId();
 	}
 
 	public ClientLink getClientLink() {

@@ -1,10 +1,11 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
-import java.util.List;
 import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.core.model.DiskSpaceUsage;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
@@ -93,12 +94,20 @@ public interface VFSDiskManager {
 	void closeCurrentJournal() throws VFSException;
 
 	/**
-	 * Returns all journals which have not yet been transfered to the synchronization server (because we were offline some time)
+	 * Returns the current version which has not yet been published to the server
+	 * 
 	 * 
 	 * @return sorted list of journals, the first element of the list is the oldest journal
 	 * @throws VFSException
 	 */
-	List<Journal> getPendingJournals() throws VFSException;
+	ClientVersion getPendingVersion() throws VFSException;
+
+	/**
+	 * Returns the most current version of the synchronisation server
+	 * 
+	 * @return
+	 */
+	long getServerVersion();
 
 	/**
 	 * 
@@ -110,16 +119,13 @@ public interface VFSDiskManager {
 	Journal linkDisk(String hostName) throws VFSException;
 
 	/**
-	 * we need journaling to be temporary disabled while replaying journals
-	 * 
-	 * @param pause
-	 */
-	void pauseJournaling(boolean pause);
-
-	/**
 	 * Returns the currents disks UUID
 	 * 
 	 * @return uuid of the disk
 	 */
 	UUID getDiskId();
+
+	void persistServerJournal(Journal journal) throws VFSException;
+
+	VFSJournaling getJournaling();
 }

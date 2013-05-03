@@ -31,6 +31,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSDisabledJournaling;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
@@ -191,9 +192,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	private void initJournaling() {
-		if (config.isHostNameLinked()) {
+		if (config.isHostNameLinked() || config.isSyncServerMode()) {
 			this.journaling = new VFSJournalingImpl(this);
-
 		} else {
 			this.journaling = new VFSDisabledJournaling();
 		}
@@ -383,11 +383,6 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		journaling.addJournalItem(journalEntry);
 	}
 
-	@Override
-	public List<Journal> getPendingJournals() throws VFSException {
-		return journaling.getPendingJournals();
-	}
-
 	/**
 	 * This method is called on an offline disk to attach and upload it to a synchronization server
 	 * 
@@ -398,6 +393,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
 		config.setLinkedHostName(hostName);
 		initJournaling();
+
+		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, 0);
 		return journaling.journalizeDisk(getRoot());
 	}
 
@@ -408,18 +405,47 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 * @throws VFSException
 	 */
 	public void replayInitialJournal(Journal journal) throws VFSException {
+		journaling.openNewJournal(journal.getJournalEntries());
 		for (JournalItem item : journal.getJournalEntries()) {
 			item.replay(this);
 		}
-	}
 
-	@Override
-	public void pauseJournaling(boolean pause) {
-		journaling.pauseJournaling(pause);
+		journaling.closeJournal();
+		long serverVersion = getServerVersion() + 1;
+		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, serverVersion);
 	}
 
 	@Override
 	public UUID getDiskId() {
 		return headerSectionHandler.getUuid();
+	}
+
+	@Override
+	public long getServerVersion() {
+		return headerSectionHandler.getLinkedHostVersion();
+	}
+
+	@Override
+	public ClientVersion getPendingVersion() throws VFSException {
+		List<Journal> journals = journaling.getPendingJournals();
+		ClientVersion version = new ClientVersion(headerSectionHandler.getLinkedHostVersion());
+		version.setJournals(journals);
+		return version;
+	}
+
+	@Override
+	public void persistServerJournal(Journal journal) throws VFSException {
+		for (JournalItem journalEntry : journal.getJournalEntries()) {
+			journaling.addJournalItem(journalEntry);
+		}
+
+		journaling.closeJournal();
+
+		long serverVersion = getServerVersion() + 1;
+		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, serverVersion);
+	}
+
+	public VFSJournaling getJournaling() {
+		return journaling;
 	}
 }

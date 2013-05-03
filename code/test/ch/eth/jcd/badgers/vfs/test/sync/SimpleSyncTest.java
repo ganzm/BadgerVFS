@@ -18,11 +18,13 @@ import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
+import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
@@ -168,11 +170,15 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 		LOGGER.info("Disk is now linked");
 
+		ClientVersion clientVersion = clientDiskManager.getPendingVersion();
+		Assert.assertEquals("expect no local changes", 0, clientVersion.getJournals().size());
+
 		List<ClientLink> links = syncServer.getActiveClientLinks();
 		Assert.assertEquals(1, links.size());
 		ClientLink clientLink = links.get(0);
 
 		VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
+		Assert.assertEquals("Expecte initial Version 0", 0, syncServerDiskManager.getServerVersion());
 
 		// compare content of the file systems
 		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
@@ -194,12 +200,17 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 		clientDiskManager.closeCurrentJournal();
 
-		List<Journal> pendingJournals = clientDiskManager.getPendingJournals();
+		ClientVersion version = clientDiskManager.getPendingVersion();
+		List<Journal> pendingJournals = version.getJournals();
 		Assert.assertEquals("expected 2 pending journals", 2, pendingJournals.size());
 
-		for (Journal toUpload : pendingJournals) {
-			diskRemoteInterface.pushVersion(toUpload.getServerVersion(), toUpload);
-		}
+		version.beforeRmiTransport(clientDiskManager);
+		PushVersionResult pushVersionResult = diskRemoteInterface.pushVersion(version);
+		Assert.assertTrue(pushVersionResult.toString(), pushVersionResult.isSuccess());
+		Assert.assertEquals(2, pushVersionResult.getNewServerVersion());
+
+		// version is pushed - compare server and client disk
+		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
 
 		LOGGER.info("Unlink Disk");
 		diskRemoteInterface.unlink();
