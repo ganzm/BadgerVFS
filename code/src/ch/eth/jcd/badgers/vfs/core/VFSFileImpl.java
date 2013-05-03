@@ -8,6 +8,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
+import ch.eth.jcd.badgers.vfs.core.data.DataSectionHandler;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryChildTree;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectoryEntryBlock;
+import ch.eth.jcd.badgers.vfs.core.directory.DirectorySectionHandler;
 import ch.eth.jcd.badgers.vfs.core.interfaces.FindInFolderCallback;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
@@ -62,11 +66,36 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 		// if (writeMode == WRITE_MODE_OVERRIDE) {
 		try {
-			truncateDataBlocks();
+			if (this.firstDataBlock.getLinkCount() <= 1) {
+				// there is only one DirectoryEntryBlock pointing to this file content
+				truncateDataBlocks();
+			} else {
+				// there is more than one DirectoryEntryBlock pointing to this file content
+				String fileName = getPath().getName();
+
+				DirectorySectionHandler directorySectionHandler = diskManager.getDirectorySectionHandler();
+				DataSectionHandler dataSectionHandler = diskManager.getDataSectionHandler();
+
+				// allocate new DataBlock and clone header
+				DataBlock newBlock = dataSectionHandler.allocateNewDataBlock(true);
+				newBlock.setCreationDate(firstDataBlock.getCreationDate());
+
+				// assign the newly created DataBlock to the corresponding DirectoryEntry
+				VFSDirectoryImpl parentDir = getParentProtected();
+				DirectoryChildTree childTree = parentDir.getChildTree();
+				DirectoryEntryBlock removedEntry = childTree.remove(directorySectionHandler, fileName);
+				removedEntry.assignDataBlock(newBlock);
+				childTree.insert(directorySectionHandler, removedEntry);
+
+				// decrease DataBlock LinkCount
+				firstDataBlock.decLinkCount();
+				diskManager.getDataSectionHandler().persistDataBlock(firstDataBlock);
+
+				firstDataBlock = newBlock;
+			}
 		} catch (IOException e) {
 			throw new VFSException("Error while truncating file", e);
 		}
-		// }
 
 		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 		diskManager.addJournalItem(new ModifyFileItem(this));

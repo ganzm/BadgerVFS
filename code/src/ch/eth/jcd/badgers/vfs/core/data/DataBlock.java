@@ -98,6 +98,10 @@ public class DataBlock {
 		this.dataLength = dataLength;
 	}
 
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
 	public Date getCreationDate() {
 		return creationDate;
 	}
