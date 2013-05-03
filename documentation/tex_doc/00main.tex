@@ -99,7 +99,21 @@ search interface, that allows quick finding of files.
 % PART III: Synchronization Server
 % --------------------------------------
 
-%\section{Synchronization Server}
+\section{Synchronization Server}
+
+Synchronization Server is a command line server that allows synchronization of
+virtual disks. It allows basic user management via VFS Browser, that includes
+creating users and a login of created users. Logged in users can link local
+disks to an account on the server via VFS Browser and then can connect to such
+shared disks from an other client machine. Disks can also be created directly on
+the server. When VFS Browser has a connection to the server, changes that occur
+on the local disk will be propagated to the server which propagates these
+changes to possibly other connected machines. If a user has
+no connection to the Synchronization Server but operates on a disk that is
+linked to a server instance the changes are recorded and are propagated as soon
+as the connection is established next time. Thus synchronization server allows
+seamless synchronization between several VFS Browser instances running on
+different machines.
 
 % TODO: Remove this line
 %\textbf{[This section has to be completed by May 13th.]}
@@ -108,21 +122,14 @@ search interface, that allows quick finding of files.
 %\emph{Give a short (1-2 paragraphs) description of what VFS Browser is.}
 
 
-%\subsection{Requirements}
+\include{21requirements}
+\include{22design}
 
 % TODO: Remove this text and replace it with actual content
 %\emph{Describe which requirements (and possibly bonus requirements) you have
 % implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
 
-
-%\subsection{Design}
-
-% TODO: Remove this text and replace it with actual content
-%\emph{Give an overview of the design of this part and describe in general terms
-% how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
-
-
-%\subsection{Integration}
+\subsection{Integration}
 
 % TODO: Remove this text and replace it with actual content
 %\emph{If you had to change the design or API of the previous part, describe the
