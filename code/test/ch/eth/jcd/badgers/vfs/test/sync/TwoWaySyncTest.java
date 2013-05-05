@@ -31,6 +31,7 @@ import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
+import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
@@ -46,6 +47,8 @@ public class TwoWaySyncTest {
 	private RemoteManager clientRemoteManager1;
 	private RemoteManager clientRemoteManager2;
 	private final String hostLink = "localhost";
+	private VFSDiskManager serverDiskManager;
+
 	private VFSDiskManagerImpl clientDiskManager1;
 	private VFSDiskManagerImpl clientDiskManager2;
 	private final String username = new BigInteger(130, new Random()).toString(32);
@@ -110,6 +113,11 @@ public class TwoWaySyncTest {
 		DiskRemoteInterface diskRemoteInterface1 = clientAdminInterface1.useLinkedDisk(diskUuid);
 		DiskRemoteInterface diskRemoteInterface2 = clientAdminInterface2.useLinkedDisk(diskUuid);
 
+		setServerDiskManager();
+
+		// check Version on Server
+		Assert.assertEquals("Expect Version 0 on Server", 0, serverDiskManager.getServerVersion());
+
 		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 
 		DiskConfiguration clientDiskConfig1 = createConfig(hostLink, diskName, diskUuid, ".client1.bfs");
@@ -144,10 +152,14 @@ public class TwoWaySyncTest {
 		PushVersionResult pushResult1 = diskRemoteInterface1.pushVersion(clientVersion1);
 		Assert.assertTrue("Expect Version update to be successfull", pushResult1.isSuccess());
 		Assert.assertEquals("Expected Server to be Version 1", 1, pushResult1.getNewServerVersion());
+		clientDiskManager1.setServerVersion(pushResult1.getNewServerVersion());
+
+		// check Version on Server
+		Assert.assertEquals("Expect Version 1 on Server", 1, serverDiskManager.getServerVersion());
 
 		LOGGER.info("Client2 pushes changes to Server");
 		ClientVersion clientVersion2 = clientDiskManager2.getPendingVersion();
-		clientVersion1.beforeRmiTransport(clientDiskManager2);
+		clientVersion2.beforeRmiTransport(clientDiskManager2);
 		PushVersionResult pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
 		Assert.assertFalse("Expect Version update to be unsuccessfull because client already updated Server to Version 1", pushResult2.isSuccess());
 
@@ -161,8 +173,9 @@ public class TwoWaySyncTest {
 		clientVersion2 = clientDiskManager2.getPendingVersion();
 		clientVersion2.beforeRmiTransport(clientDiskManager2);
 		pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
-		Assert.assertTrue("Expect Version update to be successfull", pushResult2.isSuccess());
+		Assert.assertTrue("Expect Version update to be successfull but - " + pushResult2.getMessage(), pushResult2.isSuccess());
 		Assert.assertEquals("Expected Server to be Version 2", 2, pushResult1.getNewServerVersion());
+		clientDiskManager2.setServerVersion(pushResult2.getNewServerVersion());
 
 		LOGGER.info("Client1 updates to Version 2");
 		performUpdate(clientDiskManager1, diskRemoteInterface1, 2);
@@ -175,6 +188,18 @@ public class TwoWaySyncTest {
 		diskRemoteInterface2.unlink();
 	}
 
+	private void setServerDiskManager() {
+		List<ClientLink> activeLinks = syncServer.getActiveClientLinks();
+		Assert.assertEquals(2, activeLinks.size());
+
+		ClientLink link1 = activeLinks.get(0);
+		ClientLink link2 = activeLinks.get(1);
+
+		Assert.assertSame(link1.getDiskWorkerController(), link2.getDiskWorkerController());
+
+		serverDiskManager = link1.getDiskWorkerController().getDiskManager();
+	}
+
 	private void performUpdate(VFSDiskManagerImpl clientDiskManager, DiskRemoteInterface diskRemoteInterface, long expectedServerVersionOnClient)
 			throws RemoteException, VFSException {
 		long lastSeenServerVersion = clientDiskManager.getServerVersion();
@@ -182,6 +207,8 @@ public class TwoWaySyncTest {
 		List<Journal> toUpdate = diskRemoteInterface.getVersionDelta(lastSeenServerVersion);
 		for (Journal j : toUpdate) {
 			j.replay(clientDiskManager);
+
+			clientDiskManager.setServerVersion(clientDiskManager.getServerVersion() + 1);
 		}
 
 		diskRemoteInterface.downloadFinished();

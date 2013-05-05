@@ -39,9 +39,9 @@ public interface VFSJournaling {
 
 	void persistServerJournal(Journal journal) throws VFSException;
 
-	void openNewJournal() throws VFSException;
+	void openNewJournal(boolean doEnableJournaling) throws VFSException;
 
-	void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException;
+	void openNewJournal(List<JournalItem> journalItemsToAdd, boolean doEnableJournaling) throws VFSException;
 
 	/**
 	 * get all persisted journals from lastSeenServerVersion (excluded) up to the most recent one

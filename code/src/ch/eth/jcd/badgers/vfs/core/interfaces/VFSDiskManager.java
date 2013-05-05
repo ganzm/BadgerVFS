@@ -110,6 +110,14 @@ public interface VFSDiskManager {
 	long getServerVersion();
 
 	/**
+	 * Sets the current version
+	 * 
+	 * @param serverVersion
+	 * @throws VFSException
+	 */
+	void setServerVersion(long serverVersion) throws VFSException;
+
+	/**
 	 * 
 	 * @param hostName
 	 * @throws VFSException
@@ -128,4 +136,5 @@ public interface VFSDiskManager {
 	void persistServerJournal(Journal journal) throws VFSException;
 
 	VFSJournaling getJournaling();
+
 }

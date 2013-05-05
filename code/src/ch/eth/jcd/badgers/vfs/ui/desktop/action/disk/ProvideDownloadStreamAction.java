@@ -12,6 +12,8 @@ public class ProvideDownloadStreamAction extends DiskAction {
 
 	private static final Logger LOGGER = Logger.getLogger(ProvideDownloadStreamAction.class);
 
+	private static final long PREPARE_TIMEOUT = 10000;
+
 	private final List<Journal> journals;
 	private boolean preparedFlag = false;
 	private Object preparedMonitor = new Object();
@@ -31,27 +33,30 @@ public class ProvideDownloadStreamAction extends DiskAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
-		synchronized (streamOpenMonitor) {
-			streamsOpenedFlag = true;
-		}
-
-		prepareDownloads(diskManager);
-
-		setPrepared();
-
 		try {
-			LOGGER.info("Block DiskManager until client download is finished " + diskManager);
-
 			synchronized (streamOpenMonitor) {
-				if (streamsOpenedFlag) {
-					streamOpenMonitor.wait(clientDownloadTimeout);
-				}
+				streamsOpenedFlag = true;
 			}
-		} catch (InterruptedException e) {
-			throw new VFSException(e);
+
+			prepareDownloads(diskManager);
+
+			setPrepared();
+
+			try {
+				LOGGER.info("Block DiskManager until client download is finished " + diskManager);
+				synchronized (streamOpenMonitor) {
+					if (streamsOpenedFlag) {
+						streamOpenMonitor.wait(clientDownloadTimeout);
+					}
+				}
+			} catch (InterruptedException e) {
+				throw new VFSException(e);
+			} finally {
+				closeDownloads(diskManager);
+				LOGGER.info("Block DiskManager Finished  " + diskManager);
+			}
 		} finally {
-			closeDownloads(diskManager);
-			LOGGER.info("Block DiskManager Finished  " + diskManager);
+
 		}
 	}
 
@@ -81,7 +86,7 @@ public class ProvideDownloadStreamAction extends DiskAction {
 			if (preparedFlag) {
 				return;
 			}
-			preparedMonitor.wait();
+			preparedMonitor.wait(PREPARE_TIMEOUT);
 		}
 	}
 

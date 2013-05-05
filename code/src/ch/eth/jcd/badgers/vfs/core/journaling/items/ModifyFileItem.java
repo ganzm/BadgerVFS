@@ -133,7 +133,8 @@ public class ModifyFileItem extends JournalItem {
 			if (replayOnSyncServer) {
 				VFSJournaling journaling = diskManager.getJournaling();
 				VFSPath fileInJournalPath = journaling.copyFileToJournal(absoluteFilePath);
-				this.absoluteFilePath = fileInJournalPath.getAbsolutePath();
+				this.journalPathString = fileInJournalPath.getAbsolutePath();
+				suppressOnJournalAddJournalCopy = true;
 			}
 		} catch (IOException e) {
 			throw new VFSException(e);

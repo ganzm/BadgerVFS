@@ -165,14 +165,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 	public void addJournalItem(JournalItem journalEntry) throws VFSException {
 		if (journalingEnabled) {
 			if (uncommitedJournalEntries == null) {
-
-				boolean journalingEnabledBackupFlag = journalingEnabled;
-				journalingEnabled = false;
-				try {
-					openNewJournal();
-				} finally {
-					journalingEnabled = journalingEnabledBackupFlag;
-				}
+				openNewJournal(false);
 			}
 			uncommitedJournalEntries.add(journalEntry);
 			journalEntry.onJournalAdd(this);
@@ -184,34 +177,40 @@ public class VFSJournalingImpl implements VFSJournaling {
 	}
 
 	@Override
-	public void openNewJournal() throws VFSException {
-		openNewJournal(new ArrayList<JournalItem>(0));
+	public void openNewJournal(boolean doEnableJournaling) throws VFSException {
+		openNewJournal(new ArrayList<JournalItem>(0), doEnableJournaling);
 	}
 
 	@Override
-	public void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException {
+	public void openNewJournal(List<JournalItem> journalItemsToAdd, boolean doEnableJournaling) throws VFSException {
+		boolean journalingEnabledBackupFlag = journalingEnabled;
+		journalingEnabled = doEnableJournaling;
+		try {
 
-		VFSEntry journalsFolder = getJournalsFolder();
+			VFSEntry journalsFolder = getJournalsFolder();
 
-		List<VFSEntry> journals = journalsFolder.getChildren();
+			List<VFSEntry> journals = journalsFolder.getChildren();
 
-		long newJournalNumber = 0;
-		if (journals.isEmpty()) {
-			newJournalNumber = 1 + diskManager.getServerVersion();
+			long newJournalNumber = 0;
+			if (journals.isEmpty()) {
+				newJournalNumber = 1 + diskManager.getServerVersion();
+			}
+
+			else {
+				String journalName = journals.get(journals.size() - 1).getPath().getName();
+				newJournalNumber = 1 + Long.parseLong(journalName);
+			}
+
+			String newJournalName = versionToJournalFolderName(newJournalNumber);
+
+			VFSPath newJournalPath = journalsFolder.getChildPath(newJournalName);
+
+			LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
+			currentJournalFolder = newJournalPath.createDirectory();
+			uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
+		} finally {
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
-
-		else {
-			String journalName = journals.get(journals.size() - 1).getPath().getName();
-			newJournalNumber = 1 + Long.parseLong(journalName);
-		}
-
-		String newJournalName = versionToJournalFolderName(newJournalNumber);
-
-		VFSPath newJournalPath = journalsFolder.getChildPath(newJournalName);
-
-		LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
-		currentJournalFolder = newJournalPath.createDirectory();
-		uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
 	}
 
 	private String versionToJournalFolderName(long versionNumber) {
@@ -295,23 +294,12 @@ public class VFSJournalingImpl implements VFSJournaling {
 		VFSEntry journalsFolder = getJournalsFolder();
 		List<VFSEntry> journalFolders = journalsFolder.getChildren();
 
-		int index = 1;
 		for (VFSEntry journalFolder : journalFolders) {
 			String journalFolderName = journalFolder.getPath().getName();
-			if (journalFolderName.equals(lastSeenJournal)) {
-				// break for loop
-				break;
+			if (journalFolderName.compareTo(lastSeenJournal) > 0) {
+				Journal journal = deserializeJournalFromFolder(journalFolder);
+				result.add(journal);
 			}
-
-			index++;
-		}
-
-		// index is now our the index of our first journal to pick/return
-
-		for (int i = index; i < journalFolders.size(); i++) {
-			VFSEntry journalFolder = journalFolders.get(i);
-			Journal journal = deserializeJournalFromFolder(journalFolder);
-			result.add(journal);
 		}
 
 		return result;

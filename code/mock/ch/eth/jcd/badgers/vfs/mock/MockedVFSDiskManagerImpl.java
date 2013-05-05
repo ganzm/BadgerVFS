@@ -177,6 +177,11 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
+	public void setServerVersion(long serverVersion) throws VFSException {
+
+	}
+
+	@Override
 	public void persistServerJournal(Journal journal) {
 		throw new UnsupportedOperationException(TODO);
 	}

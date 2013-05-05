@@ -45,7 +45,7 @@ public class SyncServerPushVersionAction extends DiskAction {
 		try {
 			List<Journal> journals = clientVersion.getJournals();
 			for (Journal journal : journals) {
-				journaling.openNewJournal();
+				journaling.openNewJournal(false);
 				journal.replay(diskManager);
 				diskManager.persistServerJournal(journal);
 			}

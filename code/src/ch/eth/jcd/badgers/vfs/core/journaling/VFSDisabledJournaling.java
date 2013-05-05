@@ -45,11 +45,11 @@ public class VFSDisabledJournaling implements VFSJournaling {
 	}
 
 	@Override
-	public void openNewJournal() throws VFSException {
+	public void openNewJournal(boolean doEnableJournaling) throws VFSException {
 	}
 
 	@Override
-	public void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException {
+	public void openNewJournal(List<JournalItem> journalItemsToAdd, boolean doEnableJournaling) throws VFSException {
 	}
 
 	@Override
