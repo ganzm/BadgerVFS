@@ -33,10 +33,9 @@ public interface DiskRemoteInterface extends Remote {
 	 * 
 	 * Whenever you do that you should call {@link #downloadFinished()}
 	 * 
-	 * @param clientVersion
 	 * @return
 	 */
-	List<Journal> getVersionDelta(long lastSeenServerVersion, long clientVersion) throws RemoteException;
+	List<Journal> getVersionDelta(long lastSeenServerVersion) throws RemoteException;
 
 	/**
 	 * Releases DownloadStreams on the Synchronization Server

@@ -14,8 +14,8 @@ public class RemoteWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
-	public void enqueueBlocking(final RemoteAction action) throws InterruptedException {
-		super.enqueueBlocking(action);
+	public void enqueueBlocking(final RemoteAction action, final boolean rethrowException) throws InterruptedException, VFSException {
+		super.enqueueBlocking(action, rethrowException);
 	}
 
 	@Override

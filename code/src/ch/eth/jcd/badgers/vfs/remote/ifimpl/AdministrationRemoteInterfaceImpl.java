@@ -101,6 +101,10 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		if (workerController == null) {
 			LinkedDisk linkedDisk = account.getLinkedDiskById(diskId);
 			DiskConfiguration diskConfig = linkedDisk.getDiskConfig();
+
+			// hack...
+			diskConfig.setSyncServerMode(true);
+
 			final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 			VFSDiskManager diskManager = factory.openDiskManager(diskConfig);
 			workerController = new DiskWorkerController(diskManager);
@@ -131,6 +135,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
 		diskConfiguration.setMaximumSize(-1);
 		diskConfiguration.setDiskId(diskId);
+		diskConfiguration.setSyncServerMode(true);
 
 		LinkedDisk linkedDisk = new LinkedDisk(diskId, diskname, diskConfiguration);
 		diskConfiguration.setHostFilePath(createDiskPathFromUUID(diskId));

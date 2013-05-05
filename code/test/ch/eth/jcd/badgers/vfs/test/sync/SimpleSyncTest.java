@@ -177,7 +177,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		final ClientLink clientLink = links.get(0);
 
 		final VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
-		Assert.assertEquals("Expecte initial Version 0", 0, syncServerDiskManager.getServerVersion());
+		Assert.assertEquals("Expecte Version 1 with initial Journal", 1, syncServerDiskManager.getServerVersion());
 
 		// compare content of the file systems
 		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
@@ -206,7 +206,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		version.beforeRmiTransport(clientDiskManager);
 		final PushVersionResult pushVersionResult = diskRemoteInterface.pushVersion(version);
 		Assert.assertTrue(pushVersionResult.toString(), pushVersionResult.isSuccess());
-		Assert.assertEquals(2, pushVersionResult.getNewServerVersion());
+		Assert.assertEquals(3, pushVersionResult.getNewServerVersion());
 
 		// version is pushed - compare server and client disk
 		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());

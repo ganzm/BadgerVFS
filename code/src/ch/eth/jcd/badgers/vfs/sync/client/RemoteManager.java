@@ -119,7 +119,7 @@ public class RemoteManager implements ActionObserver {
 			}
 
 			final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(actionObserver, adminInterface, diskConfig, journal);
-			remoteWorkerController.enqueueBlocking(linkNewDiskAction);
+			remoteWorkerController.enqueueBlocking(linkNewDiskAction, true);
 			return true;
 		} catch (InterruptedException e) {
 			throw new VFSException(e);

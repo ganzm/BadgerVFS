@@ -55,23 +55,23 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	}
 
 	@Override
-	public List<Journal> getVersionDelta(final long lastSeenServerVersion, final long clientVersion) throws RemoteException {
+	public List<Journal> getVersionDelta(final long lastSeenServerVersion) throws RemoteException {
 		if (downloadAction != null) {
 			throw new RemoteException("DownloadStreams openend - Someone forgot to call downloadFinished");
 		}
 
 		try {
-			final GetVersionDeltaAction deltaAction = new GetVersionDeltaAction(lastSeenServerVersion, clientVersion, null);
-			diskWorkerController.enqueueBlocking(deltaAction);
-			List<Journal> result = deltaAction.getResult();
+			final GetVersionDeltaAction deltaAction = new GetVersionDeltaAction(lastSeenServerVersion);
+			diskWorkerController.enqueueBlocking(deltaAction, true);
 
-			downloadAction = new ProvideDownloadStreamAction();
+			List<Journal> result = deltaAction.getResult();
+			downloadAction = new ProvideDownloadStreamAction(result);
 
 			diskWorkerController.enqueue(downloadAction);
 			downloadAction.waitUntilPrepared();
 
 			return result;
-		} catch (final InterruptedException e) {
+		} catch (final InterruptedException | VFSException e) {
 			throw new RemoteException("error getting version Delta", e);
 		}
 	}
@@ -85,9 +85,9 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	public PushVersionResult pushVersion(ClientVersion clientVersion) throws RemoteException {
 		try {
 			final SyncServerPushVersionAction pushVersionAction = new SyncServerPushVersionAction(clientVersion);
-			diskWorkerController.enqueueBlocking(pushVersionAction);
+			diskWorkerController.enqueueBlocking(pushVersionAction, true);
 			return pushVersionAction.getResult();
-		} catch (final InterruptedException e) {
+		} catch (final InterruptedException | VFSException e) {
 			throw new RemoteException("Error pushVersion: ", e);
 		}
 	}

@@ -22,8 +22,8 @@ public class DiskWorkerController extends WorkerController {
 		super.enqueue(action);
 	}
 
-	public void enqueueBlocking(final DiskAction action) throws InterruptedException {
-		super.enqueueBlocking(action);
+	public void enqueueBlocking(final DiskAction action, final boolean rethrowException) throws InterruptedException, VFSException {
+		super.enqueueBlocking(action, rethrowException);
 	}
 
 	public VFSDiskManager getDiskManager() {

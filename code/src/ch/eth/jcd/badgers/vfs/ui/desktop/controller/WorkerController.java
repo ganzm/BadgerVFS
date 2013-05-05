@@ -42,10 +42,18 @@ public abstract class WorkerController implements Runnable {
 		}
 	}
 
-	protected void enqueueBlocking(final AbstractBadgerAction action) throws InterruptedException {
+	protected void enqueueBlocking(final AbstractBadgerAction action, final boolean rethrowException) throws InterruptedException, VFSException {
 		synchronized (action) {
 			enqueue(action);
 			action.wait();
+		}
+
+		if (rethrowException) {
+			Exception ex = action.getException();
+			if (ex != null) {
+				// rethrow exception
+				throw new VFSException(ex);
+			}
 		}
 	}
 
@@ -62,6 +70,7 @@ public abstract class WorkerController implements Runnable {
 					performAction(action);
 				} catch (final Exception ex) {
 					LOGGER.error("Error while performing Action " + action, ex);
+					action.setFailed(ex);
 				} finally {
 					synchronized (action) {
 						action.notifyAll();

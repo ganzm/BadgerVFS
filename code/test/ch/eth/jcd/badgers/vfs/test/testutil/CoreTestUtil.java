@@ -39,7 +39,8 @@ public class CoreTestUtil {
 		if (expected.isDirectory()) {
 			List<VFSEntry> exptectedChildren = expected.getChildren();
 			List<VFSEntry> actualChildren = actual.getChildren();
-			Assert.assertEquals(exptectedChildren.size(), actualChildren.size());
+			Assert.assertEquals("" + expected.getPath().getAbsolutePath() + " expected children " + exptectedChildren, exptectedChildren.size(),
+					actualChildren.size());
 
 			for (int i = 0; i < exptectedChildren.size(); i++) {
 				VFSEntry exptedChild = exptectedChildren.get(i);

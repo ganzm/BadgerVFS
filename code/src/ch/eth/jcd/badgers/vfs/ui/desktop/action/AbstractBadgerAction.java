@@ -6,6 +6,11 @@ public class AbstractBadgerAction {
 	 */
 	private final ActionObserver actionObserver;
 
+	/**
+	 * Exception which occured while performing this Action
+	 */
+	private Exception exception = null;
+
 	public AbstractBadgerAction(final ActionObserver actionObserver) {
 		this.actionObserver = actionObserver;
 	}
@@ -35,5 +40,13 @@ public class AbstractBadgerAction {
 	 */
 	public boolean needsToLockGui() {
 		return true;
+	}
+
+	public void setFailed(Exception ex) {
+		this.exception = ex;
+	}
+
+	public Exception getException() {
+		return exception;
 	}
 }

@@ -111,6 +111,11 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 			mgr.createRootFolder();
 			mgr.initJournaling();
 
+			if (config.isSyncServerMode()) {
+				// Assume Version 0 since we create a new Disk on the Server
+				mgr.headerSectionHandler.setlinkedHostVersion(mgr.virtualDiskFile, 0);
+			}
+
 			return mgr;
 
 		} catch (IOException e) {
@@ -393,9 +398,11 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		headerSectionHandler.setLinkedHostName(virtualDiskFile, hostName);
 		config.setLinkedHostName(hostName);
 		initJournaling();
+		Journal journal = journaling.journalizeDisk(getRoot());
 
-		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, 0);
-		return journaling.journalizeDisk(getRoot());
+		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, 1);
+
+		return journal;
 	}
 
 	/**
@@ -427,6 +434,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public ClientVersion getPendingVersion() throws VFSException {
+		journaling.closeJournal();
 		List<Journal> journals = journaling.getPendingJournals();
 		ClientVersion version = new ClientVersion(headerSectionHandler.getLinkedHostVersion());
 		version.setJournals(journals);

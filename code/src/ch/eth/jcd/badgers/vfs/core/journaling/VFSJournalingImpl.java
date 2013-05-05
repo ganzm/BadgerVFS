@@ -68,12 +68,14 @@ public class VFSJournalingImpl implements VFSJournaling {
 	@Override
 	public void closeJournal() throws VFSException {
 		if (uncommitedJournalEntries == null) {
+			currentJournalFolder = null;
 			// nothing to do
 			return;
 		}
 
 		writeJournal(currentJournalFolder, uncommitedJournalEntries);
 		uncommitedJournalEntries = null;
+		currentJournalFolder = null;
 	}
 
 	@Override
@@ -221,6 +223,8 @@ public class VFSJournalingImpl implements VFSJournaling {
 	/**
 	 * scans the whole disk and creates a journals which when replayed creates exactly the same content
 	 * 
+	 * but we don't want to persist the journal on the client file system
+	 * 
 	 * @param root
 	 * @return
 	 * @throws VFSException
@@ -231,8 +235,8 @@ public class VFSJournalingImpl implements VFSJournaling {
 		if (uncommitedJournalEntries != null) {
 			throw new VFSException("Disallowed action - use this method only for unlinked/unjournalized disks");
 		}
-		openNewJournal();
 
+		uncommitedJournalEntries = new ArrayList<>();
 		addDirectoryToJournal(root);
 		Journal j = new Journal(uncommitedJournalEntries);
 		uncommitedJournalEntries = null;
@@ -246,7 +250,10 @@ public class VFSJournalingImpl implements VFSJournaling {
 				addDirectoryToJournal(childEntry);
 			} else {
 				addJournalItem(new CreateFileItem(childEntry));
-				addJournalItem(new ModifyFileItem((VFSFileImpl) childEntry));
+
+				ModifyFileItem modifyFile = new ModifyFileItem((VFSFileImpl) childEntry);
+				modifyFile.suppressOnJournalAddJournalCopy();
+				addJournalItem(modifyFile);
 			}
 		}
 	}

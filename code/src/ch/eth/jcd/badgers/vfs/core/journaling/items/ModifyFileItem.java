@@ -47,6 +47,8 @@ public class ModifyFileItem extends JournalItem {
 	 */
 	private String journalPathString;
 
+	private boolean suppressOnJournalAddJournalCopy = false;
+
 	private InputStream inputStream;
 
 	public ModifyFileItem(VFSFileImpl vfsFileImpl) throws VFSException {
@@ -55,8 +57,19 @@ public class ModifyFileItem extends JournalItem {
 
 	@Override
 	public void onJournalAdd(VFSJournaling journaling) throws VFSException {
-		VFSPath journalPath = journaling.copyFileToJournal(absoluteFilePath);
-		journalPathString = journalPath.getAbsolutePath();
+		if (!suppressOnJournalAddJournalCopy) {
+			VFSPath journalPath = journaling.copyFileToJournal(absoluteFilePath);
+			journalPathString = journalPath.getAbsolutePath();
+		} else {
+			journalPathString = absoluteFilePath;
+		}
+	}
+
+	/**
+	 * prevent that we copy the file content to the journal
+	 */
+	public void suppressOnJournalAddJournalCopy() {
+		suppressOnJournalAddJournalCopy = true;
 	}
 
 	@Override
@@ -67,6 +80,18 @@ public class ModifyFileItem extends JournalItem {
 			this.inputStream = RemoteInputStreamServer.wrap(journalEntry.getInputStream());
 		} catch (RemoteException ex) {
 			throw new VFSException(ex);
+		}
+	}
+
+	@Override
+	public void afterRmiTransport(VFSDiskManager diskManager) {
+		if (this.inputStream != null) {
+			try {
+				this.inputStream.close();
+			} catch (IOException e) {
+				LOGGER.error("Error while closing InputStream " + inputStream, e);
+			}
+			this.inputStream = null;
 		}
 	}
 
@@ -121,4 +146,5 @@ public class ModifyFileItem extends JournalItem {
 			inputStream = null;
 		}
 	}
+
 }

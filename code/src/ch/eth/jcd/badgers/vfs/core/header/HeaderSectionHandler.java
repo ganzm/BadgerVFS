@@ -71,8 +71,14 @@ public final class HeaderSectionHandler {
 
 	/**
 	 * Version number we have last seen on the synchronization server
+	 * 
+	 * <ul>
+	 * 
+	 * <li>An empty Disk created on the Synchronization Server has Version 0</li>
+	 * <li>An (may be empty) offline disk which is freshly linked to a Synchronization Server has Version 1</li>
+	 * </ul>
 	 */
-	private long linkedHostVersion = -1;
+	private long linkedHostVersion = 0;
 
 	private HeaderSectionHandler() {
 	}

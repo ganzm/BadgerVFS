@@ -30,6 +30,10 @@ public abstract class JournalItem implements Serializable {
 		// does nothing by default
 	}
 
+	public void afterRmiTransport(VFSDiskManager diskManager) {
+		// does nothing by default
+	}
+
 	public void beforeLocalTransport(VFSDiskManager diskManager) throws VFSException {
 
 	}
