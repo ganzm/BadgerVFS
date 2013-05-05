@@ -31,4 +31,13 @@ public class RemoteWorkerController extends WorkerController {
 			actionFailed(action, e);
 		}
 	}
+
+	@Override
+	protected AbstractBadgerAction createNoopAction() {
+		return new RemoteAction(null) {
+			@Override
+			public void runRemoteAction() throws VFSException {
+			}
+		};
+	}
 }

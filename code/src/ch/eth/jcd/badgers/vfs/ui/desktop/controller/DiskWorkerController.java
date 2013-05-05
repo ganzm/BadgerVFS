@@ -62,4 +62,14 @@ public class DiskWorkerController extends WorkerController {
 			LOGGER.error("Error while closing DiskManager " + diskManager, e);
 		}
 	}
+
+	@Override
+	protected AbstractBadgerAction createNoopAction() {
+		return new DiskAction(null) {
+			@Override
+			public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
+
+			}
+		};
+	}
 }

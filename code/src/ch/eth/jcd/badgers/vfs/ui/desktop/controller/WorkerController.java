@@ -110,9 +110,16 @@ public abstract class WorkerController implements Runnable {
 
 	public void dispose() {
 		running = false;
-		final AbstractBadgerAction noop = new AbstractBadgerAction(null) {
-		};
+
+		AbstractBadgerAction noop = createNoopAction();
 
 		enqueue(noop);
 	}
+
+	/**
+	 * Noop Action is used on shutdown to wakeup the thread checking the queue for input
+	 * 
+	 * @return
+	 */
+	protected abstract AbstractBadgerAction createNoopAction();
 }
