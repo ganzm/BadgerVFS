@@ -48,7 +48,7 @@ public class DataBlock {
 	 * 
 	 * If true we have DirectoryBlocks pointing on us
 	 */
-	private boolean isEntryHeaderBlock;
+	private final boolean isEntryHeaderBlock;
 
 	/**
 	 * counter from 0 to 127 which indicates how many DirectoryBlocks point on this specific DataBlock

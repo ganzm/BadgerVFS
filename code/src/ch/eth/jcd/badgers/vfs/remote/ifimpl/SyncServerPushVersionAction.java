@@ -48,7 +48,7 @@ public class SyncServerPushVersionAction extends DiskAction {
 
 			long newServerVersion = diskManager.getServerVersion();
 			result = new PushVersionResult(true, newServerVersion);
-		} catch (VFSException | RuntimeException ex) {
+		} catch (VFSException ex) {
 			LOGGER.error("Error while pushing Version", ex);
 			result = new PushVersionResult(false, ex.getClass().getName() + " - " + ex.getMessage());
 		}

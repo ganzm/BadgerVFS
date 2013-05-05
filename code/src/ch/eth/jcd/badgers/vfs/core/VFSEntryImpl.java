@@ -90,16 +90,13 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * @throws IOException
 	 */
 	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, DataBlock dataBlock) throws VFSException, IOException {
-		try {
-			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
 
-			VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
+		insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
 
-			diskManager.addJournalItem(new CreateFileItem(vfsPath));
-			return entry;
-		} catch (IOException ex) {
-			throw ex;
-		}
+		VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
+
+		diskManager.addJournalItem(new CreateFileItem(vfsPath));
+		return entry;
 	}
 
 	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath) throws VFSException, IOException {

@@ -86,7 +86,7 @@ public class DiskConfiguration implements Serializable {
 	}
 
 	public boolean isHostNameLinked() {
-		return linkedHostName != null && "".equals(linkedHostName) == false;
+		return !"".equals(linkedHostName);
 	}
 
 	public void setLinkedHostName(final String linkedHostName) {
@@ -103,7 +103,7 @@ public class DiskConfiguration implements Serializable {
 		return syncServerMode;
 	}
 
-	public void setSyncServerMode(boolean syncServerMode) {
+	public void setSyncServerMode(final boolean syncServerMode) {
 		this.syncServerMode = syncServerMode;
 	}
 

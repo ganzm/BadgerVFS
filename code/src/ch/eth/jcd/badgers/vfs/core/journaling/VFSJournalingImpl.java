@@ -65,6 +65,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 	/**
 	 * Persist the current journal
 	 */
+	@Override
 	public void closeJournal() throws VFSException {
 		if (uncommitedJournalEntries == null) {
 			// nothing to do
@@ -75,6 +76,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 		uncommitedJournalEntries = null;
 	}
 
+	@Override
 	public List<Journal> getPendingJournals() throws VFSException {
 		List<Journal> journals = new ArrayList<>();
 		VFSEntry journalsFolder = getJournalsFolder();
@@ -137,11 +139,8 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 			VFSPathImpl hiddenPath = (VFSPathImpl) diskManager.getRoot().getChildPath(HIDDEN_FOLDER_NAME);
 			VFSEntry hiddenEntry;
-			if (!hiddenPath.exists()) {
-				hiddenEntry = hiddenPath.createDirectory();
-			} else {
-				hiddenEntry = hiddenPath.getVFSEntry();
-			}
+
+			hiddenEntry = hiddenPath.exists() ? hiddenPath.getVFSEntry() : hiddenPath.createDirectory();
 
 			VFSPath journalsPath = hiddenEntry.getChildPath(JOURNALS_FOLDER_NAME);
 
@@ -155,6 +154,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
+	@Override
 	public void addJournalItem(JournalItem journalEntry) throws VFSException {
 		if (journalingEnabled) {
 			if (uncommitedJournalEntries == null) {
@@ -176,10 +176,12 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
+	@Override
 	public void openNewJournal() throws VFSException {
 		openNewJournal(new ArrayList<JournalItem>(0));
 	}
 
+	@Override
 	public void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException {
 
 		VFSEntry journalsFolder = getJournalsFolder();
@@ -187,7 +189,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 		List<VFSEntry> journals = journalsFolder.getChildren();
 
 		long newJournalNumber = 0;
-		if (journals.size() == 0) {
+		if (journals.isEmpty()) {
 			newJournalNumber = 1 + diskManager.getServerVersion();
 		}
 
@@ -213,6 +215,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 	 * @return
 	 * @throws VFSException
 	 */
+	@Override
 	public Journal journalizeDisk(VFSEntry root) throws VFSException {
 
 		if (uncommitedJournalEntries != null) {
@@ -238,6 +241,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
+	@Override
 	public void pauseJournaling(boolean pause) {
 		journalingEnabled = !pause;
 	}

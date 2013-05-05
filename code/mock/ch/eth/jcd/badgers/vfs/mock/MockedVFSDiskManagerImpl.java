@@ -26,6 +26,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
+	private static final String TODO = "TODO";
 	private static final Logger LOGGER = Logger.getLogger(MockedVFSDiskManagerImpl.class);
 
 	/**
@@ -152,32 +153,32 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void closeCurrentJournal() throws VFSException {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override
 	public Journal linkDisk(String hostName) throws VFSException {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override
 	public ClientVersion getPendingVersion() throws VFSException {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override
 	public UUID getDiskId() {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override
 	public long getServerVersion() {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override
 	public void persistServerJournal(Journal journal) {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException(TODO);
 	}
 
 	@Override

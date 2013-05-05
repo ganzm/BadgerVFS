@@ -26,8 +26,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	private static RemoteManager clientRemoteManager;
 	private static String hostLink = "localhost";
 
-	private static final String username = new BigInteger(130, new Random()).toString(32);
-	private static final String password = "asdf";
+	private static final String USERNAME = new BigInteger(130, new Random()).toString(32);
+	private static final String PASSWORD = "asdf";
 
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
@@ -50,18 +50,18 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	@Test
 	public void testLogin() throws InterruptedException {
 
-		long t = System.currentTimeMillis();
-		long timeout = 5000;
+		final long t = System.currentTimeMillis();
+		final long timeout = 5000;
 		while (status != ConnectionStatus.CONNECTED && (System.currentTimeMillis() - t) < timeout) {
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException ex) {
+			} catch (final InterruptedException ex) {
 			}
 		}
 
 		final CountDownLatch lock = new CountDownLatch(1);
 		final ConnectionStatus[] statusResult = new ConnectionStatus[1];
-		boolean result = clientRemoteManager.startLogin(username, password, new ConnectionStateListener() {
+		final boolean result = clientRemoteManager.startLogin(USERNAME, PASSWORD, new ConnectionStateListener() {
 			@Override
 			public void connectionStateChanged(final ConnectionStatus status) {
 				statusResult[0] = status;
@@ -94,8 +94,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	private static ServerConfiguration createServerConfiguration() throws VFSException {
 		final ServerConfiguration config = new ServerConfiguration("");
 
-		if (!config.accountExists(username)) {
-			UserAccount userAccount = new UserAccount(username, password);
+		if (!config.accountExists(USERNAME)) {
+			final UserAccount userAccount = new UserAccount(USERNAME, PASSWORD);
 			config.setUserAccount(userAccount);
 		}
 		return config;
@@ -106,7 +106,7 @@ public class SimpleLoginTest implements ConnectionStateListener {
 	}
 
 	@Override
-	public void connectionStateChanged(ConnectionStatus status) {
+	public void connectionStateChanged(final ConnectionStatus status) {
 		this.status = status;
 	}
 

@@ -780,30 +780,7 @@ public class DirectoryChildTree {
 		DirectoryEntryBlock leftNode = block.getNodeLeft();
 		DirectoryEntryBlock rightNode = block.getNodeRight();
 
-		if (leftNode == null) {
-			throw new VFSException("Empty LeftNode in Block " + block.getLocation());
-		}
-
-		if (leftPivot != null) {
-			if (leftPivot.compareTo(leftNode) >= 0) {
-				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With left Parent Pivot [" + leftPivot.getFileName()
-						+ "] and LeftNode" + leftNode.getFileName() + "]");
-			}
-		}
-
-		if (rightPivot != null) {
-			if (rightPivot.compareTo(leftNode) <= 0) {
-				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With right Parent Pivot [" + rightPivot.getFileName()
-						+ "] and LeftNode[" + leftNode.getFileName() + "]");
-			}
-		}
-
-		if (rightNode != null) {
-			if (leftNode.compareTo(block.getNodeRight()) >= 0) {
-				throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " [" + leftNode.getFileName() + "] [" + rightNode.getFileName()
-						+ "]");
-			}
-		}
+		checkErrorConditions(block, leftPivot, rightPivot, leftNode, rightNode);
 
 		int depth = 0;
 		// check left subblocks
@@ -834,6 +811,29 @@ public class DirectoryChildTree {
 		}
 
 		return depth;
+	}
+
+	private void checkErrorConditions(DirectoryBlock block, DirectoryEntryBlock leftPivot, DirectoryEntryBlock rightPivot, DirectoryEntryBlock leftNode,
+			DirectoryEntryBlock rightNode) throws VFSException {
+		if (leftNode == null) {
+			throw new VFSException("Empty LeftNode in Block " + block.getLocation());
+		}
+
+		if (leftPivot != null && leftPivot.compareTo(leftNode) >= 0) {
+			throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With left Parent Pivot [" + leftPivot.getFileName()
+					+ "] and LeftNode" + leftNode.getFileName() + "]");
+
+		}
+
+		if (rightPivot != null && rightPivot.compareTo(leftNode) <= 0) {
+			throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " With right Parent Pivot [" + rightPivot.getFileName()
+					+ "] and LeftNode[" + leftNode.getFileName() + "]");
+		}
+
+		if (rightNode != null && leftNode.compareTo(block.getNodeRight()) >= 0) {
+			throw new VFSException("NodeOrder Violation on Block " + block.getLocation() + " [" + leftNode.getFileName() + "] [" + rightNode.getFileName()
+					+ "]");
+		}
 	}
 
 }

@@ -40,13 +40,12 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 	private ConnectionStatus status;
 
-	private ServerConfiguration serverConfig;
 	private SynchronisationServer syncServer;
 	private RemoteManager clientRemoteManager;
-	private final String hostLink = "localhost";
+	private static final String HOST_LINK = "localhost";
 	private VFSDiskManagerImpl clientDiskManager;
-	private final String username = new BigInteger(130, new Random()).toString(32);
-	private final String password = "asdf";
+	private static final String USERNAME = new BigInteger(130, new Random()).toString(32);
+	private static final String PASSWORD = "asdf";
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
@@ -56,45 +55,45 @@ public class SimpleSyncTest implements ConnectionStateListener {
 	@Before
 	public void before() throws VFSException {
 		LOGGER.info("Start Synchronisation Server");
-		serverConfig = setupServerConfiguration();
+		final ServerConfiguration serverConfig = setupServerConfiguration();
 		syncServer = new SynchronisationServer(serverConfig);
 		syncServer.start();
 
 		LOGGER.info("Start Client");
-		clientRemoteManager = new RemoteManager(hostLink);
+		clientRemoteManager = new RemoteManager(HOST_LINK);
 		clientRemoteManager.addConnectionStateListener(this);
 		clientRemoteManager.start();
 
 		LOGGER.info("Create new disk");
-		DiskConfiguration clientConfig = createConfig();
+		final DiskConfiguration clientConfig = createConfig();
 		clientDiskManager = VFSDiskManagerImpl.create(clientConfig);
 
 		fillDiskWithStuff(clientDiskManager);
 
 	}
 
-	private void fillDiskWithStuff(VFSDiskManagerImpl diskManager) throws VFSException {
-		VFSEntry root = diskManager.getRoot();
-		VFSPath homePath = root.getChildPath("home");
-		VFSPath libPath = root.getChildPath("lib");
+	private void fillDiskWithStuff(final VFSDiskManagerImpl diskManager) throws VFSException {
+		final VFSEntry root = diskManager.getRoot();
+		final VFSPath homePath = root.getChildPath("home");
+		final VFSPath libPath = root.getChildPath("lib");
 
-		VFSEntry homeDir = homePath.createDirectory();
+		final VFSEntry homeDir = homePath.createDirectory();
 		libPath.createDirectory();
 
-		VFSPath filePath1 = homeDir.getChildPath("anyFile1.bin");
-		VFSEntry fileEntry1 = filePath1.createFile();
+		final VFSPath filePath1 = homeDir.getChildPath("anyFile1.bin");
+		final VFSEntry fileEntry1 = filePath1.createFile();
 
-		VFSPath filePath2 = homeDir.getChildPath("anyFile2.bin");
-		VFSEntry fileEntry2 = filePath2.createFile();
+		final VFSPath filePath2 = homeDir.getChildPath("anyFile2.bin");
+		final VFSEntry fileEntry2 = filePath2.createFile();
 
 		fillInRandomData(fileEntry1);
 		fillInRandomData(fileEntry2);
 	}
 
-	private void fillInRandomData(VFSEntry fileEntry) {
+	private void fillInRandomData(final VFSEntry fileEntry) {
 		try (OutputStream out = fileEntry.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
-			Random rnd = new Random();
-			byte[] rawData = new byte[rnd.nextInt(1000)];
+			final Random rnd = new Random();
+			final byte[] rawData = new byte[rnd.nextInt(1000)];
 			rnd.nextBytes(rawData);
 			out.write(rawData);
 		} catch (IOException | VFSException e) {
@@ -103,13 +102,13 @@ public class SimpleSyncTest implements ConnectionStateListener {
 	}
 
 	private DiskConfiguration createConfig() {
-		DiskConfiguration config = new DiskConfiguration();
+		final DiskConfiguration config = new DiskConfiguration();
 
-		String name = "synctest.bfs";
-		String tempDir = System.getProperty("java.io.tmpdir");
-		String fileName = tempDir + File.separatorChar + name;
+		final String name = "synctest.bfs";
+		final String tempDir = System.getProperty("java.io.tmpdir");
+		final String fileName = tempDir + File.separatorChar + name;
 
-		File f = new File(fileName);
+		final File f = new File(fileName);
 		if (f.exists()) {
 			f.delete();
 		}
@@ -119,10 +118,10 @@ public class SimpleSyncTest implements ConnectionStateListener {
 	}
 
 	private ServerConfiguration setupServerConfiguration() throws VFSException {
-		ServerConfiguration config = new ServerConfiguration("");
-		UserAccount userAccount = new UserAccount(username, password);
+		final ServerConfiguration config = new ServerConfiguration("");
+		final UserAccount userAccount = new UserAccount(USERNAME, PASSWORD);
 
-		if (!config.accountExists(username)) {
+		if (!config.accountExists(USERNAME)) {
 			config.setUserAccount(userAccount);
 		}
 		return config;
@@ -142,17 +141,17 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 		waitUntilConnected();
 
-		boolean result = clientRemoteManager.startLogin(username, password, this);
+		final boolean result = clientRemoteManager.startLogin(USERNAME, PASSWORD, this);
 		Assert.assertTrue(result);
 
-		long t = System.currentTimeMillis();
-		long timeout = 5000;
+		final long t = System.currentTimeMillis();
+		final long timeout = 5000;
 		AdministrationRemoteInterface adminRI = null;
 		do {
 			adminRI = clientRemoteManager.getAdminInterface();
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 			}
 		} while (adminRI == null && (System.currentTimeMillis() - t) < timeout);
 
@@ -160,34 +159,34 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 		LOGGER.info("We are now logged in");
 
-		String displayName = "TestName";
-		DiskConfiguration diskConfig = new DiskConfiguration();
-		LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
+		final String displayName = "TestName";
+		final DiskConfiguration diskConfig = new DiskConfiguration();
+		final LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 
-		Journal journal = clientDiskManager.linkDisk(hostLink);
+		final Journal journal = clientDiskManager.linkDisk(HOST_LINK);
 		journal.beforeRmiTransport(clientDiskManager);
-		DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
+		final DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
 
 		LOGGER.info("Disk is now linked");
 
-		ClientVersion clientVersion = clientDiskManager.getPendingVersion();
+		final ClientVersion clientVersion = clientDiskManager.getPendingVersion();
 		Assert.assertEquals("expect no local changes", 0, clientVersion.getJournals().size());
 
-		List<ClientLink> links = syncServer.getActiveClientLinks();
+		final List<ClientLink> links = syncServer.getActiveClientLinks();
 		Assert.assertEquals(1, links.size());
-		ClientLink clientLink = links.get(0);
+		final ClientLink clientLink = links.get(0);
 
-		VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
+		final VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
 		Assert.assertEquals("Expecte initial Version 0", 0, syncServerDiskManager.getServerVersion());
 
 		// compare content of the file systems
 		CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
 
 		LOGGER.info("Do local change");
-		VFSPath otherDirectoryPath = clientDiskManager.getRoot().getChildPath("FileWithVersion1Stuff");
-		VFSEntry otherDirectory = otherDirectoryPath.createDirectory();
-		VFSPath otherFilePath = otherDirectory.getChildPath("test.txt");
-		VFSEntry otherFile = otherFilePath.createFile();
+		final VFSPath otherDirectoryPath = clientDiskManager.getRoot().getChildPath("FileWithVersion1Stuff");
+		final VFSEntry otherDirectory = otherDirectoryPath.createDirectory();
+		final VFSPath otherFilePath = otherDirectory.getChildPath("test.txt");
+		final VFSEntry otherFile = otherFilePath.createFile();
 		try (OutputStream out = otherFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
 			out.write("Hello World".getBytes());
 		}
@@ -195,17 +194,17 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		clientDiskManager.closeCurrentJournal();
 
 		LOGGER.info("Do some more local change");
-		VFSPath otherDirectoryPath2 = clientDiskManager.getRoot().getChildPath("FileWithVersion2Stuff");
+		final VFSPath otherDirectoryPath2 = clientDiskManager.getRoot().getChildPath("FileWithVersion2Stuff");
 		otherDirectoryPath2.createDirectory();
 
 		clientDiskManager.closeCurrentJournal();
 
-		ClientVersion version = clientDiskManager.getPendingVersion();
-		List<Journal> pendingJournals = version.getJournals();
+		final ClientVersion version = clientDiskManager.getPendingVersion();
+		final List<Journal> pendingJournals = version.getJournals();
 		Assert.assertEquals("expected 2 pending journals", 2, pendingJournals.size());
 
 		version.beforeRmiTransport(clientDiskManager);
-		PushVersionResult pushVersionResult = diskRemoteInterface.pushVersion(version);
+		final PushVersionResult pushVersionResult = diskRemoteInterface.pushVersion(version);
 		Assert.assertTrue(pushVersionResult.toString(), pushVersionResult.isSuccess());
 		Assert.assertEquals(2, pushVersionResult.getNewServerVersion());
 
@@ -228,7 +227,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 	}
 
 	@Override
-	public void connectionStateChanged(ConnectionStatus status) {
+	public void connectionStateChanged(final ConnectionStatus status) {
 		this.status = status;
 	}
 }

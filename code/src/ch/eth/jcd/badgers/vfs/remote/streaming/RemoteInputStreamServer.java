@@ -9,9 +9,7 @@ public class RemoteInputStreamServer implements Readable {
 
 	private final InputStream in;
 
-	public static final byte EMPTY_BUFFER[] = new byte[0];
-
-	RemoteInputStreamServer(final InputStream in) {
+	public RemoteInputStreamServer(final InputStream in) {
 		this.in = in;
 	}
 
@@ -23,7 +21,7 @@ public class RemoteInputStreamServer implements Readable {
 		if (actualCount == count) {
 			return buffer;
 		} else if (actualCount == -1) {
-			return EMPTY_BUFFER;
+			return new byte[0];
 		} else {
 			final byte data[] = new byte[actualCount];
 			System.arraycopy(buffer, 0, data, 0, data.length);

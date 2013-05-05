@@ -12,7 +12,7 @@ public class Journal implements Serializable {
 
 	private static final long serialVersionUID = -4125853629235672102L;
 
-	private List<JournalItem> journalEntries = new ArrayList<>();
+	private final List<JournalItem> journalEntries = new ArrayList<>();
 
 	public Journal(List<JournalItem> uncommitedJournalEntries) {
 		// copy entries
