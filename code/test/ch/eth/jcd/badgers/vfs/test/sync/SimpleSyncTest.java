@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,12 +24,12 @@ import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
-import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
@@ -127,6 +128,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		return config;
 	}
 
+	@After
 	public void after() throws VFSException {
 		LOGGER.info("Shutdown client");
 		clientRemoteManager.dispose();
@@ -172,11 +174,11 @@ public class SimpleSyncTest implements ConnectionStateListener {
 		final ClientVersion clientVersion = clientDiskManager.getPendingVersion();
 		Assert.assertEquals("expect no local changes", 0, clientVersion.getJournals().size());
 
-		final List<ClientLink> links = syncServer.getActiveClientLinks();
+		final List<ActiveClientLink> links = syncServer.getActiveClientLinks();
 		Assert.assertEquals(1, links.size());
-		final ClientLink clientLink = links.get(0);
+		final ActiveClientLink clientLink = links.get(0);
 
-		final VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
+		final VFSDiskManager syncServerDiskManager = clientLink.getClientLink().getDiskWorkerController().getDiskManager();
 		Assert.assertEquals("Expecte Version 1 with initial Journal", 1, syncServerDiskManager.getServerVersion());
 
 		// compare content of the file systems

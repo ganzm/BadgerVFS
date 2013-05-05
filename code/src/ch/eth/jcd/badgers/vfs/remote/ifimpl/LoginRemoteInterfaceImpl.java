@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerRemoteInterfaceManager;
@@ -29,11 +30,8 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 
 		ServerConfiguration config = ifManager.getConfig();
 		final UserAccount userAccount = config.getUserAccount(username, password);
-		final ClientLink clientLink = new ClientLink(userAccount);
 
-		ifManager.addActiveClientLink(clientLink);
-		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, ifManager);
-		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+		final AdministrationRemoteInterface stub = createAdminRemoteInterface(userAccount);
 
 		return stub;
 	}
@@ -44,22 +42,34 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 
 		ServerConfiguration config = ifManager.getConfig();
 		final UserAccount userAccount = new UserAccount(username, password);
+
 		config.setUserAccount(userAccount);
 		config.persist();
-		final ClientLink clientLink = new ClientLink(userAccount);
 
-		ifManager.addActiveClientLink(clientLink);
+		final AdministrationRemoteInterface stub = createAdminRemoteInterface(userAccount);
+
+		return stub;
+	}
+
+	private AdministrationRemoteInterface createAdminRemoteInterface(final UserAccount userAccount) throws RemoteException {
+		final ClientLink clientLink = new ClientLink(userAccount);
+		ActiveClientLink activeLink = new ActiveClientLink(clientLink);
+		ifManager.addActiveClientLink(activeLink);
 		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, ifManager);
 		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
+		activeLink.setRmiIf(obj, stub);
 		return stub;
 	}
 
 	@Override
 	public void logout(final AdministrationRemoteInterface remoteInterface) throws RemoteException, VFSException {
-		AdministrationRemoteInterfaceImpl remoteInterfaceImpl = (AdministrationRemoteInterfaceImpl) remoteInterface;
-		LOGGER.info("logout Username: " + remoteInterfaceImpl.getClientLink().getUserAccount().getUsername());
-		UnicastRemoteObject.unexportObject(remoteInterface, true);
+		for (ActiveClientLink activeLink : ifManager.getActiveClientLinks()) {
+			if (activeLink.getRemoteIf() == remoteInterface) {
+				LOGGER.info("logout Username: " + activeLink.getClientLink().getUserAccount().getUsername());
+				UnicastRemoteObject.unexportObject(activeLink.getRemoteifImpl(), true);
+				break;
+			}
+		}
 	}
-
 }

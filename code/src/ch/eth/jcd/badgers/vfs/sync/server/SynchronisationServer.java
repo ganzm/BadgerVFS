@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 
 public class SynchronisationServer {
@@ -26,7 +27,7 @@ public class SynchronisationServer {
 		ifManager.dispose();
 	}
 
-	public List<ClientLink> getActiveClientLinks() {
+	public List<ActiveClientLink> getActiveClientLinks() {
 		return ifManager.getActiveClientLinks();
 	}
 

@@ -27,11 +27,11 @@ import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
-import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
@@ -189,15 +189,15 @@ public class TwoWaySyncTest {
 	}
 
 	private void setServerDiskManager() {
-		List<ClientLink> activeLinks = syncServer.getActiveClientLinks();
+		List<ActiveClientLink> activeLinks = syncServer.getActiveClientLinks();
 		Assert.assertEquals(2, activeLinks.size());
 
-		ClientLink link1 = activeLinks.get(0);
-		ClientLink link2 = activeLinks.get(1);
+		ActiveClientLink link1 = activeLinks.get(0);
+		ActiveClientLink link2 = activeLinks.get(1);
 
-		Assert.assertSame(link1.getDiskWorkerController(), link2.getDiskWorkerController());
+		Assert.assertSame(link1.getClientLink().getDiskWorkerController(), link2.getClientLink().getDiskWorkerController());
 
-		serverDiskManager = link1.getDiskWorkerController().getDiskManager();
+		serverDiskManager = link1.getClientLink().getDiskWorkerController().getDiskManager();
 	}
 
 	private void performUpdate(VFSDiskManagerImpl clientDiskManager, DiskRemoteInterface diskRemoteInterface, long expectedServerVersionOnClient)

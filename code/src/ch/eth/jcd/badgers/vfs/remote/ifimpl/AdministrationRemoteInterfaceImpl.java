@@ -22,6 +22,7 @@ import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
@@ -88,8 +89,9 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		// check the currently linked disks for this
 		DiskWorkerController workerController = null;
-		List<ClientLink> clientLinks = ifManager.getActiveClientLinks();
-		for (ClientLink clientLink : clientLinks) {
+		List<ActiveClientLink> clientLinks = ifManager.getActiveClientLinks();
+		for (ActiveClientLink activeClientLink : clientLinks) {
+			ClientLink clientLink = activeClientLink.getClientLink();
 			UUID clientLinkDiskId = clientLink.getDiskId();
 			if (diskId.equals(clientLinkDiskId)) {
 				LOGGER.info("Disk " + diskId + " already instantiated");

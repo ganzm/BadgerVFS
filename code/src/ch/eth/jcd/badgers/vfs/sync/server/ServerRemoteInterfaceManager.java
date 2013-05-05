@@ -14,17 +14,20 @@ import org.apache.log4j.Logger;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.ifimpl.LoginRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 
 public class ServerRemoteInterfaceManager {
 	private static final Logger LOGGER = Logger.getLogger(ServerRemoteInterfaceManager.class);
 	private final ServerConfiguration config;
 
-	private final List<ClientLink> activeClientLinks = new ArrayList<>();
+	private final List<ActiveClientLink> activeClientLinks = new ArrayList<>();
 
 	/**
 	 * instance to the single LoginInterface published by RMI
 	 */
 	private LoginRemoteInterface loginRemoteInterface;
+
+	private LoginRemoteInterfaceImpl loginRemoteInterfaceImpl;
 
 	public ServerRemoteInterfaceManager(final ServerConfiguration config) {
 		this.config = config;
@@ -32,8 +35,8 @@ public class ServerRemoteInterfaceManager {
 
 	public void setup() throws VFSException {
 		try {
-			final LoginRemoteInterfaceImpl obj = new LoginRemoteInterfaceImpl(this);
-			loginRemoteInterface = (LoginRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+			loginRemoteInterfaceImpl = new LoginRemoteInterfaceImpl(this);
+			loginRemoteInterface = (LoginRemoteInterface) UnicastRemoteObject.exportObject(loginRemoteInterfaceImpl, 0);
 
 			// Bind the remote object's stub in the registry.
 			LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
@@ -52,17 +55,17 @@ public class ServerRemoteInterfaceManager {
 
 	public void dispose() {
 		try {
-			UnicastRemoteObject.unexportObject(loginRemoteInterface, true);
+			UnicastRemoteObject.unexportObject(loginRemoteInterfaceImpl, true);
 		} catch (NoSuchObjectException e) {
 			LOGGER.error("Error on server dispose", e);
 		}
 	}
 
-	public List<ClientLink> getActiveClientLinks() {
+	public List<ActiveClientLink> getActiveClientLinks() {
 		return activeClientLinks;
 	}
 
-	public void addActiveClientLink(ClientLink clientLink) {
+	public void addActiveClientLink(ActiveClientLink clientLink) {
 		activeClientLinks.add(clientLink);
 	}
 

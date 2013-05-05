@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -42,6 +43,7 @@ public class SimpleLoginTest implements ConnectionStateListener {
 		setupClient();
 	}
 
+	@After
 	public void after() throws VFSException {
 		tearDownClient();
 		tearDownSynchronisationServer();
@@ -49,9 +51,8 @@ public class SimpleLoginTest implements ConnectionStateListener {
 
 	@Test
 	public void testLogin() throws InterruptedException {
-
-		final long t = System.currentTimeMillis();
-		final long timeout = 5000;
+		long t = System.currentTimeMillis();
+		long timeout = 5000;
 		while (status != ConnectionStatus.CONNECTED && (System.currentTimeMillis() - t) < timeout) {
 			try {
 				Thread.sleep(100);
@@ -73,6 +74,19 @@ public class SimpleLoginTest implements ConnectionStateListener {
 		lock.await(5000, TimeUnit.MILLISECONDS);
 
 		Assert.assertEquals(ConnectionStatus.LOGGED_IN, statusResult[0]);
+
+		Assert.assertTrue(clientRemoteManager.logout());
+
+		t = System.currentTimeMillis();
+		// polling because i am lazy and because it's just a unittest
+		while (clientRemoteManager.getConnectionStatus() == ConnectionStatus.LOGGED_IN && System.currentTimeMillis() - t < timeout) {
+			try {
+				Thread.sleep(100);
+			} catch (final InterruptedException ex) {
+			}
+		}
+		Assert.assertEquals(ConnectionStatus.DISCONNECTED, clientRemoteManager.getConnectionStatus());
+
 	}
 
 	private void setupClient() {

@@ -225,7 +225,7 @@ public class RemoteManager implements ActionObserver {
 	}
 
 	public boolean logout() {
-		if (status != ConnectionStatus.CONNECTED || status != ConnectionStatus.LOGGED_IN || status != ConnectionStatus.DISK_MODE) {
+		if (status != ConnectionStatus.LOGGED_IN) {
 			return false;
 		}
 		final LogoutAction action = new LogoutAction(this, this);
