@@ -16,6 +16,12 @@ public interface VFSJournaling {
 	 */
 	void closeJournal() throws VFSException;
 
+	/**
+	 * gets a list of journals which have not yet been published to the synchronization server
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
 	List<Journal> getPendingJournals() throws VFSException;
 
 	/**
@@ -36,4 +42,13 @@ public interface VFSJournaling {
 	void openNewJournal() throws VFSException;
 
 	void openNewJournal(List<JournalItem> journalItemsToAdd) throws VFSException;
+
+	/**
+	 * get all persisted journals from lastSeenServerVersion (excluded) up to the most recent one
+	 * 
+	 * @param lastSeenServerVersion
+	 * @return any journal which is newer than lastSeenServerVersion
+	 * @throws VFSException
+	 */
+	List<Journal> getJournalsSince(long lastSeenServerVersion) throws VFSException;
 }

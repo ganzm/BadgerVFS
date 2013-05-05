@@ -28,7 +28,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 /**
  * $ID$
  * 
- * In order to synchronize data via SynchronisationServer the file system writes serializable journal files
+ * In order to synchronize data via SynchronisationServer the file system writes serializeable journal files
  * 
  * 
  */
@@ -82,20 +82,25 @@ public class VFSJournalingImpl implements VFSJournaling {
 		VFSEntry journalsFolder = getJournalsFolder();
 
 		List<VFSEntry> journalEntries = journalsFolder.getChildren();
-		for (VFSEntry journalFolders : journalEntries) {
-			assert journalsFolder.isDirectory();
-
-			VFSPath journalFilePath = journalFolders.getChildPath(JOURNAL_NAME);
-			if (!journalFilePath.exists()) {
-				continue;
-			}
-
-			VFSEntry journalFile = journalFilePath.getVFSEntry();
-
-			Journal journal = deserializeJournalEntry(journalFile);
+		for (VFSEntry journalFolder : journalEntries) {
+			Journal journal = deserializeJournalFromFolder(journalFolder);
 			journals.add(journal);
 		}
 		return journals;
+	}
+
+	private Journal deserializeJournalFromFolder(VFSEntry journalFolder) throws VFSException {
+		assert journalFolder.isDirectory();
+
+		VFSPath journalFilePath = journalFolder.getChildPath(JOURNAL_NAME);
+		if (!journalFilePath.exists()) {
+			throw new VFSException("Journal file " + JOURNAL_NAME + " not found in " + journalFolder.getPath().getAbsolutePath());
+		}
+
+		VFSEntry journalFile = journalFilePath.getVFSEntry();
+
+		Journal journal = deserializeJournalEntry(journalFile);
+		return journal;
 	}
 
 	private Journal deserializeJournalEntry(VFSEntry journalEntry) throws VFSException {
@@ -110,12 +115,12 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 	}
 
-	private void writeJournal(VFSEntry journalsFolder, List<JournalItem> uncommitedJournalEntries) throws VFSException {
+	private void writeJournal(VFSEntry journalFolder, List<JournalItem> uncommitedJournalEntries) throws VFSException {
 
 		boolean journalingEnabledBackupFlag = journalingEnabled;
 		journalingEnabled = false;
 		try {
-			VFSPath journalPath = journalsFolder.getChildPath(JOURNAL_NAME);
+			VFSPath journalPath = journalFolder.getChildPath(JOURNAL_NAME);
 			VFSEntry journalFile = journalPath.createFile();
 
 			Journal toPersist = new Journal(uncommitedJournalEntries);
@@ -198,14 +203,19 @@ public class VFSJournalingImpl implements VFSJournaling {
 			newJournalNumber = 1 + Long.parseLong(journalName);
 		}
 
-		NumberFormat decimalFormat = new DecimalFormat("000000000000000");
-		String newJournalName = decimalFormat.format(newJournalNumber);
+		String newJournalName = versionToJournalFolderName(newJournalNumber);
 
 		VFSPath newJournalPath = journalsFolder.getChildPath(newJournalName);
 
 		LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
 		currentJournalFolder = newJournalPath.createDirectory();
 		uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
+	}
+
+	private String versionToJournalFolderName(long versionNumber) {
+		NumberFormat decimalFormat = new DecimalFormat("000000000000000");
+		String newJournalName = decimalFormat.format(versionNumber);
+		return newJournalName;
 	}
 
 	/**
@@ -268,5 +278,35 @@ public class VFSJournalingImpl implements VFSJournaling {
 	public void persistServerJournal(Journal journal) throws VFSException {
 		uncommitedJournalEntries.addAll(journal.getJournalEntries());
 		closeJournal();
+	}
+
+	@Override
+	public List<Journal> getJournalsSince(long lastSeenServerVersion) throws VFSException {
+		List<Journal> result = new ArrayList<>();
+
+		String lastSeenJournal = versionToJournalFolderName(lastSeenServerVersion);
+		VFSEntry journalsFolder = getJournalsFolder();
+		List<VFSEntry> journalFolders = journalsFolder.getChildren();
+
+		int index = 1;
+		for (VFSEntry journalFolder : journalFolders) {
+			String journalFolderName = journalFolder.getPath().getName();
+			if (journalFolderName.equals(lastSeenJournal)) {
+				// break for loop
+				break;
+			}
+
+			index++;
+		}
+
+		// index is now our the index of our first journal to pick/return
+
+		for (int i = index; i < journalFolders.size(); i++) {
+			VFSEntry journalFolder = journalFolders.get(i);
+			Journal journal = deserializeJournalFromFolder(journalFolder);
+			result.add(journal);
+		}
+
+		return result;
 	}
 }

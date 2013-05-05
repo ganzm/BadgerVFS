@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
+import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 
@@ -31,10 +31,19 @@ public interface DiskRemoteInterface extends Remote {
 	/**
 	 * Asks the server for new data
 	 * 
+	 * Whenever you do that you should call {@link #downloadFinished()}
+	 * 
 	 * @param clientVersion
 	 * @return
 	 */
 	List<Journal> getVersionDelta(long lastSeenServerVersion, long clientVersion) throws RemoteException;
+
+	/**
+	 * Releases DownloadStreams on the Synchronization Server
+	 * 
+	 * @see {@link #getVersionDelta(long, long)}
+	 */
+	void downloadFinished() throws RemoteException;
 
 	/**
 	 * pushes locally made changes to the server. The client needs to be ready to revert his changes because an other client may have made conflicting changes

@@ -51,7 +51,6 @@ public class RemoteDiskDialog extends JDialog {
 				{
 					final Box verticalBox = Box.createVerticalBox();
 					panel.add(verticalBox);
-					// add(new JScrollPane(scrTbl));
 					{
 						table = new JTable();
 						try {

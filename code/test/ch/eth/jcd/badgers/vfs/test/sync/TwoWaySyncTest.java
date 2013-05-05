@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,19 +17,23 @@ import org.junit.Test;
 
 import ch.eth.jcd.badgers.vfs.core.VFSDiskManagerImpl;
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
+import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
+import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 
@@ -64,42 +69,111 @@ public class TwoWaySyncTest {
 		LOGGER.info("Start Client2");
 		clientRemoteManager2 = new RemoteManager(hostLink);
 		clientRemoteManager2.start();
-		//
-		// LOGGER.info("Create new disk");
-		// DiskConfiguration clientConfig = createConfig();
-		// clientDiskManager = VFSDiskManagerImpl.create(clientConfig);
-		//
-		// fillDiskWithStuff(clientDiskManager);
-
 	}
 
-	private void fillDiskWithStuff(VFSDiskManagerImpl diskManager) throws VFSException {
-		VFSEntry root = diskManager.getRoot();
-		VFSPath homePath = root.getChildPath("home");
-		VFSPath libPath = root.getChildPath("lib");
+	@After
+	public void after() throws VFSException {
+		LOGGER.info("Shutdown client1");
+		clientRemoteManager1.dispose();
 
-		VFSEntry homeDir = homePath.createDirectory();
-		libPath.createDirectory();
+		LOGGER.info("Shutdown client2");
+		clientRemoteManager2.dispose();
 
-		VFSPath filePath1 = homeDir.getChildPath("anyFile1.bin");
-		VFSEntry fileEntry1 = filePath1.createFile();
-
-		VFSPath filePath2 = homeDir.getChildPath("anyFile2.bin");
-		VFSEntry fileEntry2 = filePath2.createFile();
-
-		fillInRandomData(fileEntry1);
-		fillInRandomData(fileEntry2);
+		LOGGER.info("Shutdown SynchronisationServer");
+		syncServer.stop();
 	}
 
-	private void fillInRandomData(VFSEntry fileEntry) {
-		try (OutputStream out = fileEntry.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
-			Random rnd = new Random();
-			byte[] rawData = new byte[rnd.nextInt(1000)];
-			rnd.nextBytes(rawData);
-			out.write(rawData);
-		} catch (IOException | VFSException e) {
-			LOGGER.error("", e);
+	@Test
+	public void testNonConflictingSync() throws VFSException, IOException {
+		LOGGER.info("Start login");
+		waitForConnectionStatus(ConnectionStatus.CONNECTED);
+	
+		boolean result1 = clientRemoteManager1.startLogin(username, password, null);
+		boolean result2 = clientRemoteManager2.startLogin(username, password, null);
+		Assert.assertTrue(result1);
+		Assert.assertTrue(result2);
+	
+		waitForConnectionStatus(ConnectionStatus.LOGGED_IN);
+	
+		AdministrationRemoteInterface clientAdminInterface1 = clientRemoteManager1.getAdminInterface();
+		AdministrationRemoteInterface clientAdminInterface2 = clientRemoteManager2.getAdminInterface();
+	
+		LOGGER.info("Client1 creates a new RemoteDisk");
+		String diskName = "UnitTest-" + System.currentTimeMillis();
+		List<LinkedDisk> availableRemoteDisksBefore = clientAdminInterface1.listDisks();
+		UUID diskUuid = clientAdminInterface1.createNewDisk(diskName);
+		List<LinkedDisk> availableRemoteDisksAfter = clientAdminInterface1.listDisks();
+		Assert.assertTrue(availableRemoteDisksBefore.size() + 1 == availableRemoteDisksAfter.size());
+	
+		LOGGER.info("Both clients use the new disk");
+		DiskRemoteInterface diskRemoteInterface1 = clientAdminInterface1.useLinkedDisk(diskUuid);
+		DiskRemoteInterface diskRemoteInterface2 = clientAdminInterface2.useLinkedDisk(diskUuid);
+	
+		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
+	
+		DiskConfiguration clientDiskConfig1 = createConfig(hostLink, diskName, diskUuid, ".client1.bfs");
+		clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
+	
+		DiskConfiguration clientDiskConfig2 = createConfig(hostLink, diskName, diskUuid, ".client2.bfs");
+		clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
+	
+		// Both clients now have their local disk created and are in sync
+	
+		long lastSeenServerVersion1 = clientDiskManager1.getServerVersion();
+		List<Journal> versionDelta1 = diskRemoteInterface1.getVersionDelta(lastSeenServerVersion1, -1);
+		Assert.assertEquals("Expected no new version", 0, versionDelta1.size());
+	
+		long lastSeenServerVersion2 = clientDiskManager1.getServerVersion();
+		List<Journal> versionDelta2 = diskRemoteInterface1.getVersionDelta(lastSeenServerVersion2, -1);
+		Assert.assertEquals("Expected no new version", 0, versionDelta2.size());
+	
+		LOGGER.info("Everything is synched now");
+	
+		LOGGER.info("Client1 does some nonconflicting changes");
+		doNonConflictingChanges(clientDiskManager1, ".1");
+	
+		LOGGER.info("Client2 does some nonconflicting changes");
+		doNonConflictingChanges(clientDiskManager2, ".2");
+	
+		LOGGER.info("Client1 pushes changes to Server");
+		ClientVersion clientVersion1 = clientDiskManager1.getPendingVersion();
+		PushVersionResult pushResult1 = diskRemoteInterface1.pushVersion(clientVersion1);
+		Assert.assertTrue("Expect Version update to be successfull", pushResult1.isSuccess());
+		Assert.assertEquals("Expected Server to be Version 1", 1, pushResult1.getNewServerVersion());
+	
+		LOGGER.info("Client2 pushes changes to Server");
+		ClientVersion clientVersion2 = clientDiskManager2.getPendingVersion();
+		PushVersionResult pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
+		Assert.assertFalse("Expect Version update to be unsuccessfull because client already updated Server to Version 1", pushResult2.isSuccess());
+	
+		LOGGER.info("Client2 needs to update to version 1 before he can push his changes");
+		lastSeenServerVersion2 = clientDiskManager1.getServerVersion();
+		Assert.assertEquals(0, lastSeenServerVersion2);
+		List<Journal> toUpdate = diskRemoteInterface2.getVersionDelta(lastSeenServerVersion2, -1);
+		for (Journal j : toUpdate) {
+			j.replay(clientDiskManager2);
 		}
+		lastSeenServerVersion2 = clientDiskManager1.getServerVersion();
+		Assert.assertEquals(1, lastSeenServerVersion2);
+	
+		LOGGER.info("Client2 pushes changes to Server");
+		clientVersion2 = clientDiskManager2.getPendingVersion();
+		pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
+		Assert.assertTrue("Expect Version update to be successfull", pushResult2.isSuccess());
+		Assert.assertEquals("Expected Server to be Version 2", 2, pushResult1.getNewServerVersion());
+	
+		LOGGER.info("Client1 updates to Version 2");
+		versionDelta1 = diskRemoteInterface1.getVersionDelta(lastSeenServerVersion1, -1);
+		for (Journal j : versionDelta1) {
+			j.replay(clientDiskManager1);
+		}
+	
+		LOGGER.info("Expect both clients to have the same content on their disks");
+		CoreTestUtil.assertEntriesEqual(clientDiskManager1.getRoot(), clientDiskManager2.getRoot());
+	
+		LOGGER.info("Unlink Disk");
+		diskRemoteInterface1.unlink();
+		diskRemoteInterface2.unlink();
 	}
 
 	private DiskConfiguration createConfig(String hostLink, String diskName, UUID diskUuid, String fileSuffix) {
@@ -128,134 +202,15 @@ public class TwoWaySyncTest {
 		return config;
 	}
 
-	public void after() throws VFSException {
-		LOGGER.info("Shutdown client1");
-		clientRemoteManager1.dispose();
-
-		LOGGER.info("Shutdown client2");
-		clientRemoteManager2.dispose();
-
-		LOGGER.info("Shutdown SynchronisationServer");
-		syncServer.stop();
-	}
-
-	@Test
-	public void testSimpleSync() throws VFSException, IOException {
-		LOGGER.info("Start login");
-		waitForConnectionStatus(ConnectionStatus.CONNECTED);
-
-		boolean result1 = clientRemoteManager1.startLogin(username, password, null);
-		boolean result2 = clientRemoteManager2.startLogin(username, password, null);
-		Assert.assertTrue(result1);
-		Assert.assertTrue(result2);
-
-		waitForConnectionStatus(ConnectionStatus.LOGGED_IN);
-
-		AdministrationRemoteInterface clientAdminInterface1 = clientRemoteManager1.getAdminInterface();
-		AdministrationRemoteInterface clientAdminInterface2 = clientRemoteManager2.getAdminInterface();
-
-		LOGGER.info("Client1 creates a new RemoteDisk");
-		String diskName = "UnitTest-" + System.currentTimeMillis();
-		List<LinkedDisk> availableRemoteDisksBefore = clientAdminInterface1.listDisks();
-		UUID diskUuid = clientAdminInterface1.createNewDisk(diskName);
-		List<LinkedDisk> availableRemoteDisksAfter = clientAdminInterface1.listDisks();
-		Assert.assertTrue(availableRemoteDisksBefore.size() + 1 == availableRemoteDisksAfter.size());
-
-		DiskRemoteInterface diskRemoteInterface1 = clientAdminInterface1.useLinkedDisk(diskUuid);
-		DiskRemoteInterface diskRemoteInterface2 = clientAdminInterface2.useLinkedDisk(diskUuid);
-
-		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
-
-		DiskConfiguration clientDiskConfig1 = createConfig(hostLink, diskName, diskUuid, ".client1.bfs");
-		clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
-
-		DiskConfiguration clientDiskConfig2 = createConfig(hostLink, diskName, diskUuid, ".client2.bfs");
-		clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
-
-		long lastSeenServerVersion1 = clientDiskManager1.getServerVersion();
-		List<Journal> versionDelta = diskRemoteInterface1.getVersionDelta(lastSeenServerVersion1, -1);
-
-		// do stuff on the server
-
-		// TODO
-
-		// connect client 2
-
-		// TODO
-
-		//
-		// clientAdminInterface1.getLinkedDisk(diskId, remoteDiskFileContent)
-		//
-		// long t = System.currentTimeMillis();
-		// long timeout = 5000;
-		// AdministrationRemoteInterface adminRI = null;
-		// do {
-		// adminRI = clientRemoteManager.getAdminInterface();
-		// try {
-		// Thread.sleep(100);
-		// } catch (InterruptedException e) {
-		// }
-		// } while (adminRI == null && (System.currentTimeMillis() - t) < timeout);
-		//
-		// Assert.assertNotNull(adminRI);
-		//
-		// LOGGER.info("We are now logged in");
-		//
-		// String displayName = "TestName";
-		// DiskConfiguration diskConfig = new DiskConfiguration();
-		// LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
-		//
-		// Journal journal = clientDiskManager.linkDisk(hostLink);
-		// journal.beforeRmiTransport(clientDiskManager);
-		// DiskRemoteInterface diskRemoteInterface = adminRI.linkNewDisk(linkedDisk, journal);
-		//
-		// LOGGER.info("Disk is now linked");
-		//
-		// ClientVersion clientVersion = clientDiskManager.getPendingVersion();
-		// Assert.assertEquals("expect no local changes", 0, clientVersion.getJournals().size());
-		//
-		// List<ClientLink> links = syncServer.getActiveClientLinks();
-		// Assert.assertEquals(1, links.size());
-		// ClientLink clientLink = links.get(0);
-		//
-		// VFSDiskManager syncServerDiskManager = clientLink.getDiskWorkerController().getDiskManager();
-		// Assert.assertEquals("Expecte initial Version 0", 0, syncServerDiskManager.getServerVersion());
-		//
-		// // compare content of the file systems
-		// CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
-		//
-		// LOGGER.info("Do local change");
-		// VFSPath otherDirectoryPath = clientDiskManager.getRoot().getChildPath("FileWithVersion1Stuff");
-		// VFSEntry otherDirectory = otherDirectoryPath.createDirectory();
-		// VFSPath otherFilePath = otherDirectory.getChildPath("test.txt");
-		// VFSEntry otherFile = otherFilePath.createFile();
-		// try (OutputStream out = otherFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
-		// out.write("Hello World".getBytes());
-		// }
-		//
-		// clientDiskManager.closeCurrentJournal();
-		//
-		// LOGGER.info("Do some more local change");
-		// VFSPath otherDirectoryPath2 = clientDiskManager.getRoot().getChildPath("FileWithVersion2Stuff");
-		// otherDirectoryPath2.createDirectory();
-		//
-		// clientDiskManager.closeCurrentJournal();
-		//
-		// ClientVersion version = clientDiskManager.getPendingVersion();
-		// List<Journal> pendingJournals = version.getJournals();
-		// Assert.assertEquals("expected 2 pending journals", 2, pendingJournals.size());
-		//
-		// version.beforeRmiTransport(clientDiskManager);
-		// PushVersionResult pushVersionResult = diskRemoteInterface.pushVersion(version);
-		// Assert.assertTrue(pushVersionResult.toString(), pushVersionResult.isSuccess());
-		// Assert.assertEquals(2, pushVersionResult.getNewServerVersion());
-		//
-		// // version is pushed - compare server and client disk
-		// CoreTestUtil.assertEntriesEqual(clientDiskManager.getRoot(), syncServerDiskManager.getRoot());
-		//
-		LOGGER.info("Unlink Disk");
-		diskRemoteInterface1.unlink();
-		diskRemoteInterface2.unlink();
+	private void doNonConflictingChanges(VFSDiskManager clientDiskManager, String suffix) throws VFSException, IOException {
+		VFSEntry root = clientDiskManager.getRoot();
+		VFSPath dirCPath = root.getChildPath("dirClient" + suffix);
+		VFSEntry dirC = dirCPath.createDirectory();
+		VFSPath testFilePath = dirC.getChildPath("test.txt");
+		VFSEntry testFile = testFilePath.createFile();
+		try (OutputStream out = testFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write("Hallo Welt".getBytes());
+		}
 	}
 
 	private void waitForConnectionStatus(ConnectionStatus expectedStatus) {
