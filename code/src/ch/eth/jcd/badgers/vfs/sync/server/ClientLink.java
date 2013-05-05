@@ -1,5 +1,7 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
+import java.util.UUID;
+
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 
@@ -31,5 +33,17 @@ public class ClientLink {
 
 	public DiskWorkerController getDiskWorkerController() {
 		return diskWorkerController;
+	}
+
+	/**
+	 * 
+	 * @return NULL or the DiskId which is currently bound to this Client
+	 */
+	public UUID getDiskId() {
+		if (diskWorkerController != null) {
+			return diskWorkerController.getDiskManager().getDiskId();
+		}
+
+		return null;
 	}
 }

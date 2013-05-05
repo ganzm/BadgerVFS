@@ -26,6 +26,7 @@ import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
+import ch.eth.jcd.badgers.vfs.sync.server.ServerRemoteInterfaceManager;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
@@ -33,12 +34,14 @@ import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteInterface {
 
 	private final ClientLink clientLink;
+	private final ServerRemoteInterfaceManager ifManager;
 	private final ServerConfiguration config;
 	private static final Logger LOGGER = Logger.getLogger(AdministrationRemoteInterfaceImpl.class);
 
-	public AdministrationRemoteInterfaceImpl(final ClientLink clientLink, final ServerConfiguration config) {
+	public AdministrationRemoteInterfaceImpl(final ClientLink clientLink, final ServerRemoteInterfaceManager ifManager) {
 		this.clientLink = clientLink;
-		this.config = config;
+		this.ifManager = ifManager;
+		this.config = ifManager.getConfig();
 	}
 
 	@Override
@@ -82,15 +85,27 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	@Override
 	public DiskRemoteInterface useLinkedDisk(final UUID diskId) throws RemoteException, VFSException {
 		UserAccount account = clientLink.getUserAccount();
-		LinkedDisk linkedDisk = account.getLinkedDiskById(diskId);
 
-		DiskConfiguration diskConfig = linkedDisk.getDiskConfig();
+		// check the currently linked disks for this
+		DiskWorkerController workerController = null;
+		List<ClientLink> clientLinks = ifManager.getActiveClientLinks();
+		for (ClientLink clientLink : clientLinks) {
+			UUID clientLinkDiskId = clientLink.getDiskId();
+			if (diskId.equals(clientLinkDiskId)) {
+				LOGGER.info("Disk " + diskId + " already instantiated");
+				workerController = clientLink.getDiskWorkerController();
+				break;
+			}
+		}
 
-		final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
+		if (workerController == null) {
+			LinkedDisk linkedDisk = account.getLinkedDiskById(diskId);
+			DiskConfiguration diskConfig = linkedDisk.getDiskConfig();
+			final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
+			VFSDiskManager diskManager = factory.createDiskManager(diskConfig);
+			workerController = new DiskWorkerController(diskManager);
+		}
 
-		VFSDiskManager diskManager = factory.createDiskManager(diskConfig);
-
-		final DiskWorkerController workerController = new DiskWorkerController(diskManager);
 		clientLink.setDiskWorkerController(workerController);
 
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(workerController);

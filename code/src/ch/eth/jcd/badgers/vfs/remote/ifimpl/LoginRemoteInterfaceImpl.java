@@ -32,7 +32,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 		final ClientLink clientLink = new ClientLink(userAccount);
 
 		ifManager.addActiveClientLink(clientLink);
-		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, config);
+		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, ifManager);
 		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;
@@ -49,7 +49,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 		final ClientLink clientLink = new ClientLink(userAccount);
 
 		ifManager.addActiveClientLink(clientLink);
-		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, config);
+		final AdministrationRemoteInterfaceImpl obj = new AdministrationRemoteInterfaceImpl(clientLink, ifManager);
 		final AdministrationRemoteInterface stub = (AdministrationRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 
 		return stub;

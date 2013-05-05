@@ -30,6 +30,7 @@ import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.SynchronisationServer;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
+import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 
 public class TwoWaySyncTest {
 	private static final Logger LOGGER = Logger.getLogger(TwoWaySyncTest.class);
@@ -110,7 +111,7 @@ public class TwoWaySyncTest {
 
 		File f = new File(fileName);
 		if (f.exists()) {
-			f.delete();
+			Assert.assertTrue(f.delete());
 		}
 
 		config.setHostFilePath(fileName);
@@ -118,7 +119,7 @@ public class TwoWaySyncTest {
 	}
 
 	private ServerConfiguration setupServerConfiguration() throws VFSException {
-		ServerConfiguration config = new ServerConfiguration("");
+		ServerConfiguration config = Initialisation.parseServerConfiguration(new String[] { "-cc" });
 		UserAccount userAccount = new UserAccount(username, password);
 
 		if (!config.accountExists(username)) {
@@ -141,12 +142,14 @@ public class TwoWaySyncTest {
 	@Test
 	public void testSimpleSync() throws VFSException, IOException {
 		LOGGER.info("Start login");
-		waitUntilConnected();
+		waitForConnectionStatus(ConnectionStatus.CONNECTED);
 
 		boolean result1 = clientRemoteManager1.startLogin(username, password, null);
 		boolean result2 = clientRemoteManager2.startLogin(username, password, null);
 		Assert.assertTrue(result1);
 		Assert.assertTrue(result2);
+
+		waitForConnectionStatus(ConnectionStatus.LOGGED_IN);
 
 		AdministrationRemoteInterface clientAdminInterface1 = clientRemoteManager1.getAdminInterface();
 		AdministrationRemoteInterface clientAdminInterface2 = clientRemoteManager2.getAdminInterface();
@@ -255,7 +258,7 @@ public class TwoWaySyncTest {
 		diskRemoteInterface2.unlink();
 	}
 
-	private void waitUntilConnected() {
+	private void waitForConnectionStatus(ConnectionStatus expectedStatus) {
 		final long startTime = System.currentTimeMillis();
 		final long timeout = 5000;
 
@@ -265,15 +268,13 @@ public class TwoWaySyncTest {
 				Thread.sleep(100);
 			} catch (final InterruptedException e) {
 			}
-			if (clientRemoteManager1.getConnectionStatus() == ConnectionStatus.CONNECTED
-					&& clientRemoteManager2.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+			if (clientRemoteManager1.getConnectionStatus() == expectedStatus && clientRemoteManager2.getConnectionStatus() == expectedStatus) {
 				break;
 			}
 		}
 
-		if (clientRemoteManager1.getConnectionStatus() != ConnectionStatus.CONNECTED
-				|| clientRemoteManager2.getConnectionStatus() != ConnectionStatus.CONNECTED) {
-			Assert.fail("Expected both clients to be connected");
+		if (clientRemoteManager1.getConnectionStatus() != expectedStatus || clientRemoteManager2.getConnectionStatus() != expectedStatus) {
+			Assert.fail("Expected both clients to be " + expectedStatus);
 		}
 	}
 }
