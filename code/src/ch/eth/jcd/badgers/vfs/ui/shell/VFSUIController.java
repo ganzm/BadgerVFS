@@ -42,7 +42,7 @@ public class VFSUIController {
 	private VFSEntry currentDirectory;
 	private VFSDiskManager currentManager;
 
-	public VFSUIController(VFSConsole vfsConsole) {
+	public VFSUIController(final VFSConsole vfsConsole) {
 		this.console = vfsConsole;
 
 	}
@@ -51,7 +51,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("cd command entered");
 
 				if (currentManager == null || currentDirectory == null) {
@@ -61,7 +61,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cd", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cd", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -71,33 +71,33 @@ public class VFSUIController {
 				if ("..".equals(param[0])) {
 					try {
 						currentDirectory = currentDirectory.getParent();
-					} catch (VFSException e) {
+					} catch (final VFSException e) {
 						LOGGER.error("could not cd to ..", e);
 					}
 					return;
 				}
 				VFSEntry childToCD = null;
 				try {
-					for (VFSEntry child : currentDirectory.getChildren()) {
+					for (final VFSEntry child : currentDirectory.getChildren()) {
 						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToCD = child;
 						}
 					}
 					if (childToCD == null) {
-						String warning = String.format("Child: %s not found in current directory", param[0]);
+						final String warning = String.format("Child: %s not found in current directory", param[0]);
 						LOGGER.warn(warning);
 						console.writeLn(warning);
 						return;
 					}
 					if (!childToCD.isDirectory()) {
-						String warning = "Cannot cd to file!";
+						final String warning = "Cannot cd to file!";
 						LOGGER.warn(warning);
 						console.writeLn(warning);
 						return;
 					}
 					currentDirectory = childToCD;
 
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Could not cd to file:" + param[0], e);
 				}
 
@@ -111,7 +111,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("close command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -121,7 +121,7 @@ public class VFSUIController {
 
 				try {
 					currentManager.close();
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while closing disk:", e);
 				}
 				currentManager = null;
@@ -137,7 +137,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("cp command entered");
 
 				if (currentManager == null || currentDirectory == null) {
@@ -147,7 +147,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 2) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cp", 2, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "cp", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -169,7 +169,7 @@ public class VFSUIController {
 					}
 
 					srcPath.getVFSEntry().copyTo(dstPath);
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error copying from " + param[0] + " to " + param[1]);
 				}
 				LOGGER.debug("cp command leaving");
@@ -181,10 +181,10 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("create command entered");
 				if (param == null || (param.length < 2 && param.length > 4)) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 2, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "create", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -192,9 +192,9 @@ public class VFSUIController {
 				}
 				try {
 
-					DiskConfiguration config = new DiskConfiguration();
+					final DiskConfiguration config = new DiskConfiguration();
 					config.setHostFilePath(param[0]);
-					long maximumSizeInMb = Long.parseLong(param[1]);
+					final long maximumSizeInMb = Long.parseLong(param[1]);
 					config.setMaximumSize(maximumSizeInMb * 1024 * 1024);
 					if (param.length > 2 && param[2] != null) {
 						if (Encryption.NONE.name().equalsIgnoreCase(param[2])) {
@@ -216,7 +216,7 @@ public class VFSUIController {
 					currentManager = VFSDiskManagerFactory.getInstance().createDiskManager(config);
 					currentDirectory = currentManager.getRoot();
 					console.setPromptString(param[0] + ">");
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Exception while setting up Disk:", e);
 				}
 				LOGGER.debug("create command leaving");
@@ -230,7 +230,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("dispose command entered");
 				if (currentManager == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -239,7 +239,7 @@ public class VFSUIController {
 				}
 				try {
 					currentManager.dispose();
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error disposing disk:", e);
 				}
 				currentManager = null;
@@ -255,7 +255,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("df command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -264,35 +264,35 @@ public class VFSUIController {
 				}
 				try {
 					console.writeLn("VirtualFileSystem\tSize \tUsed \tAvail \tUse% \tMounted on");
-					DiskSpaceUsage dm = currentManager.getDiskSpaceUsage();
-					long freeSpace = currentManager.getFreeSpace();
-					long maxSpace = currentManager.getMaxSpace();
+					final DiskSpaceUsage dm = currentManager.getDiskSpaceUsage();
+					final long freeSpace = currentManager.getFreeSpace();
+					final long maxSpace = currentManager.getMaxSpace();
 					console.writeLn(getCurrentVFSPathString() + getFormattedSize(dm.getMaxData()) + "\t" + getFormattedSize(maxSpace - freeSpace) + "\t"
 							+ getFormattedSize(dm.getFreeData()) + "\t" + (int) (((maxSpace - freeSpace) * 100) / maxSpace) + "%\t"
 							+ currentManager.getDiskConfiguration().getHostFilePath());
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while listing files", e);
 				}
 				LOGGER.debug("df command leaving");
 			}
 
 			private String getCurrentVFSPathString() throws VFSException {
-				StringBuilder path = new StringBuilder(currentDirectory.getPath().getAbsolutePath());
-				int tabsToAdd = (23 - path.length()) / 8 + 1;
+				final StringBuilder path = new StringBuilder(currentDirectory.getPath().getAbsolutePath());
+				final int tabsToAdd = (23 - path.length()) / 8 + 1;
 				for (int i = 0; i < tabsToAdd; i++) {
 					path.append('\t');
 				}
 				return path.toString();
 			}
 
-			private String getFormattedSize(long size) throws VFSException {
+			private String getFormattedSize(final long size) throws VFSException {
 				double tmpSize = size;
 				int unit = 0;
 				while (tmpSize > 1024) {
 					tmpSize = tmpSize / 1024;
 					unit++;
 				}
-				DecimalFormat df = new DecimalFormat("####.#");
+				final DecimalFormat df = new DecimalFormat("####.#");
 
 				return df.format(tmpSize) + (unit < UNITS.length ? UNITS[unit] : "XL");
 			}
@@ -304,7 +304,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("exit command entered");
 				if (currentManager != null) {
 					console.writeLn("There is still a disk in use, please use close command first");
@@ -322,7 +322,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("export command entered");
 
 				if (currentManager == null || currentDirectory == null) {
@@ -332,13 +332,13 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 2) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "export", 2, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "export", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
-				File exportFile = new File(param[1]);
+				final File exportFile = new File(param[1]);
 				if (exportFile.exists()) {
 					LOGGER.warn("export file already exists! I do not overwrite already existing files");
 					return;
@@ -346,23 +346,23 @@ public class VFSUIController {
 
 				try {
 					VFSEntry childToExport = null;
-					for (VFSEntry child : currentDirectory.getChildren()) {
+					for (final VFSEntry child : currentDirectory.getChildren()) {
 						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToExport = child;
 						}
 					}
 					if (childToExport == null) {
-						String warning = String.format("Child: %s not found in current directory, nothing exported", param[0]);
+						final String warning = String.format("Child: %s not found in current directory, nothing exported", param[0]);
 						LOGGER.warn(warning);
 						console.writeLn(warning);
 
 						return;
 					}
-					List<VFSEntry> entries = new LinkedList<>();
+					final List<VFSEntry> entries = new LinkedList<>();
 					entries.add(childToExport);
-					VFSExporter exporter = new VFSExporter();
+					final VFSExporter exporter = new VFSExporter();
 					exporter.exportFileOrFolder(entries, exportFile);
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while exporting file: ", e);
 				}
 				LOGGER.debug("export command leaving");
@@ -375,7 +375,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 
 				LOGGER.debug("find command entered");
 
@@ -386,7 +386,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "find", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "find", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -396,18 +396,18 @@ public class VFSUIController {
 					currentDirectory.findInFolder(param[0], new FindInFolderCallback() {
 
 						@Override
-						public void foundEntry(VFSPath path) {
+						public void foundEntry(final VFSPath path) {
 							console.writeLn(path.getAbsolutePath());
 						}
 
 						@Override
-						public boolean stopSearch(VFSPath currentDirectory) {
+						public boolean stopSearch(final VFSPath currentDirectory) {
 							LOGGER.debug("currently looking in:" + currentDirectory.getAbsolutePath());
 							// do not stop search
 							return false;
 						}
 					});
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("error while find:", e);
 				}
 
@@ -420,7 +420,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("import command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -429,7 +429,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 2) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "import", 2, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "import", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -437,13 +437,13 @@ public class VFSUIController {
 				}
 
 				try {
-					VFSPath importDestinationPath = currentDirectory.getChildPath(param[1]);
-					VFSImporter importer = new VFSImporter();
+					final VFSPath importDestinationPath = currentDirectory.getChildPath(param[1]);
+					final VFSImporter importer = new VFSImporter();
 					importer.importFileOrFolder(param[0], importDestinationPath);
-				} catch (VFSInvalidPathException ex) {
+				} catch (final VFSInvalidPathException ex) {
 					LOGGER.info("Invalid User Input for path " + ex.getMessage());
 					console.writeLn(ex.getMessage());
-				} catch (VFSException ex) {
+				} catch (final VFSException ex) {
 					LOGGER.error("Error while importing file: ", ex);
 					console.writeLn("There was an error: " + ex.getMessage());
 				}
@@ -458,7 +458,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("ls command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -466,10 +466,10 @@ public class VFSUIController {
 					return;
 				}
 				try {
-					for (VFSEntry child : currentDirectory.getChildren()) {
+					for (final VFSEntry child : currentDirectory.getChildren()) {
 						console.writeLn(child.getPath().getName());
 					}
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while listing files", e);
 				}
 				LOGGER.debug("ls command leaving");
@@ -482,7 +482,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("makedir command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -490,7 +490,7 @@ public class VFSUIController {
 					return;
 				}
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkdir", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkdir", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -498,7 +498,7 @@ public class VFSUIController {
 				}
 				try {
 					currentDirectory.getChildPath(param[0]).createDirectory();
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while creating new directory:", e);
 				}
 				LOGGER.debug("makedir command leaving");
@@ -511,7 +511,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("makefile command entered");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -519,7 +519,7 @@ public class VFSUIController {
 					return;
 				}
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkfile", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mkfile", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 
@@ -528,7 +528,7 @@ public class VFSUIController {
 				}
 				try {
 					currentDirectory.getChildPath(param[0]).createFile();
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error while creating new directory:", e);
 				}
 				LOGGER.debug("makefile command leaving");
@@ -541,7 +541,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("mv command entered");
 
 				if (currentManager == null || currentDirectory == null) {
@@ -551,28 +551,21 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 2) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mv", 2, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "mv", 2, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
 					return;
 				}
 				try {
-					VFSPath srcPath;
-					if (param[0].startsWith(VFSPath.FILE_SEPARATOR)) {
-						srcPath = currentManager.createPath(param[0]);
-					} else {
-						srcPath = currentDirectory.getChildPath(param[0]);
-					}
+					final VFSPath srcPath = param[0].startsWith(VFSPath.FILE_SEPARATOR) ? currentManager.createPath(param[0]) : currentDirectory
+							.getChildPath(param[0]);
 
-					VFSPath dstPath;
-					if (param[1].startsWith(VFSPath.FILE_SEPARATOR)) {
-						dstPath = currentManager.createPath(param[1]);
-					} else {
-						dstPath = currentDirectory.getChildPath(param[1]);
-					}
+					final VFSPath dstPath = param[1].startsWith(VFSPath.FILE_SEPARATOR) ? currentManager.createPath(param[1]) : currentDirectory
+							.getChildPath(param[1]);
+
 					srcPath.getVFSEntry().moveTo(dstPath);
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Error moving from " + param[0] + " to " + param[1]);
 				}
 				LOGGER.debug("mv command leaving");
@@ -585,11 +578,11 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("open command entered");
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "open", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "open", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -597,13 +590,13 @@ public class VFSUIController {
 				}
 				try {
 					// create configuration
-					DiskConfiguration config = new DiskConfiguration();
+					final DiskConfiguration config = new DiskConfiguration();
 					config.setHostFilePath(param[0]);
 
 					currentManager = VFSDiskManagerFactory.getInstance().openDiskManager(config);
 					currentDirectory = currentManager.getRoot();
 					console.setPromptString(param[0] + ">");
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Exception while setting up Disk:", e);
 				}
 				LOGGER.debug("open command leaving");
@@ -616,7 +609,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("pwd command entering");
 				if (currentManager == null || currentDirectory == null) {
 					LOGGER.warn(NO_DISK_OPEN_ERROR);
@@ -634,7 +627,7 @@ public class VFSUIController {
 		return new Command() {
 
 			@Override
-			public void execute(String[] param) {
+			public void execute(final String[] param) {
 				LOGGER.debug("remove command entered");
 
 				if (currentManager == null || currentDirectory == null) {
@@ -644,7 +637,7 @@ public class VFSUIController {
 				}
 
 				if (param == null || param.length != 1) {
-					String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "rm", 1, param == null ? 0 : param.length);
+					final String logString = String.format(NO_CORRECT_NUMBER_OF_PARAMS, "rm", 1, param == null ? 0 : param.length);
 					LOGGER.warn(logString);
 					console.writeLn(logString);
 					console.printHelpMessage();
@@ -652,20 +645,20 @@ public class VFSUIController {
 				}
 				VFSEntry childToRemove = null;
 				try {
-					for (VFSEntry child : currentDirectory.getChildren()) {
+					for (final VFSEntry child : currentDirectory.getChildren()) {
 						if (child.getPath().getAbsolutePath().endsWith(param[0])) {
 							childToRemove = child;
 						}
 					}
 					if (childToRemove == null) {
-						String warning = String.format("Child: %s not found in current directory, nothing removed", param[0]);
+						final String warning = String.format("Child: %s not found in current directory, nothing removed", param[0]);
 						LOGGER.warn(warning);
 						console.writeLn(warning);
 						return;
 					}
 
 					childToRemove.delete();
-				} catch (VFSException e) {
+				} catch (final VFSException e) {
 					LOGGER.error("Could not remove file:" + param[0], e);
 				}
 

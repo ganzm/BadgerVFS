@@ -26,6 +26,7 @@ import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.DefaultObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CopyAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CutAction;
@@ -34,7 +35,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.LinkCurrentDiskAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
@@ -55,11 +55,28 @@ import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
-public class DesktopController extends BadgerController implements ActionObserver, ConnectionStateListener {
+public class DesktopController extends BadgerController implements ConnectionStateListener {
 	public enum ClipboardAction {
 		COPY, CUT
 	}
 
+	private final ActionObserver getFolderContentActionHandler = new DefaultObserver(this) {
+		@Override
+		public void onActionFinished(final AbstractBadgerAction action) {
+			getFolderContentActionFinished((GetFolderContentAction) action);
+			updateGUI();
+		}
+	};
+
+	private final ActionObserver importActionHandler = new DefaultObserver(this) {
+		@Override
+		public void onActionFinished(final AbstractBadgerAction action) {
+			// reload current folder after import
+			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(getFolderContentActionHandler, currentFolder);
+			workerController.enqueue(reloadCurrentFolderAction);
+			updateGUI();
+		}
+	};
 	private static final Logger LOGGER = Logger.getLogger(DesktopController.class);
 
 	private final EntryTableModel entryTableModel = new EntryTableModel();
@@ -139,7 +156,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openLinkedDisk(final String path, final String username, final String password) throws VFSException {
-		VFSDiskManager diskManager = initDisk(path);
+		final VFSDiskManager diskManager = initDisk(path);
 		openDisk(diskManager);
 		if (remoteManager == null) {
 			// disk not linked so return
@@ -167,7 +184,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {
-		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(this, wizardContext.getRemoteManager());
+		final ActionObserver handler = new DefaultObserver(this) {
+
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final LinkCurrentDiskAction linkCurrentDiskAction = (LinkCurrentDiskAction) action;
+				remoteManager = initRemoteManager(linkCurrentDiskAction.getDiskConfiguration());
+				updateGUI();
+			}
+		};
+		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(handler, wizardContext.getRemoteManager());
 		workerController.enqueue(action);
 	}
 
@@ -197,12 +223,12 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final File selectedFile = fileChooser.getSelectedFile();
-			VFSDiskManager diskManager = initDisk(selectedFile.getAbsolutePath());
+			final VFSDiskManager diskManager = initDisk(selectedFile.getAbsolutePath());
 			if (remoteManager == null) {
 				openDisk(diskManager);
 			} else {
 				diskManager.close();
-				RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
+				final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
 				wizardContext.setRemoteManager(remoteManager);
 				wizardContext.setLocalFilePath(diskManager.getDiskConfiguration().getHostFilePath());
 				openLoginDialog(wizardContext);
@@ -257,7 +283,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			return null;
 		}
 
-		RemoteManager mgr = new RemoteManager(hostLink);
+		final RemoteManager mgr = new RemoteManager(hostLink);
 		mgr.addConnectionStateListener(this);
 		mgr.start();
 		return mgr;
@@ -283,7 +309,8 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	private void loadRootFolder() {
-		final GetFolderContentAction getFolderContentAction = new GetFolderContentAction(this);
+
+		final GetFolderContentAction getFolderContentAction = new GetFolderContentAction(getFolderContentActionHandler);
 		workerController.enqueue(getFolderContentAction);
 	}
 
@@ -312,66 +339,13 @@ public class DesktopController extends BadgerController implements ActionObserve
 		updateGUI();
 	}
 
-	@Override
-	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-		SwingUtil.handleException(null, e);
-		updateGUI();
-	}
-
-	@Override
-	public void onActionFinished(final AbstractBadgerAction action) {
-		if (action instanceof GetFolderContentAction) {
-			getFolderContentActionFinished((GetFolderContentAction) action);
-		} else if (action instanceof DeleteEntryAction) {
-			// after deletion of multiple items we cannot operate anymore with table indices
-			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			workerController.enqueue(reloadCurrentFolderAction);
-		} else if (action instanceof OpenFileInFolderAction) {
-			final OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
-			final VFSPath folderPath = openInFolder.getFolderPath();
-			final List<EntryUiModel> entries = openInFolder.getEntries();
-			final ParentFolderEntryUiModel parentFolderEntryModel = openInFolder.getParentFolderEntryUiModel();
-			setCurrentFolder(folderPath, parentFolderEntryModel, entries);
-		} else if (action instanceof CreateFolderAction) {
-			final CreateFolderAction createAction = (CreateFolderAction) action;
-			final EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
-			entryTableModel.appendEntry(entryModel);
-		} else if (action instanceof ImportAction) {
-			// reload current folder after import
-			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			workerController.enqueue(reloadCurrentFolderAction);
-		} else if (action instanceof RenameEntryAction) {
-			final RenameEntryAction renameAction = (RenameEntryAction) action;
-			entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
-		} else if (action instanceof ExportAction) {
-			final ExportAction exportAction = (ExportAction) action;
-			JOptionPane.showMessageDialog((Component) getView(), "Successfully exported " + exportAction.getEntries() + " to "
-					+ exportAction.getDestination().getAbsolutePath());
-		} else if (action instanceof CopyAction) {
-			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			workerController.enqueue(reloadCurrentFolderAction);
-		} else if (action instanceof CutAction) {
-			final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(this, currentFolder);
-			workerController.enqueue(reloadCurrentFolderAction);
-
-		} else if (action instanceof LinkCurrentDiskAction) {
-			final LinkCurrentDiskAction linkCurrentDiskAction = (LinkCurrentDiskAction) action;
-			remoteManager = initRemoteManager(linkCurrentDiskAction.getDiskConfiguration());
-			updateGUI();
-		} else {
-			LOGGER.debug("Action " + action.getClass().getName() + " not handled in " + this.getClass().getName());
-		}
-
-		updateGUI();
-	}
-
 	private void getFolderContentActionFinished(final GetFolderContentAction getFolderAction) {
 		final ParentFolderEntryUiModel parentFolderEntryModel = getFolderAction.getParentFolderEntryModel();
 		final List<EntryUiModel> entries = getFolderAction.getEntries();
 		setCurrentFolder(getFolderAction.getFolderPath(), parentFolderEntryModel, entries);
 	}
 
-	private void setCurrentFolder(final VFSPath path, final ParentFolderEntryUiModel parentFolderEntryModel, final List<EntryUiModel> entries) {
+	public void setCurrentFolder(final VFSPath path, final ParentFolderEntryUiModel parentFolderEntryModel, final List<EntryUiModel> entries) {
 		entryTableModel.setEntries(parentFolderEntryModel, entries);
 		this.currentFolder = path;
 		updateGUI();
@@ -382,17 +356,32 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void openEntry(final EntryUiModel entry) {
-		final GetFolderContentAction action = new GetFolderContentAction(this, entry);
+		final GetFolderContentAction action = new GetFolderContentAction(getFolderContentActionHandler, entry);
 		workerController.enqueue(action);
 	}
 
 	public void startDelete(final List<EntryUiModel> entries) {
-		final DeleteEntryAction action = new DeleteEntryAction(this, entries);
+		final ActionObserver handler = new DefaultObserver(this) {
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(getFolderContentActionHandler, currentFolder);
+				workerController.enqueue(reloadCurrentFolderAction);
+				updateGUI();
+			}
+		};
+		final DeleteEntryAction action = new DeleteEntryAction(handler, entries);
 		workerController.enqueue(action);
 	}
 
 	public void startRenameEntry(final EntryUiModel currentEditedValue, final int editedRow, final String newEntryName) {
-		final RenameEntryAction action = new RenameEntryAction(this, currentEditedValue, editedRow, newEntryName);
+		final ActionObserver handler = new DefaultObserver(this) {
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final RenameEntryAction renameAction = (RenameEntryAction) action;
+				entryTableModel.setValueAt(renameAction.getEntryModel(), renameAction.getEditedRowIndex(), 0);
+			}
+		};
+		final RenameEntryAction action = new RenameEntryAction(handler, currentEditedValue, editedRow, newEntryName);
 		workerController.enqueue(action);
 	}
 
@@ -425,12 +414,22 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	public void startCreateNewFolder(final String name) {
-		final CreateFolderAction action = new CreateFolderAction(this, currentFolder, name);
+		final ActionObserver handler = new DefaultObserver(this) {
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final CreateFolderAction createAction = (CreateFolderAction) action;
+				final EntryUiModel entryModel = new EntryUiModel(createAction.getNewFolder(), true);
+				entryTableModel.appendEntry(entryModel);
+				updateGUI();
+			}
+		};
+		final CreateFolderAction action = new CreateFolderAction(handler, currentFolder, name);
 		workerController.enqueue(action);
 	}
 
 	public void startImportFromHostFs(final String sourcePath, final String targetPath) {
-		final ImportAction action = new ImportAction(this, sourcePath, targetPath);
+
+		final ImportAction action = new ImportAction(importActionHandler, sourcePath, targetPath);
 		workerController.enqueue(action);
 	}
 
@@ -448,7 +447,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 			filePathes.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 		}
 
-		final ImportAction action = new ImportAction(this, filePathes);
+		final ImportAction action = new ImportAction(importActionHandler, filePathes);
 		workerController.enqueue(action);
 	}
 
@@ -478,7 +477,16 @@ public class DesktopController extends BadgerController implements ActionObserve
 					|| !selected.exists()
 					|| JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(desktopFrame,
 							"The selected file already exists, do you really want do overwrite it?")) {
-				final ExportAction action = new ExportAction(this, vfsEntries, selected, desktopFrame);
+				final DefaultObserver handler = new DefaultObserver(this) {
+					@Override
+					public void onActionFinished(final AbstractBadgerAction action) {
+						final ExportAction exportAction = (ExportAction) action;
+						JOptionPane.showMessageDialog((Component) getView(), "Successfully exported " + exportAction.getEntries() + " to "
+								+ exportAction.getDestination().getAbsolutePath());
+						updateGUI();
+					}
+				};
+				final ExportAction action = new ExportAction(handler, vfsEntries, selected, desktopFrame);
 				workerController.enqueue(action);
 
 			}
@@ -512,20 +520,9 @@ public class DesktopController extends BadgerController implements ActionObserve
 				vfsEntries.add(entry.getEntry());
 			}
 			if (clipboard.getFirst() == ClipboardAction.COPY) {
-				final CopyAction copy = new CopyAction(this, vfsEntries, destinationFolder);
-				workerController.enqueue(copy);
+				handleCopy(destinationFolder, vfsEntries);
 			} else {
-				for (final VFSEntry cutSource : vfsEntries) {
-					final String cutSourcePath = cutSource.getPath().getAbsolutePath();
-
-					if (destinationFolder.getPath().getAbsolutePath().contains(cutSourcePath)) {
-						SwingUtil.showWarning(null, "No can do! Target folder is a descendant of cut source folder");
-						return;
-					}
-				}
-				final CutAction cut = new CutAction(this, vfsEntries, destinationFolder);
-				workerController.enqueue(cut);
-
+				handleCut(destinationFolder, vfsEntries);
 			}
 			clipboard = null;
 		} catch (final VFSException e) {
@@ -533,18 +530,46 @@ public class DesktopController extends BadgerController implements ActionObserve
 		}
 	}
 
+	private void handleCut(final VFSEntry destinationFolder, final List<VFSEntry> vfsEntries) {
+		for (final VFSEntry cutSource : vfsEntries) {
+			final String cutSourcePath = cutSource.getPath().getAbsolutePath();
+
+			if (destinationFolder.getPath().getAbsolutePath().contains(cutSourcePath)) {
+				SwingUtil.showWarning(null, "No can do! Target folder is a descendant of cut source folder");
+				return;
+			}
+		}
+		final ActionObserver handler = new DefaultObserver(this) {
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(getFolderContentActionHandler, currentFolder);
+				workerController.enqueue(reloadCurrentFolderAction);
+			}
+		};
+		final CutAction cut = new CutAction(handler, vfsEntries, destinationFolder);
+		workerController.enqueue(cut);
+	}
+
+	private void handleCopy(final VFSEntry destinationFolder, final List<VFSEntry> vfsEntries) {
+		final ActionObserver handler = new DefaultObserver(this) {
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(getFolderContentActionHandler, currentFolder);
+				workerController.enqueue(reloadCurrentFolderAction);
+				updateGUI();
+			}
+		};
+		final CopyAction copy = new CopyAction(handler, vfsEntries, destinationFolder);
+		workerController.enqueue(copy);
+	}
+
 	public void createNewFolderFromContextMenu(final EntryUiModel entry) {
-		final GetFolderContentAction action = new GetFolderContentAction(new ActionObserver() {
+		final GetFolderContentAction action = new GetFolderContentAction(new DefaultObserver(this) {
 
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
 				startCreateNewFolder();
-			}
-
-			@Override
-			public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-				SwingUtil.handleException(null, e);
 				updateGUI();
 			}
 		}, entry);
@@ -554,19 +579,14 @@ public class DesktopController extends BadgerController implements ActionObserve
 
 	public void importFromContextMenu(final EntryUiModel entry, final JFrame parent) {
 
-		final GetFolderContentAction action = new GetFolderContentAction(new ActionObserver() {
-
+		final GetFolderContentAction action = new GetFolderContentAction(new DefaultObserver(this) {
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
 				getFolderContentActionFinished((GetFolderContentAction) action);
 				openImportDialog();
-			}
-
-			@Override
-			public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-				SwingUtil.handleException(null, e);
 				updateGUI();
 			}
+
 		}, entry);
 
 		workerController.enqueue(action);
@@ -602,7 +622,7 @@ public class DesktopController extends BadgerController implements ActionObserve
 	}
 
 	@Override
-	public void connectionStateChanged(ConnectionStatus status) {
+	public void connectionStateChanged(final ConnectionStatus status) {
 		updateGUI();
 	}
 

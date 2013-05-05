@@ -10,7 +10,6 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.util.Pair;
 
 public class ImportAction extends DiskAction {
@@ -29,7 +28,7 @@ public class ImportAction extends DiskAction {
 		this.host2DestinationPathList.add(new Pair<String, String>(hostFsSourcePath, destinationPath));
 	}
 
-	public ImportAction(final DesktopController actionObserver, final List<Pair<String, String>> host2DestinationPathList) {
+	public ImportAction(final ActionObserver actionObserver, final List<Pair<String, String>> host2DestinationPathList) {
 		super(actionObserver);
 		this.host2DestinationPathList = host2DestinationPathList;
 	}

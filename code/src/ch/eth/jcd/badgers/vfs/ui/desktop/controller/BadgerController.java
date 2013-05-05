@@ -11,7 +11,7 @@ public class BadgerController {
 		this.badgerView = badgerView;
 	}
 
-	protected void updateGUI() {
+	public void updateGUI() {
 		badgerView.update();
 	}
 

@@ -1,19 +1,23 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.controller;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 
+import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.model.SearchParameter;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.DefaultObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.OpenFileInFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.SearchAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
+import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class SearchController extends BadgerController implements ActionObserver {
@@ -88,7 +92,19 @@ public class SearchController extends BadgerController implements ActionObserver
 
 	public void openSearchEntryAtRow(final int rowIndex) {
 		final EntryUiModel entryModel = (EntryUiModel) searchResultTableModel.getValueAt(rowIndex, 0);
-		final OpenFileInFolderAction action = new OpenFileInFolderAction(parentController, entryModel);
+		final ActionObserver handler = new DefaultObserver(parentController) {
+
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				final OpenFileInFolderAction openInFolder = (OpenFileInFolderAction) action;
+				final VFSPath folderPath = openInFolder.getFolderPath();
+				final List<EntryUiModel> entries = openInFolder.getEntries();
+				final ParentFolderEntryUiModel parentFolderEntryModel = openInFolder.getParentFolderEntryUiModel();
+				parentController.setCurrentFolder(folderPath, parentFolderEntryModel, entries);
+				parentController.updateGUI();
+			}
+		};
+		final OpenFileInFolderAction action = new OpenFileInFolderAction(handler, entryModel);
 		parentController.getWorkerController().enqueue(action);
 	}
 
