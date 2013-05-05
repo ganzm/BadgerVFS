@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.config;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
@@ -25,6 +26,8 @@ public class DiskConfiguration implements Serializable {
 	private Compression compressionAlgorithm = Compression.LZ77;
 
 	private String linkedHostName;
+
+	private UUID diskId;
 
 	/**
 	 * If set to true this is a VirtualDisk located on the SynchronisationServer
@@ -102,5 +105,13 @@ public class DiskConfiguration implements Serializable {
 
 	public void setSyncServerMode(boolean syncServerMode) {
 		this.syncServerMode = syncServerMode;
+	}
+
+	public void setDiskId(UUID diskId) {
+		this.diskId = diskId;
+	}
+
+	public UUID getDiskId() {
+		return this.diskId;
 	}
 }

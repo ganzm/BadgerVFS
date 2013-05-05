@@ -95,7 +95,10 @@ public final class HeaderSectionHandler {
 		virtualDiskFile.write(Arrays.copyOf(header.versionString.getBytes(cs), VERSION_FIELD_LENGTH));
 
 		// write uuid
-		header.uuid = UUID.randomUUID();
+		if (config.getDiskId() == null) {
+			config.setDiskId(UUID.randomUUID());
+		}
+		header.uuid = config.getDiskId();
 		virtualDiskFile.writeLong(header.uuid.getLeastSignificantBits());
 		virtualDiskFile.writeLong(header.uuid.getMostSignificantBits());
 
@@ -192,6 +195,7 @@ public final class HeaderSectionHandler {
 		long leastSigBits = virtualDiskFile.readLong();
 		long mostSigBits = virtualDiskFile.readLong();
 		header.uuid = new UUID(mostSigBits, leastSigBits);
+		config.setDiskId(header.uuid);
 		LOGGER.debug("UUID: " + header.uuid);
 
 		// Maximum Size

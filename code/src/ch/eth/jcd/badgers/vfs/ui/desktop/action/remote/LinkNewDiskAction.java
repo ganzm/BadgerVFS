@@ -29,8 +29,8 @@ public class LinkNewDiskAction extends RemoteAction {
 
 	@Override
 	public void runRemoteAction() throws VFSException {
-		final LinkedDisk linkedDisk = new LinkedDisk(diskConfig.getHostFilePath().substring(diskConfig.getHostFilePath().lastIndexOf(File.separatorChar) + 1),
-				diskConfig);
+		final String displayName = diskConfig.getHostFilePath().substring(diskConfig.getHostFilePath().lastIndexOf(File.separatorChar) + 1);
+		final LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 		try {
 			adminInterface.linkNewDisk(linkedDisk, journal);
 		} catch (final RemoteException e) {
