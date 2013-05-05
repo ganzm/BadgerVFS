@@ -169,16 +169,16 @@ public class TwoWaySyncTest {
 		lastSeenServerVersion2 = clientDiskManager1.getServerVersion();
 		Assert.assertEquals(1, lastSeenServerVersion2);
 
-		LOGGER.info("Client2 pushes changes to Server");
+		LOGGER.info("Client2 pushes changes to Server again");
 		clientVersion2 = clientDiskManager2.getPendingVersion();
 		clientVersion2.beforeRmiTransport(clientDiskManager2);
 		pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
 		Assert.assertTrue("Expect Version update to be successfull but - " + pushResult2.getMessage(), pushResult2.isSuccess());
-		Assert.assertEquals("Expected Server to be Version 2", 2, pushResult1.getNewServerVersion());
+		Assert.assertEquals("Expected Server to be Version 2", 2, pushResult2.getNewServerVersion());
 		clientDiskManager2.setServerVersion(pushResult2.getNewServerVersion());
 
-		LOGGER.info("Client1 updates to Version 2");
-		performUpdate(clientDiskManager1, diskRemoteInterface1, 2);
+		LOGGER.info("Client1 updates from Version 1 to Version 2");
+		performUpdate(clientDiskManager1, diskRemoteInterface1, 1);
 
 		LOGGER.info("Expect both clients to have the same content on their disks");
 		CoreTestUtil.assertEntriesEqual(clientDiskManager1.getRoot(), clientDiskManager2.getRoot());

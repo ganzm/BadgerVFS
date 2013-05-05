@@ -35,14 +35,6 @@ public abstract class JournalItem implements Serializable {
 	}
 
 	public void beforeLocalTransport(VFSDiskManager diskManager) throws VFSException {
-
-	}
-
-	public void beforeSerializeToDisk() throws VFSException {
-		// does nothing by default
-	}
-
-	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
 		// does nothing by default
 	}
 }

@@ -4,11 +4,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
-import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
 
 /**
  * This class handles access to the VFSDiskManager
@@ -112,14 +110,9 @@ public abstract class WorkerController implements Runnable {
 
 	public void dispose() {
 		running = false;
-		final DiskAction noop = new DiskAction(null) {
-			@Override
-			public void runDiskAction(final VFSDiskManager diskManager) throws VFSException {
-				// intentionally does nothing
-			}
+		final AbstractBadgerAction noop = new AbstractBadgerAction(null) {
 		};
 
 		enqueue(noop);
-
 	}
 }

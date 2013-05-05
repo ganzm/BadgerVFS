@@ -50,17 +50,4 @@ public class Journal implements Serializable {
 			entry.afterRmiTransport(diskManager);
 		}
 	}
-
-	public void beforeSerializeToDisk() throws VFSException {
-		for (JournalItem entry : journalEntries) {
-			entry.beforeSerializeToDisk();
-		}
-	}
-
-	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
-		for (JournalItem entry : journalEntries) {
-			entry.afterDeserializeFromDisk(diskManager);
-		}
-	}
-
 }

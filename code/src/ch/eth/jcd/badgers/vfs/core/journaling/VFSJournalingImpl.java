@@ -109,7 +109,6 @@ public class VFSJournalingImpl implements VFSJournaling {
 		try (InputStream in = journalEntry.getInputStream()) {
 			try (ObjectInput objIn = new ObjectInputStream(in)) {
 				Journal journal = (Journal) objIn.readObject();
-				journal.afterDeserializeFromDisk(diskManager);
 				return journal;
 			}
 		} catch (IOException | ClassNotFoundException e) {
@@ -128,7 +127,6 @@ public class VFSJournalingImpl implements VFSJournaling {
 			Journal toPersist = new Journal(uncommitedJournalEntries);
 			try (OutputStream out = journalFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
 				ObjectOutputStream objOout = new ObjectOutputStream(out);
-				toPersist.beforeSerializeToDisk();
 				objOout.writeObject(toPersist);
 
 			} catch (IOException e) {

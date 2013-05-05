@@ -47,7 +47,7 @@ public class ModifyFileItem extends JournalItem {
 	 */
 	private String journalPathString;
 
-	private boolean suppressOnJournalAddJournalCopy = false;
+	private transient boolean suppressOnJournalAddJournalCopy = false;
 
 	private InputStream inputStream;
 
@@ -60,7 +60,7 @@ public class ModifyFileItem extends JournalItem {
 		if (!suppressOnJournalAddJournalCopy) {
 			VFSPath journalPath = journaling.copyFileToJournal(absoluteFilePath);
 			journalPathString = journalPath.getAbsolutePath();
-		} else {
+		} else if (journalPathString == null) {
 			journalPathString = absoluteFilePath;
 		}
 	}
@@ -100,15 +100,6 @@ public class ModifyFileItem extends JournalItem {
 		VFSPath journalPath = diskManager.createPath(journalPathString);
 		VFSEntry journalEntry = journalPath.getVFSEntry();
 		this.inputStream = journalEntry.getInputStream();
-	}
-
-	@Override
-	public void beforeSerializeToDisk() throws VFSException {
-		inputStream = null;
-	}
-
-	@Override
-	public void afterDeserializeFromDisk(VFSDiskManager diskManager) throws VFSException {
 	}
 
 	@Override
