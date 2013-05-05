@@ -11,7 +11,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
@@ -24,8 +23,6 @@ public class SyncWithServerDialog extends JDialog implements ActionListener {
 
 	private DiskAction currentAction;
 	private final JLabel lblHeader;
-
-	private final Timer swingTimer = new Timer(500, this);
 
 	/**
 	 * Create the dialog.

@@ -30,7 +30,7 @@ public class ServerUrlDialog extends JDialog {
 
 	private static final Logger LOGGER = Logger.getLogger(ServerUrlDialog.class);
 	private static final long serialVersionUID = 6008623672955958103L;
-	private JTextField textFieldRemoteServerUrl;
+	private final JTextField textFieldRemoteServerUrl;
 	private final DesktopController controller;
 
 	/**

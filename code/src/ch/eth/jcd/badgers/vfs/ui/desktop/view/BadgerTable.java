@@ -44,20 +44,7 @@ public class BadgerTable extends JScrollPane {
 
 	public BadgerTable(final BadgerMainFrame parent) {
 		this.parent = parent;
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			// rightclick windows/linux
-			public void mousePressed(final MouseEvent e) {
-				parent.getJMenuBar().doContextMenuOnTable(e);
-			}
-
-			@Override
-			// rightclick mac
-			public void mouseReleased(final MouseEvent e) {
-				parent.getJMenuBar().doContextMenuOnTable(e);
-			}
-		});
+		addMouseListener(getRightClickMouseAdapter(parent));
 
 		tableFolderEntries = new JTable();
 		tableFolderEntries.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -72,34 +59,7 @@ public class BadgerTable extends JScrollPane {
 		columnModel.setCellEditor(entryCellEditor);
 
 		// mouse listeners on jtable
-		tableFolderEntries.addMouseListener(new MouseAdapter() {
-
-			@Override
-			// doubleclick
-			public void mouseClicked(final MouseEvent event) {
-				if (event.getClickCount() >= 2) {
-					final int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
-					final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
-					LOGGER.debug("Doubleclicked " + entry);
-					if (entry != null && entry.isDirectory()) {
-						parent.getController().openEntry(entry);
-					}
-				}
-			}
-
-			@Override
-			// rightclick windows/linux
-			public void mousePressed(final MouseEvent e) {
-				parent.getJMenuBar().doContextMenuOnTable(e);
-			}
-
-			@Override
-			// rightclick mac
-			public void mouseReleased(final MouseEvent e) {
-				parent.getJMenuBar().doContextMenuOnTable(e);
-			}
-
-		});
+		tableFolderEntries.addMouseListener(getMouseAdapterForTable(parent));
 
 		// adjusting menuItems when selection in table changes
 		tableFolderEntries.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -140,6 +100,54 @@ public class BadgerTable extends JScrollPane {
 		tableFolderEntries.setDragEnabled(true);
 		new DropTarget(this, new FileImportDropTargetListener(parent.getController()));
 		removeKeysFromJTableInputMap(tableFolderEntries);
+	}
+
+	private MouseAdapter getMouseAdapterForTable(final BadgerMainFrame parent) {
+		return new MouseAdapter() {
+
+			@Override
+			// doubleclick
+			public void mouseClicked(final MouseEvent event) {
+				if (event.getClickCount() >= 2) {
+					final int rowIndex = tableFolderEntries.rowAtPoint(event.getPoint());
+					final EntryUiModel entry = (EntryUiModel) tableFolderEntries.getModel().getValueAt(rowIndex, 0);
+					LOGGER.debug("Doubleclicked " + entry);
+					if (entry != null && entry.isDirectory()) {
+						parent.getController().openEntry(entry);
+					}
+				}
+			}
+
+			@Override
+			// rightclick windows/linux
+			public void mousePressed(final MouseEvent e) {
+				parent.getJMenuBar().doContextMenuOnTable(e);
+			}
+
+			@Override
+			// rightclick mac
+			public void mouseReleased(final MouseEvent e) {
+				parent.getJMenuBar().doContextMenuOnTable(e);
+			}
+
+		};
+	}
+
+	private MouseAdapter getRightClickMouseAdapter(final BadgerMainFrame parent) {
+		return new MouseAdapter() {
+
+			@Override
+			// rightclick windows/linux
+			public void mousePressed(final MouseEvent e) {
+				parent.getJMenuBar().doContextMenuOnTable(e);
+			}
+
+			@Override
+			// rightclick mac
+			public void mouseReleased(final MouseEvent e) {
+				parent.getJMenuBar().doContextMenuOnTable(e);
+			}
+		};
 	}
 
 	/**

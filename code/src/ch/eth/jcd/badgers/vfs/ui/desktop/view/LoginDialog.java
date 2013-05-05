@@ -49,271 +49,289 @@ public class LoginDialog extends JDialog {
 		setTitle("Remote Login");
 		setBounds(100, 100, 450, 149);
 		getContentPane().setLayout(new BorderLayout());
+
+		final JPanel panel = new JPanel();
+		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		getContentPane().add(panel, BorderLayout.CENTER);
+		final GridBagLayout gblPanel = new GridBagLayout();
+		gblPanel.columnWidths = new int[] { 0, 0, 0 };
+		gblPanel.rowHeights = new int[] { 0, 0, 0 };
+		gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gblPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+		panel.setLayout(gblPanel);
 		{
-			final JPanel panel = new JPanel();
-			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-			getContentPane().add(panel, BorderLayout.CENTER);
-			final GridBagLayout gblPanel = new GridBagLayout();
-			gblPanel.columnWidths = new int[] { 0, 0, 0 };
-			gblPanel.rowHeights = new int[] { 0, 0, 0 };
-			gblPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gblPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
-			panel.setLayout(gblPanel);
+			final JLabel lblUsername = new JLabel("Username: ");
+			final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+			gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
+			gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
+			gbcLblMaximumSpace.gridx = 0;
+			gbcLblMaximumSpace.gridy = 0;
+			panel.add(lblUsername, gbcLblMaximumSpace);
+		}
+		{
+			textFieldUsername = new JTextField();
+			textFieldUsername.setHorizontalAlignment(SwingConstants.LEADING);
+			final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+			gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
+			gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
+			gbcTextFieldMaxSpace.gridx = 1;
+			gbcTextFieldMaxSpace.gridy = 0;
+			panel.add(textFieldUsername, gbcTextFieldMaxSpace);
+			textFieldUsername.setColumns(10);
+		}
+		{
+			final JLabel lblPassword = new JLabel("Password: ");
+			final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
+			gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
+			gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
+			gbcLblMaximumSpace.gridx = 0;
+			gbcLblMaximumSpace.gridy = 1;
+			panel.add(lblPassword, gbcLblMaximumSpace);
+		}
+		{
+			passwordField = new JPasswordField();
+			passwordField.setHorizontalAlignment(SwingConstants.LEADING);
+			final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
+			gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
+			gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
+			gbcTextFieldMaxSpace.gridx = 1;
+			gbcTextFieldMaxSpace.gridy = 1;
+			panel.add(passwordField, gbcTextFieldMaxSpace);
+			passwordField.setColumns(10);
+		}
+		{
+			final JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				final JLabel lblUsername = new JLabel("Username: ");
-				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
-				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
-				gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
-				gbcLblMaximumSpace.gridx = 0;
-				gbcLblMaximumSpace.gridy = 0;
-				panel.add(lblUsername, gbcLblMaximumSpace);
-			}
-			{
-				textFieldUsername = new JTextField();
-				textFieldUsername.setHorizontalAlignment(SwingConstants.LEADING);
-				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
-				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
-				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
-				gbcTextFieldMaxSpace.gridx = 1;
-				gbcTextFieldMaxSpace.gridy = 0;
-				panel.add(textFieldUsername, gbcTextFieldMaxSpace);
-				textFieldUsername.setColumns(10);
-			}
-			{
-				final JLabel lblPassword = new JLabel("Password: ");
-				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
-				gbcLblMaximumSpace.anchor = GridBagConstraints.EAST;
-				gbcLblMaximumSpace.insets = new Insets(0, 0, 2, 2);
-				gbcLblMaximumSpace.gridx = 0;
-				gbcLblMaximumSpace.gridy = 1;
-				panel.add(lblPassword, gbcLblMaximumSpace);
-			}
-			{
-				passwordField = new JPasswordField();
-				passwordField.setHorizontalAlignment(SwingConstants.LEADING);
-				final GridBagConstraints gbcTextFieldMaxSpace = new GridBagConstraints();
-				gbcTextFieldMaxSpace.insets = new Insets(0, 0, 2, 0);
-				gbcTextFieldMaxSpace.fill = GridBagConstraints.HORIZONTAL;
-				gbcTextFieldMaxSpace.gridx = 1;
-				gbcTextFieldMaxSpace.gridy = 1;
-				panel.add(passwordField, gbcTextFieldMaxSpace);
-				passwordField.setColumns(10);
-			}
-			{
-				final JPanel buttonPane = new JPanel();
-				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-				getContentPane().add(buttonPane, BorderLayout.SOUTH);
-				{
 
-					final JButton loginAndSyncButton = new JButton("Login & Sync");
-					loginAndSyncButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
-									new ConnectionStateListener() {
-										private ConnectionStateListener getConnectionStateListener() {
-											return this;
-										}
+				final JButton loginAndSyncButton = new JButton("Login & Sync");
+				loginAndSyncButton.addActionListener(getLoginAndSyncActionListener(wizardContext));
+				loginAndSyncButton.setMnemonic('l');
+				loginAndSyncButton.setActionCommand("LoginSync");
+				buttonPane.add(loginAndSyncButton);
+				getRootPane().setDefaultButton(loginAndSyncButton);
 
-										@Override
-										public void connectionStateChanged(final ConnectionStatus status) {
-											LOGGER.debug("Connection state changed to " + status);
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-													dispose();
-													controller.startSyncToServer(getThis().wizardContext);
-												}
-											});
-										}
-									});
-						}
-					});
-					loginAndSyncButton.setMnemonic('l');
-					loginAndSyncButton.setActionCommand("LoginSync");
-					buttonPane.add(loginAndSyncButton);
-					getRootPane().setDefaultButton(loginAndSyncButton);
+				final JButton createAndSyncButton = new JButton("Register & Sync");
+				createAndSyncButton.addActionListener(getRegisterAndSyncActionListener(wizardContext));
+				createAndSyncButton.setMnemonic('r');
+				createAndSyncButton.setActionCommand("RegisterSync");
+				buttonPane.add(createAndSyncButton);
 
-					final JButton createAndSyncButton = new JButton("Register & Sync");
-					createAndSyncButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
-									new ConnectionStateListener() {
-										private ConnectionStateListener getConnectionStateListener() {
-											return this;
-										}
+				final JButton connectButton = new JButton("Connect");
+				connectButton.addActionListener(getConnectActionlistener(wizardContext));
+				connectButton.setMnemonic('c');
+				connectButton.setActionCommand("Connect");
+				buttonPane.add(connectButton);
+				getRootPane().setDefaultButton(connectButton);
 
-										@Override
-										public void connectionStateChanged(final ConnectionStatus status) {
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-													dispose();
-													controller.startSyncToServer(getThis().wizardContext);
-												}
-											});
-										}
-									});
-						}
-					});
-					createAndSyncButton.setMnemonic('r');
-					createAndSyncButton.setActionCommand("RegisterSync");
-					buttonPane.add(createAndSyncButton);
+				final JButton loginButton = new JButton("Login");
+				loginButton.addActionListener(getLoginActionListener(wizardContext));
+				loginButton.setMnemonic('l');
+				loginButton.setActionCommand("Login");
+				buttonPane.add(loginButton);
+				getRootPane().setDefaultButton(loginButton);
 
-					final JButton connectButton = new JButton("Connect");
-					connectButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.setUsername(textFieldUsername.getText());
-							wizardContext.setPassword(new String(passwordField.getPassword()));
-							wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(),
-									new ConnectionStateListener() {
-										private ConnectionStateListener getConnectionStateListener() {
-											return this;
-										}
+				final JButton createButton = new JButton("Register");
+				createButton.addActionListener(getRegisterActionListener(wizardContext));
+				createButton.setMnemonic('c');
+				createButton.setActionCommand("Register");
+				buttonPane.add(createButton);
+				getRootPane().setDefaultButton(createButton);
 
-										@Override
-										public void connectionStateChanged(final ConnectionStatus status) {
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													dispose();
-													try {
-														wizardContext.getRemoteManager().logout();
-														// TODO Warten auf fertiges Logout. Blocking.
-														wizardContext.getRemoteManager().dispose();
-														controller.openLinkedDisk(wizardContext.getLocalFilePath(), wizardContext.getUsername(),
-																wizardContext.getPassword());
-													} catch (final VFSException e) {
-														SwingUtil.handleException(getThis(), e);
-													}
-												}
-											});
-										}
-									});
-						}
-					});
-					connectButton.setMnemonic('c');
-					connectButton.setActionCommand("Connect");
-					buttonPane.add(connectButton);
-					getRootPane().setDefaultButton(connectButton);
+				final JButton closeButton = new JButton("Close");
+				closeButton.addActionListener(getCloseActionListener());
+				closeButton.setMnemonic('c');
+				closeButton.setActionCommand("Close");
+				buttonPane.add(closeButton);
+				getRootPane().setDefaultButton(closeButton);
 
-					final JButton loginButton = new JButton("Login");
-					loginButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.setUsername(textFieldUsername.getText());
-							wizardContext.setPassword(new String(passwordField.getPassword()));
-							wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(),
-									new ConnectionStateListener() {
-										private ConnectionStateListener getConnectionStateListener() {
-											return this;
-										}
+				if (wizardContext.getLoginActionEnum() == LoginActionEnum.SYNC) {
+					loginAndSyncButton.setVisible(true);
+					createAndSyncButton.setVisible(true);
+					loginButton.setVisible(false);
+					connectButton.setVisible(false);
+					createButton.setVisible(false);
+					closeButton.setVisible(false);
 
-										@Override
-										public void connectionStateChanged(final ConnectionStatus status) {
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-													dispose();
-													controller.openRemoteDiskDialog(wizardContext);
-												}
-											});
-										}
-									});
-						}
-					});
-					loginButton.setMnemonic('l');
-					loginButton.setActionCommand("Login");
-					buttonPane.add(loginButton);
-					getRootPane().setDefaultButton(loginButton);
+				} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.LOGINREMOTE) {
+					loginAndSyncButton.setVisible(false);
+					createAndSyncButton.setVisible(false);
+					loginButton.setVisible(true);
+					connectButton.setVisible(false);
+					createButton.setVisible(true);
+					closeButton.setVisible(false);
 
-					final JButton createButton = new JButton("Register");
-					createButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
-									new ConnectionStateListener() {
+				} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.CONNECT) {
+					loginAndSyncButton.setVisible(false);
+					createAndSyncButton.setVisible(false);
+					loginButton.setVisible(false);
+					connectButton.setVisible(true);
+					createButton.setVisible(false);
+					closeButton.setVisible(false);
 
-										private ConnectionStateListener getConnectionStateListener() {
-											return this;
-										}
-
-										@Override
-										public void connectionStateChanged(final ConnectionStatus status) {
-											SwingUtilities.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-													dispose();
-													controller.openRemoteDiskDialog(wizardContext);
-
-												}
-											});
-
-										}
-
-									});
-
-						}
-					});
-					createButton.setMnemonic('c');
-					createButton.setActionCommand("Register");
-					buttonPane.add(createButton);
-					getRootPane().setDefaultButton(createButton);
-
-					final JButton closeButton = new JButton("Close");
-					closeButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent arg0) {
-							dispose();
-						}
-					});
-					closeButton.setMnemonic('c');
-					closeButton.setActionCommand("Close");
-					buttonPane.add(closeButton);
-					getRootPane().setDefaultButton(closeButton);
-
-					if (wizardContext.getLoginActionEnum() == LoginActionEnum.SYNC) {
-						loginAndSyncButton.setVisible(true);
-						createAndSyncButton.setVisible(true);
-						loginButton.setVisible(false);
-						connectButton.setVisible(false);
-						createButton.setVisible(false);
-						closeButton.setVisible(false);
-
-					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.LOGINREMOTE) {
-						loginAndSyncButton.setVisible(false);
-						createAndSyncButton.setVisible(false);
-						loginButton.setVisible(true);
-						connectButton.setVisible(false);
-						createButton.setVisible(true);
-						closeButton.setVisible(false);
-
-					} else if (wizardContext.getLoginActionEnum() == LoginActionEnum.CONNECT) {
-						loginAndSyncButton.setVisible(false);
-						createAndSyncButton.setVisible(false);
-						loginButton.setVisible(false);
-						connectButton.setVisible(true);
-						createButton.setVisible(false);
-						closeButton.setVisible(false);
-
-					} else {
-						loginAndSyncButton.setVisible(false);
-						createAndSyncButton.setVisible(false);
-						loginButton.setVisible(false);
-						connectButton.setVisible(false);
-						createButton.setVisible(false);
-						closeButton.setVisible(true);
-					}
+				} else {
+					loginAndSyncButton.setVisible(false);
+					createAndSyncButton.setVisible(false);
+					loginButton.setVisible(false);
+					connectButton.setVisible(false);
+					createButton.setVisible(false);
+					closeButton.setVisible(true);
 				}
 			}
 		}
+
+	}
+
+	private ActionListener getCloseActionListener() {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				dispose();
+			}
+		};
+	}
+
+	private ActionListener getRegisterActionListener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
+						new ConnectionStateListener() {
+
+							private ConnectionStateListener getConnectionStateListener() {
+								return this;
+							}
+
+							@Override
+							public void connectionStateChanged(final ConnectionStatus status) {
+								SwingUtilities.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+										dispose();
+										controller.openRemoteDiskDialog(wizardContext);
+
+									}
+								});
+
+							}
+
+						});
+
+			}
+		};
+	}
+
+	private ActionListener getLoginActionListener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.setUsername(textFieldUsername.getText());
+				wizardContext.setPassword(new String(passwordField.getPassword()));
+				wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+					private ConnectionStateListener getConnectionStateListener() {
+						return this;
+					}
+
+					@Override
+					public void connectionStateChanged(final ConnectionStatus status) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+								dispose();
+								controller.openRemoteDiskDialog(wizardContext);
+							}
+						});
+					}
+				});
+			}
+		};
+	}
+
+	private ActionListener getConnectActionlistener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.setUsername(textFieldUsername.getText());
+				wizardContext.setPassword(new String(passwordField.getPassword()));
+				wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+
+					@Override
+					public void connectionStateChanged(final ConnectionStatus status) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								dispose();
+								try {
+									wizardContext.getRemoteManager().logout();
+									// TODO Warten auf fertiges Logout. Blocking.
+									wizardContext.getRemoteManager().dispose();
+									controller.openLinkedDisk(wizardContext.getLocalFilePath(), wizardContext.getUsername(), wizardContext.getPassword());
+								} catch (final VFSException e) {
+									SwingUtil.handleException(getThis(), e);
+								}
+							}
+						});
+					}
+				});
+			}
+		};
+	}
+
+	private ActionListener getRegisterAndSyncActionListener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
+						new ConnectionStateListener() {
+							private ConnectionStateListener getConnectionStateListener() {
+								return this;
+							}
+
+							@Override
+							public void connectionStateChanged(final ConnectionStatus status) {
+								SwingUtilities.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+										dispose();
+										controller.startSyncToServer(getThis().wizardContext);
+									}
+								});
+							}
+						});
+			}
+		};
+	}
+
+	private ActionListener getLoginAndSyncActionListener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
+						new ConnectionStateListener() {
+							private ConnectionStateListener getConnectionStateListener() {
+								return this;
+							}
+
+							@Override
+							public void connectionStateChanged(final ConnectionStatus status) {
+								LOGGER.debug("Connection state changed to " + status);
+								SwingUtilities.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+										dispose();
+										controller.startSyncToServer(getThis().wizardContext);
+									}
+								});
+							}
+						});
+			}
+		};
 	}
 
 	private LoginDialog getThis() {

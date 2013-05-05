@@ -29,8 +29,7 @@ public class RemoteDiskDialog extends JDialog {
 	private static final Logger LOGGER = Logger.getLogger(RemoteDiskDialog.class);
 	private final DesktopController controller;
 	private LinkedDiskTableModel linkedDiskTableModel;
-	private JTable table;
-	private JButton btnCreateNewDisk;
+	private final JTable table;
 
 	/**
 	 * Create the dialog.
@@ -55,7 +54,6 @@ public class RemoteDiskDialog extends JDialog {
 					// add(new JScrollPane(scrTbl));
 					{
 						table = new JTable();
-						final Object[][] disks;
 						try {
 							linkedDiskTableModel = new LinkedDiskTableModel(wizardContext.getRemoteManager().getAdminInterface().listDisks());
 							table.setModel(linkedDiskTableModel);
@@ -75,7 +73,7 @@ public class RemoteDiskDialog extends JDialog {
 					final Dimension d = table.getPreferredSize();
 					scrollPane.setPreferredSize(new Dimension(d.width, table.getRowHeight() * 3));
 					{
-						btnCreateNewDisk = new JButton("Create new disk");
+						final JButton btnCreateNewDisk = new JButton("Create new disk");
 						btnCreateNewDisk.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(final ActionEvent arg0) {

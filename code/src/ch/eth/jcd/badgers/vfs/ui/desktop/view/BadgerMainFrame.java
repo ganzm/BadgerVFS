@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -54,9 +55,8 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	private final BadgerMenuBar menuBar;
 
 	private final BadgerTable table;
-	private JPanel panelCenter;
-	private JPanel panelStatusBar;
-	private JLabel lblStatusbar;
+	private final JPanel panelCenter;
+	private final JLabel lblStatusbar;
 
 	/**
 	 * Launch the application.
@@ -74,7 +74,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 							break;
 						}
 					}
-				} catch (final Exception e) {
+				} catch (final ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
 					LOGGER.debug(e);
 					// If Nimbus is not available, you can set the GUI to another look and feel.
 				}
@@ -108,7 +108,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 
-		panelStatusBar = new JPanel();
+		final JPanel panelStatusBar = new JPanel();
 		panelStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		panelStatusBar.setPreferredSize(new Dimension(getWidth(), 16));
 		panelStatusBar.setLayout(new BoxLayout(panelStatusBar, BoxLayout.X_AXIS));

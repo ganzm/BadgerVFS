@@ -59,80 +59,35 @@ public class BadgerMenuBar extends JMenuBar {
 		mnDisk.setMnemonic('D');
 		add(mnDisk);
 
-		mntmNew = new JMenuItem(new AbstractAction("New") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openCreateNewDiskDialog();
-			}
-		});
+		mntmNew = createNewMenuItem(parent);
 
 		mnDisk.add(mntmNew);
 
-		mntmOpen = new JMenuItem(new AbstractAction("Open") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					parent.getController().openFileChooserForDiskOpen(parent);
-				} catch (final VFSException ex) {
-					SwingUtil.handleException(parent, ex);
-				}
-			}
-		});
+		mntmOpen = createOpenMenuItem(parent);
 
 		mnDisk.add(mntmOpen);
 
-		mntmClose = new JMenuItem(new AbstractAction("Close") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					parent.getController().closeDisk();
-					// if we open/create another disk the Browser Panel is shown
-					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
-				} catch (final VFSException ex) {
-					SwingUtil.handleException(parent, ex);
-				}
-			}
-		});
+		mntmClose = createCloseMenuItem(parent);
 
 		mnDisk.add(mntmClose);
 
 		mnDisk.addSeparator();
 
-		mntmConnectRemote = new JMenuItem(new AbstractAction("Connect remote") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openConnectRemoteDialog();
-			}
-		});
+		mntmConnectRemote = createConnectRemoteMenuItem(parent);
 
 		mnDisk.add(mntmConnectRemote);
-		mntmLinkDisk = new JMenuItem(new AbstractAction("Link disk") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openLinkDiskDialog();
-			}
-		});
+		mntmLinkDisk = createLinkDiskMenuItem(parent);
 
 		mnDisk.add(mntmLinkDisk);
 
 		mnDisk.addSeparator();
 
-		mntmQueryDiskspace = new JMenuItem(new AbstractAction("Query Diskspace") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openDiskSpaceDialog();
-			}
-		});
+		mntmQueryDiskspace = createQuerySpaceMenuItem(parent);
 		mnDisk.add(mntmQueryDiskspace);
 
 		mnDisk.addSeparator();
 
-		final JMenuItem mntmExit = new JMenuItem(new AbstractAction("Exit") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.beforeWindowClosing();
-			}
-		});
+		final JMenuItem mntmExit = createExitMenuItem(parent);
 		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
 		mnDisk.add(mntmExit);
 
@@ -143,28 +98,14 @@ public class BadgerMenuBar extends JMenuBar {
 		// actions on the current directory!
 		// create new folder in the current directory!
 
-		mnActions.add(new JMenuItem(new AbstractAction("New Folder") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					parent.getController().startCreateNewFolder();
-				} catch (final VFSRuntimeException ex) {
-					SwingUtil.handleException(parent, ex);
-				}
-			}
-		}));
+		mnActions.add(createNewFolderMenuItem(parent));
 
 		mntmPaste = getPasteMenuItem(null);
 
 		mnActions.add(mntmPaste);
 
 		// open import dialog, using current folder
-		mnActions.add(new JMenuItem(new AbstractAction("Import") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openImportDialog();
-			}
-		}));
+		mnActions.add(createImportMenuItem(parent));
 
 		mnActions.addSeparator();
 
@@ -178,13 +119,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mnHelp.setMnemonic('H');
 		add(mnHelp);
 
-		final JMenuItem mntmInfo = new JMenuItem(new AbstractAction("Info") {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				parent.getController().openInfoDialog();
-			}
-		});
-		mnHelp.add(mntmInfo);
+		mnHelp.add(createInfoMenutItem(parent));
 
 		textFieldSearch = new JTextField();
 		textFieldSearch.addFocusListener(new FocusAdapter() {
@@ -214,6 +149,110 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 
 		add(btnSearch);
+	}
+
+	private JMenuItem createInfoMenutItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Info") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openInfoDialog();
+			}
+		});
+	}
+
+	private JMenuItem createImportMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Import") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openImportDialog();
+			}
+		});
+	}
+
+	private JMenuItem createNewFolderMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("New Folder") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().startCreateNewFolder();
+				} catch (final VFSRuntimeException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
+	private JMenuItem createExitMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Exit") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.beforeWindowClosing();
+			}
+		});
+	}
+
+	private JMenuItem createQuerySpaceMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Query Diskspace") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openDiskSpaceDialog();
+			}
+		});
+	}
+
+	private JMenuItem createLinkDiskMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Link disk") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openLinkDiskDialog();
+			}
+		});
+	}
+
+	private JMenuItem createConnectRemoteMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Connect remote") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openConnectRemoteDialog();
+			}
+		});
+	}
+
+	private JMenuItem createCloseMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Close") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().closeDisk();
+					// if we open/create another disk the Browser Panel is shown
+					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
+				} catch (final VFSException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
+	private JMenuItem createOpenMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Open") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().openFileChooserForDiskOpen(parent);
+				} catch (final VFSException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
+	private JMenuItem createNewMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("New") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				parent.getController().openCreateNewDiskDialog();
+			}
+		});
 	}
 
 	public JTextField getTextFieldSearch() {
