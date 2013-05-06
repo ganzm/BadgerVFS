@@ -40,7 +40,7 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmLinkDisk;
 	private final JMenuItem mntmClose;
 	private final JMenuItem mntmPaste;
-	private final JMenuItem mntmQueryDiskspace;
+	private final JMenuItem mntmDiskInfo;
 	private final JButton btnSearch;
 	private final JTextField textFieldSearch;
 
@@ -82,8 +82,9 @@ public class BadgerMenuBar extends JMenuBar {
 
 		mnDisk.addSeparator();
 
-		mntmQueryDiskspace = createQuerySpaceMenuItem(parent);
-		mnDisk.add(mntmQueryDiskspace);
+		mntmDiskInfo = createQuerySpaceMenuItem(parent);
+		mntmDiskInfo.setText("Disk Info");
+		mnDisk.add(mntmDiskInfo);
 
 		mnDisk.addSeparator();
 
@@ -289,7 +290,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmOpen.setEnabled(!diskMode);
 		mntmConnectRemote.setEnabled(!diskMode);
 		mntmLinkDisk.setEnabled(diskMode);
-		mntmQueryDiskspace.setEnabled(diskMode);
+		mntmDiskInfo.setEnabled(diskMode);
 		btnSearch.setEnabled(diskMode && !searching);
 	}
 
