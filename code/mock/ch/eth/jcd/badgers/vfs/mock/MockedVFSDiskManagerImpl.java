@@ -190,4 +190,9 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	public VFSJournaling getJournaling() {
 		return new VFSDisabledJournaling();
 	}
+
+	@Override
+	public void setSynchronized(long newServerVersion) throws VFSException {
+
+	}
 }

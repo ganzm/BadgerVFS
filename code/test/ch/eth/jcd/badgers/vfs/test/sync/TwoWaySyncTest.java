@@ -152,7 +152,9 @@ public class TwoWaySyncTest {
 		PushVersionResult pushResult1 = diskRemoteInterface1.pushVersion(clientVersion1);
 		Assert.assertTrue("Expect Version update to be successfull", pushResult1.isSuccess());
 		Assert.assertEquals("Expected Server to be Version 1", 1, pushResult1.getNewServerVersion());
-		clientDiskManager1.setServerVersion(pushResult1.getNewServerVersion());
+		clientDiskManager1.setSynchronized(pushResult1.getNewServerVersion());
+
+		// lösche journal
 
 		// check Version on Server
 		Assert.assertEquals("Expect Version 1 on Server", 1, serverDiskManager.getServerVersion());
@@ -175,7 +177,7 @@ public class TwoWaySyncTest {
 		pushResult2 = diskRemoteInterface2.pushVersion(clientVersion2);
 		Assert.assertTrue("Expect Version update to be successfull but - " + pushResult2.getMessage(), pushResult2.isSuccess());
 		Assert.assertEquals("Expected Server to be Version 2", 2, pushResult2.getNewServerVersion());
-		clientDiskManager2.setServerVersion(pushResult2.getNewServerVersion());
+		clientDiskManager2.setSynchronized(pushResult2.getNewServerVersion());
 
 		LOGGER.info("Client1 updates from Version 1 to Version 2");
 		performUpdate(clientDiskManager1, diskRemoteInterface1, 1);

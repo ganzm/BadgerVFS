@@ -137,4 +137,11 @@ public interface VFSDiskManager {
 
 	VFSJournaling getJournaling();
 
+	/**
+	 * This method is called by a client whenever local changes where successfully pushed to the synchronization server
+	 * 
+	 * @param newServerVersion
+	 */
+	void setSynchronized(long newServerVersion) throws VFSException;
+
 }

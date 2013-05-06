@@ -461,4 +461,12 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	public VFSJournaling getJournaling() {
 		return journaling;
 	}
+
+	@Override
+	public void setSynchronized(long newServerVersion) throws VFSException {
+
+//		journaling.deleteJournals(newServerVersion);
+		// TODO Auto-generated method stub
+		setServerVersion(newServerVersion);
+	}
 }
