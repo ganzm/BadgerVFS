@@ -13,6 +13,7 @@ TODOS
 - (TF) GetDiskFromServer  löschen und ersetzen durch code aus UnitTests SST und TWST
   - SST: Szenario wo lokal modifizierte disk uploaded wird
   - TWST: Disk wird serverseitig erzeugt
+- (TF) RMI close
 - SequenzDiagramme Upload/Download
   - Papier (MG)
   - Digital (PR)
