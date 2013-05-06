@@ -88,7 +88,7 @@ public class FileCopyTest extends VFSDiskManagerTestBase {
 		}
 
 		f1.copyTo(f4Path);
-		VFSEntry f4 = f3Path.getVFSEntry();
+		VFSEntry f4 = f4Path.getVFSEntry();
 		try (OutputStream out = f4.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
 			out.write(f4Content);
 		}
