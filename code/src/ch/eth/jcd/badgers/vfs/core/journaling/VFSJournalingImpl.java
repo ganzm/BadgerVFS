@@ -28,7 +28,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 /**
  * $ID$
  * 
- * In order to synchronize data via SynchronisationServer the file system writes serializeable journal files
+ * In order to synchronize data via SynchronisationServer the file system writes serializable journal files
  * 
  * 
  */
@@ -301,5 +301,18 @@ public class VFSJournalingImpl implements VFSJournaling {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void deleteJournals() throws VFSException {
+		// expect this method to be called after having synchronized data to the SynchronisationServer
+		assert currentJournalFolder == null;
+
+		VFSEntry journalsFolder = getJournalsFolder();
+		for (VFSEntry journal : journalsFolder.getChildren()) {
+			LOGGER.debug("Delete old Journal " + journal.getPath().getAbsolutePath());
+			journal.delete();
+		}
+
 	}
 }
