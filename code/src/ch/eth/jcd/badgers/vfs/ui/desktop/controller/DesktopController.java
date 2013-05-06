@@ -10,7 +10,6 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
@@ -36,6 +35,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.LinkCurrentDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.UseCurrentLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
@@ -155,32 +155,17 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		dialog.setVisible(true);
 	}
 
-	public void openLinkedDisk(final String path, final String username, final String password) throws VFSException {
-		final VFSDiskManager diskManager = initDisk(path);
-		openDisk(diskManager);
-		if (remoteManager == null) {
-			// disk not linked so return
-			return;
-		}
-		remoteManager.startLogin(username, password, new ConnectionStateListener() {
-			private ConnectionStateListener getConnectionStateListener() {
-				return this;
-			}
+	public void openLinkedDisk(RemoteSynchronisationWizardContext wizardContext) throws VFSException {
+		openDisk(wizardContext.getDiskManager());
+		final ActionObserver handler = new DefaultObserver(this) {
 
 			@Override
-			public void connectionStateChanged(final ConnectionStatus status) {
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run() {
-						remoteManager.removeConnectionStateListener(getConnectionStateListener());
-						remoteManager.startUseLinkedDisk(workerController.getDiskManager().getDiskId());
-
-					}
-				});
+			public void onActionFinished(final AbstractBadgerAction action) {
+				updateGUI();
 			}
-		});
-
+		};
+		final UseCurrentLinkedDiskAction action = new UseCurrentLinkedDiskAction(handler, remoteManager);
+		workerController.enqueue(action);
 	}
 
 	public void startSyncToServer(final RemoteSynchronisationWizardContext wizardContext) {
@@ -188,8 +173,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
-				final LinkCurrentDiskAction linkCurrentDiskAction = (LinkCurrentDiskAction) action;
-				remoteManager = initRemoteManager(linkCurrentDiskAction.getDiskConfiguration());
+				remoteManager = wizardContext.getRemoteManager();
 				updateGUI();
 			}
 		};
@@ -227,10 +211,9 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			if (remoteManager == null) {
 				openDisk(diskManager);
 			} else {
-				diskManager.close();
 				final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
 				wizardContext.setRemoteManager(remoteManager);
-				wizardContext.setLocalFilePath(diskManager.getDiskConfiguration().getHostFilePath());
+				wizardContext.setDiskManager(diskManager);
 				openLoginDialog(wizardContext);
 			}
 		}
@@ -619,6 +602,13 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		}
 
 		return null;
+	}
+
+	public boolean isDiskConnectedWithServer() {
+		if (remoteManager != null) {
+			return remoteManager.getConnectionStatus() == ConnectionStatus.DISK_MODE;
+		}
+		return false;
 	}
 
 	@Override

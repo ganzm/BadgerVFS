@@ -42,6 +42,7 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmDiskInfo;
 	private final JButton btnSearch;
+	private final JButton btnSync;
 	private final JTextField textFieldSearch;
 
 	private final BadgerMainFrame parent;
@@ -150,6 +151,19 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 
 		add(btnSearch);
+
+		btnSync = new JButton(new AbstractAction("Sync") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().startCreateNewFolder();
+				} catch (final VFSRuntimeException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+
+		add(btnSync);
 	}
 
 	private JMenuItem createInfoMenutItem(final BadgerMainFrame parent) {
@@ -283,15 +297,16 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
-	public void update(final boolean diskMode, final boolean searching) {
+	public void update(final boolean diskMode, final boolean searching, boolean isConnected) {
 		mnActions.setEnabled(diskMode && !searching);
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
 		mntmConnectRemote.setEnabled(!diskMode);
-		mntmLinkDisk.setEnabled(diskMode);
+		mntmLinkDisk.setEnabled(diskMode && !isConnected);
 		mntmDiskInfo.setEnabled(diskMode);
 		btnSearch.setEnabled(diskMode && !searching);
+		btnSync.setEnabled(diskMode && isConnected);
 	}
 
 	private JMenuItem getCutMenuItem() {

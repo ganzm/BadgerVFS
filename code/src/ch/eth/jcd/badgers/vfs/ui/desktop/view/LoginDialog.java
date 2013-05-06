@@ -264,22 +264,30 @@ public class LoginDialog extends JDialog {
 				wizardContext.setPassword(new String(passwordField.getPassword()));
 				wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
 
+					private ConnectionStateListener getConnectionStateListener() {
+						return this;
+					}
+
 					@Override
 					public void connectionStateChanged(final ConnectionStatus status) {
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								dispose();
-								try {
-									wizardContext.getRemoteManager().logout();
-									// TODO Warten auf fertiges Logout. Blocking.
-									wizardContext.getRemoteManager().dispose();
-									controller.openLinkedDisk(wizardContext.getLocalFilePath(), wizardContext.getUsername(), wizardContext.getPassword());
-								} catch (final VFSException e) {
-									SwingUtil.handleException(getThis(), e);
+
+						if (ConnectionStatus.CONNECTED.equals(status)) {
+							SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+									dispose();
+									try {
+										controller.openLinkedDisk(wizardContext);
+									} catch (VFSException e) {
+										SwingUtil.handleException(getThis(), e);
+									}
 								}
-							}
-						});
+							});
+						}
 					}
 				});
 			}
@@ -299,6 +307,7 @@ public class LoginDialog extends JDialog {
 							@Override
 							public void connectionStateChanged(final ConnectionStatus status) {
 								if (ConnectionStatus.CONNECTED.equals(status)) {
+									SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
 									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 								} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
 									SwingUtilities.invokeLater(new Runnable() {

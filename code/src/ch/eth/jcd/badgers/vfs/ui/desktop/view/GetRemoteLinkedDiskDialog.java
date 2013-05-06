@@ -182,7 +182,8 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 											wizardContext.getRemoteManager().logout();
 											// TODO Warten auf fertiges Logout. Blocking.
 											wizardContext.getRemoteManager().dispose();
-											controller.openLinkedDisk(txtPath.getText(), wizardContext.getUsername(), wizardContext.getPassword());
+											wizardContext.setRemoteHostName(txtPath.getText());
+											controller.openLinkedDisk(wizardContext);
 										} catch (final VFSException e) {
 											SwingUtil.handleException(getThis(), e);
 										}

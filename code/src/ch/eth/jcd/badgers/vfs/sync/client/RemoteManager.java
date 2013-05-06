@@ -126,6 +126,21 @@ public class RemoteManager implements ActionObserver {
 		}
 	}
 
+	public boolean useLinkedDisk(final UUID diskId, final ActionObserver actionObserver) throws VFSException {
+		LOGGER.trace("Start using linked disk");
+		if (status != ConnectionStatus.LOGGED_IN) {
+			LOGGER.trace("cannot Start using linked disk, when not logged in");
+			return false;
+		}
+		final UseLinkedDiskAction useLinkedDiskAction = new UseLinkedDiskAction(this, this, diskId);
+		try {
+			remoteWorkerController.enqueueBlocking(useLinkedDiskAction, true);
+		} catch (InterruptedException | VFSException e) {
+			throw new VFSException(e);
+		}
+		return true;
+	}
+
 	public ConnectionStatus getConnectionStatus() {
 		return status;
 	}
@@ -228,17 +243,6 @@ public class RemoteManager implements ActionObserver {
 		remoteWorkerController.enqueue(action);
 		return true;
 
-	}
-
-	public boolean startUseLinkedDisk(final UUID diskId) {
-		LOGGER.trace("Start using linked disk");
-		if (status != ConnectionStatus.LOGGED_IN) {
-			LOGGER.trace("cannot Start using linked disk, when not logged in");
-			return false;
-		}
-		final UseLinkedDiskAction useLinkedDiskAction = new UseLinkedDiskAction(this, this, diskId);
-		remoteWorkerController.enqueue(useLinkedDiskAction);
-		return true;
 	}
 
 	public boolean logout() {
