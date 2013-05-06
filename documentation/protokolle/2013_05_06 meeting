@@ -1,0 +1,20 @@
+- Wann wird synchronisiert
+  - Wenn long term poll zurückkommt wird disk blockiert und DownloadRemoteChanges Action wird enqueuet
+  - Upload Button neben search button trigger Upload
+  - Disk Open triggert DownloadRemoteChanges
+
+TODOS
+
+- (TF) Action UploadLocalChanges blockiert client disk bis Version geuploaded wird
+- (TF) Action DownloadRemoteChanges blockiert clientdisk bis neue Version von Server eingefügt wurde
+- (MG) LongTerm Polling implementieren
+- (TF) Disk offline mode
+- (PR) Doku
+- (TF) GetDiskFromServer  löschen und ersetzen durch code aus UnitTests SST und TWST
+  - SST: Szenario wo lokal modifizierte disk uploaded wird
+  - TWST: Disk wird serverseitig erzeugt
+- SequenzDiagramme Upload/Download
+  - Papier (MG)
+  - Digital (PR)
+
+  
