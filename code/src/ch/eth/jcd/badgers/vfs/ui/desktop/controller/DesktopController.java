@@ -35,6 +35,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.LinkCurrentDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.UploadLocalChangesAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.UseCurrentLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.BadgerFileExtensionFilter;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryTableModel;
@@ -179,6 +180,22 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		};
 		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(handler, wizardContext.getRemoteManager());
 		workerController.enqueue(action);
+	}
+
+	public void startUploadLocalChanges() throws VFSException {
+		final ActionObserver handler = new DefaultObserver(this) {
+
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				updateGUI();
+			}
+		};
+		UploadLocalChangesAction action = new UploadLocalChangesAction(handler, remoteManager);
+		try {
+			workerController.enqueueBlocking(action, true);
+		} catch (InterruptedException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {

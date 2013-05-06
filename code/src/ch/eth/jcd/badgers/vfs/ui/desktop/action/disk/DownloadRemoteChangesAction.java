@@ -5,18 +5,14 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
 /**
- * gemäss Upload Pull SequenzDiagramm
+ * Updates the local disk to the same version as the SyncServer
  * 
- * Versucht 1x lokale Änderungen auf den SynchServer hochzuladen
- * 
- * 
- * If this action fails
- * 
+ * TODO describe PullRemoteChanges
  * 
  */
-public class UploadLocalChanges extends DiskAction {
+public class DownloadRemoteChangesAction extends DiskAction {
 
-	public UploadLocalChanges(ActionObserver actionObserver) {
+	public DownloadRemoteChangesAction(ActionObserver actionObserver) {
 		super(actionObserver);
 		// TODO Auto-generated constructor stub
 	}

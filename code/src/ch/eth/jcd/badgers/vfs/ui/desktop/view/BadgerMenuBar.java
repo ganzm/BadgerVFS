@@ -156,8 +156,8 @@ public class BadgerMenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
-					parent.getController().startCreateNewFolder();
-				} catch (final VFSRuntimeException ex) {
+					parent.getController().startUploadLocalChanges();
+				} catch (final VFSRuntimeException | VFSException ex) {
 					SwingUtil.handleException(parent, ex);
 				}
 			}

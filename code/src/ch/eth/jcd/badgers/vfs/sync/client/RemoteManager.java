@@ -266,4 +266,5 @@ public class RemoteManager implements ActionObserver {
 	public void removeConnectionStateListener(final ConnectionStateListener connectionStateListener) {
 		connectionStateListeners.remove(connectionStateListener);
 	}
+
 }
