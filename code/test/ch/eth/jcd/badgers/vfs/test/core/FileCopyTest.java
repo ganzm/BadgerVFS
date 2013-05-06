@@ -52,6 +52,57 @@ public class FileCopyTest extends VFSDiskManagerTestBase {
 		Assert.assertArrayEquals(tempFileContent, actualByteData);
 	}
 
+	@Test
+	public void testMultiCopy() throws VFSException, IOException {
+		byte[] f1Content = generateRandomData();
+		byte[] f2Content = generateRandomData();
+		byte[] f3Content = generateRandomData();
+		byte[] f4Content = generateRandomData();
+
+		VFSEntry rootEntry = diskManager.getRoot();
+
+		VFSPath multiCopyPath = rootEntry.getChildPath("multicopy");
+		VFSEntry multiCopyDir = multiCopyPath.createDirectory();
+
+		VFSPath f1path = multiCopyDir.getChildPath("1");
+		VFSPath f2Path = multiCopyDir.getChildPath("2");
+		VFSPath f3Path = multiCopyDir.getChildPath("3");
+		VFSPath f4Path = multiCopyDir.getChildPath("4");
+		VFSPath f5Path = multiCopyDir.getChildPath("5");
+
+		VFSEntry f1 = f1path.createFile();
+		try (OutputStream out = f1.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write(f1Content);
+		}
+
+		f1.copyTo(f2Path);
+		VFSEntry f2 = f2Path.getVFSEntry();
+		try (OutputStream out = f2.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write(f2Content);
+		}
+
+		f1.copyTo(f3Path);
+		VFSEntry f3 = f3Path.getVFSEntry();
+		try (OutputStream out = f3.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write(f3Content);
+		}
+
+		f1.copyTo(f4Path);
+		VFSEntry f4 = f3Path.getVFSEntry();
+		try (OutputStream out = f4.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write(f4Content);
+		}
+
+		f1.copyTo(f5Path);
+
+		Assert.assertArrayEquals(f1Content, CoreTestUtil.fileToBytes(f1));
+		Assert.assertArrayEquals(f2Content, CoreTestUtil.fileToBytes(f2));
+		Assert.assertArrayEquals(f3Content, CoreTestUtil.fileToBytes(f3));
+		Assert.assertArrayEquals(f4Content, CoreTestUtil.fileToBytes(f4));
+		Assert.assertArrayEquals(f1Content, CoreTestUtil.fileToBytes(f1));
+
+	}
+
 	private byte[] generateRandomData() {
 		byte[] bytes = new byte[rnd.nextInt(10000)];
 		rnd.nextBytes(bytes);
