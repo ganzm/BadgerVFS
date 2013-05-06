@@ -154,8 +154,6 @@ public class TwoWaySyncTest {
 		Assert.assertEquals("Expected Server to be Version 1", 1, pushResult1.getNewServerVersion());
 		clientDiskManager1.setSynchronized(pushResult1.getNewServerVersion());
 
-		// lösche journal
-
 		// check Version on Server
 		Assert.assertEquals("Expect Version 1 on Server", 1, serverDiskManager.getServerVersion());
 
