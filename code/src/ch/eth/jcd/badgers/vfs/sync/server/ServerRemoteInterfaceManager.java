@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -20,7 +21,7 @@ public class ServerRemoteInterfaceManager {
 	private static final Logger LOGGER = Logger.getLogger(ServerRemoteInterfaceManager.class);
 	private final ServerConfiguration config;
 
-	private final List<ActiveClientLink> activeClientLinks = new ArrayList<>();
+	private final List<ActiveClientLink> activeClientLinks;
 
 	/**
 	 * instance to the single LoginInterface published by RMI
@@ -31,6 +32,7 @@ public class ServerRemoteInterfaceManager {
 
 	public ServerRemoteInterfaceManager(final ServerConfiguration config) {
 		this.config = config;
+		this.activeClientLinks = Collections.synchronizedList(new ArrayList<ActiveClientLink>());
 	}
 
 	public void setup() throws VFSException {
