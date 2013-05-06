@@ -13,9 +13,8 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ProvideDownloadStreamAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetVersionDeltaAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
-import ch.eth.jcd.badgers.vfs.ui.desktop.controller.GetVersionDeltaAction;
 
 public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
@@ -26,14 +25,14 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	private final DiskWorkerController diskWorkerController;
 
 	/**
-	 * In order to achieve single thread access to a disk we need to lock disk access while a client pulls data to download
+	 * In order to achieve single threaded access to a disk we need to lock disk access while a client pulls data to download
 	 * 
 	 * This Action blocks any other access to a single Disk
 	 * 
 	 * @see {@link #getVersionDelta(long, long)}
 	 * @see {@link #downloadFinished()}
 	 */
-	private ProvideDownloadStreamAction downloadAction = null;
+	private GetVersionDeltaAction getVersionDeltaAction = null;
 
 	public DiskRemoteInterfaceImpl(final DiskWorkerController diskWorkerController) throws VFSException {
 		this.diskWorkerController = diskWorkerController;
@@ -56,29 +55,25 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
 	@Override
 	public List<Journal> getVersionDelta(final long lastSeenServerVersion) throws RemoteException {
-		if (downloadAction != null) {
+		if (getVersionDeltaAction != null) {
 			throw new RemoteException("DownloadStreams openend - Someone forgot to call downloadFinished");
 		}
 
+		getVersionDeltaAction = new GetVersionDeltaAction(lastSeenServerVersion);
+		diskWorkerController.enqueue(getVersionDeltaAction);
+
+		// this call blocks until GetVersionDeltaAction has prepared the result
 		try {
-			final GetVersionDeltaAction deltaAction = new GetVersionDeltaAction(lastSeenServerVersion);
-			diskWorkerController.enqueueBlocking(deltaAction, true);
-
-			List<Journal> result = deltaAction.getResult();
-			downloadAction = new ProvideDownloadStreamAction(result);
-
-			diskWorkerController.enqueue(downloadAction);
-			downloadAction.waitUntilPrepared();
-
+			List<Journal> result = getVersionDeltaAction.blockingGetResult();
 			return result;
-		} catch (final InterruptedException | VFSException e) {
-			throw new RemoteException("error getting version Delta", e);
+		} catch (InterruptedException e) {
+			throw new RemoteException("Interrupted", e);
 		}
 	}
 
 	public void downloadFinished() {
-		downloadAction.closeStreams();
-		downloadAction = null;
+		getVersionDeltaAction.stopBlocking();
+		getVersionDeltaAction = null;
 	}
 
 	@Override
