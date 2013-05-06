@@ -118,7 +118,7 @@ public class RemoteManager implements ActionObserver {
 				return false;
 			}
 
-			final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(actionObserver, adminInterface, diskConfig, journal);
+			final LinkNewDiskAction linkNewDiskAction = new LinkNewDiskAction(this, adminInterface, diskConfig, journal);
 			remoteWorkerController.enqueueBlocking(linkNewDiskAction, true);
 			return true;
 		} catch (InterruptedException e) {
@@ -138,6 +138,9 @@ public class RemoteManager implements ActionObserver {
 	public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
 		if (action instanceof ConnectAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
+		} else if (action instanceof LoginAction) {
+			LOGGER.warn(e);
+			setStatus(ConnectionStatus.CONNECTED);
 		} else {
 			// TODO remove GUI Code
 			SwingUtil.handleException(null, e);
@@ -166,6 +169,9 @@ public class RemoteManager implements ActionObserver {
 		else if (action instanceof UseLinkedDiskAction) {
 			currentLinkedDiskRemoteInterface = ((UseLinkedDiskAction) action).getResult();
 			this.setStatus(ConnectionStatus.DISK_MODE);
+		} else if (action instanceof LinkNewDiskAction) {
+			currentLinkedDiskRemoteInterface = ((LinkNewDiskAction) action).getResult();
+			this.setStatus(ConnectionStatus.DISK_MODE);
 		} else if (action instanceof LogoutAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
 		}
@@ -185,6 +191,17 @@ public class RemoteManager implements ActionObserver {
 				}
 			}
 
+		} else {
+			LOGGER.info("ConnectionStatus have not changed, still" + this.status);
+
+			// notify listeners
+			for (final ConnectionStateListener csl : connectionStateListeners) {
+				try {
+					csl.connectionStateChanged(status);
+				} catch (final RuntimeException ex) {
+					LOGGER.error("", ex);
+				}
+			}
 		}
 	}
 

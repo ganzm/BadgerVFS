@@ -85,6 +85,10 @@ public class ServerUrlDialog extends JDialog {
 							final RemoteManager remoteManager = new RemoteManager(wizardContext.getRemoteHostName());
 							remoteManager.addConnectionStateListener(new ConnectionStateListener() {
 
+								private ConnectionStateListener getConnectionStateListener() {
+									return this;
+								}
+
 								@Override
 								public void connectionStateChanged(final ConnectionStatus status) {
 									if (ConnectionStatus.CONNECTED == status) {
@@ -98,6 +102,7 @@ public class ServerUrlDialog extends JDialog {
 
 											@Override
 											public void run() {
+												wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 												dispose();
 												controller.openLoginDialog(wizardContext);
 												LOGGER.debug("Connected to Server");
@@ -106,8 +111,10 @@ public class ServerUrlDialog extends JDialog {
 										});
 
 									} else if (ConnectionStatus.DISCONNECTED == status) {
+										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 										// TODO implement correct disconnect.
 										SwingUtil.showWarning(getThis(), "Cannot connect to the Server");
+										dispose();
 										LOGGER.debug("Cannot connect to the Server");
 									}
 								}

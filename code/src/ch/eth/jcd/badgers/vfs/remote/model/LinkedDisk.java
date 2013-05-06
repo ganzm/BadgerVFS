@@ -12,7 +12,7 @@ public class LinkedDisk implements Serializable {
 	private DiskConfiguration diskConfig = new DiskConfiguration();
 
 	public LinkedDisk(final String displayName, final DiskConfiguration diskConfig) {
-		this.uuid = UUID.randomUUID();
+		this.uuid = diskConfig.getDiskId();
 		this.displayName = displayName;
 		this.diskConfig = diskConfig;
 	}

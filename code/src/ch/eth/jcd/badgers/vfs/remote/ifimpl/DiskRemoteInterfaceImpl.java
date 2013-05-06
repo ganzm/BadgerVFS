@@ -2,6 +2,7 @@ package ch.eth.jcd.badgers.vfs.remote.ifimpl;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -34,9 +35,12 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	 */
 	private GetVersionDeltaAction getVersionDeltaAction = null;
 
+	private final UUID id;
+
 	public DiskRemoteInterfaceImpl(final DiskWorkerController diskWorkerController) throws VFSException {
 		this.diskWorkerController = diskWorkerController;
 		diskWorkerController.startWorkerController();
+		this.id = UUID.randomUUID();
 	}
 
 	@Override
@@ -71,6 +75,7 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 		}
 	}
 
+	@Override
 	public void downloadFinished() {
 		getVersionDeltaAction.stopBlocking();
 		getVersionDeltaAction = null;
@@ -87,6 +92,7 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 		}
 	}
 
+	@Override
 	public void close() throws RemoteException, VFSException {
 		diskWorkerController.dispose();
 	}
@@ -94,5 +100,10 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	@Override
 	public void unlink() throws RemoteException {
 		LOGGER.info("unlink() - TODO");
+	}
+
+	@Override
+	public UUID getId() throws RemoteException {
+		return id;
 	}
 }

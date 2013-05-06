@@ -8,11 +8,15 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.ifimpl.DiskRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.ifimpl.LoginRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
@@ -22,7 +26,7 @@ public class ServerRemoteInterfaceManager {
 	private final ServerConfiguration config;
 
 	private final List<ActiveClientLink> activeClientLinks;
-
+	private final Map<UUID, DiskRemoteInterfaceImpl> activeDiskRemoteInterfaceImpls = new HashMap<>();
 	/**
 	 * instance to the single LoginInterface published by RMI
 	 */
@@ -71,4 +75,11 @@ public class ServerRemoteInterfaceManager {
 		activeClientLinks.add(clientLink);
 	}
 
+	public Map<UUID, DiskRemoteInterfaceImpl> getActiveDiskRemoteInterfaceImpls() {
+		return activeDiskRemoteInterfaceImpls;
+	}
+
+	public void addActiveDiskRemoteInterfaceImpls(UUID uuid, DiskRemoteInterfaceImpl drii) {
+		activeDiskRemoteInterfaceImpls.put(uuid, drii);
+	}
 }

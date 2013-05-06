@@ -37,12 +37,14 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	private final ClientLink clientLink;
 	private final ServerRemoteInterfaceManager ifManager;
 	private final ServerConfiguration config;
+	private final UUID id;
 	private static final Logger LOGGER = Logger.getLogger(AdministrationRemoteInterfaceImpl.class);
 
 	public AdministrationRemoteInterfaceImpl(final ClientLink clientLink, final ServerRemoteInterfaceManager ifManager) {
 		this.clientLink = clientLink;
 		this.ifManager = ifManager;
 		this.config = ifManager.getConfig();
+		id = UUID.randomUUID();
 	}
 
 	@Override
@@ -79,6 +81,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		clientLink.setDiskWorkerController(diskWorkerController);
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+		ifManager.addActiveDiskRemoteInterfaceImpls(obj.getId(), obj);
 
 		return stub;
 	}
@@ -116,15 +119,19 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(workerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
+		ifManager.addActiveDiskRemoteInterfaceImpls(obj.getId(), obj);
 
 		return stub;
 	}
 
 	public void closeDisk(final DiskRemoteInterface diskRemoteInterface) throws RemoteException, VFSException {
-		((DiskRemoteInterfaceImpl) diskRemoteInterface).close();
+		diskRemoteInterface.close();
+		UUID diskId = diskRemoteInterface.getId();
 		LOGGER.info("closing disk for user Username: " + clientLink.getUserAccount().getUsername());
-
-		UnicastRemoteObject.unexportObject(diskRemoteInterface, true);
+		if (ifManager.getActiveDiskRemoteInterfaceImpls().containsKey(diskId)) {
+			UnicastRemoteObject.unexportObject(ifManager.getActiveDiskRemoteInterfaceImpls().get(diskId), true);
+			ifManager.getActiveDiskRemoteInterfaceImpls().remove(diskId);
+		}
 	}
 
 	@Override
@@ -196,5 +203,10 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 	@Override
 	public void closeLinkedDisk(final DiskRemoteInterface diskInterface) throws RemoteException, VFSException {
 		closeDisk(diskInterface);
+	}
+
+	@Override
+	public UUID getId() throws RemoteException {
+		return id;
 	}
 }

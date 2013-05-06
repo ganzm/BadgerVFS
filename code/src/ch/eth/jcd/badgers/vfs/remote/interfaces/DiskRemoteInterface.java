@@ -3,9 +3,11 @@ package ch.eth.jcd.badgers.vfs.remote.interfaces;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.UUID;
 
 import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 
@@ -62,5 +64,20 @@ public interface DiskRemoteInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	void unlink() throws RemoteException;
+
+	/**
+	 * Closes the DiskRemoteInterface and deregisters it from RMI
+	 * 
+	 * @throws RemoteException
+	 * @throws VFSException
+	 */
+	void close() throws RemoteException, VFSException;
+
+	/**
+	 * 
+	 * @return UUID from the Impl
+	 * @throws RemoteException
+	 */
+	UUID getId() throws RemoteException;
 
 }

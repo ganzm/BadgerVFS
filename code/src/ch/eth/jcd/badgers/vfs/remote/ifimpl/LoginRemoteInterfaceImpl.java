@@ -65,9 +65,10 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 	@Override
 	public void logout(final AdministrationRemoteInterface remoteInterface) throws RemoteException, VFSException {
 		for (ActiveClientLink activeLink : ifManager.getActiveClientLinks()) {
-			if (activeLink.getRemoteIf() == remoteInterface) {
+			if (activeLink.getRemoteIf().getId().equals(remoteInterface.getId())) {
 				LOGGER.info("logout Username: " + activeLink.getClientLink().getUserAccount().getUsername());
 				UnicastRemoteObject.unexportObject(activeLink.getRemoteifImpl(), true);
+				ifManager.getActiveClientLinks().remove(activeLink);
 				break;
 			}
 		}

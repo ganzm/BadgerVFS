@@ -1,10 +1,13 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.ifimpl.DiskRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 
@@ -29,6 +32,10 @@ public class SynchronisationServer {
 
 	public List<ActiveClientLink> getActiveClientLinks() {
 		return ifManager.getActiveClientLinks();
+	}
+
+	public Map<UUID, DiskRemoteInterfaceImpl> activeDiskRemoteInterfaceImpls() {
+		return ifManager.getActiveDiskRemoteInterfaceImpls();
 	}
 
 	/**

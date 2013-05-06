@@ -237,14 +237,19 @@ public class LoginDialog extends JDialog {
 
 					@Override
 					public void connectionStateChanged(final ConnectionStatus status) {
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-								dispose();
-								controller.openRemoteDiskDialog(wizardContext);
-							}
-						});
+						if (ConnectionStatus.CONNECTED.equals(status)) {
+							SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+							SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+									dispose();
+									controller.openRemoteDiskDialog(wizardContext);
+								}
+							});
+						}
 					}
 				});
 			}
@@ -293,14 +298,18 @@ public class LoginDialog extends JDialog {
 
 							@Override
 							public void connectionStateChanged(final ConnectionStatus status) {
-								SwingUtilities.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										dispose();
-										controller.startSyncToServer(getThis().wizardContext);
-									}
-								});
+								if (ConnectionStatus.CONNECTED.equals(status)) {
+									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+								} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+									SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+											dispose();
+											controller.startSyncToServer(getThis().wizardContext);
+										}
+									});
+								}
 							}
 						});
 			}
@@ -319,15 +328,19 @@ public class LoginDialog extends JDialog {
 
 							@Override
 							public void connectionStateChanged(final ConnectionStatus status) {
-								LOGGER.debug("Connection state changed to " + status);
-								SwingUtilities.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										dispose();
-										controller.startSyncToServer(getThis().wizardContext);
-									}
-								});
+								if (ConnectionStatus.CONNECTED.equals(status)) {
+									SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+								} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+									SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+											dispose();
+											controller.startSyncToServer(getThis().wizardContext);
+										}
+									});
+								}
 							}
 						});
 			}

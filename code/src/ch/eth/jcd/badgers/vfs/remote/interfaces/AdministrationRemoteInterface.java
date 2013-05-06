@@ -71,4 +71,10 @@ public interface AdministrationRemoteInterface extends Remote {
 	 */
 	void closeLinkedDisk(DiskRemoteInterface diskInterface) throws RemoteException, VFSException;
 
+	/**
+	 * 
+	 * @return UUID from the Impl
+	 * @throws RemoteException
+	 */
+	UUID getId() throws RemoteException;
 }
