@@ -31,10 +31,12 @@ public class UploadLocalChangesAction extends DiskAction {
 
 	@Override
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
+		LOGGER.debug("Starting upload action on remote Manager");
 		ClientVersion clientVersion = diskManager.getPendingVersion();
 		clientVersion.beforeRmiTransport(diskManager);
 		PushVersionResult result = manager.pushVersion(clientVersion);
 		diskManager.setSynchronized(result.getNewServerVersion());
+		LOGGER.debug("Finished upload action on remote Manager");
 	}
 
 }
