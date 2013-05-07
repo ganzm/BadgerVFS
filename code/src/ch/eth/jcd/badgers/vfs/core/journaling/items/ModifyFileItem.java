@@ -37,7 +37,7 @@ public class ModifyFileItem extends JournalItem {
 	/**
 	 * Path where our data should be stored but may be touched/deleted/renamed by the user
 	 */
-	private String absoluteFilePath;
+	private final String absoluteFilePath;
 
 	/**
 	 * Path where our data are stored and where the user can not touch/rename/delete them
@@ -137,6 +137,12 @@ public class ModifyFileItem extends JournalItem {
 			}
 			inputStream = null;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "ModifyFileItem [absoluteFilePath=" + absoluteFilePath + ", journalPathString=" + journalPathString + ", suppressOnJournalAddJournalCopy="
+				+ suppressOnJournalAddJournalCopy + "]";
 	}
 
 }

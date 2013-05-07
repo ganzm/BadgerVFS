@@ -28,4 +28,9 @@ public class MoveToItem extends JournalItem {
 		path.getVFSEntry().moveTo(newPath);
 	}
 
+	@Override
+	public String toString() {
+		return "MoveToItem [oldPathString=" + oldPathString + ", newPathString=" + newPathString + "]";
+	}
+
 }

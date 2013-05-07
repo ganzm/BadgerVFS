@@ -25,4 +25,9 @@ public class DeleteEntryItem extends JournalItem {
 		VFSPath path = diskManager.createPath(absolutePath);
 		path.getVFSEntry().delete();
 	}
+
+	@Override
+	public String toString() {
+		return "DeleteEntryItem [absolutePath=" + absolutePath + "]";
+	}
 }

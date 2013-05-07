@@ -30,4 +30,10 @@ public class CreateDirectoryItem extends JournalItem {
 		VFSPath path = diskManager.createPath(absolutePath);
 		path.createDirectory();
 	}
+
+	@Override
+	public String toString() {
+		return "CreateDirectoryItem [absolutePath=" + absolutePath + "]";
+	}
+
 }

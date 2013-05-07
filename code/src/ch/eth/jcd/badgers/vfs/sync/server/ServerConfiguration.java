@@ -31,6 +31,8 @@ public class ServerConfiguration {
 		}
 		bfsFileFolder = new File(bfsPath);
 		bfsServerConfigFile = new File(bfsPath + File.separatorChar + "ServerConfiguration.prs");
+		LOGGER.debug("bfsFileFolder: " + bfsFileFolder.getAbsolutePath());
+		LOGGER.debug("bfsServerConfigFile: " + bfsServerConfigFile.getAbsolutePath());
 		if (!bfsServerConfigFile.exists()) {
 			try {
 				bfsServerConfigFile.getParentFile().mkdirs();

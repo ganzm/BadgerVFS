@@ -20,6 +20,9 @@ public abstract class JournalItem implements Serializable {
 		}
 	}
 
+	@Override
+	public abstract String toString();
+
 	public abstract void doReplay(VFSDiskManager diskManager) throws VFSException;
 
 	public void onJournalAdd(VFSJournaling journaling) throws VFSException {

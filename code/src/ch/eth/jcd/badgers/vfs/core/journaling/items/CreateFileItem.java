@@ -30,4 +30,9 @@ public class CreateFileItem extends JournalItem {
 		VFSPath path = diskManager.createPath(absolutePath);
 		path.createFile();
 	}
+
+	@Override
+	public String toString() {
+		return "CreateFileItem [absolutePath=" + absolutePath + "]";
+	}
 }

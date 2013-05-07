@@ -26,4 +26,9 @@ public class RenameEntryItem extends JournalItem {
 		VFSPath path = diskManager.createPath(oldPath);
 		path.getVFSEntry().renameTo(newName);
 	}
+
+	@Override
+	public String toString() {
+		return "RenameEntryItem [oldPath=" + oldPath + ", newName=" + newName + "]";
+	}
 }
