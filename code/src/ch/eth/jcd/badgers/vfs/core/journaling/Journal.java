@@ -4,11 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class Journal implements Serializable {
+	private static final Logger LOGGER = Logger.getLogger(Journal.class);
 
 	private static final long serialVersionUID = -4125853629235672102L;
 
@@ -24,6 +27,11 @@ public class Journal implements Serializable {
 	}
 
 	public void replay(VFSDiskManager diskManager) throws VFSException {
+		if (LOGGER.isTraceEnabled()) {
+			for (JournalItem item : journalEntries) {
+				LOGGER.trace("About to Replay: " + item);
+			}
+		}
 		for (JournalItem entry : journalEntries) {
 			entry.replay(diskManager);
 		}
