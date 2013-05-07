@@ -115,7 +115,6 @@ public class RemoteDiskDialog extends JDialog {
 								wizardContext.setSelectedDiskToLink(linkedDiskTableModel.getEntries().get(selectedRow));
 								dispose();
 								controller.openGetRemoteLinkedDiskDialog(wizardContext);
-
 							}
 						}
 					});

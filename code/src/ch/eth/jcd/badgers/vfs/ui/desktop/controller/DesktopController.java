@@ -30,6 +30,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CopyAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CreateFolderAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.CutAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DeleteEntryAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DownloadRemoteChangesAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
@@ -156,8 +157,8 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		dialog.setVisible(true);
 	}
 
-	public void openLinkedDisk(RemoteSynchronisationWizardContext wizardContext) throws VFSException {
-		openDisk(wizardContext.getDiskManager());
+	public void openLinkedDisk(VFSDiskManager diskManager) throws VFSException {
+		openDisk(diskManager);
 		final ActionObserver handler = new DefaultObserver(this) {
 
 			@Override
@@ -192,6 +193,22 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		};
 		UploadLocalChangesAction action = new UploadLocalChangesAction(handler, remoteManager);
 		workerController.enqueue(action);
+	}
+
+	public void startDownloadRemoteChanges() throws VFSException {
+		final ActionObserver handler = new DefaultObserver(this) {
+
+			@Override
+			public void onActionFinished(final AbstractBadgerAction action) {
+				updateGUI();
+			}
+		};
+		DownloadRemoteChangesAction action = new DownloadRemoteChangesAction(handler, remoteManager);
+		try {
+			workerController.enqueueBlocking(action, true);
+		} catch (InterruptedException e) {
+			throw new VFSException(e);
+		}
 	}
 
 	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {
@@ -622,6 +639,10 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			return remoteManager.getConnectionStatus() == ConnectionStatus.DISK_MODE;
 		}
 		return false;
+	}
+
+	public RemoteManager getRemoteManager() {
+		return remoteManager;
 	}
 
 	@Override

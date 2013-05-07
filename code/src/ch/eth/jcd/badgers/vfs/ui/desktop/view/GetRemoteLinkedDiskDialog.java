@@ -21,11 +21,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
+import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
 import ch.eth.jcd.badgers.vfs.core.model.Compression;
 import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
+import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.BadgerViewBase;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DesktopController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContext;
@@ -33,14 +36,20 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase {
 
+	private static final Logger LOGGER = Logger.getLogger(NewDiskCreationDialog.class);
 	private static final String DEFAULT_FILE_NAME = "disk.bfs";
 
 	private static final long serialVersionUID = -2652867330270571476L;
 
 	private final JPanel contentPanel = new JPanel();
-	private final JTextField txtPath;
 
 	private final DesktopController controller;
+
+	private final JTextField txtPath;
+	private final JTextField txtMaximumSize;
+
+	private final JComboBox<Encryption> cboEncryption;
+	private final JComboBox<Compression> cboCompression;
 
 	/**
 	 * Create the dialog.
@@ -94,7 +103,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 		gbc_lblMaximumSize.gridy = 1;
 		contentPanel.add(lblMaximumSize, gbc_lblMaximumSize);
 
-		final JTextField txtMaximumSize = new JTextField();
+		txtMaximumSize = new JTextField();
 		txtMaximumSize.setText("1000");
 		final GridBagConstraints gbc_txtMaximumSize = new GridBagConstraints();
 		gbc_txtMaximumSize.insets = new Insets(0, 0, 5, 5);
@@ -112,7 +121,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 		gbc_lblEncryption.gridy = 2;
 		contentPanel.add(lblEncryption, gbc_lblEncryption);
 
-		final JComboBox<Encryption> cboEncryption = new JComboBox<Encryption>();
+		cboEncryption = new JComboBox<Encryption>();
 		cboEncryption.setModel(new DefaultComboBoxModel<Encryption>(Encryption.values()));
 		final GridBagConstraints gbc_cboEncryption = new GridBagConstraints();
 		gbc_cboEncryption.insets = new Insets(0, 0, 5, 5);
@@ -129,7 +138,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 		gbc_lblCompression.gridy = 3;
 		contentPanel.add(lblCompression, gbc_lblCompression);
 
-		final JComboBox<Compression> cboCompression = new JComboBox<Compression>();
+		cboCompression = new JComboBox<Compression>();
 		cboCompression.setModel(new DefaultComboBoxModel<Compression>(Compression.values()));
 		final GridBagConstraints gbc_cboCompression = new GridBagConstraints();
 		gbc_cboCompression.insets = new Insets(0, 0, 0, 5);
@@ -169,34 +178,43 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
 
-				wizardContext.getRemoteManager().startGetRemoteLinkedDisk(txtPath.getText(), wizardContext.getSelectedDiskToLink().getId(),
-						new ActionObserver() {
+				dispose();
+				try {
+					wizardContext.getRemoteManager().logout();
+					// TODO Warten auf fertiges Logout. Blocking.
+					wizardContext.getRemoteManager().dispose();
+					createDisk(wizardContext);
+					controller.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
 
-							@Override
-							public void onActionFinished(final AbstractBadgerAction action) {
+						private ConnectionStateListener getConnectionStateListener() {
+							return this;
+						}
+
+						@Override
+						public void connectionStateChanged(final ConnectionStatus status) {
+
+							if (ConnectionStatus.CONNECTED.equals(status)) {
+								SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+								wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+							} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
 								SwingUtilities.invokeLater(new Runnable() {
 									@Override
 									public void run() {
+										controller.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 										dispose();
 										try {
-											wizardContext.getRemoteManager().logout();
-											// TODO Warten auf fertiges Logout. Blocking.
-											wizardContext.getRemoteManager().dispose();
-											wizardContext.setRemoteHostName(txtPath.getText());
-											controller.openLinkedDisk(wizardContext);
-										} catch (final VFSException e) {
+											controller.openLinkedDisk(controller.getWorkerController().getDiskManager());
+										} catch (VFSException e) {
 											SwingUtil.handleException(getThis(), e);
 										}
 									}
 								});
 							}
-
-							@Override
-							public void onActionFailed(final AbstractBadgerAction action, final Exception e) {
-								SwingUtil.handleException(getThis(), e);
-							}
-						});
-
+						}
+					});
+				} catch (final VFSException e) {
+					SwingUtil.handleException(getThis(), e);
+				}
 			}
 		};
 	}
@@ -240,6 +258,26 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 
 	@Override
 	public void update() {
+	}
+
+	private void createDisk(RemoteSynchronisationWizardContext wizardContext) throws VFSException {
+		LOGGER.info("Create Disk");
+
+		final DiskConfiguration config = new DiskConfiguration();
+		config.setMaximumSize(1024 * 1024 * Long.parseLong(txtMaximumSize.getText()));
+
+		final Compression compression = (Compression) cboCompression.getSelectedItem();
+		final Encryption encryption = (Encryption) cboEncryption.getSelectedItem();
+
+		config.setCompressionAlgorithm(compression);
+		config.setEncryptionAlgorithm(encryption);
+
+		config.setHostFilePath(txtPath.getText());
+
+		config.setDiskId(wizardContext.getSelectedDiskToLink().getId());
+		config.setLinkedHostName(wizardContext.getRemoteHostName());
+
+		controller.createDisk(config);
 	}
 
 }

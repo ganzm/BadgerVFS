@@ -1,5 +1,6 @@
 package ch.eth.jcd.badgers.vfs.sync.client;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CloseLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CreateNewDiskAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.DownloadRemoteChangesRemoteAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.GetRemoteLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LinkNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
@@ -291,6 +293,24 @@ public class RemoteManager implements ActionObserver {
 			remoteWorkerController.enqueueBlocking(ra, true);
 			return ra.getResult();
 		} catch (InterruptedException e) {
+			throw new VFSException(e);
+		}
+	}
+
+	public List<Journal> getVersionDelta(long lastSeenServerVersion) throws VFSException {
+		DownloadRemoteChangesRemoteAction ra = new DownloadRemoteChangesRemoteAction(this, DUMMY_HANDLER, lastSeenServerVersion);
+		try {
+			remoteWorkerController.enqueueBlocking(ra, true);
+			return ra.getResult();
+		} catch (InterruptedException e) {
+			throw new VFSException(e);
+		}
+	}
+
+	public void downloadFinished() throws VFSException {
+		try {
+			currentLinkedDiskRemoteInterface.downloadFinished();
+		} catch (RemoteException e) {
 			throw new VFSException(e);
 		}
 	}
