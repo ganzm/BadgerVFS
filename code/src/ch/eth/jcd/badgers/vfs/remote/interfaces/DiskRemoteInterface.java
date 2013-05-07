@@ -28,7 +28,7 @@ public interface DiskRemoteInterface extends Remote {
 	 * 
 	 * @return
 	 */
-	DiskRemoteResult longTermPollVersion(long clientVersion) throws RemoteException;
+	DiskRemoteResult longTermPollVersion(long clientVersion, long timeout) throws RemoteException;
 
 	/**
 	 * Asks the server for new data

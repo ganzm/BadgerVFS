@@ -3,8 +3,6 @@ package ch.eth.jcd.badgers.vfs.remote.ifimpl;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 
@@ -14,6 +12,7 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetServerVersionAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetVersionDeltaAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 
@@ -21,8 +20,9 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
 	private static final Logger LOGGER = Logger.getLogger(DiskRemoteInterfaceImpl.class);
 
-	private final BlockingQueue<DiskRemoteResult> clientRequests = new LinkedBlockingQueue<DiskRemoteResult>();
-
+	/**
+	 * This Instance of DiskWokerController is shared between multiple connections
+	 */
 	private final DiskWorkerController diskWorkerController;
 
 	/**
@@ -44,17 +44,33 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	}
 
 	@Override
-	public DiskRemoteResult longTermPollVersion(final long clientVersion) throws RemoteException {
-		try {
-			return clientRequests.take();
-		} catch (final InterruptedException e) {
-			LOGGER.info("Interrupted on take", e);
+	public DiskRemoteResult longTermPollVersion(final long clientVersion, long timeout) throws RemoteException {
+		LOGGER.info("Start Long term Poll for " + id);
+		synchronized (diskWorkerController) {
+			try {
+				diskWorkerController.wait(timeout);
+			} catch (InterruptedException e) {
+				LOGGER.error("LongTermPoll Interrupted", e);
+			}
 		}
-		return null;
+
+		try {
+
+			GetServerVersionAction action = new GetServerVersionAction();
+			diskWorkerController.enqueueBlocking(action, true);
+			DiskRemoteResult result = new DiskRemoteResult(action.getServerVersion());
+			return result;
+		} catch (VFSException | InterruptedException e) {
+			throw new RemoteException("", e);
+		} finally {
+			LOGGER.info("Long term Poll returned for " + id);
+		}
 	}
 
-	public void sendToClient(final DiskRemoteResult drr) {
-		clientRequests.offer(drr);
+	private void wakeupLongTermPolls() {
+		synchronized (diskWorkerController) {
+			diskWorkerController.notifyAll();
+		}
 	}
 
 	@Override
@@ -86,7 +102,11 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 		try {
 			final SyncServerPushVersionAction pushVersionAction = new SyncServerPushVersionAction(clientVersion);
 			diskWorkerController.enqueueBlocking(pushVersionAction, true);
-			return pushVersionAction.getResult();
+			PushVersionResult result = pushVersionAction.getResult();
+
+			wakeupLongTermPolls();
+
+			return result;
 		} catch (final InterruptedException | VFSException e) {
 			throw new RemoteException("Error pushVersion: ", e);
 		}
