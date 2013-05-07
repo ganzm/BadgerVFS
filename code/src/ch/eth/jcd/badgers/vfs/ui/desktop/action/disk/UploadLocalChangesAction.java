@@ -21,12 +21,12 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
  */
 public class UploadLocalChangesAction extends DiskAction {
 
-	private final RemoteManager manager;
+	private final RemoteManager remoteManager;
 	private static final Logger LOGGER = Logger.getLogger(UploadLocalChangesAction.class);
 
 	public UploadLocalChangesAction(ActionObserver actionObserver, final RemoteManager manager) {
 		super(actionObserver);
-		this.manager = manager;
+		this.remoteManager = manager;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class UploadLocalChangesAction extends DiskAction {
 		LOGGER.debug("Starting upload action on remote Manager");
 		ClientVersion clientVersion = diskManager.getPendingVersion();
 		clientVersion.beforeRmiTransport(diskManager);
-		PushVersionResult result = manager.pushVersion(clientVersion);
+		PushVersionResult result = remoteManager.pushVersion(clientVersion);
 		diskManager.setSynchronized(result.getNewServerVersion());
 		LOGGER.debug("Finished upload action on remote Manager");
 	}
