@@ -82,6 +82,7 @@ public abstract class WorkerController implements Runnable {
 	}
 
 	protected void workerControllerDisposed() {
+		LOGGER.info("do nothing in workerControllerDisposed");
 	}
 
 	protected abstract void performAction(final AbstractBadgerAction action);
