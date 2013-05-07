@@ -9,9 +9,6 @@ import ch.eth.jcd.badgers.vfs.exception.VFSException;
 
 public class VFSDisabledJournaling implements VFSJournaling {
 
-	public VFSDisabledJournaling() {
-	}
-
 	@Override
 	public void addJournalItem(JournalItem journalEntry) {
 	}

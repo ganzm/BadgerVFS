@@ -16,7 +16,7 @@ public class ClientVersion implements Serializable {
 	 * up to this version there are no differences from the local to the server side version
 	 * 
 	 */
-	private long serverVersion;
+	private final long serverVersion;
 
 	private List<Journal> journals;
 
