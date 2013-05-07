@@ -19,10 +19,16 @@ public class Journal implements Serializable {
 
 	public Journal(List<JournalItem> uncommitedJournalEntries) {
 		// copy entries
+		if (LOGGER.isTraceEnabled()) {
+			for (JournalItem journalItem : uncommitedJournalEntries) {
+				LOGGER.trace("Adding " + journalItem + " to journal");
+			}
+		}
 		journalEntries.addAll(uncommitedJournalEntries);
 	}
 
 	public void addJournalEntry(JournalItem entry) {
+		LOGGER.trace("Adding " + entry + " to journal");
 		journalEntries.add(entry);
 	}
 
