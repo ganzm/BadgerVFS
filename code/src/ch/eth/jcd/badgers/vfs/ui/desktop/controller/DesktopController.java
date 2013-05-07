@@ -191,11 +191,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			}
 		};
 		UploadLocalChangesAction action = new UploadLocalChangesAction(handler, remoteManager);
-		try {
-			workerController.enqueueBlocking(action, true);
-		} catch (InterruptedException e) {
-			throw new VFSException(e);
-		}
+		workerController.enqueue(action);
 	}
 
 	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {
