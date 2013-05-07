@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="PMD.new" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0" name="PMD.new" xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 <description>PMD Plugin preferences rule set</description>
 <rule ref="rulesets/java/controversial.xml/UnnecessaryConstructor">
 <priority>5</priority>
@@ -118,7 +118,7 @@
 <rule ref="rulesets/java/design.xml/AvoidDeeplyNestedIfStmts">
 <priority>5</priority>
 <properties>
-<property name="problemDepth" value="4"/>
+<property name="problemDepth" value="4"></property>
 </properties>
 </rule>
 <rule ref="rulesets/java/design.xml/AvoidReassigningParameters">
@@ -127,7 +127,7 @@
 <rule ref="rulesets/java/design.xml/SwitchDensity">
 <priority>5</priority>
 </rule>
-<rule ref="rulesets/java/design.xml/ConstructorCallsOverridableMethod"/>
+<rule ref="rulesets/java/design.xml/ConstructorCallsOverridableMethod"></rule>
 <rule ref="rulesets/java/design.xml/FinalFieldCouldBeStatic">
 <priority>5</priority>
 </rule>
@@ -203,7 +203,7 @@
 <rule ref="rulesets/java/design.xml/SingularField">
 <priority>5</priority>
 </rule>
-<rule ref="rulesets/java/design.xml/ReturnEmptyArrayRatherThanNull"/>
+<rule ref="rulesets/java/design.xml/ReturnEmptyArrayRatherThanNull"></rule>
 <rule ref="rulesets/java/design.xml/AbstractClassWithoutAnyMethod">
 <priority>5</priority>
 </rule>
@@ -291,8 +291,8 @@
 <rule ref="rulesets/java/strictexception.xml/AvoidCatchingNPE">
 <priority>1</priority>
 </rule>
-<rule ref="rulesets/java/strictexception.xml/AvoidThrowingRawExceptionTypes"/>
-<rule ref="rulesets/java/strictexception.xml/AvoidThrowingNullPointerException"/>
+<rule ref="rulesets/java/strictexception.xml/AvoidThrowingRawExceptionTypes"></rule>
+<rule ref="rulesets/java/strictexception.xml/AvoidThrowingNullPointerException"></rule>
 <rule ref="rulesets/java/strictexception.xml/AvoidRethrowingException">
 <priority>5</priority>
 </rule>
@@ -314,7 +314,7 @@
 <rule ref="rulesets/java/codesize.xml/ExcessiveMethodLength">
 <priority>1</priority>
 <properties>
-<property name="minimum" value="100.0"/>
+<property name="minimum" value="100.0"></property>
 </properties>
 </rule>
 <rule ref="rulesets/java/codesize.xml/ExcessiveParameterList">
@@ -323,7 +323,7 @@
 <rule ref="rulesets/java/codesize.xml/CyclomaticComplexity">
 <priority>1</priority>
 <properties>
-<property name="reportLevel" value="25"/>
+<property name="reportLevel" value="25"></property>
 </properties>
 </rule>
 <rule ref="rulesets/java/naming.xml/VariableNamingConventions">
@@ -365,7 +365,7 @@
 <rule ref="rulesets/java/basic.xml/OverrideBothEqualsAndHashcode">
 <priority>1</priority>
 </rule>
-<rule ref="rulesets/java/basic.xml/DoubleCheckedLocking"/>
+<rule ref="rulesets/java/basic.xml/DoubleCheckedLocking"></rule>
 <rule ref="rulesets/java/basic.xml/ReturnFromFinallyBlock">
 <priority>1</priority>
 </rule>
@@ -450,7 +450,7 @@
 <rule ref="rulesets/java/coupling.xml/CouplingBetweenObjects">
 <priority>1</priority>
 <properties>
-<property name="threshold" value="50"/>
+<property name="threshold" value="50"></property>
 </properties>
 </rule>
 <rule ref="rulesets/java/coupling.xml/ExcessiveImports">
