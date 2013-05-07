@@ -7,12 +7,14 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.config.DiskConfiguration;
+import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
+import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CloseLinkedDiskAction;
@@ -23,6 +25,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LinkNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LogoutAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.RegisterUserAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.UploadLocalChangesRemoteAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.UseLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
@@ -33,6 +36,20 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class RemoteManager implements ActionObserver {
 
 	private static final Logger LOGGER = Logger.getLogger(RemoteManager.class);
+	private static final ActionObserver DUMMY_HANDLER = new ActionObserver() {
+
+		@Override
+		public void onActionFinished(AbstractBadgerAction action) {
+			// do nothing
+
+		}
+
+		@Override
+		public void onActionFailed(AbstractBadgerAction action, Exception e) {
+			// do nothing
+
+		}
+	};
 
 	private final RemoteWorkerController remoteWorkerController;
 	private final String hostLink;
@@ -265,6 +282,17 @@ public class RemoteManager implements ActionObserver {
 
 	public void removeConnectionStateListener(final ConnectionStateListener connectionStateListener) {
 		connectionStateListeners.remove(connectionStateListener);
+	}
+
+	public PushVersionResult pushVersion(final ClientVersion clientVersion) throws VFSException {
+
+		UploadLocalChangesRemoteAction ra = new UploadLocalChangesRemoteAction(this, DUMMY_HANDLER, clientVersion);
+		try {
+			remoteWorkerController.enqueueBlocking(ra, true);
+			return ra.getResult();
+		} catch (InterruptedException e) {
+			throw new VFSException(e);
+		}
 	}
 
 }

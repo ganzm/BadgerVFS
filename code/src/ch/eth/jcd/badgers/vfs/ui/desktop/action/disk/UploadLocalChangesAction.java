@@ -1,7 +1,5 @@
 package ch.eth.jcd.badgers.vfs.ui.desktop.action.disk;
 
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
@@ -35,13 +33,8 @@ public class UploadLocalChangesAction extends DiskAction {
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 		ClientVersion clientVersion = diskManager.getPendingVersion();
 		clientVersion.beforeRmiTransport(diskManager);
-		try {
-			PushVersionResult result = manager.getCurrentLinkedDiskRemoteInterface().pushVersion(clientVersion);
-			diskManager.setSynchronized(result.getNewServerVersion());
-		} catch (final RemoteException e) {
-			LOGGER.error(e);
-			throw new VFSException(e);
-		}
+		PushVersionResult result = manager.pushVersion(clientVersion);
+		diskManager.setSynchronized(result.getNewServerVersion());
 	}
 
 }
