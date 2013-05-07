@@ -29,8 +29,8 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	private static final Logger LOGGER = Logger.getLogger(VFSFileImpl.class);
 
-	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
-		super(diskManager, path, firstDataBlock);
+	protected VFSFileImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, long firstDataBlockLocation) {
+		super(diskManager, path, firstDataBlockLocation);
 	}
 
 	@Override
@@ -57,16 +57,16 @@ public class VFSFileImpl extends VFSEntryImpl {
 
 	@Override
 	public InputStream getInputStream() throws VFSException {
-		VFSFileInputStream inputStream = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
+		VFSFileInputStream inputStream = new VFSFileInputStream(diskManager.getDataSectionHandler(), getFirstDataBlock());
 		return diskManager.wrapInputStream(inputStream);
 	}
 
 	@Override
 	public OutputStream getOutputStream(int writeMode) throws VFSException {
 
-		// if (writeMode == WRITE_MODE_OVERRIDE) {
 		try {
-			if (this.firstDataBlock.getLinkCount() <= 1) {
+			DataBlock firstDataBlock = getFirstDataBlock();
+			if (firstDataBlock.getLinkCount() <= 1) {
 				// there is only one DirectoryEntryBlock pointing to this file content
 				truncateDataBlocks();
 			} else {
@@ -84,22 +84,30 @@ public class VFSFileImpl extends VFSEntryImpl {
 				VFSDirectoryImpl parentDir = getParentProtected();
 				DirectoryChildTree childTree = parentDir.getChildTree();
 				DirectoryEntryBlock removedEntry = childTree.remove(directorySectionHandler, fileName);
-				removedEntry.assignDataBlock(newBlock);
+				removedEntry.assignDataBlockLocation(newBlock.getLocation());
 				childTree.insert(directorySectionHandler, removedEntry);
 
 				// decrease DataBlock LinkCount
 				firstDataBlock.decLinkCount();
 				diskManager.getDataSectionHandler().persistDataBlock(firstDataBlock);
+				diskManager.getDataSectionHandler().persistDataBlock(newBlock);
 
+				firstDataBlockLocation = newBlock.getLocation();
 				firstDataBlock = newBlock;
+
 			}
+
+			diskManager.addJournalItem(new ModifyFileItem(this));
+
+			// reload DataBlock since addJournal copies this file to the journal section (yes, this is nasty)
+			firstDataBlock = diskManager.getDataSectionHandler().loadDataBlock(firstDataBlock.getLocation());
+
+			VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
+			return diskManager.wrapOutputStream(outputStream);
+
 		} catch (IOException e) {
 			throw new VFSException("Error while truncating file", e);
 		}
-
-		VFSFileOutputStream outputStream = new VFSFileOutputStream(diskManager.getDataSectionHandler(), firstDataBlock);
-		diskManager.addJournalItem(new ModifyFileItem(this));
-		return diskManager.wrapOutputStream(outputStream);
 	}
 
 	@Override
@@ -108,27 +116,28 @@ public class VFSFileImpl extends VFSEntryImpl {
 			throw new VFSException("Copy failed - file already exist " + newLocation.getAbsolutePath());
 		}
 
+		DataBlock firstDataBlock = getFirstDataBlock();
+
 		LOGGER.info("Copy file " + path.getAbsolutePath() + " to " + newLocation.getAbsolutePath());
 		if (firstDataBlock.getLinkCount() < DataBlock.MAX_LINK_COUNT) {
-			shallowCopy(newLocation);
+			shallowCopy(firstDataBlock, newLocation);
 		} else {
-			deepCopy(newLocation);
+			deepCopy(firstDataBlock, newLocation);
 		}
 	}
 
-	private void deepCopy(VFSPath newLocation) throws VFSException {
+	private void deepCopy(DataBlock firstDataBlock, VFSPath newLocation) throws VFSException {
 		OutputStream out = null;
 		InputStream in = null;
 
 		try {
-
 			// copy as usual
 			VFSFileImpl newFile = (VFSFileImpl) newLocation.createFile();
 
 			// since we do an file system internal copy we bypass the getOutputStream/getInputStream method to avoid compression/decompression
 			// encryption/decryption
 			// get outputstream of new file
-			out = new VFSFileOutputStream(diskManager.getDataSectionHandler(), newFile.firstDataBlock);
+			out = new VFSFileOutputStream(diskManager.getDataSectionHandler(), newFile.getFirstDataBlock());
 			// get input stream of this file
 			in = new VFSFileInputStream(diskManager.getDataSectionHandler(), firstDataBlock);
 
@@ -160,12 +169,12 @@ public class VFSFileImpl extends VFSEntryImpl {
 		}
 	}
 
-	private void shallowCopy(VFSPath newLocation) throws VFSException {
+	private void shallowCopy(DataBlock firstDataBlock, VFSPath newLocation) throws VFSException {
 		try {
 			LOGGER.debug("Do shallow copy operation from " + getPath().getAbsolutePath() + " to " + newLocation.getAbsolutePath());
 			firstDataBlock.incLinkCount();
 			diskManager.getDataSectionHandler().persistDataBlock(firstDataBlock);
-			VFSFileImpl newFile = VFSEntryImpl.createNewFile(diskManager, (VFSPathImpl) newLocation, firstDataBlock);
+			VFSFileImpl newFile = VFSEntryImpl.createNewFile(diskManager, (VFSPathImpl) newLocation, firstDataBlock.getLocation());
 
 			diskManager.addJournalItem(new ModifyFileItem(newFile));
 		} catch (IOException e) {

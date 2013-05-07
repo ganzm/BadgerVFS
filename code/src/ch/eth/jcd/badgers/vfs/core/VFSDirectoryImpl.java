@@ -33,8 +33,8 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 
 	private DirectoryChildTree childTree;
 
-	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock, DirectoryBlock directoryBlock) {
-		super(diskManager, path, firstDataBlock);
+	protected VFSDirectoryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, long firstDataBlockLocation, DirectoryBlock directoryBlock) {
+		super(diskManager, path, firstDataBlockLocation);
 		childTree = new DirectoryChildTree(directoryBlock);
 	}
 
@@ -122,15 +122,15 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 	private VFSEntryImpl createFromDirectoryEntryBlock(DirectoryEntryBlock block) throws IOException, VFSException {
 		VFSPathImpl path = (VFSPathImpl) getChildPath(block.getFileName());
 
-		DataBlock firstDataBlock = diskManager.getDataSectionHandler().loadDataBlock(block.getDataBlockLocation());
+		long firstDataBlockLocation = block.getDataBlockLocation();
 
 		VFSEntryImpl entry;
 		if (block.isFolderEntryBlock()) {
 			DirectoryBlock directoryBlock = diskManager.getDirectorySectionHandler().loadDirectoryBlock(block.getDirectoryEntryNodeLocation());
-			entry = new VFSDirectoryImpl(diskManager, path, firstDataBlock, directoryBlock);
+			entry = new VFSDirectoryImpl(diskManager, path, firstDataBlockLocation, directoryBlock);
 
 		} else {
-			entry = new VFSFileImpl(diskManager, path, firstDataBlock);
+			entry = new VFSFileImpl(diskManager, path, firstDataBlockLocation);
 		}
 
 		return entry;
@@ -172,11 +172,12 @@ public class VFSDirectoryImpl extends VFSEntryImpl {
 		// remove this from parent directory tree structure
 		childTree.remove(diskManager.getDirectorySectionHandler(), fileName);
 
-		if (entry.firstDataBlock.getLinkCount() <= 1) {
+		DataBlock childsFirstDataBlock = diskManager.getDataSectionHandler().loadDataBlock(entry.firstDataBlockLocation);
+		if (childsFirstDataBlock.getLinkCount() <= 1) {
 			entry.deleteDataBlocks();
 		} else {
-			entry.firstDataBlock.decLinkCount();
-			diskManager.getDataSectionHandler().persistDataBlock(entry.firstDataBlock);
+			childsFirstDataBlock.decLinkCount();
+			diskManager.getDataSectionHandler().persistDataBlock(childsFirstDataBlock);
 		}
 
 		LOGGER.info("Deleting DONE " + filePath);

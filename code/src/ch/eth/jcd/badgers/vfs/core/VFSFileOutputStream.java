@@ -14,14 +14,14 @@ public class VFSFileOutputStream extends OutputStream {
 	private static final Logger LOGGER = Logger.getLogger(VFSFileOutputStream.class);
 
 	private final DataSectionHandler dataSectionHandler;
-	private final DataBlock firstDataBlock;
+	private final long firstDataBlockLocation;
 	private DataBlock currentDataBlock;
 
 	private long currentPosition;
 
 	public VFSFileOutputStream(DataSectionHandler dataSectionHandler, DataBlock firstDataBlock) {
 		this.dataSectionHandler = dataSectionHandler;
-		this.firstDataBlock = firstDataBlock;
+		this.firstDataBlockLocation = firstDataBlock.getLocation();
 		this.currentDataBlock = firstDataBlock;
 		this.currentPosition = firstDataBlock.getUserDataLocation();
 
@@ -42,7 +42,7 @@ public class VFSFileOutputStream extends OutputStream {
 				currentDataBlock = newBlock;
 				currentPosition = currentDataBlock.getUserDataLocation();
 
-				LOGGER.debug("OutputStream[" + firstDataBlock.getLocation() + "] - allocated new Block at " + currentDataBlock.getLocation());
+				LOGGER.debug("OutputStream[" + firstDataBlockLocation + "] - allocated new Block at " + currentDataBlock.getLocation());
 			}
 
 			dataSectionHandler.writeByte(currentPosition++, b);
@@ -88,7 +88,7 @@ public class VFSFileOutputStream extends OutputStream {
 					currentDataBlock = newBlock;
 					currentPosition = currentDataBlock.getUserDataLocation();
 
-					LOGGER.debug("OutputStream[" + firstDataBlock.getLocation() + "] - allocated new Block at " + currentDataBlock.getLocation());
+					LOGGER.debug("OutputStream[" + firstDataBlockLocation + "] - allocated new Block at " + currentDataBlock.getLocation());
 				}
 
 				i += toWriteOnThisBlock;

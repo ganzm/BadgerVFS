@@ -51,4 +51,6 @@ public interface VFSJournaling {
 	 * @throws VFSException
 	 */
 	List<Journal> getJournalsSince(long lastSeenServerVersion) throws VFSException;
+
+	void deleteJournals() throws VFSException;
 }

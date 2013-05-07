@@ -3,7 +3,6 @@ package ch.eth.jcd.badgers.vfs.core.directory;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
@@ -78,8 +77,8 @@ public class DirectoryEntryBlock implements Comparable<DirectoryEntryBlock> {
 		return directoryEntryNodeLocation;
 	}
 
-	public void assignDataBlock(DataBlock dataBlock) {
-		this.dataBlockLocation = dataBlock.getLocation();
+	public void assignDataBlockLocation(long dataBlockLocation) {
+		this.dataBlockLocation = dataBlockLocation;
 	}
 
 	public void assignDirectoryBlock(DirectoryBlock directoryBlock) {

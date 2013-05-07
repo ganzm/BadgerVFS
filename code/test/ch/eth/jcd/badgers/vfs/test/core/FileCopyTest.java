@@ -53,6 +53,30 @@ public class FileCopyTest extends VFSDiskManagerTestBase {
 	}
 
 	@Test
+	public void testCopyDelete() throws VFSException, IOException {
+
+		byte[] f1Content = generateRandomData();
+		VFSEntry rootEntry = diskManager.getRoot();
+
+		VFSPath multiCopyPath = rootEntry.getChildPath("copydelete");
+		VFSEntry multiCopyDir = multiCopyPath.createDirectory();
+		VFSPath f1path = multiCopyDir.getChildPath("1");
+		VFSPath f2path = multiCopyDir.getChildPath("2");
+
+		VFSEntry f1 = f1path.createFile();
+		try (OutputStream out = f1.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
+			out.write(f1Content);
+		}
+
+		f1.copyTo(f2path);
+
+		VFSEntry f2 = f2path.getVFSEntry();
+
+		f2.delete();
+		Assert.assertArrayEquals(f1Content, CoreTestUtil.fileToBytes(f1));
+	}
+
+	@Test
 	public void testMultiCopy() throws VFSException, IOException {
 		byte[] f1Content = generateRandomData();
 		byte[] f2Content = generateRandomData();

@@ -29,17 +29,17 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 	protected VFSPathImpl path;
 
-	protected DataBlock firstDataBlock;
+	protected long firstDataBlockLocation = -1;
 
 	/**
 	 * creates a new
 	 * 
 	 * @param path
 	 */
-	protected VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, DataBlock firstDataBlock) {
+	protected VFSEntryImpl(VFSDiskManagerImpl diskManager, VFSPathImpl path, long firstDataBlockLocation) {
 		this.diskManager = diskManager;
 		this.path = path;
-		this.firstDataBlock = firstDataBlock;
+		this.firstDataBlockLocation = firstDataBlockLocation;
 	}
 
 	/**
@@ -57,9 +57,9 @@ public abstract class VFSEntryImpl implements VFSEntry {
 			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
 			directoryBlock = diskManager.getDirectorySectionHandler().allocateNewDirectoryBlock();
 
-			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, directoryBlock);
+			insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock.getLocation(), directoryBlock);
 
-			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock, directoryBlock);
+			VFSDirectoryImpl entry = new VFSDirectoryImpl(diskManager, vfsPath, dataBlock.getLocation(), directoryBlock);
 
 			diskManager.addJournalItem(new CreateDirectoryItem(vfsPath));
 
@@ -89,11 +89,11 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * @throws VFSException
 	 * @throws IOException
 	 */
-	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, DataBlock dataBlock) throws VFSException, IOException {
+	protected static VFSFileImpl createNewFile(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, long dataBlockLocation) throws VFSException, IOException {
 
-		insertEntryIntoParentFolder(diskManager, vfsPath, dataBlock, null);
+		insertEntryIntoParentFolder(diskManager, vfsPath, dataBlockLocation, null);
 
-		VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlock);
+		VFSFileImpl entry = new VFSFileImpl(diskManager, vfsPath, dataBlockLocation);
 
 		diskManager.addJournalItem(new CreateFileItem(vfsPath));
 		return entry;
@@ -103,7 +103,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		DataBlock dataBlock = null;
 		try {
 			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
-			return createNewFile(diskManager, vfsPath, dataBlock);
+			return createNewFile(diskManager, vfsPath, dataBlock.getLocation());
 		} catch (IOException ex) {
 
 			if (dataBlock != null) {
@@ -114,7 +114,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		}
 	}
 
-	private static void insertEntryIntoParentFolder(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, DataBlock dataBlock, DirectoryBlock directoryBlock)
+	private static void insertEntryIntoParentFolder(VFSDiskManagerImpl diskManager, VFSPathImpl vfsPath, long dataBlockLocation, DirectoryBlock directoryBlock)
 			throws VFSException, IOException {
 
 		// get parent directory
@@ -123,7 +123,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 
 		DirectoryEntryBlock directoryEntryBlock = new DirectoryEntryBlock(vfsPath.getName());
 
-		directoryEntryBlock.assignDataBlock(dataBlock);
+		directoryEntryBlock.assignDataBlockLocation(dataBlockLocation);
 
 		if (directoryBlock != null) {
 			// allocate DirectoryBlock which will contain subdirectories of that directory were about to create
@@ -133,13 +133,23 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		parentDirectory.getChildTree().insert(diskManager.getDirectorySectionHandler(), directoryEntryBlock);
 	}
 
+	/**
+	 * Reload first DataBlock from file
+	 * 
+	 * @return
+	 * @throws VFSException
+	 */
+	protected DataBlock getFirstDataBlock() throws VFSException {
+		return diskManager.getDataSectionHandler().loadDataBlock(firstDataBlockLocation);
+	}
+
 	public void setDataBlock(DataBlock dataBlock) {
-		if (firstDataBlock != null) {
+		if (firstDataBlockLocation != -1) {
 			// this should not happen
 			throw new VFSRuntimeException("Internal error - Overriding DataBlock of " + this);
 		}
 
-		this.firstDataBlock = dataBlock;
+		this.firstDataBlockLocation = dataBlock.getLocation();
 	}
 
 	@Override
@@ -290,6 +300,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * @throws IOException
 	 */
 	protected void deleteDataBlocks() throws VFSException, IOException {
+		DataBlock firstDataBlock = getFirstDataBlock();
 		long next = firstDataBlock.getNextDataBlock();
 		diskManager.getDataSectionHandler().freeDataBlock(firstDataBlock);
 
@@ -303,6 +314,8 @@ public abstract class VFSEntryImpl implements VFSEntry {
 	 * @throws IOException
 	 */
 	protected void truncateDataBlocks() throws VFSException, IOException {
+		DataBlock firstDataBlock = getFirstDataBlock();
+
 		long next = firstDataBlock.getNextDataBlock();
 
 		firstDataBlock.setDataLength(0);

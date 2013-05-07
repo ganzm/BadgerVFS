@@ -56,4 +56,9 @@ public class VFSDisabledJournaling implements VFSJournaling {
 	public List<Journal> getJournalsSince(long lastSeenServerVersion) {
 		return null;
 	}
+
+	@Override
+	public void deleteJournals() throws VFSException {
+
+	}
 }

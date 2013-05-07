@@ -313,6 +313,5 @@ public class VFSJournalingImpl implements VFSJournaling {
 			LOGGER.debug("Delete old Journal " + journal.getPath().getAbsolutePath());
 			journal.delete();
 		}
-
 	}
 }

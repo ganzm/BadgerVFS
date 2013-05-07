@@ -148,7 +148,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	private void prepareRootFolder(DataBlock rootDirectoryDataBlock, DirectoryBlock rootDirectoryBlock) {
 		try {
 			VFSPathImpl rootPath = new VFSPathImpl(this, VFSPathImpl.FILE_SEPARATOR);
-			VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath, rootDirectoryDataBlock, rootDirectoryBlock);
+			VFSDirectoryImpl rootDirectory = new VFSDirectoryImpl(this, rootPath, rootDirectoryDataBlock.getLocation(), rootDirectoryBlock);
 
 			this.root = rootDirectory;
 		} catch (VFSInvalidPathException e) {
@@ -464,9 +464,8 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 
 	@Override
 	public void setSynchronized(long newServerVersion) throws VFSException {
+		journaling.deleteJournals();
 
-//		journaling.deleteJournals(newServerVersion);
-		// TODO Auto-generated method stub
 		setServerVersion(newServerVersion);
 	}
 }

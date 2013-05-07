@@ -112,11 +112,15 @@ public final class DataSectionHandler {
 	}
 
 	public void freeDataBlock(DataBlock dataBlock) throws IOException {
-		virtualDiskFile.seek(dataBlock.getLocation());
+		freeDataBlock(dataBlock.getLocation());
+	}
+
+	public void freeDataBlock(long dataBlockLocation) throws IOException {
+		virtualDiskFile.seek(dataBlockLocation);
 		// just clear header byte
 		virtualDiskFile.write(0);
 		// update cache
-		cache.markFree(dataBlock.getLocation());
+		cache.markFree(dataBlockLocation);
 	}
 
 	public DataBlock loadDataBlock(long location) throws VFSException {

@@ -24,6 +24,8 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
+import ch.eth.jcd.badgers.vfs.core.model.Compression;
+import ch.eth.jcd.badgers.vfs.core.model.Encryption;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
@@ -232,6 +234,8 @@ public class TwoWaySyncTest {
 
 		config.setLinkedHostName(hostLink);
 		config.setHostFilePath(fileName);
+		config.setCompressionAlgorithm(Compression.NONE);
+		config.setEncryptionAlgorithm(Encryption.NONE);
 		return config;
 	}
 
