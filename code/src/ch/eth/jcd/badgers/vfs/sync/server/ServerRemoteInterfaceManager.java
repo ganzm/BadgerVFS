@@ -1,7 +1,7 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
 import java.rmi.AlreadyBoundException;
-import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -34,6 +34,11 @@ public class ServerRemoteInterfaceManager {
 
 	private LoginRemoteInterfaceImpl loginRemoteInterfaceImpl;
 
+	/**
+	 * Reference to the RMI Registry
+	 */
+	private Registry rmiRegistry;
+
 	public ServerRemoteInterfaceManager(final ServerConfiguration config) {
 		this.config = config;
 		this.activeClientLinks = Collections.synchronizedList(new ArrayList<ActiveClientLink>());
@@ -41,13 +46,15 @@ public class ServerRemoteInterfaceManager {
 
 	public void setup() throws VFSException {
 		try {
+			int port = Registry.REGISTRY_PORT;
+			LOGGER.info("Create RMI Registry on Port " + port);
+			rmiRegistry = LocateRegistry.createRegistry(port);
+
 			loginRemoteInterfaceImpl = new LoginRemoteInterfaceImpl(this);
 			loginRemoteInterface = (LoginRemoteInterface) UnicastRemoteObject.exportObject(loginRemoteInterfaceImpl, 0);
 
 			// Bind the remote object's stub in the registry.
-			LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
-			final Registry registry = LocateRegistry.getRegistry();
-			registry.bind(LoginRemoteInterface.LOGIN_INTERFACE_KEY, loginRemoteInterface);
+			rmiRegistry.bind(LoginRemoteInterface.LOGIN_INTERFACE_KEY, loginRemoteInterface);
 
 			LOGGER.info("Server ready on port " + Registry.REGISTRY_PORT);
 		} catch (final AlreadyBoundException | RemoteException e) {
@@ -61,8 +68,17 @@ public class ServerRemoteInterfaceManager {
 
 	public void dispose() {
 		try {
-			UnicastRemoteObject.unexportObject(loginRemoteInterfaceImpl, true);
-		} catch (NoSuchObjectException e) {
+			rmiRegistry.unbind(LoginRemoteInterface.LOGIN_INTERFACE_KEY);
+
+			if (!UnicastRemoteObject.unexportObject(loginRemoteInterfaceImpl, true)) {
+				LOGGER.error("RMI Unexport failed for " + loginRemoteInterfaceImpl);
+			}
+
+			if (!UnicastRemoteObject.unexportObject(rmiRegistry, true)) {
+				LOGGER.error("RMI Registry unexport failed");
+			}
+
+		} catch (RemoteException | NotBoundException e) {
 			LOGGER.error("Error on server dispose", e);
 		}
 	}
