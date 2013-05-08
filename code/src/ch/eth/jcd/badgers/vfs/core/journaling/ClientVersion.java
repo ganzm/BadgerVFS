@@ -41,4 +41,8 @@ public class ClientVersion implements Serializable {
 			journal.beforeRmiTransport(diskManager);
 		}
 	}
+
+	public boolean isEmpty() {
+		return journals == null || journals.size() == 0;
+	}
 }
