@@ -11,6 +11,10 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.EntryUiModel;
 import ch.eth.jcd.badgers.vfs.ui.desktop.model.ParentFolderEntryUiModel;
 
+/**
+ * This Action loads child entries from a specific folder
+ * 
+ */
 public class GetFolderContentAction extends DiskAction {
 
 	private List<EntryUiModel> uiEntries;

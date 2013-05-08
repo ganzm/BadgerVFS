@@ -43,7 +43,7 @@ public class DiskWorkerController extends WorkerController {
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
 		} catch (final VFSException | RuntimeException e) {
-			LOGGER.error("", e);
+			LOGGER.error("Error while performing " + abstractAction, e);
 			actionFailed(action, e);
 		}
 	}

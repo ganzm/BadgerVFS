@@ -11,7 +11,8 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 /**
  * Updates the local disk to the same version as the SyncServer
  * 
- * TODO describe PullRemoteChanges
+ * This action is performed on the client side
+ * 
  * 
  */
 public class DownloadRemoteChangesAction extends DiskAction {
