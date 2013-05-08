@@ -41,7 +41,11 @@ public class WorkLoadIndicator {
 
 		jobPerforming++;
 		if (action.needsToLockGui()) {
-			timer.schedule(new WorkLoadTimerTask(), 500);
+			try {
+				timer.schedule(new WorkLoadTimerTask(), 500);
+			} catch (IllegalStateException ile) {
+				LOGGER.error("error while scheduling task on workload indicator", ile);
+			}
 		}
 	}
 

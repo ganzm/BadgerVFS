@@ -111,8 +111,12 @@ public class ServerUrlDialog extends JDialog {
 										});
 
 									} else if (ConnectionStatus.DISCONNECTED == status) {
-										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										// TODO implement correct disconnect.
+										SwingUtilities.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+											};
+										}); // TODO implement correct disconnect.
 										SwingUtil.showWarning(getThis(), "Cannot connect to the Server");
 										dispose();
 										LOGGER.debug("Cannot connect to the Server");
