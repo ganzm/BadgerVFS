@@ -16,6 +16,8 @@ public class GetVersionDeltaAction extends DiskAction {
 
 	private static final Logger LOGGER = Logger.getLogger(GetVersionDeltaAction.class);
 
+	private static final long GET_RESULT_TIMEOUT = 10000;
+
 	private final long lastSeenServerVersion;
 
 	private List<Journal> result;
@@ -58,9 +60,16 @@ public class GetVersionDeltaAction extends DiskAction {
 		} finally {
 
 			LOGGER.info("Close Downloads");
-			for (Journal journal : result) {
-				journal.afterRmiTransport(diskManager);
+			try {
+				if (result != null) {
+					for (Journal journal : result) {
+						journal.afterRmiTransport(diskManager);
+					}
+				}
+			} catch (RuntimeException ex) {
+				LOGGER.error("closing journals failed", ex);
 			}
+
 			LOGGER.info("Block DiskManager Finished  " + diskManager);
 
 			// be sure to wake up callers of blockingGetResult, even if there was an error
@@ -86,7 +95,7 @@ public class GetVersionDeltaAction extends DiskAction {
 	public List<Journal> blockingGetResult() throws InterruptedException {
 		synchronized (waitForResultLock) {
 			if (!waitForResultBool) {
-				waitForResultLock.wait();
+				waitForResultLock.wait(GET_RESULT_TIMEOUT);
 			}
 		}
 
