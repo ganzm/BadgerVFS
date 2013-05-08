@@ -249,7 +249,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 				addJournalItem(new CreateFileItem(childEntry));
 
 				ModifyFileItem modifyFile = new ModifyFileItem((VFSFileImpl) childEntry);
-				modifyFile.suppressOnJournalAddJournalCopy();
+				modifyFile.setSuppressOnJournalAddJournalCopy();
 				addJournalItem(modifyFile);
 			}
 		}

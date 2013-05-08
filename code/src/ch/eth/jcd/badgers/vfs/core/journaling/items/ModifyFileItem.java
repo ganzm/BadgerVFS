@@ -68,7 +68,7 @@ public class ModifyFileItem extends JournalItem {
 	/**
 	 * prevent that we copy the file content to the journal
 	 */
-	public void suppressOnJournalAddJournalCopy() {
+	public void setSuppressOnJournalAddJournalCopy() {
 		suppressOnJournalAddJournalCopy = true;
 	}
 
