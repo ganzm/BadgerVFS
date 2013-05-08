@@ -44,17 +44,14 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 public class TwoWaySyncTest {
 	private static final Logger LOGGER = Logger.getLogger(TwoWaySyncTest.class);
 
-	private ServerConfiguration serverConfig;
 	private SynchronisationServer syncServer;
 	private RemoteManager clientRemoteManager1;
 	private RemoteManager clientRemoteManager2;
-	private final String hostLink = "localhost";
+	private static final String HOST_LINK = "localhost";
 	private VFSDiskManager serverDiskManager;
 
-	private VFSDiskManagerImpl clientDiskManager1;
-	private VFSDiskManagerImpl clientDiskManager2;
-	private final String username = new BigInteger(130, new Random()).toString(32);
-	private final String password = "asdf";
+	private static final String USERNAME = new BigInteger(130, new Random()).toString(32);
+	private static final String PASSWORD = "asdf";
 
 	@BeforeClass
 	public static void beforeClass() throws VFSException {
@@ -64,16 +61,16 @@ public class TwoWaySyncTest {
 	@Before
 	public void before() throws VFSException {
 		LOGGER.info("Start Synchronisation Server");
-		serverConfig = setupServerConfiguration();
+		ServerConfiguration serverConfig = setupServerConfiguration();
 		syncServer = new SynchronisationServer(serverConfig);
 		syncServer.start();
 
 		LOGGER.info("Start Client1");
-		clientRemoteManager1 = new RemoteManager(hostLink);
+		clientRemoteManager1 = new RemoteManager(HOST_LINK);
 		clientRemoteManager1.start();
 
 		LOGGER.info("Start Client2");
-		clientRemoteManager2 = new RemoteManager(hostLink);
+		clientRemoteManager2 = new RemoteManager(HOST_LINK);
 		clientRemoteManager2.start();
 	}
 
@@ -94,8 +91,8 @@ public class TwoWaySyncTest {
 		LOGGER.info("Start login");
 		waitForConnectionStatus(ConnectionStatus.CONNECTED);
 
-		boolean result1 = clientRemoteManager1.startLogin(username, password, null);
-		boolean result2 = clientRemoteManager2.startLogin(username, password, null);
+		boolean result1 = clientRemoteManager1.startLogin(USERNAME, PASSWORD, null);
+		boolean result2 = clientRemoteManager2.startLogin(USERNAME, PASSWORD, null);
 		Assert.assertTrue(result1);
 		Assert.assertTrue(result2);
 
@@ -122,11 +119,11 @@ public class TwoWaySyncTest {
 
 		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 
-		DiskConfiguration clientDiskConfig1 = createConfig(hostLink, diskName, diskUuid, ".client1.bfs");
-		clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
+		DiskConfiguration clientDiskConfig1 = createConfig(HOST_LINK, ".client1.bfs");
+		VFSDiskManagerImpl clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
 
-		DiskConfiguration clientDiskConfig2 = createConfig(hostLink, diskName, diskUuid, ".client2.bfs");
-		clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
+		DiskConfiguration clientDiskConfig2 = createConfig(HOST_LINK, ".client2.bfs");
+		VFSDiskManagerImpl clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
 
 		// Both clients now have their local disk created and are in sync
 
@@ -220,7 +217,7 @@ public class TwoWaySyncTest {
 	 * create client side configuration
 	 * 
 	 */
-	private DiskConfiguration createConfig(String hostLink, String diskName, UUID diskUuid, String fileSuffix) {
+	private DiskConfiguration createConfig(String hostLink, String fileSuffix) {
 		DiskConfiguration config = new DiskConfiguration();
 
 		String name = "synctest" + fileSuffix;
@@ -241,9 +238,9 @@ public class TwoWaySyncTest {
 
 	private ServerConfiguration setupServerConfiguration() throws VFSException {
 		ServerConfiguration config = Initialisation.parseServerConfiguration(new String[] { "-cc" });
-		UserAccount userAccount = new UserAccount(username, password);
+		UserAccount userAccount = new UserAccount(USERNAME, PASSWORD);
 
-		if (!config.accountExists(username)) {
+		if (!config.accountExists(USERNAME)) {
 			config.setUserAccount(userAccount);
 		}
 		return config;
