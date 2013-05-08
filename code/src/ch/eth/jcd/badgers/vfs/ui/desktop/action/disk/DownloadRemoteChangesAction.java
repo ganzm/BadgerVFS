@@ -17,11 +17,11 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
  */
 public class DownloadRemoteChangesAction extends DiskAction {
 
-	private final RemoteManager manager;
+	private final RemoteManager remoteManager;
 
 	public DownloadRemoteChangesAction(ActionObserver actionObserver, final RemoteManager manager) {
 		super(actionObserver);
-		this.manager = manager;
+		this.remoteManager = manager;
 	}
 
 	@Override
@@ -30,13 +30,13 @@ public class DownloadRemoteChangesAction extends DiskAction {
 		List<Journal> toUpdate;
 
 		try {
-			toUpdate = manager.getVersionDelta(lastSeenServerVersion);
+			toUpdate = remoteManager.getVersionDelta(lastSeenServerVersion);
 			for (Journal j : toUpdate) {
 				j.replay(diskManager);
 				diskManager.setServerVersion(diskManager.getServerVersion() + 1);
 			}
 		} finally {
-			manager.downloadFinished();
+			remoteManager.downloadFinished();
 		}
 	}
 
