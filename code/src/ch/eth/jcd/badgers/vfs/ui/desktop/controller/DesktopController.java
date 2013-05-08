@@ -183,32 +183,24 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		workerController.enqueue(action);
 	}
 
-	public void startUploadLocalChanges() throws VFSException {
-		final ActionObserver handler = new DefaultObserver(this) {
+	public void startSynchronization() {
+		ActionObserver handler = new DefaultObserver(this) {
 
 			@Override
-			public void onActionFinished(final AbstractBadgerAction action) {
+			public void onActionFinished(AbstractBadgerAction action) {
+				// reload current folder
+				final GetFolderContentAction reloadCurrentFolderAction = new GetFolderContentAction(getFolderContentActionHandler, currentFolder);
+				workerController.enqueue(reloadCurrentFolderAction);
 				updateGUI();
 			}
 		};
-		UploadLocalChangesAction action = new UploadLocalChangesAction(handler, remoteManager);
-		workerController.enqueue(action);
-	}
 
-	public void startDownloadRemoteChanges() throws VFSException {
-		final ActionObserver handler = new DefaultObserver(this) {
+		DownloadRemoteChangesAction downloadAction = new DownloadRemoteChangesAction(null, remoteManager);
+		workerController.enqueue(downloadAction);
 
-			@Override
-			public void onActionFinished(final AbstractBadgerAction action) {
-				updateGUI();
-			}
-		};
-		DownloadRemoteChangesAction action = new DownloadRemoteChangesAction(handler, remoteManager);
-		try {
-			workerController.enqueueBlocking(action, true);
-		} catch (InterruptedException e) {
-			throw new VFSException(e);
-		}
+		UploadLocalChangesAction uploadAction = new UploadLocalChangesAction(handler, remoteManager);
+		workerController.enqueue(uploadAction);
+
 	}
 
 	public void openRemoteDiskDialog(final RemoteSynchronisationWizardContext wizard) {
