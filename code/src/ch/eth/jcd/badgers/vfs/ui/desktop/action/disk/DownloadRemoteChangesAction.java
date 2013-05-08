@@ -28,14 +28,16 @@ public class DownloadRemoteChangesAction extends DiskAction {
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 		long lastSeenServerVersion = diskManager.getServerVersion();
 		List<Journal> toUpdate;
-		toUpdate = manager.getVersionDelta(lastSeenServerVersion);
-		for (Journal j : toUpdate) {
-			j.replay(diskManager);
 
-			diskManager.setServerVersion(diskManager.getServerVersion() + 1);
+		try {
+			toUpdate = manager.getVersionDelta(lastSeenServerVersion);
+			for (Journal j : toUpdate) {
+				j.replay(diskManager);
+				diskManager.setServerVersion(diskManager.getServerVersion() + 1);
+			}
+		} finally {
+			manager.downloadFinished();
 		}
-
-		manager.downloadFinished();
 	}
 
 }
