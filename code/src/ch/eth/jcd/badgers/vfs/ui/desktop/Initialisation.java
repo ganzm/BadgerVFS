@@ -82,6 +82,10 @@ public class Initialisation {
 			LOGGER.info("Reset SynchronisationServer Configuration at " + configPath);
 			File configFolder = new File(configPath);
 			if (configFolder.exists()) {
+				if (configFolder.isDirectory()) {
+					deleteFolderContent(configFolder);
+				}
+
 				if (!configFolder.delete()) {
 					LOGGER.warn("Could not delete Config at " + configPath);
 				}
@@ -91,5 +95,15 @@ public class Initialisation {
 		final ServerConfiguration config = new ServerConfiguration(configPath);
 
 		return config;
+	}
+
+	private static void deleteFolderContent(File folder) {
+		for (File child : folder.listFiles()) {
+			if (child.isDirectory()) {
+				deleteFolderContent(child);
+			}
+
+			child.delete();
+		}
 	}
 }
