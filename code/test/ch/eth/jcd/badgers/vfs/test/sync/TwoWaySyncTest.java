@@ -48,6 +48,9 @@ public class TwoWaySyncTest {
 	private RemoteManager clientRemoteManager1;
 	private RemoteManager clientRemoteManager2;
 	private static final String HOST_LINK = "localhost";
+
+	private VFSDiskManagerImpl clientDiskManager1;
+	private VFSDiskManagerImpl clientDiskManager2;
 	private VFSDiskManager serverDiskManager;
 
 	private static final String USERNAME = new BigInteger(130, new Random()).toString(32);
@@ -82,12 +85,31 @@ public class TwoWaySyncTest {
 		LOGGER.info("Shutdown client2");
 		clientRemoteManager2.dispose();
 
+		LOGGER.info("Get rid of Disk1");
+		if (clientDiskManager1 != null) {
+			clientDiskManager1.dispose();
+		}
+
+		LOGGER.info("Get rid of Disk2");
+		if (clientDiskManager2 != null) {
+			clientDiskManager2.dispose();
+		}
+
 		LOGGER.info("Shutdown SynchronisationServer");
 		syncServer.stop();
 	}
 
 	@Test
 	public void testNonConflictingSync() throws VFSException, IOException {
+		testSynchronization(".c1", ".c2");
+	}
+
+	@Test
+	public void testConflictingSync() throws VFSException, IOException {
+		testSynchronization("-colides", "-colides");
+	}
+
+	public void testSynchronization(String client1Suffix, String client2Suffix) throws VFSException, IOException {
 		LOGGER.info("Start login");
 		waitForConnectionStatus(ConnectionStatus.CONNECTED);
 
@@ -120,10 +142,10 @@ public class TwoWaySyncTest {
 		VFSDiskManagerFactory factory = VFSDiskManagerFactory.getInstance();
 
 		DiskConfiguration clientDiskConfig1 = createConfig(HOST_LINK, ".client1.bfs");
-		VFSDiskManagerImpl clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
+		clientDiskManager1 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig1);
 
 		DiskConfiguration clientDiskConfig2 = createConfig(HOST_LINK, ".client2.bfs");
-		VFSDiskManagerImpl clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
+		clientDiskManager2 = (VFSDiskManagerImpl) factory.createDiskManager(clientDiskConfig2);
 
 		// Both clients now have their local disk created and are in sync
 
@@ -139,11 +161,11 @@ public class TwoWaySyncTest {
 
 		LOGGER.info("Everything is synched now");
 
-		LOGGER.info("Client1 does some nonconflicting changes");
-		doNonConflictingChanges(clientDiskManager1, ".1");
+		LOGGER.info("Client1 does some changes");
+		doChanges(clientDiskManager1, client1Suffix);
 
-		LOGGER.info("Client2 does some nonconflicting changes");
-		doNonConflictingChanges(clientDiskManager2, ".2");
+		LOGGER.info("Client2 does some changes");
+		doChanges(clientDiskManager2, client2Suffix);
 
 		LOGGER.info("Client1 pushes changes to Server");
 		ClientVersion clientVersion1 = clientDiskManager1.getPendingVersion();
@@ -246,7 +268,7 @@ public class TwoWaySyncTest {
 		return config;
 	}
 
-	private void doNonConflictingChanges(VFSDiskManager clientDiskManager, String suffix) throws VFSException, IOException {
+	private void doChanges(VFSDiskManager clientDiskManager, String suffix) throws VFSException, IOException {
 		VFSEntry root = clientDiskManager.getRoot();
 		VFSPath dirCPath = root.getChildPath("dirClient" + suffix);
 		VFSEntry dirC = dirCPath.createDirectory();
