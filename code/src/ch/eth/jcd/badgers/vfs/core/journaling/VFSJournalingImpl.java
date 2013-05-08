@@ -308,10 +308,16 @@ public class VFSJournalingImpl implements VFSJournaling {
 		// expect this method to be called after having synchronized data to the SynchronisationServer
 		assert currentJournalFolder == null;
 
-		VFSEntry journalsFolder = getJournalsFolder();
-		for (VFSEntry journal : journalsFolder.getChildren()) {
-			LOGGER.debug("Delete old Journal " + journal.getPath().getAbsolutePath());
-			journal.delete();
+		boolean journalingEnabledBackupFlag = journalingEnabled;
+		journalingEnabled = false;
+		try {
+			VFSEntry journalsFolder = getJournalsFolder();
+			for (VFSEntry journal : journalsFolder.getChildren()) {
+				LOGGER.debug("Delete old Journal " + journal.getPath().getAbsolutePath());
+				journal.delete();
+			}
+		} finally {
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
 	}
 }
