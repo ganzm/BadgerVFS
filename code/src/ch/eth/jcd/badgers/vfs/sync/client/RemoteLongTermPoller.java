@@ -24,10 +24,6 @@ public class RemoteLongTermPoller implements Runnable {
 	private boolean running = false;
 	private ServerVersionChangedListener listener;
 
-	public RemoteLongTermPoller() {
-
-	}
-
 	public void setServerVersionChangedListener(ServerVersionChangedListener listener) {
 		this.listener = listener;
 	}

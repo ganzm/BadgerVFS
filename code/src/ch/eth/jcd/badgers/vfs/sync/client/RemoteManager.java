@@ -155,7 +155,7 @@ public class RemoteManager implements ActionObserver {
 		final UseLinkedDiskAction useLinkedDiskAction = new UseLinkedDiskAction(this, this, diskId);
 		try {
 			remoteWorkerController.enqueueBlocking(useLinkedDiskAction, true);
-		} catch (InterruptedException | VFSException e) {
+		} catch (InterruptedException e) {
 			throw new VFSException(e);
 		}
 		return true;
@@ -224,31 +224,18 @@ public class RemoteManager implements ActionObserver {
 	}
 
 	private void setStatus(final ConnectionStatus status) {
-		if (this.status != status) {
-			LOGGER.info("Switch ConnectionStatus To " + status + " was  " + this.status);
-			this.status = status;
-
-			// notify listeners
-			for (final ConnectionStateListener csl : connectionStateListeners) {
-				try {
-					csl.connectionStateChanged(status);
-				} catch (final RuntimeException ex) {
-					LOGGER.error("", ex);
-				}
-			}
-
-		} else {
+		if (this.status == status) {
 			LOGGER.info("ConnectionStatus have not changed, still" + this.status);
-
-			// notify listeners
-			for (final ConnectionStateListener csl : connectionStateListeners) {
-				try {
-					csl.connectionStateChanged(status);
-				} catch (final RuntimeException ex) {
-					LOGGER.error("", ex);
-				}
-			}
+		} else {
+			LOGGER.info("Switch ConnectionStatus from " + this.status + " To " + status);
+			this.status = status;
 		}
+
+		// notify listeners
+		for (final ConnectionStateListener csl : connectionStateListeners) {
+			csl.connectionStateChanged(status);
+		}
+
 	}
 
 	public void addConnectionStateListener(final ConnectionStateListener connectionStateListener) {
