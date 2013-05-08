@@ -64,7 +64,7 @@ public class FileImportDropTargetListener implements DropTargetListener {
 
 	@Override
 	public void dragOver(final DropTargetDragEvent event) {
-		LOGGER.debug("dragOver");
+		LOGGER.trace("dragOver");
 
 		final DataFlavor[] dataFlavours = event.getCurrentDataFlavors();
 		for (final DataFlavor df : dataFlavours) {

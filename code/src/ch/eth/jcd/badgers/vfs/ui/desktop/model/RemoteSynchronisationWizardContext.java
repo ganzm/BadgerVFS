@@ -10,7 +10,13 @@ public class RemoteSynchronisationWizardContext {
 	}
 
 	private LoginActionEnum loginActionEnum;
+
+	/**
+	 * @Deprecated to be refactored - Memo MG: do not carry around RemoteManager Threads. RemoteManagers created by ServerUrlDialog may not be disposed
+	 *             correctly
+	 */
 	private RemoteManager remoteManager;
+
 	private LinkedDisk selectedDiskToLink;
 
 	private String localFilePath;

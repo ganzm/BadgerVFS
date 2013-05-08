@@ -179,11 +179,16 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
 				remoteManager = wizardContext.getRemoteManager();
+				remoteManager.setServerVersionChangedListener(getThis());
 				updateGUI();
 			}
 		};
 		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(handler, wizardContext.getRemoteManager());
 		workerController.enqueue(action);
+	}
+
+	private DesktopController getThis() {
+		return this;
 	}
 
 	public void startSynchronization() {
