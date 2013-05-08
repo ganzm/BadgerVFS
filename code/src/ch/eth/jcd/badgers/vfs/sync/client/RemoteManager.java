@@ -38,18 +38,17 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 public class RemoteManager implements ActionObserver {
 
 	private static final Logger LOGGER = Logger.getLogger(RemoteManager.class);
+
 	private static final ActionObserver DUMMY_HANDLER = new ActionObserver() {
 
 		@Override
 		public void onActionFinished(AbstractBadgerAction action) {
 			// do nothing
-
 		}
 
 		@Override
 		public void onActionFailed(AbstractBadgerAction action, Exception e) {
 			// do nothing
-
 		}
 	};
 
@@ -61,12 +60,14 @@ public class RemoteManager implements ActionObserver {
 	private LoginRemoteInterface loginInterface;
 	private AdministrationRemoteInterface adminInterface;
 	private DiskRemoteInterface currentLinkedDiskRemoteInterface;
+	private final RemoteLongTermPoller longTermPoller;
 
 	private final List<ConnectionStateListener> connectionStateListeners = new ArrayList<>();
 
 	public RemoteManager(final String hostLink) {
 		this.hostLink = hostLink;
 		this.remoteWorkerController = new RemoteWorkerController();
+		this.longTermPoller = new RemoteLongTermPoller();
 	}
 
 	/**
@@ -166,6 +167,7 @@ public class RemoteManager implements ActionObserver {
 
 	public void dispose() {
 		remoteWorkerController.dispose();
+		longTermPoller.dispose();
 	}
 
 	@Override
@@ -198,17 +200,27 @@ public class RemoteManager implements ActionObserver {
 			final RegisterUserAction regUserAction = (RegisterUserAction) action;
 			this.adminInterface = regUserAction.getAdminInterface();
 			this.setStatus(ConnectionStatus.LOGGED_IN);
-		}
-
-		else if (action instanceof UseLinkedDiskAction) {
-			currentLinkedDiskRemoteInterface = ((UseLinkedDiskAction) action).getResult();
-			this.setStatus(ConnectionStatus.DISK_MODE);
+		} else if (action instanceof UseLinkedDiskAction) {
+			DiskRemoteInterface diskRemoteInterface = ((UseLinkedDiskAction) action).getResult();
+			setDiskRemoteInterface(diskRemoteInterface);
 		} else if (action instanceof LinkNewDiskAction) {
-			currentLinkedDiskRemoteInterface = ((LinkNewDiskAction) action).getResult();
-			this.setStatus(ConnectionStatus.DISK_MODE);
+			DiskRemoteInterface diskRemoteInterface = ((LinkNewDiskAction) action).getResult();
+			setDiskRemoteInterface(diskRemoteInterface);
 		} else if (action instanceof LogoutAction) {
 			setStatus(ConnectionStatus.DISCONNECTED);
 		}
+	}
+
+	private void setDiskRemoteInterface(DiskRemoteInterface diskRemoteInterface) {
+
+		if (currentLinkedDiskRemoteInterface != null) {
+			throw new VFSRuntimeException("DiskRemoteInterface already set");
+		}
+
+		currentLinkedDiskRemoteInterface = diskRemoteInterface;
+		this.setStatus(ConnectionStatus.DISK_MODE);
+
+		longTermPoller.startLongtermPoll(currentLinkedDiskRemoteInterface);
 	}
 
 	private void setStatus(final ConnectionStatus status) {
@@ -286,8 +298,14 @@ public class RemoteManager implements ActionObserver {
 		connectionStateListeners.remove(connectionStateListener);
 	}
 
+	/**
+	 * Blocking call which publishes local changes to a remote server
+	 * 
+	 * @param clientVersion
+	 * @return
+	 * @throws VFSException
+	 */
 	public PushVersionResult pushVersion(final ClientVersion clientVersion) throws VFSException {
-
 		UploadLocalChangesRemoteAction ra = new UploadLocalChangesRemoteAction(this, DUMMY_HANDLER, clientVersion);
 		try {
 			remoteWorkerController.enqueueBlocking(ra, true);
@@ -315,4 +333,7 @@ public class RemoteManager implements ActionObserver {
 		}
 	}
 
+	public void setServerVersionChangedListener(ServerVersionChangedListener listener) {
+		this.longTermPoller.setServerVersionChangedListener(listener);
+	}
 }

@@ -10,13 +10,9 @@ import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 
 /**
- * gemäss Upload Pull SequenzDiagramm
+ * this updates local changes to a synchronization server
  * 
- * Versucht 1x lokale Änderungen auf den SynchServer hochzuladen
- * 
- * 
- * If this action fails
- * 
+ * it locks access to the disk until all changes are published. This is achieved by blocking until changes are fully published
  * 
  */
 public class UploadLocalChangesAction extends DiskAction {
@@ -44,5 +40,4 @@ public class UploadLocalChangesAction extends DiskAction {
 		diskManager.setSynchronized(result.getNewServerVersion());
 		LOGGER.debug("Finished upload action on remote Manager");
 	}
-
 }

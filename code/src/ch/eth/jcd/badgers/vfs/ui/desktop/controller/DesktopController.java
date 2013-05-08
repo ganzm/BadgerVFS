@@ -20,9 +20,11 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManagerFactory;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.model.DiskRemoteResult;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
 import ch.eth.jcd.badgers.vfs.sync.client.RemoteManager;
+import ch.eth.jcd.badgers.vfs.sync.client.ServerVersionChangedListener;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.AbstractBadgerAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.DefaultObserver;
@@ -33,6 +35,7 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DeleteEntryAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DownloadRemoteChangesAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ExportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetFolderContentAction;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.GetServerVersionAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.ImportAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.LinkCurrentDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.RenameEntryAction;
@@ -57,7 +60,7 @@ import ch.eth.jcd.badgers.vfs.util.Pair;
 import ch.eth.jcd.badgers.vfs.util.PathUtil;
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
-public class DesktopController extends BadgerController implements ConnectionStateListener {
+public class DesktopController extends BadgerController implements ConnectionStateListener, ServerVersionChangedListener {
 	public enum ClipboardAction {
 		COPY, CUT
 	}
@@ -290,6 +293,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 
 		final RemoteManager mgr = new RemoteManager(hostLink);
 		mgr.addConnectionStateListener(this);
+		mgr.setServerVersionChangedListener(this);
 		mgr.start();
 		return mgr;
 	}
@@ -642,4 +646,18 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		updateGUI();
 	}
 
+	@Override
+	public void serverVersionChanged(DiskRemoteResult remoteResult) {
+		try {
+			GetServerVersionAction diskAction = new GetServerVersionAction();
+			workerController.enqueueBlocking(diskAction, true);
+
+			if (diskAction.getServerVersion() < remoteResult.getServerVersion()) {
+				LOGGER.info("ServerVersion Changed to " + remoteResult.getServerVersion() + " Local Version is " + diskAction.getServerVersion());
+				startSynchronization();
+			}
+		} catch (InterruptedException | VFSException e) {
+			LOGGER.error("", e);
+		}
+	}
 }

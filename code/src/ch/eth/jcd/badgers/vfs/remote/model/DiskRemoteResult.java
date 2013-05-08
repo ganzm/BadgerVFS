@@ -1,6 +1,9 @@
 package ch.eth.jcd.badgers.vfs.remote.model;
 
-public class DiskRemoteResult {
+import java.io.Serializable;
+
+public class DiskRemoteResult implements Serializable {
+	private static final long serialVersionUID = 537567482688747181L;
 	private final long serverVersion;
 
 	public DiskRemoteResult(long serverVersion) {

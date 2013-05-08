@@ -44,7 +44,7 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 	}
 
 	@Override
-	public DiskRemoteResult longTermPollVersion(final long clientVersion, long timeout) throws RemoteException {
+	public DiskRemoteResult longTermPollVersion(long timeout) throws RemoteException {
 		LOGGER.info("Start Long term Poll for " + id);
 		synchronized (diskWorkerController) {
 			try {
