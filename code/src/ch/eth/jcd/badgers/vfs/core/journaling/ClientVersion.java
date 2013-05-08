@@ -43,6 +43,6 @@ public class ClientVersion implements Serializable {
 	}
 
 	public boolean isEmpty() {
-		return journals == null || journals.size() == 0;
+		return journals == null || journals.isEmpty();
 	}
 }
