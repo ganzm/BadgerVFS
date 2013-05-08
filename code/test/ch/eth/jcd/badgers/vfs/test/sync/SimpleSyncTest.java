@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -163,6 +164,7 @@ public class SimpleSyncTest implements ConnectionStateListener {
 
 		final String displayName = "TestName";
 		final DiskConfiguration diskConfig = new DiskConfiguration();
+		diskConfig.setDiskId(UUID.randomUUID());
 		final LinkedDisk linkedDisk = new LinkedDisk(displayName, diskConfig);
 
 		final Journal journal = clientDiskManager.linkDisk(HOST_LINK);
