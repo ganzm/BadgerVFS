@@ -34,6 +34,7 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 
+	private static final String FRAME_TITLE = "BadgerFS Client";
 	private static final long serialVersionUID = -8776317677851635247L;
 	private static final Logger LOGGER = Logger.getLogger(BadgerMainFrame.class);
 
@@ -89,7 +90,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	 * Create the frame.
 	 */
 	public BadgerMainFrame() {
-		setTitle("BadgerFS Client");
+		setTitle(FRAME_TITLE);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -219,6 +220,13 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 
 		textFieldCurrentPath.setText(desktopController.getCurrentFolderAsString());
 		this.lblStatusbar.setText(desktopController.getStatusText());
+
+		if (diskMode) {
+			String diskPath = desktopController.getDiskPath();
+			setTitle(FRAME_TITLE + " - " + diskPath);
+		} else {
+			setTitle(FRAME_TITLE);
+		}
 	}
 
 	public DesktopController getController() {

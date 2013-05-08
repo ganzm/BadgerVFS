@@ -660,4 +660,12 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			LOGGER.error("", e);
 		}
 	}
+
+	public String getDiskPath() {
+		try {
+			return workerController.getDiskManager().getDiskConfiguration().getHostFilePath();
+		} catch (NullPointerException | VFSException ex) {
+			return "";
+		}
+	}
 }
