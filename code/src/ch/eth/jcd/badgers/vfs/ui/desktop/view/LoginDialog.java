@@ -18,8 +18,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Logger;
-
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStateListener;
 import ch.eth.jcd.badgers.vfs.sync.client.ConnectionStatus;
@@ -29,8 +27,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.model.RemoteSynchronisationWizardContex
 import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class LoginDialog extends JDialog {
-
-	private static final Logger LOGGER = Logger.getLogger(LoginDialog.class);
 
 	private static final long serialVersionUID = 6008623672955958103L;
 	private final JTextField textFieldUsername;
@@ -197,6 +193,8 @@ public class LoginDialog extends JDialog {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
+				wizardContext.setUsername(textFieldUsername.getText());
+				wizardContext.setPassword(new String(passwordField.getPassword()));
 				wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
 						new ConnectionStateListener() {
 
