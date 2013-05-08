@@ -64,6 +64,15 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	 */
 	public static void main(final String[] args) {
 		Initialisation.initLog4J(args);
+
+		setLookandFeel();
+
+		final BadgerMainFrame frame = new BadgerMainFrame();
+		frame.update();
+		frame.setVisible(true);
+	}
+
+	public static void setLookandFeel() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -79,9 +88,7 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 					LOGGER.debug(e);
 					// If Nimbus is not available, you can set the GUI to another look and feel.
 				}
-				final BadgerMainFrame frame = new BadgerMainFrame();
-				frame.update();
-				frame.setVisible(true);
+
 			}
 		});
 	}

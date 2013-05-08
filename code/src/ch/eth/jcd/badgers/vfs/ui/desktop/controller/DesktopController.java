@@ -232,15 +232,19 @@ public class DesktopController extends BadgerController implements ConnectionSta
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final File selectedFile = fileChooser.getSelectedFile();
-			final VFSDiskManager diskManager = initDisk(selectedFile.getAbsolutePath());
-			if (remoteManager == null) {
-				openDisk(diskManager);
-			} else {
-				final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
-				wizardContext.setRemoteManager(remoteManager);
-				wizardContext.setDiskManager(diskManager);
-				openLoginDialog(wizardContext);
-			}
+			openDiskFromFile(selectedFile);
+		}
+	}
+
+	public void openDiskFromFile(File file) throws VFSException {
+		final VFSDiskManager diskManager = initDisk(file.getAbsolutePath());
+		if (remoteManager == null) {
+			openDisk(diskManager);
+		} else {
+			final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
+			wizardContext.setRemoteManager(remoteManager);
+			wizardContext.setDiskManager(diskManager);
+			openLoginDialog(wizardContext);
 		}
 	}
 

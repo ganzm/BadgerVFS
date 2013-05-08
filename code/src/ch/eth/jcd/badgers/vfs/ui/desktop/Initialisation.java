@@ -82,7 +82,9 @@ public class Initialisation {
 			LOGGER.info("Reset SynchronisationServer Configuration at " + configPath);
 			File configFolder = new File(configPath);
 			if (configFolder.exists()) {
-				configFolder.delete();
+				if (!configFolder.delete()) {
+					LOGGER.warn("Could not delete Config at " + configPath);
+				}
 			}
 		}
 
