@@ -352,7 +352,6 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		if (remoteManager != null) {
 			remoteManager.removeConnectionStateListener(this);
 			remoteManager.startCloseDisk();
-			remoteManager = null;
 		}
 		updateGUI();
 	}
@@ -511,6 +510,11 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		}
 	}
 
+	public void startWorkOffline() throws VFSException {
+		LOGGER.debug("Start Work Offline.");
+		disconnect();
+	}
+
 	public void copyToClipboard(final List<EntryUiModel> entries) {
 		LOGGER.debug("Adding " + entries + " to clipboard for copy");
 		clipboard = new Pair<ClipboardAction, List<EntryUiModel>>(ClipboardAction.COPY, entries);
@@ -623,12 +627,27 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		return workerController;
 	}
 
+	public void disconnect() throws VFSException {
+		if (isInManagementMode()) {
+			throw new VFSException("Cannot close new Disk - no current disk opened");
+		}
+
+		if (remoteManager != null) {
+			remoteManager.removeConnectionStateListener(this);
+			remoteManager.startCloseDisk();
+			remoteManager.logout();
+			remoteManager.dispose();
+		}
+		updateGUI();
+
+	}
+
 	public void closeAndLogout() throws VFSException {
 		closeDisk();
 		if (remoteManager != null) {
 			remoteManager.logout();
+			remoteManager.dispose();
 		}
-
 	}
 
 	public String getStatusText() {

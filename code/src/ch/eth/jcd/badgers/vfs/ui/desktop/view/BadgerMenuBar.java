@@ -38,6 +38,7 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmOpen;
 	private final JMenuItem mntmConnectRemote;
 	private final JMenuItem mntmLinkDisk;
+	private final JMenuItem mntmWorkOffline;
 	private final JMenuItem mntmClose;
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmDiskInfo;
@@ -80,6 +81,10 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmLinkDisk = createLinkDiskMenuItem(parent);
 
 		mnDisk.add(mntmLinkDisk);
+
+		mntmWorkOffline = createWorkOfflineMenuItem(parent);
+
+		mnDisk.add(mntmWorkOffline);
 
 		mnDisk.addSeparator();
 
@@ -166,6 +171,19 @@ public class BadgerMenuBar extends JMenuBar {
 		add(btnSync);
 	}
 
+	private JMenuItem createWorkOfflineMenuItem(BadgerMainFrame parent2) {
+		return new JMenuItem(new AbstractAction("Work Offline") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().startWorkOffline();
+				} catch (final VFSException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
 	private JMenuItem createInfoMenutItem(final BadgerMainFrame parent) {
 		return new JMenuItem(new AbstractAction("Info") {
 			@Override
@@ -238,7 +256,7 @@ public class BadgerMenuBar extends JMenuBar {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
-					parent.getController().closeDisk();
+					parent.getController().closeAndLogout();
 					// if we open/create another disk the Browser Panel is shown
 					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
 				} catch (final VFSException ex) {

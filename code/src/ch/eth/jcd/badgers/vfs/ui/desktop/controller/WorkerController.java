@@ -110,11 +110,21 @@ public abstract class WorkerController implements Runnable {
 	}
 
 	public void dispose() {
+		LOGGER.info("start dispose WorkerController");
+		// do all undone work first.
+		try {
+			while (actionQueue.size() > 0) {
+				Thread.sleep(100);
+			}
+		} catch (InterruptedException e) {
+			LOGGER.warn(e);
+		}
 		running = false;
 
 		AbstractBadgerAction noop = createNoopAction();
 
 		enqueue(noop);
+		LOGGER.info("done dispose WorkerController");
 	}
 
 	/**

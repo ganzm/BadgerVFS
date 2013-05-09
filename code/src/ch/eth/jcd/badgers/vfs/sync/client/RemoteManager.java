@@ -188,14 +188,11 @@ public class RemoteManager implements ActionObserver {
 		if (action instanceof ConnectAction) {
 			final ConnectAction loginAction = (ConnectAction) action;
 			loginInterface = loginAction.getLoginInterface();
-
 			setStatus(ConnectionStatus.CONNECTED);
 		} else if (action instanceof LoginAction) {
 			final LoginAction loginAction = (LoginAction) action;
-
 			this.adminInterface = loginAction.getAdminInterface();
 			setStatus(ConnectionStatus.LOGGED_IN);
-
 		} else if (action instanceof RegisterUserAction) {
 			final RegisterUserAction regUserAction = (RegisterUserAction) action;
 			this.adminInterface = regUserAction.getAdminInterface();
@@ -264,7 +261,7 @@ public class RemoteManager implements ActionObserver {
 	}
 
 	public boolean logout() {
-		if (status != ConnectionStatus.LOGGED_IN) {
+		if (status != ConnectionStatus.DISK_MODE && status != ConnectionStatus.LOGGED_IN) {
 			return false;
 		}
 		final LogoutAction action = new LogoutAction(this, this);

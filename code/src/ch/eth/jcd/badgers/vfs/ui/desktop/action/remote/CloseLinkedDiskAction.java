@@ -24,8 +24,6 @@ public class CloseLinkedDiskAction extends RemoteAction {
 			LOGGER.trace("trying to close disk...");
 			remoteManager.getAdminInterface().closeLinkedDisk(remoteManager.getCurrentLinkedDiskRemoteInterface());
 			LOGGER.trace("successfully closed disk!");
-			remoteManager.logout();
-			remoteManager.dispose();
 		} catch (final RemoteException e) {
 			LOGGER.error("Error closing linked Disk", e);
 		}
