@@ -1,6 +1,7 @@
 package ch.eth.jcd.badgers.vfs.core.interfaces;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 /**
  * $Id$
@@ -41,4 +42,6 @@ public interface VFSPath {
 	String getName();
 
 	VFSEntry getVFSEntry() throws VFSException;
+
+	VFSPath renameTo(String newFileName) throws VFSInvalidPathException;
 }

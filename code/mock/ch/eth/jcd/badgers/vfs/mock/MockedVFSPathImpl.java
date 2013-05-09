@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSInvalidPathException;
 
 public class MockedVFSPathImpl implements VFSPath {
 
@@ -62,4 +63,13 @@ public class MockedVFSPathImpl implements VFSPath {
 		return parentPath;
 	}
 
+	@Override
+	public VFSPath renameTo(String newName) throws VFSInvalidPathException {
+		String parentPath = getAbsolutePath().substring(0, getAbsolutePath().lastIndexOf(VFSPath.FILE_SEPARATOR));
+		if ("".equals(parentPath)) {
+			parentPath = VFSPath.FILE_SEPARATOR;
+		}
+
+		return new MockedVFSPathImpl(parentPath + newName, pathToRoot);
+	}
 }

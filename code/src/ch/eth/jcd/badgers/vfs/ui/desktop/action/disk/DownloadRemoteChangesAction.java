@@ -36,9 +36,8 @@ public class DownloadRemoteChangesAction extends DiskAction {
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 		long lastSeenServerVersion = diskManager.getServerVersion();
 
+		List<Journal> journals = revertLocalChanges(diskManager);
 		try {
-			List<Journal> journals = revertLocalChanges(diskManager);
-
 			// apply changes from server
 			List<Journal> toUpdate = remoteManager.getVersionDelta(lastSeenServerVersion);
 			for (Journal j : toUpdate) {
@@ -46,7 +45,7 @@ public class DownloadRemoteChangesAction extends DiskAction {
 					j.replay(diskManager);
 				} catch (VFSException e) {
 					// yes this exception handling is not ideal, but there is nothing what we can do when update process fails
-					LOGGER.error("Error while replaying Journal " + j.getJournalFolderName());
+					LOGGER.error("Error while replaying Journal " + j.getJournalFolderName(), e);
 				} finally {
 					diskManager.setServerVersion(diskManager.getServerVersion() + 1);
 				}
