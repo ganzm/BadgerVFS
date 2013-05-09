@@ -229,10 +229,10 @@ public class RemoteManager implements ActionObserver {
 		}
 
 		// notify listeners
-		for (final ConnectionStateListener csl : connectionStateListeners) {
+		ConnectionStateListener[] listeners = connectionStateListeners.toArray(new ConnectionStateListener[0]);
+		for (final ConnectionStateListener csl : listeners) {
 			csl.connectionStateChanged(status);
 		}
-
 	}
 
 	public void addConnectionStateListener(final ConnectionStateListener connectionStateListener) {
