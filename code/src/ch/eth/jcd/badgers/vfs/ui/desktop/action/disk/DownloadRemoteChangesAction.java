@@ -19,11 +19,12 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.ActionObserver;
  * 
  * This action is performed on the client side
  * 
- * 
  */
 public class DownloadRemoteChangesAction extends DiskAction {
 
 	private static final Logger LOGGER = Logger.getLogger(DownloadRemoteChangesAction.class);
+
+	private static final String conflictSuffix = "." + System.getProperty("user.name");
 
 	private final RemoteManager remoteManager;
 
@@ -64,7 +65,7 @@ public class DownloadRemoteChangesAction extends DiskAction {
 		// redo local changes, but resolve conflicts
 		List<PathConflict> conflicts = new ArrayList<>();
 		for (Journal journal : journals) {
-			journal.replayResolveConflics(diskManager, ".client1", conflicts);
+			journal.replayResolveConflics(diskManager, conflictSuffix, conflicts);
 
 			// override journal
 			journaling.overrideJournal(journal);
