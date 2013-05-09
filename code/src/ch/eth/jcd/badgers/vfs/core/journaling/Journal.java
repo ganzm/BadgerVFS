@@ -16,8 +16,10 @@ public class Journal implements Serializable {
 	private static final long serialVersionUID = -4125853629235672102L;
 
 	private final List<JournalItem> journalEntries = new ArrayList<>();
+	private final String journalFolderName;
 
-	public Journal(List<JournalItem> uncommitedJournalEntries) {
+	public Journal(List<JournalItem> uncommitedJournalEntries, String journalFolderName) {
+		this.journalFolderName = journalFolderName;
 		// copy entries
 		if (LOGGER.isTraceEnabled()) {
 			for (JournalItem journalItem : uncommitedJournalEntries) {
@@ -43,6 +45,29 @@ public class Journal implements Serializable {
 		}
 	}
 
+	/**
+	 * Revert modifications done
+	 * 
+	 * reverting changes does not affect Journals
+	 * 
+	 * @throws VFSException
+	 */
+	public void revert(VFSDiskManager diskManager) throws VFSException {
+		// revert entries in opposite order
+		for (int i = journalEntries.size() - 1; i >= 0; i--) {
+			JournalItem entry = journalEntries.get(i);
+			entry.revert(diskManager);
+		}
+	}
+
+	public void replayResolveConflics(VFSDiskManager clientDiskManager, String conflictSuffix, List<PathConflict> conflicts) throws VFSException {
+
+		for (int i = 0; i < journalEntries.size(); i++) {
+			JournalItem entry = journalEntries.get(i);
+			entry.replayResolveConflics(clientDiskManager, conflictSuffix, conflicts);
+		}
+	}
+
 	public List<JournalItem> getJournalEntries() {
 		return journalEntries;
 	}
@@ -64,4 +89,9 @@ public class Journal implements Serializable {
 			entry.afterRmiTransport(diskManager);
 		}
 	}
+
+	public String getJournalFolderName() {
+		return journalFolderName;
+	}
+
 }

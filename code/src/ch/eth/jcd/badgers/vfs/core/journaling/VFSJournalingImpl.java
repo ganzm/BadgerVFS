@@ -122,9 +122,14 @@ public class VFSJournalingImpl implements VFSJournaling {
 		journalingEnabled = false;
 		try {
 			VFSPath journalPath = journalFolder.getChildPath(JOURNAL_NAME);
-			VFSEntry journalFile = journalPath.createFile();
+			VFSEntry journalFile;
+			if (journalPath.exists()) {
+				journalFile = journalPath.getVFSEntry();
+			} else {
+				journalFile = journalPath.createFile();
+			}
 
-			Journal toPersist = new Journal(uncommitedJournalEntries);
+			Journal toPersist = new Journal(uncommitedJournalEntries, journalFolder.getPath().getName());
 			try (OutputStream out = journalFile.getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE)) {
 				ObjectOutputStream objOout = new ObjectOutputStream(out);
 				objOout.writeObject(toPersist);
@@ -135,6 +140,16 @@ public class VFSJournalingImpl implements VFSJournaling {
 		} finally {
 			journalingEnabled = journalingEnabledBackupFlag;
 		}
+	}
+
+	public void overrideJournal(Journal journal) throws VFSException {
+		VFSEntry journalsFolder = getJournalsFolder();
+
+		String journalFolderName = journal.getJournalFolderName();
+		VFSPath journalPath = journalsFolder.getChildPath(journalFolderName);
+		VFSEntry journalFolder = journalPath.getVFSEntry();
+
+		writeJournal(journalFolder, journal.getJournalEntries());
 	}
 
 	private VFSEntry getJournalsFolder() throws VFSException {
@@ -235,7 +250,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 		uncommitedJournalEntries = new ArrayList<>();
 		addDirectoryToJournal(root);
-		Journal j = new Journal(uncommitedJournalEntries);
+		Journal j = new Journal(uncommitedJournalEntries, null);
 		uncommitedJournalEntries = null;
 		return j;
 	}

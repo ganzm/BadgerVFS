@@ -39,6 +39,8 @@ public interface VFSJournaling {
 
 	void persistServerJournal(Journal journal) throws VFSException;
 
+	void overrideJournal(Journal journal) throws VFSException;
+
 	void openNewJournal(boolean doEnableJournaling) throws VFSException;
 
 	void openNewJournal(List<JournalItem> journalItemsToAdd, boolean doEnableJournaling) throws VFSException;

@@ -40,6 +40,7 @@ import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.test.testutil.CoreTestUtil;
 import ch.eth.jcd.badgers.vfs.test.testutil.UnittestLogger;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
+import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DownloadRemoteChangesAction;
 
 public class TwoWaySyncTest {
 	private static final Logger LOGGER = Logger.getLogger(TwoWaySyncTest.class);
@@ -223,14 +224,20 @@ public class TwoWaySyncTest {
 
 	private void performUpdate(VFSDiskManagerImpl clientDiskManager, DiskRemoteInterface diskRemoteInterface, long expectedServerVersionOnClient)
 			throws RemoteException, VFSException {
+
 		long lastSeenServerVersion = clientDiskManager.getServerVersion();
 		Assert.assertEquals(expectedServerVersionOnClient, lastSeenServerVersion);
+
+		List<Journal> journals = DownloadRemoteChangesAction.revertLocalChanges(clientDiskManager);
+
+		// apply changes from server
 		List<Journal> toUpdate = diskRemoteInterface.getVersionDelta(lastSeenServerVersion);
 		for (Journal j : toUpdate) {
 			j.replay(clientDiskManager);
-
 			clientDiskManager.setServerVersion(clientDiskManager.getServerVersion() + 1);
 		}
+
+		DownloadRemoteChangesAction.redoLocalChanges(clientDiskManager, journals);
 
 		diskRemoteInterface.downloadFinished();
 	}

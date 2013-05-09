@@ -58,4 +58,9 @@ public class VFSDisabledJournaling implements VFSJournaling {
 	public void deleteJournals() throws VFSException {
 
 	}
+
+	@Override
+	public void overrideJournal(Journal journal) throws VFSException {
+
+	}
 }

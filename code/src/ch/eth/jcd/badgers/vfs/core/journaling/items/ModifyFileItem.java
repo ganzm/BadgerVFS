@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +13,7 @@ import ch.eth.jcd.badgers.vfs.core.data.DataBlock;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
+import ch.eth.jcd.badgers.vfs.core.journaling.PathConflict;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteInputStreamServer;
@@ -145,4 +147,14 @@ public class ModifyFileItem extends JournalItem {
 				+ suppressOnJournalAddJournalCopy + "]";
 	}
 
+	@Override
+	public void doRevert(VFSDiskManager diskManager) throws VFSException {
+
+	}
+
+	@Override
+	public void doReplayResolveConflics(VFSDiskManager diskManager, String conflictSuffix, List<PathConflict> conflicts) throws VFSException {
+		beforeLocalTransport(diskManager);
+		doReplay(diskManager);
+	}
 }
