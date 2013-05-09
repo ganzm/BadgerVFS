@@ -104,36 +104,60 @@ public class LoginDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-
 				final JButton loginAndSyncButton = new JButton("Login & Sync");
-				loginAndSyncButton.addActionListener(getLoginAndSyncActionListener(wizardContext));
+				loginAndSyncButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						loginAndSynButtonClicked();
+					}
+				});
 				loginAndSyncButton.setMnemonic('l');
 				loginAndSyncButton.setActionCommand("LoginSync");
 				buttonPane.add(loginAndSyncButton);
 				getRootPane().setDefaultButton(loginAndSyncButton);
 
 				final JButton createAndSyncButton = new JButton("Register & Sync");
-				createAndSyncButton.addActionListener(getRegisterAndSyncActionListener(wizardContext));
+				createAndSyncButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						registerAndSyncButtonClicked();
+					}
+				});
 				createAndSyncButton.setMnemonic('r');
 				createAndSyncButton.setActionCommand("RegisterSync");
 				buttonPane.add(createAndSyncButton);
 
 				final JButton connectButton = new JButton("Connect");
-				connectButton.addActionListener(getConnectActionlistener(wizardContext));
+				connectButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connectButtonClicked();
+					}
+				});
 				connectButton.setMnemonic('c');
 				connectButton.setActionCommand("Connect");
 				buttonPane.add(connectButton);
 				getRootPane().setDefaultButton(connectButton);
 
 				final JButton loginButton = new JButton("Login");
-				loginButton.addActionListener(getLoginActionListener(wizardContext));
+				loginButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						loginButtonClicked();
+					}
+				});
 				loginButton.setMnemonic('l');
 				loginButton.setActionCommand("Login");
 				buttonPane.add(loginButton);
 				getRootPane().setDefaultButton(loginButton);
 
 				final JButton createButton = new JButton("Register");
-				createButton.addActionListener(getRegisterActionListener(wizardContext));
+				createButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						registerButtonClicked();
+					}
+				});
 				createButton.setMnemonic('c');
 				createButton.setActionCommand("Register");
 				buttonPane.add(createButton);
@@ -195,46 +219,29 @@ public class LoginDialog extends JDialog {
 		};
 	}
 
-	private ActionListener getRegisterActionListener(final RemoteSynchronisationWizardContext wizardContext) {
-		return new ActionListener() {
+	private void registerButtonClicked() {
+		wizardContext.setUsername(textFieldUsername.getText());
+		wizardContext.setPassword(new String(passwordField.getPassword()));
+		wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()), new ConnectionStateListener() {
+
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
+			}
+
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				wizardContext.setUsername(textFieldUsername.getText());
-				wizardContext.setPassword(new String(passwordField.getPassword()));
-				wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
-						new ConnectionStateListener() {
+			public void connectionStateChanged(final ConnectionStatus status) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						dispose();
+						controller.openRemoteDiskDialog(wizardContext);
 
-							private ConnectionStateListener getConnectionStateListener() {
-								return this;
-							}
-
-							@Override
-							public void connectionStateChanged(final ConnectionStatus status) {
-								SwingUtilities.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										dispose();
-										controller.openRemoteDiskDialog(wizardContext);
-
-									}
-								});
-
-							}
-
-						});
+					}
+				});
 
 			}
-		};
-	}
-
-	private ActionListener getLoginActionListener(final RemoteSynchronisationWizardContext wizardContext) {
-		return new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				loginButtonClicked();
-			}
-		};
+		});
 	}
 
 	private void loginButtonClicked() {
@@ -264,119 +271,103 @@ public class LoginDialog extends JDialog {
 		});
 	}
 
-	private ActionListener getConnectActionlistener(final RemoteSynchronisationWizardContext wizardContext) {
-		return new ActionListener() {
+	private void connectButtonClicked() {
+		wizardContext.setUsername(textFieldUsername.getText());
+		wizardContext.setPassword(new String(passwordField.getPassword()));
+		wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
+			}
+
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				wizardContext.setUsername(textFieldUsername.getText());
-				wizardContext.setPassword(new String(passwordField.getPassword()));
-				wizardContext.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+			public void connectionStateChanged(final ConnectionStatus status) {
 
-					private ConnectionStateListener getConnectionStateListener() {
-						return this;
-					}
-
-					@Override
-					public void connectionStateChanged(final ConnectionStatus status) {
-
-						if (ConnectionStatus.CONNECTED.equals(status)) {
-							SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
-							SwingUtilities.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-								};
-							});
-						} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
-							SwingUtilities.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-									dispose();
-									try {
-										controller.openLinkedDisk(wizardContext.getDiskManager());
-									} catch (VFSException e) {
-										SwingUtil.handleException(getThis(), e);
-									}
-								}
-							});
+				if (ConnectionStatus.CONNECTED.equals(status)) {
+					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						};
+					});
+				} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+							dispose();
+							try {
+								controller.openLinkedDisk(wizardContext.getDiskManager());
+							} catch (VFSException e) {
+								SwingUtil.handleException(getThis(), e);
+							}
 						}
-					}
-				});
+					});
+				}
 			}
-		};
+		});
 	}
 
-	private ActionListener getRegisterAndSyncActionListener(final RemoteSynchronisationWizardContext wizardContext) {
-		return new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()),
-						new ConnectionStateListener() {
-							private ConnectionStateListener getConnectionStateListener() {
-								return this;
-							}
-
-							@Override
-							public void connectionStateChanged(final ConnectionStatus status) {
-								if (ConnectionStatus.CONNECTED.equals(status)) {
-									SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										};
-									});
-								} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-											dispose();
-											controller.startSyncToServer(getThis().wizardContext);
-										}
-									});
-								}
-							}
-						});
+	private void registerAndSyncButtonClicked() {
+		wizardContext.getRemoteManager().registerUser(textFieldUsername.getText(), new String(passwordField.getPassword()), new ConnectionStateListener() {
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
 			}
-		};
+
+			@Override
+			public void connectionStateChanged(final ConnectionStatus status) {
+				if (ConnectionStatus.CONNECTED.equals(status)) {
+					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						};
+					});
+				} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+							dispose();
+							controller.startSyncToServer(getThis().wizardContext);
+						}
+					});
+				}
+			}
+		});
 	}
 
-	private ActionListener getLoginAndSyncActionListener(final RemoteSynchronisationWizardContext wizardContext) {
-		return new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-				wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()),
-						new ConnectionStateListener() {
-							private ConnectionStateListener getConnectionStateListener() {
-								return this;
-							}
+	private void loginAndSynButtonClicked() {
 
-							@Override
-							public void connectionStateChanged(final ConnectionStatus status) {
-								if (ConnectionStatus.CONNECTED.equals(status)) {
-									SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										};
-									});
-								} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
-									SwingUtilities.invokeLater(new Runnable() {
-										@Override
-										public void run() {
-											wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-											dispose();
-											controller.startSyncToServer(getThis().wizardContext);
-										}
-									});
-								}
-							}
-						});
+		wizardContext.getRemoteManager().startLogin(textFieldUsername.getText(), new String(passwordField.getPassword()), new ConnectionStateListener() {
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
 			}
-		};
+
+			@Override
+			public void connectionStateChanged(final ConnectionStatus status) {
+				if (ConnectionStatus.CONNECTED.equals(status)) {
+					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						};
+					});
+				} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+							dispose();
+							controller.startSyncToServer(getThis().wizardContext);
+						}
+					});
+				}
+			}
+		});
 	}
 
 	private KeyListener getLoginOnEnterKeyListener() {
@@ -385,7 +376,22 @@ public class LoginDialog extends JDialog {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					e.consume();
-					loginButtonClicked();
+					LoginActionEnum loginAction = wizardContext.getLoginActionEnum();
+
+					switch (loginAction) {
+					case CONNECT:
+						connectButtonClicked();
+						break;
+					case LOGINREMOTE:
+						loginButtonClicked();
+						break;
+					case SYNC:
+						loginAndSynButtonClicked();
+						break;
+					default:
+						break;
+
+					}
 				}
 			}
 		};
