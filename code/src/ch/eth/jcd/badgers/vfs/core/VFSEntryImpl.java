@@ -249,9 +249,8 @@ public abstract class VFSEntryImpl implements VFSEntry {
 				throw new VFSException("Don't try to delete the root directory fool");
 			}
 
-			parentDirectory.deleteChild(this);
-
 			diskManager.addJournalItem(new DeleteEntryItem(this));
+			parentDirectory.deleteChild(this);
 		} catch (IOException e) {
 			throw new VFSException(e);
 		}
