@@ -298,7 +298,7 @@ public class LoginDialog extends JDialog {
 							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 							dispose();
 							try {
-								controller.openLinkedDisk(wizardContext.getDiskManager());
+								controller.openLinkedDisk();
 							} catch (VFSException e) {
 								SwingUtil.handleException(getThis(), e);
 							}

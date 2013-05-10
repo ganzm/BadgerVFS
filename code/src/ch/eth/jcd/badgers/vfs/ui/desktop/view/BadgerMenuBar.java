@@ -39,6 +39,7 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmConnectRemote;
 	private final JMenuItem mntmLinkDisk;
 	private final JMenuItem mntmWorkOffline;
+	private final JMenuItem mntmConnect;
 	private final JMenuItem mntmClose;
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmDiskInfo;
@@ -85,6 +86,10 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmWorkOffline = createWorkOfflineMenuItem(parent);
 
 		mnDisk.add(mntmWorkOffline);
+
+		mntmConnect = createConnectMenuItem(parent);
+
+		mnDisk.add(mntmConnect);
 
 		mnDisk.addSeparator();
 
@@ -171,12 +176,25 @@ public class BadgerMenuBar extends JMenuBar {
 		add(btnSync);
 	}
 
-	private JMenuItem createWorkOfflineMenuItem(BadgerMainFrame parent2) {
+	private JMenuItem createWorkOfflineMenuItem(final BadgerMainFrame parent) {
 		return new JMenuItem(new AbstractAction("Work Offline") {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				try {
 					parent.getController().startWorkOffline();
+				} catch (final VFSException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
+	private JMenuItem createConnectMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Connect") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().startConnect();
 				} catch (final VFSException ex) {
 					SwingUtil.handleException(parent, ex);
 				}
@@ -315,13 +333,15 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmPaste.setEnabled(entry == null || entry.isDirectory());
 	}
 
-	public void update(final boolean diskMode, final boolean searching, boolean isConnected) {
+	public void update(final boolean diskMode, final boolean searching, boolean isConnected, boolean isDiskLinked) {
 		mnActions.setEnabled(diskMode && !searching);
 		mntmClose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
 		mntmConnectRemote.setEnabled(!diskMode);
-		mntmLinkDisk.setEnabled(diskMode && !isConnected);
+		mntmLinkDisk.setEnabled(diskMode && !isConnected && !isDiskLinked);
+		mntmWorkOffline.setEnabled(diskMode && isConnected);
+		mntmConnect.setEnabled(diskMode && !isConnected && isDiskLinked);
 		mntmDiskInfo.setEnabled(diskMode);
 		mntmWorkOffline.setEnabled(diskMode);
 		btnSearch.setEnabled(diskMode && !searching);

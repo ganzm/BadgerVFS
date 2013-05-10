@@ -219,8 +219,14 @@ public class BadgerMainFrame extends JFrame implements BadgerViewBase {
 	public void update() {
 		final boolean diskMode = !desktopController.isInManagementMode();
 		final boolean isConnected = desktopController.isDiskConnectedWithServer();
+		boolean isDiskLinked;
+		try {
+			isDiskLinked = desktopController.isDiskLinked();
+		} catch (VFSException e) {
+			isDiskLinked = true;
+		}
 
-		menuBar.update(diskMode, searching, isConnected);
+		menuBar.update(diskMode, searching, isConnected, isDiskLinked);
 
 		contentPane.setVisible(diskMode);
 		contentPane.setEnabled(diskMode);

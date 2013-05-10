@@ -209,7 +209,7 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 										controller.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 										dispose();
 										try {
-											controller.openLinkedDisk(controller.getWorkerController().getDiskManager());
+											controller.openLinkedDisk();
 										} catch (VFSException e) {
 											SwingUtil.handleException(getThis(), e);
 										}

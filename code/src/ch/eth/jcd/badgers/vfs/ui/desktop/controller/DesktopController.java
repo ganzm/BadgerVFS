@@ -160,8 +160,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		dialog.setVisible(true);
 	}
 
-	public void openLinkedDisk(VFSDiskManager diskManager) throws VFSException {
-		openDisk(diskManager);
+	public void openLinkedDisk() throws VFSException {
 		final ActionObserver handler = new DefaultObserver(this) {
 
 			@Override
@@ -242,13 +241,10 @@ public class DesktopController extends BadgerController implements ConnectionSta
 	}
 
 	public void openDiskFromFile(File file) throws VFSException {
-		final VFSDiskManager diskManager = initDisk(file.getAbsolutePath());
-		if (remoteManager == null) {
-			openDisk(diskManager);
-		} else {
+		initDisk(file.getAbsolutePath());
+		if (remoteManager != null) {
 			final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
 			wizardContext.setRemoteManager(remoteManager);
-			wizardContext.setDiskManager(diskManager);
 			openLoginDialog(wizardContext);
 		}
 	}
@@ -258,7 +254,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 	 * 
 	 * @param path
 	 */
-	private VFSDiskManager initDisk(final String path) throws VFSException {
+	private void initDisk(final String path) throws VFSException {
 		if (!isInManagementMode()) {
 			throw new VFSException("Cannot open Disk on " + path + " - close current disk first");
 		}
@@ -273,7 +269,12 @@ public class DesktopController extends BadgerController implements ConnectionSta
 
 		remoteManager = initRemoteManager(config);
 
-		return diskManager;
+		workerController = new DiskWorkerController(diskManager);
+		workerController.startWorkerController();
+
+		loadRootFolder();
+
+		updateGUI();
 	}
 
 	/**
@@ -515,6 +516,13 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		disconnect();
 	}
 
+	public void startConnect() throws VFSException {
+		remoteManager = initRemoteManager(workerController.getDiskManager().getDiskConfiguration());
+		final RemoteSynchronisationWizardContext wizardContext = new RemoteSynchronisationWizardContext(LoginActionEnum.CONNECT);
+		wizardContext.setRemoteManager(remoteManager);
+		openLoginDialog(wizardContext);
+	}
+
 	public void copyToClipboard(final List<EntryUiModel> entries) {
 		LOGGER.debug("Adding " + entries + " to clipboard for copy");
 		clipboard = new Pair<ClipboardAction, List<EntryUiModel>>(ClipboardAction.COPY, entries);
@@ -696,4 +704,12 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			return "";
 		}
 	}
+
+	public boolean isDiskLinked() throws VFSException {
+		if (workerController != null) {
+			return workerController.getDiskManager().getDiskConfiguration().isHostNameLinked();
+		}
+		return true;
+	}
+
 }
