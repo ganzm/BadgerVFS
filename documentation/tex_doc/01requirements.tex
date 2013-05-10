@@ -51,8 +51,7 @@ system.
   \item \emph{Elastic disk: Virtual disk can dynamically grow or shrink,
   depending on its occupied space.}
 \end{itemize}
-The implementation only allows growing if more files are imported. Shrinking is
-not supported.
+The implementation expands the underlying disk file up to a specified maximum size if required. Shrinking however is not supported.
 
 \begin{itemize}
   \item \emph{Compression, if implemented with 3d party library.}
