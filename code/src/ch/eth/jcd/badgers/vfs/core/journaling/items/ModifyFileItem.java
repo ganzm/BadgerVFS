@@ -135,7 +135,7 @@ public class ModifyFileItem extends JournalItem {
 			try {
 				inputStream.close();
 			} catch (IOException e) {
-				throw new VFSException(e);
+				LOGGER.error("Error while closing inputstream", e);
 			}
 			inputStream = null;
 		}

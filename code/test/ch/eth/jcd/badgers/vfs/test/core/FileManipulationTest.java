@@ -123,7 +123,7 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 		try {
 			directoryToRename.renameTo(c2);
 			Assert.fail("Expected Exception about having create two file with the same name");
-		} catch (Exception ex) {
+		} catch (VFSException ex) {
 			LOGGER.info("Expected Exception " + ex.getMessage());
 		}
 	}

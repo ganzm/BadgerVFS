@@ -22,8 +22,8 @@ public class GetVersionDeltaAction extends DiskAction {
 
 	private List<Journal> result;
 
-	private Object waitForResultLock = new Object();
-	private Object waitForDownloadLock = new Object();
+	private final Object waitForResultLock = new Object();
+	private final Object waitForDownloadLock = new Object();
 	private boolean waitForResultBool = false;
 	private boolean waitForDownloadBool = false;
 

@@ -33,7 +33,7 @@ public class ManualTestHarness {
 	public static void main(String[] args) throws VFSException {
 		UnittestLogger.init();
 
-		startSynchronizationServer(args);
+		startSynchronizationServer();
 
 		startClientGUI("c:\\temp\\disk1.bfs");
 		startClientGUI("c:\\temp\\disk2.bfs");
@@ -73,7 +73,7 @@ public class ManualTestHarness {
 		frame.getController().openDiskFromFile(new File(diskFilePath));
 	}
 
-	private static void startSynchronizationServer(String[] args) throws VFSException {
+	private static void startSynchronizationServer() throws VFSException {
 		String[] syncServerArgs = new String[] { "-cc", "-c", syncServerConfigPath };
 
 		String serverDiskFilePath = syncServerConfigPath + File.separator + diskId.toString() + ".bfs";
