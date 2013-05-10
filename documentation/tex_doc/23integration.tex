@@ -1,4 +1,12 @@
 \subsection{Integration}
-Journaling eingebaut - jede aktion auf dem code wird journalisiert/persistiert
-shallow copy - File Inhalt wird bei copy aktionen nicht kopiert. Es wird lediglich ein Referenzcounter auf den Datenblock incrementiert. Theoretisch liesse sich so das History feature relativ (mit vorbehalt) einfach nachrüsten. 
-
+To achieve goals like file synchronization, conflict management and history
+browsing of a file, the interfaces developed in the second part of the project
+were no longer good enough. Thus the journaling classes were integrated into the
+core library. These classes help keeping track of the actions that take place on the
+file system and are used to send changes on a local disk to the server. To have
+journaling running as efficiently as possible the shallow copy mechanism was
+developed. This mechanism does not copy the full file content but just has
+reference counting on the datablock. The counters get increased/decreased
+as copies are taken into the journal or deleted. This shallow-copy mechanism
+only works, because files cannot be changed on the file system, they have to be renamed or deleted before
+new content can be stored under the same name.

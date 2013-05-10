@@ -106,20 +106,17 @@ Figure \ref{fig:journaling_classes} gives an overview over the classes that
 were implemented for journaling. The main thing to notice are the
 \textit{JournalItem}s that carry out the operations they represent (e.g.
 \textit{RenameEntryItem} renames a given entry to a new one.). For every disk a
-logical verion number is kept to make sure that no journals collide. Every time
-a client synchronizes the version number that it has last seen gets sent to the
-server so that the server can decide which journals have to be propatated to the
-client.
-
- /.hidden/journals/00001/journal.bin
-wird durch Journal serialisiert
-denn gits /.hidden/Journals/00001/file-09320982309-34234
-also /.hidden/journals/[journalnr]/file-[uuid]
-de gits shallow copies vo de erzüge files
-
-
-
-
+logical version number is kept to make sure that no journals collide. Every time
+a client synchronizes the last known server version number gets sent to the
+server so that the server can decide which journals have to be propagated to the
+client. Journals are kept inside the disk in a folder \verb|/.hidden/journals/|
+and get deleted on the client side, as soon as the local changes are propagated
+to the server. If file contents have to be transferred, they are copied and
+saved under a uuid in a path that looks like \verb|/.hidden/journals/[journalnr]/file-[uuid]|.
+Copying is done very quickly via a shallow copy mechanism, that had to be
+implemented in VFS core. On the server side the disks mainly consist of the
+whole journal from the beginning of time. With more time left for development
+one could easily show a file history or even revert to any point in time.
 
 
 \begin{figure}[h!]
@@ -131,12 +128,13 @@ de gits shallow copies vo de erzüge files
 
 \paragraph{Conflict resolution}
 Based on the logical version numbers that are given to each journal the client
-is able to do a basic conflict resolution when it detects conflicting changes.
+is able to do basic conflict resolution when it detects conflicting changes.
 Files that got new content on the server while they were changed locally will be
-renamed.
+renamed according to following scheme:
 
- Matthias:  und conflict resolution isch:
-1. revert local changes
-2. replay server journal (denn bisch in sync mit em server)
-3. redo local changes
-4. push local changes to server
+\begin{enumerate}
+    \item revert local changes
+  \item replay server journal (the client is in sync with server now)
+  \item redo local changes
+  \item push local changes to server
+\end{enumerate}
