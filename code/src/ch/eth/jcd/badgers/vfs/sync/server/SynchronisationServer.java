@@ -69,7 +69,7 @@ public class SynchronisationServer {
 			while ((input = inputReader.readLine()) != null) {
 				if ("quit".equals(input)) {
 					server.stop();
-					return;
+					System.exit(0);
 				}
 			}
 		} catch (IOException e) {
