@@ -25,7 +25,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 	}
 
 	@Override
-	public AdministrationRemoteInterface login(final String username, final String password) throws RemoteException, VFSException {
+	public synchronized AdministrationRemoteInterface login(final String username, final String password) throws RemoteException, VFSException {
 		LOGGER.info("login Username: " + username);
 
 		ServerConfiguration config = ifManager.getConfig();
@@ -37,7 +37,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 	}
 
 	@Override
-	public AdministrationRemoteInterface registerUser(final String username, final String password) throws RemoteException, VFSException {
+	public synchronized AdministrationRemoteInterface registerUser(final String username, final String password) throws RemoteException, VFSException {
 		LOGGER.info("register Username: " + username);
 
 		ServerConfiguration config = ifManager.getConfig();
@@ -63,7 +63,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 	}
 
 	@Override
-	public void logout(final AdministrationRemoteInterface remoteInterface) throws RemoteException, VFSException {
+	public synchronized void logout(final AdministrationRemoteInterface remoteInterface) throws RemoteException, VFSException {
 		for (ActiveClientLink activeLink : ifManager.getActiveClientLinks()) {
 			if (activeLink.getRemoteIf().getId().equals(remoteInterface.getId())) {
 				LOGGER.info("logout Username: " + activeLink.getClientLink().getUserAccount().getUsername());
