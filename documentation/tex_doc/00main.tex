@@ -124,25 +124,8 @@ different machines.
 
 \include{21requirements}
 \include{22design}
+\include{23integration}
 
-% TODO: Remove this text and replace it with actual content
-%\emph{Describe which requirements (and possibly bonus requirements) you have
-% implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
-
-\subsection{Integration}
-
-% TODO: Remove this text and replace it with actual content
-%\emph{If you had to change the design or API of the previous part, describe the
-% changes and the reasons for each change here.}
-
-
-Journaling eingebaut - jede aktion auf dem code wird journalisiert/persistiert
-shallow copy - File Inhalt wird bei copy aktionen nicht kopiert. Es wird lediglich ein Referenzcounter auf den Datenblock incrementiert. Theoretisch liesse sich so das History feature relativ (mit vorbehalt) einfach nachrüsten. 
-
-
-
-% TODO: Remove this line
-%\textbf{[optional: This part has to be completed by April 8th.]}
 
 % TODO: Remove this text and replace it with actual content
 \include{04quickstart}
@@ -150,25 +133,6 @@ shallow copy - File Inhalt wird bei copy aktionen nicht kopiert. Es wird ledigli
 % commands available (e.g. ls, copy, import).} \\ \\ \\
 
 \include{05glossary}
-
-% TODO: Remove this line
-%\noindent\textbf{[This part has to be completed by May 13th.]}
-
-% TODO: Remove this text and replace it with actual content
-%\emph{Describe how to realize the following use case with your system. Describe
-%the steps involved and how to perform each action (e.g. command line executions
-% and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:
-%\begin{enumerate}
-%\item Start synchronization server on localhost.
-%\item Create account on synchronization server.
-%\item Create two VFS disks (on the same machine) and link them to the new
-% account.
-%\item Import a directory (recursively) from the host file system into Disk 1.
-%\item Dispose Disk 1 after the synchronization finished.
-%\item Export the directory (recursively) from Disk 2 into the host file system.
-%\item Stop synchronization server.
-%\end{enumerate}
-%}
 
 \bibliographystyle{plain}
 \bibliography{literature}

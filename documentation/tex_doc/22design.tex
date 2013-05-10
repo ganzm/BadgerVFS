@@ -93,6 +93,14 @@ decided not to investigate further on that topic.
 \end{figure}
 
 
+\subsubsection{longterm polling}
+To make other clients aware that changes happened on their disk, a long term
+polling mechanism was implemented. Clients start the
+\textit{longTermPollVersion} method in the \textit{DiskRemoteInterface}. Upon
+files get changed by a client the other clients that are currently connected to
+the same disk get notified by returning the \textit{longTermPollVersion} method,
+containing the actual server version, to which the clients now have to update.
+
 \subsubsection{Journaling}
 Figure \ref{fig:journaling_classes} gives an overview over the classes that
 were implemented for journaling. The main thing to notice are the
@@ -102,6 +110,17 @@ logical verion number is kept to make sure that no journals collide. Every time
 a client synchronizes the version number that it has last seen gets sent to the
 server so that the server can decide which journals have to be propatated to the
 client.
+
+ /.hidden/journals/00001/journal.bin
+wird durch Journal serialisiert
+denn gits /.hidden/Journals/00001/file-09320982309-34234
+also /.hidden/journals/[journalnr]/file-[uuid]
+de gits shallow copies vo de erzüge files
+
+
+
+
+
 
 \begin{figure}[h!]
 \centering
@@ -116,14 +135,8 @@ is able to do a basic conflict resolution when it detects conflicting changes.
 Files that got new content on the server while they were changed locally will be
 renamed.
 
-
-longterm polling
-
-Schwierigkeiten mit single threaded access auf disk, auswirkungen auf das gui bei leseaktionen aka change folder
-
-
-wie funktionieriert upload/download
-
-
-
- fancy shallow copy of files
+ Matthias:  und conflict resolution isch:
+1. revert local changes
+2. replay server journal (denn bisch in sync mit em server)
+3. redo local changes
+4. push local changes to server

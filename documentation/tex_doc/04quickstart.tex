@@ -139,3 +139,110 @@ file or folder\ldots}
 \caption{\ldots and finally the folder is imported after a couple of time.}
 \label{fig:06_quickstart}
 \end{figure}
+
+
+\subsection{Disk sychronization}
+This section show how to create a new account, log in from two different
+machines, import a directory recursively on the first client
+and export the directory on the second client. Figures \ref{fig:01_newDisk.png}
+through \ref{fig:13_export.png} give a short screenshot view of the steps taken.
+
+Start synchronization server on localhost: Start
+\textit{SynchronizationServer} via eclipse. Giving following program arguments
+allow some logging output and configuration of the server side files:\newline 
+\verb|-l log4j\_server.xml -c /home/rop/Desktop/badger/server/|
+
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/01_newDisk.png}
+\caption{Create a new local disk according to figures \ldots}
+\label{fig:01_newDisk.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/02_newDisk2.png}
+\caption{\ldots and set parameters \ldots}
+\label{fig:02_newDisk2.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/03_linkDisk.png}
+\caption{\ldots open ``link disk''\ldots}
+\label{fig:03_linkDisk.png}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/04_loginremote.png}
+\caption{\ldots enter new username and password, hit ``Register \& Sync''\ldots}
+\label{fig:04_loginremote.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/05_linked.png}
+\caption{\ldots disk is now linked, ``Sync" button is available\ldots}
+\label{fig:05_linked.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/06_dragndrop.png}
+\caption{\ldots drag and drop a folder into the grey area\ldots}
+\label{fig:06_dragndrop.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/07_sync.png}
+\caption{\ldots the folder gets locally imported, and then hit ``Sync" and the
+folder gets uploaded \ldots}\label{fig:07_sync.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/08_new_client_connect_remote.png}
+\caption{\ldots in a new client open ``connect remote''
+\ldots}\label{fig:08_new_client_connect_remote.png}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/09_login.png}
+\caption{\ldots do the login with the old credentials \ldots}
+\label{fig:09_login.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/10_choose_disk.png}
+\caption{\ldots now you can choose the disk created remotely and open it \ldots}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/11choose_localdisk.png}
+\caption{\ldots here you create a new local disk to synchronize the server file
+to \ldots}
+\label{fig:11choose_localdisk.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/12_sychronized_down.png}
+\caption{\ldots upon creation the remote files get synchronized down.}
+\label{fig:12_sychronized_down.png}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{figures/serverUseCase/13_export.png}
+\caption{ via rightlick - export one can export the freshly created folder.}
+\label{fig:13_export.png}
+\end{figure}
