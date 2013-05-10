@@ -24,7 +24,7 @@ public class DownloadRemoteChangesAction extends DiskAction {
 
 	private static final Logger LOGGER = Logger.getLogger(DownloadRemoteChangesAction.class);
 
-	private static final String conflictSuffix = "." + System.getProperty("user.name");
+	private static final String CONFLICT_SUFFIX = "." + System.getProperty("user.name");
 
 	private final RemoteManager remoteManager;
 
@@ -65,7 +65,7 @@ public class DownloadRemoteChangesAction extends DiskAction {
 		// redo local changes, but resolve conflicts
 		List<PathConflict> conflicts = new ArrayList<>();
 		for (Journal journal : journals) {
-			journal.replayResolveConflics(diskManager, conflictSuffix, conflicts);
+			journal.replayResolveConflics(diskManager, CONFLICT_SUFFIX, conflicts);
 
 			// override journal
 			journaling.overrideJournal(journal);
