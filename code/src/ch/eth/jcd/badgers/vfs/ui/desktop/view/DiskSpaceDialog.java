@@ -37,9 +37,9 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 	private final JProgressBar progressBarDiskSpace;
 	private final JTextField textFieldDirectoryBlocks;
 	private final DesktopController desktopController;
-	private JTextField textFieldDiskId;
-	private JTextField textFieldHost;
-	private JTextField textFieldVersion;
+	private final JTextField textFieldDiskId;
+	private final JTextField textFieldHost;
+	private final JTextField textFieldVersion;
 
 	/**
 	 * Create the dialog.
@@ -52,27 +52,27 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		GridBagLayout gbl_contentPanel = new GridBagLayout();
-		gbl_contentPanel.columnWidths = new int[] { 424, 0 };
-		gbl_contentPanel.rowHeights = new int[] { 113, 113, 0, 0 };
-		gbl_contentPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_contentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		contentPanel.setLayout(gbl_contentPanel);
+		GridBagLayout gblContentPanel = new GridBagLayout();
+		gblContentPanel.columnWidths = new int[] { 424, 0 };
+		gblContentPanel.rowHeights = new int[] { 113, 113, 0, 0 };
+		gblContentPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gblContentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		contentPanel.setLayout(gblContentPanel);
 		{
 			final JPanel panelDiskSpace = new JPanel();
 			panelDiskSpace.setBorder(new TitledBorder(null, "Disk Space", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			GridBagConstraints gbc_panelDiskSpace = new GridBagConstraints();
-			gbc_panelDiskSpace.fill = GridBagConstraints.BOTH;
-			gbc_panelDiskSpace.insets = new Insets(0, 0, 5, 0);
-			gbc_panelDiskSpace.gridx = 0;
-			gbc_panelDiskSpace.gridy = 0;
-			contentPanel.add(panelDiskSpace, gbc_panelDiskSpace);
-			final GridBagLayout gbl_panelDiskSpace = new GridBagLayout();
-			gbl_panelDiskSpace.columnWidths = new int[] { FIRST_COLUMN_WIDTH, 0, 0 };
-			gbl_panelDiskSpace.rowHeights = new int[] { 0, 0, 0, 0, 0 };
-			gbl_panelDiskSpace.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panelDiskSpace.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-			panelDiskSpace.setLayout(gbl_panelDiskSpace);
+			GridBagConstraints gbcPanelDiskSpace = new GridBagConstraints();
+			gbcPanelDiskSpace.fill = GridBagConstraints.BOTH;
+			gbcPanelDiskSpace.insets = new Insets(0, 0, 5, 0);
+			gbcPanelDiskSpace.gridx = 0;
+			gbcPanelDiskSpace.gridy = 0;
+			contentPanel.add(panelDiskSpace, gbcPanelDiskSpace);
+			final GridBagLayout gblPanelDiskSpace = new GridBagLayout();
+			gblPanelDiskSpace.columnWidths = new int[] { FIRST_COLUMN_WIDTH, 0, 0 };
+			gblPanelDiskSpace.rowHeights = new int[] { 0, 0, 0, 0, 0 };
+			gblPanelDiskSpace.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+			gblPanelDiskSpace.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+			panelDiskSpace.setLayout(gblPanelDiskSpace);
 			{
 				final JLabel lblMaximumSpace = new JLabel("Maximum Space");
 				final GridBagConstraints gbcLblMaximumSpace = new GridBagConstraints();
@@ -148,87 +148,87 @@ public class DiskSpaceDialog extends JDialog implements ActionObserver {
 		{
 			JPanel panelSynchronisation = new JPanel();
 			panelSynchronisation.setBorder(new TitledBorder(null, "Synchronisation", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			GridBagConstraints gbc_panelSynchronisation = new GridBagConstraints();
-			gbc_panelSynchronisation.insets = new Insets(0, 0, 5, 0);
-			gbc_panelSynchronisation.anchor = GridBagConstraints.NORTH;
-			gbc_panelSynchronisation.fill = GridBagConstraints.HORIZONTAL;
-			gbc_panelSynchronisation.gridx = 0;
-			gbc_panelSynchronisation.gridy = 1;
-			contentPanel.add(panelSynchronisation, gbc_panelSynchronisation);
-			GridBagLayout gbl_panelSynchronisation = new GridBagLayout();
-			gbl_panelSynchronisation.columnWidths = new int[] { FIRST_COLUMN_WIDTH, 0, 0 };
-			gbl_panelSynchronisation.rowHeights = new int[] { 0, 0, 0, 0 };
-			gbl_panelSynchronisation.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-			gbl_panelSynchronisation.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
-			panelSynchronisation.setLayout(gbl_panelSynchronisation);
+			GridBagConstraints gbcPanelSynchronisation = new GridBagConstraints();
+			gbcPanelSynchronisation.insets = new Insets(0, 0, 5, 0);
+			gbcPanelSynchronisation.anchor = GridBagConstraints.NORTH;
+			gbcPanelSynchronisation.fill = GridBagConstraints.HORIZONTAL;
+			gbcPanelSynchronisation.gridx = 0;
+			gbcPanelSynchronisation.gridy = 1;
+			contentPanel.add(panelSynchronisation, gbcPanelSynchronisation);
+			GridBagLayout gblPanelSynchronisation = new GridBagLayout();
+			gblPanelSynchronisation.columnWidths = new int[] { FIRST_COLUMN_WIDTH, 0, 0 };
+			gblPanelSynchronisation.rowHeights = new int[] { 0, 0, 0, 0 };
+			gblPanelSynchronisation.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+			gblPanelSynchronisation.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
+			panelSynchronisation.setLayout(gblPanelSynchronisation);
 			{
 				JLabel lblDiskId = new JLabel("Disk Id");
-				GridBagConstraints gbc_lblDiskId = new GridBagConstraints();
-				gbc_lblDiskId.insets = new Insets(0, 0, 5, 5);
-				gbc_lblDiskId.anchor = GridBagConstraints.EAST;
-				gbc_lblDiskId.gridx = 0;
-				gbc_lblDiskId.gridy = 0;
-				panelSynchronisation.add(lblDiskId, gbc_lblDiskId);
+				GridBagConstraints gbcLblDiskId = new GridBagConstraints();
+				gbcLblDiskId.insets = new Insets(0, 0, 5, 5);
+				gbcLblDiskId.anchor = GridBagConstraints.EAST;
+				gbcLblDiskId.gridx = 0;
+				gbcLblDiskId.gridy = 0;
+				panelSynchronisation.add(lblDiskId, gbcLblDiskId);
 			}
 			{
 				textFieldDiskId = new JTextField();
 				textFieldDiskId.setEditable(false);
-				GridBagConstraints gbc_textFieldDiskId = new GridBagConstraints();
-				gbc_textFieldDiskId.insets = new Insets(0, 0, 5, 0);
-				gbc_textFieldDiskId.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldDiskId.gridx = 1;
-				gbc_textFieldDiskId.gridy = 0;
-				panelSynchronisation.add(textFieldDiskId, gbc_textFieldDiskId);
+				GridBagConstraints gbcTextFieldDiskId = new GridBagConstraints();
+				gbcTextFieldDiskId.insets = new Insets(0, 0, 5, 0);
+				gbcTextFieldDiskId.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldDiskId.gridx = 1;
+				gbcTextFieldDiskId.gridy = 0;
+				panelSynchronisation.add(textFieldDiskId, gbcTextFieldDiskId);
 				textFieldDiskId.setColumns(10);
 			}
 			{
 				JLabel lblHost = new JLabel("Host");
-				GridBagConstraints gbc_lblHost = new GridBagConstraints();
-				gbc_lblHost.anchor = GridBagConstraints.EAST;
-				gbc_lblHost.insets = new Insets(0, 0, 5, 5);
-				gbc_lblHost.gridx = 0;
-				gbc_lblHost.gridy = 1;
-				panelSynchronisation.add(lblHost, gbc_lblHost);
+				GridBagConstraints gbcLblHost = new GridBagConstraints();
+				gbcLblHost.anchor = GridBagConstraints.EAST;
+				gbcLblHost.insets = new Insets(0, 0, 5, 5);
+				gbcLblHost.gridx = 0;
+				gbcLblHost.gridy = 1;
+				panelSynchronisation.add(lblHost, gbcLblHost);
 			}
 			{
 				textFieldHost = new JTextField();
 				textFieldHost.setEditable(false);
-				GridBagConstraints gbc_textFieldHost = new GridBagConstraints();
-				gbc_textFieldHost.insets = new Insets(0, 0, 5, 0);
-				gbc_textFieldHost.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldHost.gridx = 1;
-				gbc_textFieldHost.gridy = 1;
-				panelSynchronisation.add(textFieldHost, gbc_textFieldHost);
+				GridBagConstraints gbcTextFieldHost = new GridBagConstraints();
+				gbcTextFieldHost.insets = new Insets(0, 0, 5, 0);
+				gbcTextFieldHost.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldHost.gridx = 1;
+				gbcTextFieldHost.gridy = 1;
+				panelSynchronisation.add(textFieldHost, gbcTextFieldHost);
 				textFieldHost.setColumns(10);
 			}
 			{
 				JLabel lblVersion = new JLabel("Version");
-				GridBagConstraints gbc_lblVersion = new GridBagConstraints();
-				gbc_lblVersion.anchor = GridBagConstraints.EAST;
-				gbc_lblVersion.insets = new Insets(0, 0, 0, 5);
-				gbc_lblVersion.gridx = 0;
-				gbc_lblVersion.gridy = 2;
-				panelSynchronisation.add(lblVersion, gbc_lblVersion);
+				GridBagConstraints gbcLblVersion = new GridBagConstraints();
+				gbcLblVersion.anchor = GridBagConstraints.EAST;
+				gbcLblVersion.insets = new Insets(0, 0, 0, 5);
+				gbcLblVersion.gridx = 0;
+				gbcLblVersion.gridy = 2;
+				panelSynchronisation.add(lblVersion, gbcLblVersion);
 			}
 			{
 				textFieldVersion = new JTextField();
 				textFieldVersion.setEditable(false);
-				GridBagConstraints gbc_textFieldVersion = new GridBagConstraints();
-				gbc_textFieldVersion.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textFieldVersion.gridx = 1;
-				gbc_textFieldVersion.gridy = 2;
-				panelSynchronisation.add(textFieldVersion, gbc_textFieldVersion);
+				GridBagConstraints gbcTextFieldVersion = new GridBagConstraints();
+				gbcTextFieldVersion.fill = GridBagConstraints.HORIZONTAL;
+				gbcTextFieldVersion.gridx = 1;
+				gbcTextFieldVersion.gridy = 2;
+				panelSynchronisation.add(textFieldVersion, gbcTextFieldVersion);
 				textFieldVersion.setColumns(10);
 			}
 		}
 		{
 			lblStatus = new JLabel("status");
-			GridBagConstraints gbc_lblStatus = new GridBagConstraints();
-			gbc_lblStatus.anchor = GridBagConstraints.NORTH;
-			gbc_lblStatus.fill = GridBagConstraints.HORIZONTAL;
-			gbc_lblStatus.gridx = 0;
-			gbc_lblStatus.gridy = 2;
-			contentPanel.add(lblStatus, gbc_lblStatus);
+			GridBagConstraints gbcLblStatus = new GridBagConstraints();
+			gbcLblStatus.anchor = GridBagConstraints.NORTH;
+			gbcLblStatus.fill = GridBagConstraints.HORIZONTAL;
+			gbcLblStatus.gridx = 0;
+			gbcLblStatus.gridy = 2;
+			contentPanel.add(lblStatus, gbcLblStatus);
 		}
 		{
 			final JPanel buttonPane = new JPanel();
