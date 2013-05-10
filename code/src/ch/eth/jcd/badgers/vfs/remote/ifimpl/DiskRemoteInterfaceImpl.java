@@ -50,7 +50,7 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 			try {
 				diskWorkerController.wait(timeout);
 			} catch (InterruptedException e) {
-				LOGGER.error("LongTermPoll Interrupted", e);
+				LOGGER.debug("LongTermPoll Interrupted", e);
 			}
 		}
 
