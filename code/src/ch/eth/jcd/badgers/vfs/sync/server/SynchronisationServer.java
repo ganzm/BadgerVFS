@@ -1,5 +1,8 @@
 package ch.eth.jcd.badgers.vfs.sync.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,7 +50,31 @@ public class SynchronisationServer {
 
 		final ServerConfiguration config = Initialisation.parseServerConfiguration(args);
 		final SynchronisationServer server = new SynchronisationServer(config);
-
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				LOGGER.debug("inside shutdown hook");
+				try {
+					server.stop();
+				} catch (VFSException e) {
+					LOGGER.error("error shutting down", e);
+				}
+			}
+		});
 		server.start();
+
+		BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+		String input;
+		try {
+			while ((input = inputReader.readLine()) != null) {
+				if ("quit".equals(input)) {
+					server.stop();
+					return;
+				}
+			}
+		} catch (IOException e) {
+			LOGGER.equals("error reading input");
+		}
+
 	}
 }
