@@ -20,7 +20,7 @@ partitioned into the packages \textit{model, view and controller}.
 \subsubsection{Decoupling of GUI and working threads}
 This section describes the way how the decoupling from GUI and working threads
 was implemented. This decoupling made the GUI still responsive even though some
-long running tasks like import or search would be running. All operations performed on the core components accessing the virtual disk file are encapsulated in subclasses of \textit{BadgerAction}. These \textit{BadgerActions} are then performed single theaded by the \textit{WorkerController}. By queuing these actions concurrent access to the virtual disk is prevented.
+long running tasks like import or search would be running. All operations performed on the core components accessing the virtual disk file are encapsulated in subclasses of \textit{BadgerAction}. These \textit{BadgerActions} are then performed single threaded by the \textit{WorkerController}. By queuing these actions concurrent access to the virtual disk is prevented.
 
 Figure
 \ref{fig:decouple_threads} shows the sequence diagram of the example ``Import'':
@@ -52,14 +52,14 @@ Searching files can be done in a separate Panel: After entering the search
 string one is allowed to switch several flags like ``case sensitive'' or
 ``search subfolder'' and one can change the search folder. As mentioned before ? and * are supported as wildcards.
 
-Search can be canceled on the gui at any time. However the search routine performed on the core checks for cancelation only once walking through a directory (which should be often enough).
+Search can be cancelled on the GUI at any time. However the search routine performed on the core checks for cancellation only once walking through a directory (which should be often enough).
 
 A double click (or keyboard enter) on a search result stops the current search and opens the containing folder in the browsing window.
 
 \subsubsection{Keyboard and Mouse support}
 One can navigate the list of entries by double clicking folders. The parent
 folder can be accessed by double clicking ``..''. By right clicking on an entry
-the user gets a menu depending on wheter she clicked on an file, folder or the empty
+the user gets a menu depending on whether she clicked on an file, folder or the empty
 space. The right click in empty space reveals the same menu entries as the right
 click on the parent folder. The only difference between file and folder menus
 are the ``new folder'', ``paste'' and ``import'' actions, that are not allowed

@@ -45,7 +45,7 @@ currently saved in the file system. More about the internals of directory
 section can be found in section \ref{sec:file_format}
 
 \subparagraph{encryption}
-The encryption package shows some demo classes that implement a ceasar
+The encryption package shows some demo classes that implement a Ceasar
 cipher\footnote{http://en.wikipedia.org/wiki/Caesar\_cipher}. These classes are
 mainly to show how encrpytion in VFS core can be implemented and configured. To
 enable encryption in a new virtual disk one has to enable it in the
@@ -110,7 +110,7 @@ DirectorySectionOffset & long (8 byte) &  File offset where the directory
 section starts \\ \hline
 DataSectionOffset & long (8 byte) &  File offset where the data section starts
 \\ \hline
- SaltString & 8 bytes  & Salt used to hash username and password randomly string generated while creating this
+ SaltString & 8 bytes  & Salt used to hash user name and password randomly string generated while creating this
    file. (Not implemented yet)
  \\ \hline
   Password & xxx bytes  & CryptoHash (SHA-whatever) of Password+SaltString  (Not implemented yet)
