@@ -412,12 +412,14 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	 * @throws VFSException
 	 */
 	public void replayInitialJournal(Journal journal) throws VFSException {
-		journaling.openNewJournal(journal.getJournalEntries(), true);
-		for (JournalItem item : journal.getJournalEntries()) {
-			item.replay(this);
-		}
+		if (journal.getJournalEntries().size() > 0) {
+			journaling.openNewJournal(journal.getJournalEntries(), true);
+			for (JournalItem item : journal.getJournalEntries()) {
+				item.replay(this);
+			}
 
-		journaling.closeJournal();
+			journaling.closeJournal();
+		}
 		long serverVersion = getServerVersion() + 1;
 		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, serverVersion);
 	}
@@ -458,6 +460,7 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, serverVersion);
 	}
 
+	@Override
 	public VFSJournaling getJournaling() {
 		return journaling;
 	}
