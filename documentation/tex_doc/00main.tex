@@ -89,13 +89,13 @@ creating users and a login of created users. Logged in users can link local
 disks to an account on the server via VFS Browser and then can connect to such
 shared disks from an other client machine. Disks can also be created directly on
 the server. When VFS Browser has a connection to the server, changes that occur
-on the local disk will be propagated to the server which propagates these
-changes to possibly other connected machines. If a user has
-no connection to the Synchronization Server but operates on a disk that is
-linked to a server instance the changes are recorded and are propagated as soon
-as the connection is established next time. Thus synchronization server allows
-seamless synchronization between several VFS Browser instances running on
-different machines.
+on the local disk will be propagated to the server as soon as the ``sync''
+button is clicked. The server then propagates these changes to possibly
+other connected machines. If a user has no connection to the synchronization
+server but operates on a disk that is linked to a server instance the changes
+are recorded in journals and are propagated as soon as the connection is
+established next time. Thus synchronization server allows seamless
+synchronization between several VFS Browser instances running on different machines.
 
 
 
