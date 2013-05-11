@@ -27,10 +27,6 @@ public class ServerRemoteInterfaceManager {
 
 	private final List<ActiveClientLink> activeClientLinks;
 	private final Map<UUID, DiskRemoteInterfaceImpl> activeDiskRemoteInterfaceImpls = new HashMap<>();
-	/**
-	 * instance to the single LoginInterface published by RMI
-	 */
-	private LoginRemoteInterface loginRemoteInterface;
 
 	private LoginRemoteInterfaceImpl loginRemoteInterfaceImpl;
 
@@ -51,7 +47,7 @@ public class ServerRemoteInterfaceManager {
 			rmiRegistry = LocateRegistry.createRegistry(port);
 
 			loginRemoteInterfaceImpl = new LoginRemoteInterfaceImpl(this);
-			loginRemoteInterface = (LoginRemoteInterface) UnicastRemoteObject.exportObject(loginRemoteInterfaceImpl, 0);
+			LoginRemoteInterface loginRemoteInterface = (LoginRemoteInterface) UnicastRemoteObject.exportObject(loginRemoteInterfaceImpl, 0);
 
 			// Bind the remote object's stub in the registry.
 			rmiRegistry.bind(LoginRemoteInterface.LOGIN_INTERFACE_KEY, loginRemoteInterface);

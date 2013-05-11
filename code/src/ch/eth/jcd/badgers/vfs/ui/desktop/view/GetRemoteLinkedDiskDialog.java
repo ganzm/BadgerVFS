@@ -184,42 +184,47 @@ public class GetRemoteLinkedDiskDialog extends JDialog implements BadgerViewBase
 					// TODO Warten auf fertiges Logout. Blocking.
 					wizardContext.getRemoteManager().dispose();
 					createDisk(wizardContext);
-					controller.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), new ConnectionStateListener() {
+					controller.getRemoteManager().startLogin(wizardContext.getUsername(), wizardContext.getPassword(), getLoginStateListener(wizardContext));
+				} catch (final VFSException e) {
+					SwingUtil.handleException(getThis(), e);
+				}
+			}
 
-						private ConnectionStateListener getConnectionStateListener() {
-							return this;
-						}
+		};
+	}
 
+	private ConnectionStateListener getLoginStateListener(final RemoteSynchronisationWizardContext wizardContext) {
+		return new ConnectionStateListener() {
+
+			private ConnectionStateListener getConnectionStateListener() {
+				return this;
+			}
+
+			@Override
+			public void connectionStateChanged(final ConnectionStatus status) {
+
+				if (ConnectionStatus.CONNECTED.equals(status)) {
+					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtilities.invokeLater(new Runnable() {
 						@Override
-						public void connectionStateChanged(final ConnectionStatus status) {
+						public void run() {
+							wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+						}
+					});
 
-							if (ConnectionStatus.CONNECTED.equals(status)) {
-								SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
-								SwingUtilities.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-									}
-								});
-
-							} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
-								SwingUtilities.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										controller.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
-										dispose();
-										try {
-											controller.openLinkedDisk();
-										} catch (VFSException e) {
-											SwingUtil.handleException(getThis(), e);
-										}
-									}
-								});
+				} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							controller.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
+							dispose();
+							try {
+								controller.openLinkedDisk();
+							} catch (VFSException e) {
+								SwingUtil.handleException(getThis(), e);
 							}
 						}
 					});
-				} catch (final VFSException e) {
-					SwingUtil.handleException(getThis(), e);
 				}
 			}
 		};

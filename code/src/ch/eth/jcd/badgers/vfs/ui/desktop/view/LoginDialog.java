@@ -31,6 +31,7 @@ import ch.eth.jcd.badgers.vfs.util.SwingUtil;
 
 public class LoginDialog extends JDialog {
 
+	private static final String LOGIN_FAILED_WRONG_USERNAME_OR_PASSWORD = "Login failed, wrong username or password";
 	private static final long serialVersionUID = 6008623672955958103L;
 	private final JTextField textFieldUsername;
 	private final JPasswordField passwordField;
@@ -255,7 +256,7 @@ public class LoginDialog extends JDialog {
 			@Override
 			public void connectionStateChanged(final ConnectionStatus status) {
 				if (ConnectionStatus.CONNECTED.equals(status)) {
-					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtil.handleError(getThis(), LOGIN_FAILED_WRONG_USERNAME_OR_PASSWORD);
 					wizardContext.getRemoteManager().removeConnectionStateListener(getConnectionStateListener());
 				} else if (ConnectionStatus.LOGGED_IN.equals(status)) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -284,7 +285,7 @@ public class LoginDialog extends JDialog {
 			public void connectionStateChanged(final ConnectionStatus status) {
 
 				if (ConnectionStatus.CONNECTED.equals(status)) {
-					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtil.handleError(getThis(), LOGIN_FAILED_WRONG_USERNAME_OR_PASSWORD);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -318,7 +319,7 @@ public class LoginDialog extends JDialog {
 			@Override
 			public void connectionStateChanged(final ConnectionStatus status) {
 				if (ConnectionStatus.CONNECTED.equals(status)) {
-					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtil.handleError(getThis(), LOGIN_FAILED_WRONG_USERNAME_OR_PASSWORD);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -349,7 +350,7 @@ public class LoginDialog extends JDialog {
 			@Override
 			public void connectionStateChanged(final ConnectionStatus status) {
 				if (ConnectionStatus.CONNECTED.equals(status)) {
-					SwingUtil.handleError(getThis(), "Login failed, wrong username or password");
+					SwingUtil.handleError(getThis(), LOGIN_FAILED_WRONG_USERNAME_OR_PASSWORD);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {

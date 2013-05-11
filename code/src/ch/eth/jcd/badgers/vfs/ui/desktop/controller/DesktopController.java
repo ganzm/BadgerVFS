@@ -277,23 +277,6 @@ public class DesktopController extends BadgerController implements ConnectionSta
 		updateGUI();
 	}
 
-	/**
-	 * Actualy open a disk You acknowledged the Disk / Open FileChooser Dialog
-	 * 
-	 * @param path
-	 * @throws VFSException
-	 */
-	private void openDisk(final VFSDiskManager diskManager) throws VFSException {
-
-		// create and start WorkerController
-		workerController = new DiskWorkerController(diskManager);
-		workerController.startWorkerController();
-
-		loadRootFolder();
-
-		updateGUI();
-	}
-
 	private RemoteManager initRemoteManager(final DiskConfiguration config) {
 		final String hostLink = config.getLinkedHostName();
 		if (hostLink == null || hostLink.isEmpty()) {
