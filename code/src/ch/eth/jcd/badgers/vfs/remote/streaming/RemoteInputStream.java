@@ -5,15 +5,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 public class RemoteInputStream extends InputStream implements Serializable {
-
-	private static final int BUFFER_SIZE = 1024;
-	private final static int MAX_EXP = 12; // max fetch size = 2^MAX_EXP (4 MB)
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4102456704778084627L;
 
 	private final Readable source;
-	private byte buffer[];
-	private int pos;
-	private int exp;
 	private boolean closed;
 
 	RemoteInputStream(final Readable source) {
@@ -22,20 +16,29 @@ public class RemoteInputStream extends InputStream implements Serializable {
 
 	@Override
 	public int read() throws IOException {
+		byte[] buffer = new byte[1];
 
-		if (pos == -2) {
+		buffer = source.read(1);
+		if (buffer.length == 0) {
 			return -1;
 		}
-		if (buffer == null || pos > buffer.length - 1) {
-			buffer = source.read(BUFFER_SIZE * (exp > MAX_EXP ? 1 << MAX_EXP : 1 << exp++));
-			pos = 0;
-			if (buffer.length == 0) {
-				pos = -2;
-				return -1;
 
-			}
+		return buffer[0] & 0xff;
+	}
+
+	@Override
+	public int read(byte[] b) throws IOException {
+		return read(b, 0, b.length);
+	}
+
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		byte[] result = source.read(len);
+		for (int i = 0; i < result.length; i++) {
+			b[off + i] = result[i];
 		}
-		return buffer[pos++] & 0xff;
+
+		return result.length;
 	}
 
 	@Override
