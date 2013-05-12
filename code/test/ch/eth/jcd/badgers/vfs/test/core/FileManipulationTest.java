@@ -110,7 +110,7 @@ public class FileManipulationTest extends VFSDiskManagerTestBase {
 		try {
 			testDir.getChildPath(c1).createFile();
 			Assert.fail("Expected Exception about having create two file with the same name");
-		} catch (Exception ex) {
+		} catch (VFSException ex) {
 			LOGGER.info("Expected Exception " + ex.getMessage());
 		}
 
