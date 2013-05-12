@@ -7,9 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -203,12 +200,33 @@ public class LoginDialog extends JDialog {
 					createButton.setVisible(false);
 					closeButton.setVisible(true);
 				}
+
+				
+				// Set default button when hitting the ENTER key
+				{
+					JButton button = null;
+					LoginActionEnum loginAction = wizardContext.getLoginActionEnum();
+					switch (loginAction) {
+					case CONNECT:
+						button = connectButton;
+						break;
+					case LOGINREMOTE:
+						button = loginButton;
+						break;
+					case SYNC:
+						button = loginAndSyncButton;
+						break;
+					default:
+						break;
+
+					}
+
+					if(button != null){
+						getRootPane().setDefaultButton(button);						
+					}
+				}
 			}
 		}
-
-		textFieldUsername.addKeyListener(getLoginOnEnterKeyListener());
-		passwordField.addKeyListener(getLoginOnEnterKeyListener());
-
 	}
 
 	private ActionListener getCloseActionListener() {
@@ -369,33 +387,6 @@ public class LoginDialog extends JDialog {
 				}
 			}
 		});
-	}
-
-	private KeyListener getLoginOnEnterKeyListener() {
-		return new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					e.consume();
-					LoginActionEnum loginAction = wizardContext.getLoginActionEnum();
-
-					switch (loginAction) {
-					case CONNECT:
-						connectButtonClicked();
-						break;
-					case LOGINREMOTE:
-						loginButtonClicked();
-						break;
-					case SYNC:
-						loginAndSynButtonClicked();
-						break;
-					default:
-						break;
-
-					}
-				}
-			}
-		};
 	}
 
 	private LoginDialog getThis() {
