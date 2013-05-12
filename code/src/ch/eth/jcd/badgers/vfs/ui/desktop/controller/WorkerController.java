@@ -63,13 +63,16 @@ public abstract class WorkerController implements Runnable {
 			AbstractBadgerAction action = null;
 
 			while (running) {
+				long startTime = 0;
 				try {
 					action = actionQueue.take();
+					startTime = System.currentTimeMillis();
 					performAction(action);
 				} catch (final Exception ex) {
 					LOGGER.error("Error while performing Action " + action, ex);
 					action.setFailed(ex);
 				} finally {
+					LOGGER.debug("[" + action.getClass().getSimpleName() + "] performed in " + (System.currentTimeMillis() - startTime) + "ms");
 					synchronized (action) {
 						action.notifyAll();
 					}

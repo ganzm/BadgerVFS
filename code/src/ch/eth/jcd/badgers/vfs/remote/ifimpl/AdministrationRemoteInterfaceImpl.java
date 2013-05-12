@@ -30,6 +30,7 @@ import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerRemoteInterfaceManager;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
+import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkLoadIndicatorPassive;
 import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteInterface {
@@ -77,7 +78,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		diskManager.replayInitialJournal(journal);
 
-		final DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager);
+		final DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager, new WorkLoadIndicatorPassive());
 		clientLink.setDiskWorkerController(diskWorkerController);
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
@@ -112,7 +113,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 			final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 			VFSDiskManager diskManager = factory.openDiskManager(diskConfig);
-			workerController = new DiskWorkerController(diskManager);
+			workerController = new DiskWorkerController(diskManager, new WorkLoadIndicatorPassive());
 		}
 
 		clientLink.setDiskWorkerController(workerController);

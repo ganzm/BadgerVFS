@@ -13,8 +13,12 @@ public class DiskWorkerController extends WorkerController {
 	private final WorkLoadIndicator workLoadIndicator;
 
 	public DiskWorkerController(final VFSDiskManager diskManager) {
+		this(diskManager, new WorkLoadIndicatorSwingGui());
+	}
+
+	public DiskWorkerController(final VFSDiskManager diskManager, WorkLoadIndicator workLoadIndicator) {
 		this.diskManager = diskManager;
-		this.workLoadIndicator = new WorkLoadIndicator();
+		this.workLoadIndicator = workLoadIndicator;
 	}
 
 	public void enqueue(final DiskAction action) {

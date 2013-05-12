@@ -34,7 +34,7 @@ public class RemoteLongTermPoller implements Runnable {
 		this.diskRemoteInterface = diskRemoteInterface;
 		pollThread = new Thread(this);
 		pollThread.setDaemon(true);
-		pollThread.setName("Poll-" + diskRemoteInterface);
+		pollThread.setName("RemoteLongTermPoller");
 
 		pollThread.start();
 
