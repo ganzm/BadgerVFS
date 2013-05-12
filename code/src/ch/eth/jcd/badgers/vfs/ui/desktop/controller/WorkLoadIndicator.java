@@ -35,8 +35,8 @@ public class WorkLoadIndicator {
 		});
 	}
 
-	public void jobEnqueued(final DiskAction action) {
-		LOGGER.debug("job enqueued");
+	public void actionEnqueued(final DiskAction action) {
+		LOGGER.debug("action enqueued " + action.getClass().getSimpleName());
 		dialog.setCurrentAction(action);
 
 		jobPerforming++;
@@ -49,8 +49,8 @@ public class WorkLoadIndicator {
 		}
 	}
 
-	public void actionFinished() {
-		LOGGER.debug("action finished");
+	public void actionFinished(DiskAction action) {
+		LOGGER.debug("action finished " + action.getClass().getSimpleName());
 
 		jobPerforming--;
 		startSetInvisible();

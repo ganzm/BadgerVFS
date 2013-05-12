@@ -18,11 +18,12 @@ public class DiskWorkerController extends WorkerController {
 	}
 
 	public void enqueue(final DiskAction action) {
-		workLoadIndicator.jobEnqueued(action);
+		workLoadIndicator.actionEnqueued(action);
 		super.enqueue(action);
 	}
 
 	public void enqueueBlocking(final DiskAction action, final boolean rethrowException) throws InterruptedException, VFSException {
+		workLoadIndicator.actionEnqueued(action);
 		super.enqueueBlocking(action, rethrowException);
 	}
 
@@ -38,7 +39,7 @@ public class DiskWorkerController extends WorkerController {
 			try {
 				action.runDiskAction(diskManager);
 			} finally {
-				workLoadIndicator.actionFinished();
+				workLoadIndicator.actionFinished(action);
 			}
 			LOGGER.info("Finished Action " + action);
 			actionFinished(action);
