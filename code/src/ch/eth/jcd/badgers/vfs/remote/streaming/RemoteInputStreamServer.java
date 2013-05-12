@@ -8,6 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 public class RemoteInputStreamServer implements Readable {
 
 	private final InputStream in;
+	private boolean alreadyUnexported = false;
 
 	public RemoteInputStreamServer(final InputStream in) {
 		this.in = in;
@@ -35,7 +36,12 @@ public class RemoteInputStreamServer implements Readable {
 		try {
 			in.close();
 		} finally {
-			UnicastRemoteObject.unexportObject(this, true);
+			// we have to check this, because otherwise we get RMI exceptions,
+			// that the "source" object cannot be found in registry
+			if (!alreadyUnexported) {
+				UnicastRemoteObject.unexportObject(this, true);
+				alreadyUnexported = true;
+			}
 		}
 	}
 
