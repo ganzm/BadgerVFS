@@ -179,9 +179,9 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 				btnOk.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						createDisk();
-						dispose();
-
+						if (createDisk()) {
+							dispose();
+						}
 					}
 
 				});
@@ -212,12 +212,29 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 		txtPath.setText(home + File.separator + DEFAULT_FILE_NAME);
 	}
 
-	private void createDisk() {
+	private boolean createDisk() {
 		try {
+			int minMaxFileSize = 30;
+
+			String hostFilePath = txtPath.getText();
+			long maxSizeMb = Long.parseLong(txtMaximumSize.getText());
+			long maxSizeInBytes = 1024 * 1024 * maxSizeMb;
+
+			// validation
+			if (new File(hostFilePath).exists()) {
+				SwingUtil.showWarning(this, "File " + hostFilePath + " already exists");
+				return false;
+			}
+
+			if (maxSizeMb < minMaxFileSize && maxSizeMb > 0) {
+				SwingUtil.showWarning(this, "Expected maximum size to be a number bigger than " + minMaxFileSize + " or -1");
+				return false;
+			}
+
 			LOGGER.info("Create Disk");
 
 			final DiskConfiguration config = new DiskConfiguration();
-			config.setMaximumSize(1024 * 1024 * Long.parseLong(txtMaximumSize.getText()));
+			config.setMaximumSize(maxSizeInBytes);
 
 			final Compression compression = (Compression) cboCompression.getSelectedItem();
 			final Encryption encryption = (Encryption) cboEncryption.getSelectedItem();
@@ -225,11 +242,13 @@ public class NewDiskCreationDialog extends JDialog implements BadgerViewBase {
 			config.setCompressionAlgorithm(compression);
 			config.setEncryptionAlgorithm(encryption);
 
-			config.setHostFilePath(txtPath.getText());
+			config.setHostFilePath(hostFilePath);
 
 			ownerController.createDisk(config);
+			return true;
 		} catch (final VFSException e) {
 			SwingUtil.handleException(this, e);
+			return false;
 		}
 	}
 
