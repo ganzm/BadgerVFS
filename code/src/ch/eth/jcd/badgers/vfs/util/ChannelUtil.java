@@ -25,17 +25,25 @@ public final class ChannelUtil {
 	 * @throws IOException
 	 */
 	public static void fastStreamCopy(final InputStream input, final OutputStream output) throws IOException {
+		ReadableByteChannel inputChannel = null;
+		WritableByteChannel outputChannel = null;
 
-		// get an channel from the stream
-		final ReadableByteChannel inputChannel = Channels.newChannel(input);
-		final WritableByteChannel outputChannel = Channels.newChannel(output);
-		// copy the channels
-		ChannelUtil.fastChannelCopy(inputChannel, outputChannel);
-		// closing the channels
-		inputChannel.close();
-		outputChannel.close();
-		// input.close();
-		// output.close();
+		try {
+			// get an channel from the stream
+			inputChannel = Channels.newChannel(input);
+			outputChannel = Channels.newChannel(output);
+			// copy the channels
+			ChannelUtil.fastChannelCopy(inputChannel, outputChannel);
+		} finally {
+			// closing the channels
+			if (inputChannel != null) {
+				inputChannel.close();
+			}
+
+			if (outputChannel != null) {
+				outputChannel.close();
+			}
+		}
 	}
 
 	/**
