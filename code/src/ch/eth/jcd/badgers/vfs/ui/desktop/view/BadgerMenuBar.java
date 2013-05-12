@@ -343,7 +343,7 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmWorkOffline.setEnabled(diskMode && isConnected);
 		mntmConnect.setEnabled(diskMode && !isConnected && isDiskLinked);
 		mntmDiskInfo.setEnabled(diskMode);
-		mntmWorkOffline.setEnabled(diskMode);
+		mntmWorkOffline.setEnabled(diskMode && isConnected && isDiskLinked);
 		btnSearch.setEnabled(diskMode && !searching);
 		btnSync.setEnabled(diskMode && isConnected);
 	}
