@@ -37,10 +37,16 @@ public class DownloadRemoteChangesAction extends DiskAction {
 	public void runDiskAction(VFSDiskManager diskManager) throws VFSException {
 		long lastSeenServerVersion = diskManager.getServerVersion();
 
-		List<Journal> journals = revertLocalChanges(diskManager);
 		try {
 			// apply changes from server
 			List<Journal> toUpdate = remoteManager.getVersionDelta(lastSeenServerVersion);
+
+			if (toUpdate == null || toUpdate.size() == 0) {
+				return;
+			}
+
+			List<Journal> journals = revertLocalChanges(diskManager);
+
 			for (Journal j : toUpdate) {
 				try {
 					j.replay(diskManager);
