@@ -270,10 +270,20 @@ public class VFSJournalingImpl implements VFSJournaling {
 			String newJournalName = versionToJournalFolderName(newJournalNumber);
 
 			VFSPath newJournalPath = journalsFolder.getChildPath(newJournalName);
+			createJournalFolder(newJournalPath);
+			uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
+		} finally {
+			journalingEnabled = journalingEnabledBackupFlag;
+		}
+	}
+
+	private void createJournalFolder(VFSPath newJournalPath) throws VFSException {
+		boolean journalingEnabledBackupFlag = journalingEnabled;
+		journalingEnabled = false;
+		try {
 
 			LOGGER.info("open new Journal on " + newJournalPath.getAbsolutePath());
 			currentJournalFolder = newJournalPath.createDirectory();
-			uncommitedJournalEntries = new ArrayList<JournalItem>(journalItemsToAdd);
 		} finally {
 			journalingEnabled = journalingEnabledBackupFlag;
 		}
