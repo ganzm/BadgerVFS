@@ -19,6 +19,7 @@ import ch.eth.jcd.badgers.vfs.core.journaling.items.MoveToItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.RenameEntryItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSDuplicatedEntryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.exception.VFSOutOfMemoryException;
 import ch.eth.jcd.badgers.vfs.exception.VFSRuntimeException;
 
 public abstract class VFSEntryImpl implements VFSEntry {
@@ -104,8 +105,7 @@ public abstract class VFSEntryImpl implements VFSEntry {
 		try {
 			dataBlock = diskManager.getDataSectionHandler().allocateNewDataBlock(true);
 			return createNewFile(diskManager, vfsPath, dataBlock.getLocation());
-		} catch (IOException ex) {
-
+		} catch (IOException | VFSOutOfMemoryException ex) {
 			if (dataBlock != null) {
 				diskManager.getDataSectionHandler().freeDataBlock(dataBlock);
 			}
