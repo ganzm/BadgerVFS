@@ -133,8 +133,6 @@ public interface VFSDiskManager {
 	 */
 	UUID getDiskId();
 
-	void persistServerJournal(Journal journal) throws VFSException;
-
 	VFSJournaling getJournaling();
 
 	/**

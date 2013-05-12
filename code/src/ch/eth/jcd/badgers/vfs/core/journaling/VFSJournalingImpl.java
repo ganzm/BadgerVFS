@@ -21,6 +21,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSEntry;
 import ch.eth.jcd.badgers.vfs.core.interfaces.VFSPath;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateDirectoryItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.CreateFileItem;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.DeleteEntryItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.core.journaling.items.ModifyFileItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
@@ -180,12 +181,64 @@ public class VFSJournalingImpl implements VFSJournaling {
 			if (uncommitedJournalEntries == null) {
 				openNewJournal(false);
 			}
+
+			if (journalEntry instanceof DeleteEntryItem) {
+				optimizeUncommitedJournalEntries((DeleteEntryItem) journalEntry);
+			}
+
 			uncommitedJournalEntries.add(journalEntry);
 			journalEntry.onJournalAdd(this);
 		} else {
 			if (LOGGER.isTraceEnabled()) {
 				LOGGER.trace("Journaling disabled -  drop " + journalEntry);
 			}
+		}
+	}
+
+	/**
+	 * Optimizes the history of uncommited journal entries by deleting content of files which are created and deleted.
+	 * 
+	 * This code is needed when reverting a file which does not fit to a disk (size constraints)
+	 * 
+	 * @param journalEntry
+	 * @throws VFSException
+	 */
+	private void optimizeUncommitedJournalEntries(DeleteEntryItem deleteEntryItem) throws VFSException {
+		String toDeleteEntry = deleteEntryItem.getAbsolutePath();
+
+		List<ModifyFileItem> toDeleteItems = new ArrayList<>();
+		for (JournalItem item : uncommitedJournalEntries) {
+			if (item instanceof ModifyFileItem) {
+				ModifyFileItem modifyItem = (ModifyFileItem) item;
+				if (modifyItem.getAbsoluteFilePath().equals(toDeleteEntry)) {
+					// found a ModifyFileItem for the same file we want to delete now
+					toDeleteItems.add(modifyItem);
+				}
+			}
+		}
+
+		boolean journalingEnabledBackupFlag = journalingEnabled;
+		journalingEnabled = false;
+		try {
+			for (ModifyFileItem toDelete : toDeleteItems) {
+				String journalPathString = toDelete.getJournalPathString();
+				VFSPath journalPath = diskManager.createPath(journalPathString);
+				VFSPath userPath = diskManager.createPath(toDelete.getAbsoluteFilePath());
+
+				// delete journal reference
+				journalPath.getVFSEntry().delete();
+
+				try {
+					// truncate file
+					userPath.getVFSEntry().getOutputStream(VFSEntry.WRITE_MODE_OVERRIDE).close();
+				} catch (IOException e) {
+					LOGGER.error("", e);
+				}
+
+				uncommitedJournalEntries.remove(toDelete);
+			}
+		} finally {
+			journalingEnabled = journalingEnabledBackupFlag;
 		}
 	}
 
@@ -277,6 +330,7 @@ public class VFSJournalingImpl implements VFSJournaling {
 
 	@Override
 	public VFSPath copyFileToJournal(String absolutePath) throws VFSException {
+		LOGGER.debug("copyFileToJournal " + absolutePath);
 		boolean journalingEnabledBackupFlag = journalingEnabled;
 		journalingEnabled = false;
 		try {

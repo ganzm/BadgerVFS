@@ -157,4 +157,12 @@ public class ModifyFileItem extends JournalItem {
 		beforeLocalTransport(diskManager);
 		doReplay(diskManager);
 	}
+
+	public String getAbsoluteFilePath() {
+		return absoluteFilePath;
+	}
+
+	public String getJournalPathString() {
+		return journalPathString;
+	}
 }

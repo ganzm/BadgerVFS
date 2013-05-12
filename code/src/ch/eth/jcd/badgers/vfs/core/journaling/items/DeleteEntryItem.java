@@ -67,4 +67,8 @@ public class DeleteEntryItem extends JournalItem {
 
 		doReplay(diskManager);
 	}
+
+	public String getAbsolutePath() {
+		return absolutePath;
+	}
 }

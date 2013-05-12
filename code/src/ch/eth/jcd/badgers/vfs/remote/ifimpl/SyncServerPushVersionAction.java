@@ -8,6 +8,7 @@ import ch.eth.jcd.badgers.vfs.core.interfaces.VFSDiskManager;
 import ch.eth.jcd.badgers.vfs.core.journaling.ClientVersion;
 import ch.eth.jcd.badgers.vfs.core.journaling.Journal;
 import ch.eth.jcd.badgers.vfs.core.journaling.VFSJournaling;
+import ch.eth.jcd.badgers.vfs.core.journaling.items.JournalItem;
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
 import ch.eth.jcd.badgers.vfs.remote.model.PushVersionResult;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.disk.DiskAction;
@@ -43,14 +44,24 @@ public class SyncServerPushVersionAction extends DiskAction {
 		VFSJournaling journaling = diskManager.getJournaling();
 
 		try {
+			long newServerVersion = serverVersion;
 			List<Journal> journals = clientVersion.getJournals();
 			for (Journal journal : journals) {
 				journaling.openNewJournal(false);
-				journal.replay(diskManager);
-				diskManager.persistServerJournal(journal);
+
+				for (JournalItem entry : journal.getJournalEntries()) {
+					journaling.addJournalItem(entry);
+					entry.replay(diskManager);
+				}
+
+				// save the journal
+				journaling.closeJournal();
+
+				// set new version
+				newServerVersion = diskManager.getServerVersion() + 1;
+				diskManager.setServerVersion(newServerVersion);
 			}
 
-			long newServerVersion = diskManager.getServerVersion();
 			result = new PushVersionResult(true, newServerVersion);
 		} catch (VFSException ex) {
 			LOGGER.error("Error while pushing Version", ex);

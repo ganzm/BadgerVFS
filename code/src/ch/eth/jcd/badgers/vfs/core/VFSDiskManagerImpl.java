@@ -449,18 +449,6 @@ public final class VFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public void persistServerJournal(Journal journal) throws VFSException {
-		for (JournalItem journalEntry : journal.getJournalEntries()) {
-			journaling.addJournalItem(journalEntry);
-		}
-
-		journaling.closeJournal();
-
-		long serverVersion = getServerVersion() + 1;
-		headerSectionHandler.setlinkedHostVersion(virtualDiskFile, serverVersion);
-	}
-
-	@Override
 	public VFSJournaling getJournaling() {
 		return journaling;
 	}

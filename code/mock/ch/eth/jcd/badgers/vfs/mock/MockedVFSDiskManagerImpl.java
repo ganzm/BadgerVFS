@@ -182,11 +182,6 @@ public final class MockedVFSDiskManagerImpl implements VFSDiskManager {
 	}
 
 	@Override
-	public void persistServerJournal(Journal journal) {
-		throw new UnsupportedOperationException(TODO);
-	}
-
-	@Override
 	public VFSJournaling getJournaling() {
 		return new VFSDisabledJournaling();
 	}
