@@ -26,6 +26,8 @@ public class LinkCurrentDiskAction extends DiskAction {
 		Journal journal = diskManager.linkDisk(hostLink);
 		diskConfig = diskManager.getDiskConfiguration();
 
+		journal.beforeRmiTransport(diskManager);
+
 		manager.linkNewDisk(diskConfig, journal, actionObserver);
 	}
 
