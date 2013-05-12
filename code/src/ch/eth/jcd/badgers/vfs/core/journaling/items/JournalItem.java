@@ -84,7 +84,6 @@ public abstract class JournalItem implements Serializable {
 
 		if (!currentPath.equals(absolutePath)) {
 			conflicts.add(new PathConflict(absolutePath, currentPath));
-			absolutePath = currentPath;
 		}
 
 		return path;
