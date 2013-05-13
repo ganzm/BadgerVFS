@@ -21,6 +21,7 @@ public class LoginRemoteInterfaceImpl implements LoginRemoteInterface {
 	private final ServerRemoteInterfaceManager ifManager;
 
 	public LoginRemoteInterfaceImpl(final ServerRemoteInterfaceManager ifManager) {
+		LOGGER.info("Instantiate LoginRemoteInterfaceImpl");
 		this.ifManager = ifManager;
 	}
 
