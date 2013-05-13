@@ -30,19 +30,19 @@ public class DataBlockCache {
 	}
 
 	public void markOccupied(long dataBlockLocation) {
-		LOGGER.debug("Mark Occupied Block " + dataBlockLocation);
+		LOGGER.trace("Mark Occupied Block " + dataBlockLocation);
 		markBlock(dataBlockLocation, DataBlockCacheEntryState.OCCUPIED);
 		mergeBlocks();
 	}
 
 	public void markFree(long dataBlockLocation) {
-		LOGGER.debug("Mark Free Block " + dataBlockLocation);
+		LOGGER.trace("Mark Free Block " + dataBlockLocation);
 		markBlock(dataBlockLocation, DataBlockCacheEntryState.FREE);
 		mergeBlocks();
 	}
 
 	public void addFreeBlocks(long firstBlockLocation, long lastBlockLocation) {
-		LOGGER.debug("Add Free Blocks from " + firstBlockLocation + " to " + lastBlockLocation);
+		LOGGER.trace("Add Free Blocks from " + firstBlockLocation + " to " + lastBlockLocation);
 		cache.add(new DataBlockCacheEntry(firstBlockLocation, lastBlockLocation, DataBlockCacheEntryState.FREE));
 	}
 
