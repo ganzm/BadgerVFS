@@ -19,6 +19,8 @@ import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.ui.desktop.Initialisation;
 
 public class SynchronisationServer {
+	private static final String JAVA_RMI_SERVER_HOSTNAME = "java.rmi.server.hostname";
+
 	private static final Logger LOGGER = Logger.getLogger(SynchronisationServer.class);
 
 	private final ServerRemoteInterfaceManager ifManager;
@@ -55,6 +57,9 @@ public class SynchronisationServer {
 		logMyIps();
 
 		final ServerConfiguration config = Initialisation.parseServerConfiguration(args);
+
+		handleRmiServerHostName(args);
+
 		final SynchronisationServer server = new SynchronisationServer(config);
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -82,6 +87,39 @@ public class SynchronisationServer {
 			LOGGER.equals("error reading input");
 		}
 
+	}
+
+	private static void handleRmiServerHostName(final String[] args) {
+		String rmiHost = Initialisation.getCommandLineArgumentValue(args, "-host");
+		if (rmiHost == null || rmiHost.isEmpty()) {
+			LOGGER.warn("Missing start parameter -host <RMI Host>");
+			rmiHost = System.getProperty(JAVA_RMI_SERVER_HOSTNAME, rmiHost);
+			if (rmiHost == null) {
+				rmiHost = getDefaultHostName();
+				System.setProperty(JAVA_RMI_SERVER_HOSTNAME, rmiHost);
+			}
+			LOGGER.warn("Assume as host name " + rmiHost);
+		} else {
+			System.setProperty(JAVA_RMI_SERVER_HOSTNAME, rmiHost);
+		}
+	}
+
+	private static String getDefaultHostName() {
+		try {
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface iface = interfaces.nextElement();
+				Enumeration<InetAddress> addresses = iface.getInetAddresses();
+				if (addresses.hasMoreElements()) {
+					InetAddress addr = addresses.nextElement();
+					return addr.getHostAddress();
+				}
+			}
+		} catch (SocketException e) {
+			LOGGER.error("", e);
+		}
+
+		return null;
 	}
 
 	private static void logMyIps() {

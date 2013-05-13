@@ -14,8 +14,10 @@ public class Initialisation {
 
 	private static final Logger LOGGER = Logger.getLogger(Initialisation.class);
 
-	public static final String HELP_MESSAGE_SYNC_SERVER = "usage:\n" + "-cc\t\tClear configuration: deletes all server side data\n"
-			+ "-c [path]\tfolder where the synchronisation server puts it's data\n" + "-l [log4j.xml]\tpath to the Log4J configuration file to use\n";
+	public static final String HELP_MESSAGE_SYNC_SERVER = "usage:\n"
+			+ "-host\t\tHost name or IP of the network interface where we want to listen to incoming RMI connections\n"
+			+ "-cc\t\tClear configuration: deletes all server side data\n" + "-c [path]\tfolder where the synchronisation server puts it's data\n"
+			+ "-l [log4j.xml]\tpath to the Log4J configuration file to use\n";
 
 	public static void initLog4J(final String[] args) {
 		String log4JConfigurationPathFromConsole = null;
