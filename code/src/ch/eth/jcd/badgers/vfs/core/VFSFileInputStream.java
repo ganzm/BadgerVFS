@@ -47,30 +47,48 @@ public class VFSFileInputStream extends InputStream {
 	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
 		try {
-			long bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
-
-			while (bytesLeftOnThisBlock <= 0) {
-				long nextBlockLocation = currentDataBlock.getNextDataBlock();
-
-				if (nextBlockLocation == 0) {
-					// no more DataBlocks
-					// EOF
-					return -1;
-				} else {
-					bytesLeftOnThisBlock = skipBlock(nextBlockLocation);
+			int totalBytes = 0;
+			while (totalBytes < len) {
+				int numBytes = readBlock(b, off + totalBytes, len - totalBytes);
+				if (numBytes < 0) {
+					if (totalBytes == 0) {
+						// couldn't read anything
+						return -1;
+					}
+					return totalBytes;
 				}
+
+				totalBytes += numBytes;
 
 			}
 
-			int numBytesToRead = Math.min(len, (int) bytesLeftOnThisBlock);
-			int numBytes = dataSectionHandler.read(currentPosition, b, off, numBytesToRead);
-
-			currentPosition += numBytes;
-
-			return numBytes;
+			return totalBytes;
 		} catch (VFSException ex) {
 			throw new IOException(ex);
 		}
+	}
+
+	private int readBlock(byte[] b, int off, int len) throws VFSException, IOException {
+		long bytesLeftOnThisBlock = currentDataBlock.getDataLenght() + currentDataBlock.getUserDataLocation() - currentPosition;
+
+		while (bytesLeftOnThisBlock <= 0) {
+			long nextBlockLocation = currentDataBlock.getNextDataBlock();
+
+			if (nextBlockLocation == 0) {
+				// no more DataBlocks
+				// EOF
+				return -1;
+			} else {
+				bytesLeftOnThisBlock = skipBlock(nextBlockLocation);
+			}
+		}
+
+		int numBytesToRead = Math.min(len, (int) bytesLeftOnThisBlock);
+		int numBytes = dataSectionHandler.read(currentPosition, b, off, numBytesToRead);
+
+		currentPosition += numBytes;
+
+		return numBytes;
 	}
 
 	private long skipBlock(long nextBlockLocation) throws VFSException {
