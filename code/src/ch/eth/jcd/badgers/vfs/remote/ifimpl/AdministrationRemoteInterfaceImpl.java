@@ -74,13 +74,14 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		diskManager.replayInitialJournal(journal);
 
+		ActiveClientLink activeClientLink = ifManager.getActiveClientLink(this);
 		final DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager, new WorkLoadIndicatorPassive());
-		clientLink.setDiskWorkerController(diskWorkerController);
+		activeClientLink.getClientLink().setDiskWorkerController(diskWorkerController);
+
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 		ifManager.addActiveDiskRemoteInterfaceImpls(obj.getId(), obj);
-		ActiveClientLink activeClientLink = new ActiveClientLink(clientLink);
-		ifManager.addActiveClientLink(activeClientLink);
+
 		return stub;
 	}
 

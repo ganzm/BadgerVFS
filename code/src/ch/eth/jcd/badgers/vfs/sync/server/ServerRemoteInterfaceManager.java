@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import ch.eth.jcd.badgers.vfs.exception.VFSException;
+import ch.eth.jcd.badgers.vfs.remote.ifimpl.AdministrationRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.ifimpl.DiskRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.ifimpl.LoginRemoteInterfaceImpl;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.LoginRemoteInterface;
@@ -93,5 +94,14 @@ public class ServerRemoteInterfaceManager {
 
 	public void addActiveDiskRemoteInterfaceImpls(UUID uuid, DiskRemoteInterfaceImpl drii) {
 		activeDiskRemoteInterfaceImpls.put(uuid, drii);
+	}
+
+	public ActiveClientLink getActiveClientLink(AdministrationRemoteInterfaceImpl administrationRemoteInterfaceImpl) {
+		for (ActiveClientLink activeLink : activeClientLinks) {
+			if (activeLink.getRemoteifImpl() == administrationRemoteInterfaceImpl) {
+				return activeLink;
+			}
+		}
+		return null;
 	}
 }
