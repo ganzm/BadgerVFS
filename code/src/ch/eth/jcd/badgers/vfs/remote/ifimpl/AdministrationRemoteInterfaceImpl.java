@@ -58,6 +58,7 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		diskConfiguration.setCompressionAlgorithm(Compression.NONE);
 		diskConfiguration.setEncryptionAlgorithm(Encryption.NONE);
 		diskConfiguration.setHostFilePath(createDiskPathFromUUID(linkedDisk.getId()));
+		diskConfiguration.setDiskId(linkedDisk.getId());
 		diskConfiguration.setMaximumSize(-1);
 
 		// override diskConfiguration
@@ -78,7 +79,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
 		final DiskRemoteInterface stub = (DiskRemoteInterface) UnicastRemoteObject.exportObject(obj, 0);
 		ifManager.addActiveDiskRemoteInterfaceImpls(obj.getId(), obj);
-
+		ActiveClientLink activeClientLink = new ActiveClientLink(clientLink);
+		ifManager.addActiveClientLink(activeClientLink);
 		return stub;
 	}
 
