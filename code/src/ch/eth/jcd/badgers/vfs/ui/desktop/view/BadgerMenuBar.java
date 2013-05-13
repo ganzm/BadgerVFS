@@ -41,6 +41,7 @@ public class BadgerMenuBar extends JMenuBar {
 	private final JMenuItem mntmWorkOffline;
 	private final JMenuItem mntmConnect;
 	private final JMenuItem mntmClose;
+	private final JMenuItem mntmDispose;
 	private final JMenuItem mntmPaste;
 	private final JMenuItem mntmDiskInfo;
 	private final JButton btnSearch;
@@ -73,6 +74,10 @@ public class BadgerMenuBar extends JMenuBar {
 		mntmClose = createCloseMenuItem(parent);
 
 		mnDisk.add(mntmClose);
+
+		mntmDispose = createDisposeMenuItem(parent);
+
+		mnDisk.add(mntmDispose);
 
 		mnDisk.addSeparator();
 
@@ -284,6 +289,21 @@ public class BadgerMenuBar extends JMenuBar {
 		});
 	}
 
+	private JMenuItem createDisposeMenuItem(final BadgerMainFrame parent) {
+		return new JMenuItem(new AbstractAction("Dispose") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					parent.getController().disposeDisk();
+					// if we open/create another disk the Browser Panel is shown
+					parent.showCardLayoutPanel(BadgerMainFrame.BROWSE_PANEL_NAME);
+				} catch (final VFSException ex) {
+					SwingUtil.handleException(parent, ex);
+				}
+			}
+		});
+	}
+
 	private JMenuItem createOpenMenuItem(final BadgerMainFrame parent) {
 		return new JMenuItem(new AbstractAction("Open") {
 			@Override
@@ -336,6 +356,7 @@ public class BadgerMenuBar extends JMenuBar {
 	public void update(final boolean diskMode, final boolean searching, boolean isConnected, boolean isDiskLinked) {
 		mnActions.setEnabled(diskMode && !searching);
 		mntmClose.setEnabled(diskMode);
+		mntmDispose.setEnabled(diskMode);
 		mntmNew.setEnabled(!diskMode);
 		mntmOpen.setEnabled(!diskMode);
 		mntmConnectRemote.setEnabled(!diskMode);

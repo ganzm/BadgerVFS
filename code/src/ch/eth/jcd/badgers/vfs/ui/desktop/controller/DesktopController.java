@@ -165,6 +165,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 
 			@Override
 			public void onActionFinished(final AbstractBadgerAction action) {
+				startSynchronization();
 				updateGUI();
 			}
 		};
@@ -180,6 +181,7 @@ public class DesktopController extends BadgerController implements ConnectionSta
 				remoteManager = wizardContext.getRemoteManager();
 				remoteManager.setServerVersionChangedListener(getThis());
 				updateGUI();
+				startSynchronization();
 			}
 		};
 		final LinkCurrentDiskAction action = new LinkCurrentDiskAction(handler, wizardContext.getRemoteManager());
@@ -337,6 +339,29 @@ public class DesktopController extends BadgerController implements ConnectionSta
 			remoteManager.removeConnectionStateListener(this);
 			remoteManager.startCloseDisk();
 		}
+		updateGUI();
+	}
+
+	/**
+	 * You have clicked on the Disk / Close menu item
+	 * 
+	 * @param desktopFrame
+	 * @throws VFSException
+	 */
+	public void disposeDisk() throws VFSException {
+		if (isInManagementMode()) {
+			throw new VFSException("Cannot close new Disk - no current disk opened");
+		}
+		VFSDiskManager manager = workerController.getDiskManager();
+		workerController.dispose();
+		workerController = null;
+		if (remoteManager != null) {
+			remoteManager.removeConnectionStateListener(this);
+			remoteManager.startCloseDisk();
+			remoteManager.logout();
+			remoteManager.dispose();
+		}
+		manager.dispose();
 		updateGUI();
 	}
 
