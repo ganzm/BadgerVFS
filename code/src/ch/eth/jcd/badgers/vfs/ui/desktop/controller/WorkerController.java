@@ -22,13 +22,17 @@ public abstract class WorkerController implements Runnable {
 
 	private boolean running = false;
 
+	private final Thread controllerThread = new Thread(this);
+
 	public boolean isRunning() {
 		return running;
 	}
 
 	public void startWorkerController() {
-		final Thread controllerThread = new Thread(this);
-		controllerThread.setName(this.getClass().getSimpleName());
+		String threadName = this.getClass().getSimpleName();
+		controllerThread.setName(threadName);
+
+		LOGGER.info("Starting WorkerController " + threadName);
 		controllerThread.start();
 	}
 

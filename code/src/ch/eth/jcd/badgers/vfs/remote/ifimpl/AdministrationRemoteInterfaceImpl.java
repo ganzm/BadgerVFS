@@ -76,6 +76,8 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 		ActiveClientLink activeClientLink = ifManager.getActiveClientLink(this);
 		final DiskWorkerController diskWorkerController = new DiskWorkerController(diskManager, new WorkLoadIndicatorPassive());
+		diskWorkerController.startWorkerController();
+
 		activeClientLink.getClientLink().setDiskWorkerController(diskWorkerController);
 
 		final DiskRemoteInterfaceImpl obj = new DiskRemoteInterfaceImpl(diskWorkerController);
@@ -111,7 +113,9 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 			final VFSDiskManagerFactory factory = VFSDiskManagerImplFactory.getInstance();
 			VFSDiskManager diskManager = factory.openDiskManager(diskConfig);
+
 			workerController = new DiskWorkerController(diskManager, new WorkLoadIndicatorPassive());
+			workerController.startWorkerController();
 		}
 
 		clientLink.setDiskWorkerController(workerController);

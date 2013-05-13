@@ -39,7 +39,6 @@ public class DiskRemoteInterfaceImpl implements DiskRemoteInterface {
 
 	public DiskRemoteInterfaceImpl(final DiskWorkerController diskWorkerController) throws VFSException {
 		this.diskWorkerController = diskWorkerController;
-		diskWorkerController.startWorkerController();
 		this.id = UUID.randomUUID();
 	}
 
