@@ -41,7 +41,7 @@ public class DownloadRemoteChangesAction extends DiskAction {
 			// apply changes from server
 			List<Journal> toUpdate = remoteManager.getVersionDelta(lastSeenServerVersion);
 
-			if (toUpdate == null || toUpdate.size() == 0) {
+			if (toUpdate == null || toUpdate.isEmpty()) {
 				return;
 			}
 

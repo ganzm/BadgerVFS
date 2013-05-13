@@ -68,7 +68,7 @@ public class Initialisation {
 		helpArgs.add("-help");
 		helpArgs.add("-h");
 		if (hasCommandLineArgument(args, helpArgs)) {
-			System.out.println(HELP_MESSAGE_SYNC_SERVER);
+			LOGGER.warn(HELP_MESSAGE_SYNC_SERVER);
 		}
 
 		// -c config folder path flag
