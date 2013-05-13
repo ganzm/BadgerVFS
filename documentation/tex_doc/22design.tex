@@ -134,14 +134,30 @@ one could easily show a file history or even revert to any point in time.
 \end{figure}
 
 \paragraph{Conflict resolution}
-Based on the logical version numbers that are given to each journal the client
-is able to do basic conflict resolution when it detects conflicting changes.
-Files that got new content on the server while they were changed locally will be
-renamed according to following scheme:
-
+Conflict resolution happens on the client side. Whenever a client wants to 
+push local changes to the synchronisation server it transmits its current 
+version number. The version number on the server may be higher because other 
+clients may have already published other changes. Is this the case the client is
+forced to update to the latest version before being able to publish its modifications. Therefore the following steps are taken.
 \begin{enumerate}
-    \item revert local changes
-  \item replay server journal (the client is in sync with server now)
-  \item redo local changes
-  \item push local changes to server
+\item{revert local changes}
+
+ All local changes are reverted on reverse order. The client restores data from the last seen server version.
+ 
+ 
+ \item{download latest server version}
+ 
+ 
+As a next step the local disk is updated to the latest version. 
+
+ \item{restore local changes}
+
+
+Then locally made changes are restored. While restoring these changes the client has to take care about conflicting changes.
+If the client detects a conflicting operation on a file or path name a new unique path name is generated. Any subsequent pending local changes which have to be redone need to consider the renamed path.
+
+ \item{upload local changes to server}
+
+The restored local changes are uploaded to the server.
+
 \end{enumerate}
