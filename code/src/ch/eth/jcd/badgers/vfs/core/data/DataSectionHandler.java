@@ -43,7 +43,7 @@ public final class DataSectionHandler {
 	 */
 	private final long maximumFileSize;
 
-	private static final long BLOCK_INCREMENT = 100;
+	private static final long BLOCK_INCREMENT = 1024;
 
 	/**
 	 * Constructor
