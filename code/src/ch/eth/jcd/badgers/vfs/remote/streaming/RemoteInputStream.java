@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
+/**
+ * Classes in this package are taken from here
+ * 
+ * <a href="http://java.dzone.com/articles/java-io-streams-and-rmi"/> and fixed/adapted to VFS Synchronization Server purposes.
+ */
 public class RemoteInputStream extends InputStream implements Serializable {
 	private static final long serialVersionUID = 4102456704778084627L;
 

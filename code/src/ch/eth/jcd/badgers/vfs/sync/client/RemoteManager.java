@@ -22,7 +22,6 @@ import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CloseLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.ConnectAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.CreateNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.DownloadRemoteChangesRemoteAction;
-import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.GetRemoteLinkedDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LinkNewDiskAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LoginAction;
 import ch.eth.jcd.badgers.vfs.ui.desktop.action.remote.LogoutAction;
@@ -112,15 +111,6 @@ public class RemoteManager implements ActionObserver {
 		}
 		final CreateNewDiskAction newDiskAction = new CreateNewDiskAction(actionObserver, this, diskname);
 		remoteWorkerController.enqueue(newDiskAction);
-		return true;
-	}
-
-	public boolean startGetRemoteLinkedDisk(final String localDiskPath, final UUID diskId, final ActionObserver actionObserver) {
-		if (status != ConnectionStatus.LOGGED_IN) {
-			return false;
-		}
-		final GetRemoteLinkedDiskAction getRemoteDiskAction = new GetRemoteLinkedDiskAction(actionObserver, this, localDiskPath, diskId);
-		remoteWorkerController.enqueue(getRemoteDiskAction);
 		return true;
 	}
 

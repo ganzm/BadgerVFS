@@ -1,9 +1,6 @@
 package ch.eth.jcd.badgers.vfs.remote.ifimpl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -24,14 +21,12 @@ import ch.eth.jcd.badgers.vfs.remote.interfaces.AdministrationRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.interfaces.DiskRemoteInterface;
 import ch.eth.jcd.badgers.vfs.remote.model.ActiveClientLink;
 import ch.eth.jcd.badgers.vfs.remote.model.LinkedDisk;
-import ch.eth.jcd.badgers.vfs.remote.streaming.RemoteOutputStream;
 import ch.eth.jcd.badgers.vfs.sync.server.ClientLink;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerConfiguration;
 import ch.eth.jcd.badgers.vfs.sync.server.ServerRemoteInterfaceManager;
 import ch.eth.jcd.badgers.vfs.sync.server.UserAccount;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.DiskWorkerController;
 import ch.eth.jcd.badgers.vfs.ui.desktop.controller.WorkLoadIndicatorPassive;
-import ch.eth.jcd.badgers.vfs.util.ChannelUtil;
 
 public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteInterface {
 
@@ -163,38 +158,6 @@ public class AdministrationRemoteInterfaceImpl implements AdministrationRemoteIn
 
 	public ClientLink getClientLink() {
 		return clientLink;
-	}
-
-	@Override
-	public void getLinkedDisk(final UUID diskId, final RemoteOutputStream remoteDiskFileContent) throws RemoteException, VFSException {
-		final LinkedDisk disk = clientLink.getUserAccount().getLinkedDiskById(diskId);
-		if (disk == null) {
-			final String errorMsg = "disk with UUID: " + diskId + " does not exists, cannot be fetched";
-			LOGGER.error(errorMsg);
-			throw new VFSException(errorMsg);
-		}
-		final File diskToFetch = new File(disk.getDiskConfig().getHostFilePath());
-		if (!diskToFetch.exists()) {
-			final String errorMsg = "disk with UUID: " + diskId + " does not exists on Server, cannot be fetched";
-			LOGGER.error(errorMsg);
-			throw new VFSException(errorMsg);
-		}
-		InputStream is = null;
-		try {
-			is = new FileInputStream(diskToFetch);
-			ChannelUtil.fastStreamCopy(is, remoteDiskFileContent);
-		} catch (final IOException e) {
-			LOGGER.error("ERROR while fetching disk with UUID: " + diskId + " from Server", e);
-			throw new VFSException("ERROR while fetching disk with UUID: " + diskId + " from Server", e);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (final IOException e) {
-					LOGGER.trace(e);
-				}
-			}
-		}
 	}
 
 	private String createDiskPathFromUUID(final UUID diskId) {
