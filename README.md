@@ -1,5 +1,6 @@
 BadgerVFS
 =========
+Badger Virtual File System
 
 Copyright (c) 2013, Thomas Frick, Matthias Ganz, Philipp Rohr
 All rights reserved.
